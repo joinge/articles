@@ -3,10 +3,12 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview \PeerReviewtrue             % Whether to create the PeerReview version or
+\newif\ifPeerReview \PeerReviewfalse            % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
                                                 % subfolders for graphics etc.
+\newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
+                                                % Place floats at end of document?
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -14,7 +16,7 @@
 
 \ifPeerReview
 \documentclass[12pt,journal,captionsoff,onecolumn]{IEEEtran}
-\newcommand\CLASSINPUTbaselinestretch{1.66}
+\newcommand\CLASSINPUTbaselinestretch{1.66}     % http://theoval.cmp.uea.ac.uk/~nlct/latex/thesis/node17.html
 \else
 \documentclass[journal]{IEEEtran}
 \fi
@@ -56,10 +58,12 @@
    \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}} % be specified.
 \fi
 
+\ifFloatAtEnd
 \ifCLASSOPTIONcaptionsoff                       % Places float at the end of the document when the
   \usepackage[nomarkers]{endfloat}              % captionsoff options is specified to IEEEtrans.cls
   \let\MYoriglatexcaption\caption               % (PeerReview mode)
   \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
+\fi
 \fi
 
 \usepackage{fixltx2e}                           % Fix some twocolumn float problems
@@ -67,172 +71,24 @@
 %\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
                                                 % (double column figures on top/bottom)
 
-% This package may be useful when used in conjunction with IEEEtran.cls'
-% captionsoff option. Some IEEE journals/societies require that submissions
-% have lists of figures/tables at the end of the paper and that
-% figures/tables without any captions are placed on a page by themselves at
-% the end of the document. If needed, the draftcls IEEEtran class option or
-% \CLASSINPUTbaselinestretch interface can be used to increase the line
-% spacing as well. Be sure and use the nomarkers option of endfloat to
-% prevent endfloat from "marking" where the figures would have been placed
-% in the text. The two hack lines of code above are a slight modification of
-% that suggested by in the endfloat docs (section 8.3.1) to ensure that
-% the full captions always appear in the list of figures/tables - even if
-% the user used the short optional argument of \caption[]{}.
-% IEEE papers do not typically make use of \caption[]'s optional argument,
-% so this should not be an issue. A similar trick can be used to disable
-% captions of packages such as subfig.sty that lack options to turn off
-% the subcaptions:
-% For subfig.sty:
-
-% \let\MYorigsubfloat\subfloat
-% \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}}
-
-% For subfigure.sty:
-% \let\MYorigsubfigure\subfigure
-% \renewcommand{\subfigure}[2][\relax]{\MYorigsubfigure[]{#2}}
-% However, the above trick will not work if both optional arguments of
-% the \subfloat/subfig command are used. Furthermore, there needs to be a
-% description of each subfigure *somewhere* and endfloat does not add
-% subfigure captions to its list of figures. Thus, the best approach is to
-% avoid the use of subfigure captions (many IEEE journals avoid them anyway)
-% and instead reference/explain all the subfigures within the main caption.
-% The latest version of endfloat.sty and its documentation can obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/endfloat/
-%
-% The IEEEtran \ifCLASSOPTIONcaptionsoff conditional can also be used
-% later in the document, say, to conditionally put the References on a 
-% page by themselves.
-
-
-
-
-
-% *** PDF, URL AND HYPERLINK PACKAGES ***
-%
-%\usepackage{url}
-% url.sty was written by Donald Arseneau. It provides better support for
-% handling and breaking URLs. url.sty is already installed on most LaTeX
-% systems. The latest version can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/misc/
-% Read the url.sty source comments for usage information. Basically,
-% \url{my_url_here}.
-
-
-% NOTE: PDF thumbnail features are not required in IEEE papers
-%       and their use requires extra complexity and work.
-%\ifCLASSINFOpdf
-%  \usepackage[pdftex]{thumbpdf}
-%\else
-%  \usepackage[dvips]{thumbpdf}
-%\fi
-% thumbpdf.sty and its companion Perl utility were written by Heiko Oberdiek.
-% It allows the user a way to produce PDF documents that contain fancy
-% thumbnail images of each of the pages (which tools like acrobat reader can
-% utilize). This is possible even when using dvi->ps->pdf workflow if the
-% correct thumbpdf driver options are used. thumbpdf.sty incorporates the
-% file containing the PDF thumbnail information (filename.tpm is used with
-% dvips, filename.tpt is used with pdftex, where filename is the base name of
-% your tex document) into the final ps or pdf output document. An external
-% utility, the thumbpdf *Perl script* is needed to make these .tpm or .tpt
-% thumbnail files from a .ps or .pdf version of the document (which obviously
-% does not yet contain pdf thumbnails). Thus, one does a:
-% 
-% thumbpdf filename.pdf 
-%
-% to make a filename.tpt, and:
-%
-% thumbpdf --mode dvips filename.ps
-%
-% to make a filename.tpm which will then be loaded into the document by
-% thumbpdf.sty the NEXT time the document is compiled (by pdflatex or
-% latex->dvips->ps2pdf). Users must be careful to regenerate the .tpt and/or
-% .tpm files if the main document changes and then to recompile the
-% document to incorporate the revised thumbnails to ensure that thumbnails
-% match the actual pages. It is easy to forget to do this!
-% 
-% Unix systems come with a Perl interpreter. However, MS Windows users
-% will usually have to install a Perl interpreter so that the thumbpdf
-% script can be run. The Ghostscript PS/PDF interpreter is also required.
-% See the thumbpdf docs for details. The latest version and documentation
-% can be obtained at.
-% http://www.ctan.org/tex-archive/support/thumbpdf/
-% Be sure and use only version 3.8 (2005/07/06) or later of thumbpdf as
-% earlier versions will not work properly with recent versions of pdfTeX
-% (1.20a and later).
-
+\usepackage{url}                                % Support for handling and breaking URLs
 
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
-% *** IF USING HYPERREF BE SURE AND CHANGE THE EXAMPLE PDF ***
-% *** TITLE/SUBJECT/AUTHOR/KEYWORDS INFO BELOW!!           ***
 \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
 pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
 colorlinks=true,linkcolor={black},citecolor={black},pagecolor={black},
 urlcolor={black},
-pdftitle={Bare Demo of IEEEtran.cls for Computer Society Journals},%<!CHANGE!
-pdfsubject={Typesetting},%<!CHANGE!
-pdfauthor={Michael D. Shell},%<!CHANGE!
-pdfkeywords={Computer Society, IEEEtran, journal, LaTeX, paper,
-             template}}%<^!CHANGE!
-%\ifCLASSINFOpdf
-%\usepackage[\MYhyperrefoptions,pdftex]{hyperref}
-%\else
-%\usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
-%\usepackage{breakurl}
-%\fi
-% One significant drawback of using hyperref under DVI output is that the
-% LaTeX compiler cannot break URLs across lines or pages as can be done
-% under pdfLaTeX's PDF output via the hyperref pdftex driver. This is
-% probably the single most important capability distinction between the
-% DVI and PDF output. Perhaps surprisingly, all the other PDF features
-% (PDF bookmarks, thumbnails, etc.) can be preserved in
-% .tex->.dvi->.ps->.pdf workflow if the respective packages/scripts are
-% loaded/invoked with the correct driver options (dvips, etc.). 
-% As most IEEE papers use URLs sparingly (mainly in the references), this
-% may not be as big an issue as with other publications.
-%
-% That said, recently Vilar Camara Neto introduced his breakurl.sty
-% package which permits hyperref to easily break URLs even in dvi
-% mode. Note that breakurl, unlike most other packages, must be loaded
-% AFTER hyperref. The latest version of breakurl and its documentation can
-% be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/breakurl/
-% breakurl.sty is not for use under pdflatex pdf mode. Versions 1.10 
-% (September 23, 2005) and later are recommened to avoid bugs in earlier
-% releases.
-%
-% The advanced features offer by hyperref.sty are not required for IEEE
-% submission, so users should weigh these features against the added
-% complexity of use. Users who wish to use hyperref *must* ensure that
-% their hyperref version is 6.72u or later *and* IEEEtran.cls is version
-% 1.6b or later.
-% The package options above demonstrate how to enable PDF bookmarks
-% (a type of table of contents viewable in Acrobat Reader) as well as
-% PDF document information (title, subject, author and keywords) that is
-% viewable in Acrobat reader's Document_Properties menu. PDF document
-% information is also used extensively to automate the cataloging of PDF
-% documents. The above set of options ensures that hyperlinks will not be
-% colored in the text and thus will not be visible in the printed page,
-% but will be active on "mouse over". USING COLORS OR OTHER HIGHLIGHTING
-% OF HYPERLINKS CAN RESULT IN DOCUMENT REJECTION BY THE IEEE, especially if
-% these appear on the "printed" page. IF IN DOUBT, ASK THE RELEVANT
-% SUBMISSION EDITOR. You may need to add the option hypertexnames=false if
-% you used duplicate equation numbers, etc., but this should not be needed
-% in normal IEEE work.
-% The latest version of hyperref and its documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/hyperref/
-
-
-
-
-
-% *** Do not adjust lengths that control margins, column widths, etc. ***
-% *** Do not use packages that alter fonts (such as pslatex).         ***
-% There should be no need to do such things with IEEEtran.cls V1.6 and later.
-% (Unless specifically asked to do so by the journal or conference you plan
-% to submit to, of course. )
-
+pdftitle={Low Complexity Adaptive Beamformer for Active Sonar Imaging},
+pdfsubject={},
+pdfauthor={Jo Inge Buskenes},
+pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+\ifCLASSINFOpdf
+   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+\else
+   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
+   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+\fi
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
