@@ -9,7 +9,7 @@
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
-\newif\ifTODO\TODOfalse                         % Use todo notes?
+\newif\ifTODO\TODOtrue                         % Use todo notes?
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -47,6 +47,10 @@
 \RequirePackage[table,dvipsnames,svgnames]{xcolor}
 
 \ifTODO
+   \setlength{\marginparwidth}{1cm}
+%    \setlength{\marginparpush}{1cm}
+   \setlength\textwidth{\columnwidth}
+   \addtolength\marginparsep{1.5cm}
    \definecolor{lightblue}{rgb}{0.8,0.8,1}
    \usepackage[backgroundcolor=LightBlue]{todonotes}
 \else
@@ -115,8 +119,9 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  \RequirePackage{layout}  
 \begin{document}
+\layout
 %
 \title{Low Complexity Adaptive Beamformer\\ for Active Sonar Imaging}
 
@@ -199,7 +204,7 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 
 
-\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.\todo[inline]{break} This is because , as demo file is intended to serve as a ``starter file''
+\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.{\todo{break at something}} This is because , as demo file is intended to serve as a ``starter file''
 for IEEE Computer Society journal papers produced under \LaTeX\ using
 IEEEtran.cls version 1.7 and later.
 % You must have at least 2 lines in the paragraph with the drop letter
