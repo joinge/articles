@@ -49,10 +49,14 @@
 \ifTODO
    \setlength{\marginparwidth}{1cm}
 %    \setlength{\marginparpush}{1cm}
-   \setlength\textwidth{\columnwidth}
-   \addtolength\marginparsep{1.5cm}
-   \definecolor{lightblue}{rgb}{0.8,0.8,1}
-   \usepackage[backgroundcolor=LightBlue]{todonotes}
+%    \setlength\marginpar{1.5cm}
+   \addtolength\marginparsep{0.1cm}
+%    \definecolor{lightblue}{rgb}{0.8,0.8,1}
+%    \newlength\textwidthold
+%    \setlength\textwidthold{\textwidth}
+%    \setlength\textwidth{\columnwidth}
+   \usepackage{./todonotes}
+%    \setlength\textwidth\textwidthold
 \else
    \usepackage[disable]{todonotes} 
 \fi
@@ -204,12 +208,21 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 
 
-\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.{\todo{break at something}} This is because , as demo file is intended to serve as a ``starter file''
+\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.\todo{break at something} This is because , as demo file is intended to serve as a ``starter file''
 for IEEE Computer Society journal papers produced under \LaTeX\ using
 IEEEtran.cls version 1.7 and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA\todo{break at something} is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 
 \hfill mds
  
