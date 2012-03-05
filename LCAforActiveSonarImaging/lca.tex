@@ -95,23 +95,25 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\newcounter{todoidx}
+% \setcounter{todoidx}
+
 \ifTODO
-% \setlength\marginparsep{10pt}
-% \setlength\marginparwidth{20pt}
-% \setlength\marginparpush{25pt}
-% \addtolength\columnwidth{-1cm}
-%    \setlength{\marginparwidth}{0cm}
-%    \setlength{\marginparpush}{1cm}
-%    \setlength\marginpar{1.5cm}
-%    \addtolength\marginparsep{0.5cm}
-%    \definecolor{lightblue}{rgb}{0.8,0.8,1}
-%    \newlength\textwidthold
-%    \setlength\textwidthold{\textwidth}
-%    \setlength\textwidth{\columnwidth}
-   \usepackage{./todonotes}
+   \setlength\marginparsep{3pt}
+   \setlength\marginparwidth{42pt}
+   \newlength\marginparwidthsmall
+   \setlength\marginparwidthsmall{\marginparwidth}
+   \addtolength\marginparwidthsmall{-7pt}
+   \newcommand\todo[1]{%
+      \addtocounter{todoidx}{1}%
+      {\color{Red}\fbox{\bf\thetodoidx{}}}%
+      \marginpar{%
+         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+         \fbox{\colorbox{red}{\parbox{\marginparwidthsmall}{#1}}}}}
 %    \setlength\textwidth\textwidthold
 \else
-   \usepackage[disable]{todonotes} 
+%    \usepackage[disable]{./todonotes} 
+   \newcommand\todo[1]{}
 \fi
 
 
