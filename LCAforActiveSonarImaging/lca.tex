@@ -9,6 +9,7 @@
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
+\newif\ifTODO\TODOtrue                          % Use todo notes?
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -21,9 +22,9 @@
 \documentclass[journal]{IEEEtran}
 \fi
 
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% PACKAGES %
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% IEEE ''APPROVED'' PACKAGES %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % \input{preamble}
 
@@ -89,9 +90,27 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
 \fi
 
-% correct bad hyphenation here
-\hyphenation{op-tical net-works semi-conduc-tor}
+%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% ADDITIONAL PACKAGES %       
+%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\RequirePackage[table,dvipsnames,svgnames]{xcolor}
+
+\ifTODO
+   \definecolor{lightblue}{rgb}{0.8,0.8,1}
+   \usepackage[backgroundcolor=LightBlue]{todonotes}
+\else
+   \usepackage[disable]{todonotes} 
+\fi
+
+
+% correct bad hyphenation here
+% \hyphenation{op-tical net-works semi-conduc-tor}
+
+
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% DOCUMENT START %
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \begin{document}
 %
@@ -110,73 +129,46 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 \markboth{IEEE Journal of Oceanic Engineering}%
 {Low Complexity Adaptive Beamformer for Active Sonar Imaging}
 
-% The publisher's ID mark at the bottom of the page is less important with
-% Computer Society journal papers as those publications place the marks
-% outside of the main text columns and, therefore, unlike regular IEEE
-% journals, the available text space is not reduced by their presence.
-% If you want to put a publisher's ID mark on the page you can do it like
-% this:
+% Publishers ID mark:
 %\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
-% or like this to get the Computer Society new two part style.
-%\IEEEpubid{\makebox[\columnwidth]{\hfill 0000--0000/00/\$00.00~\copyright~2007 IEEE}%
-%\hspace{\columnsep}\makebox[\columnwidth]{Published by the IEEE Computer Society\hfill}}
-% Remember, if you use this you must call \IEEEpubidadjcol in the second
-% column for its text to clear the IEEEpubid mark (Computer Society jorunal
-% papers don't need this extra clearance.)
-
-
 
 % use for special paper notices
 %\IEEEspecialpapernotice{(Invited Paper)}
-
-
 
 % for Computer Society papers, we must declare the abstract and index terms
 % PRIOR to the title within the \IEEEcompsoctitleabstractindextext IEEEtran
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-%\boldmath
-The abstract goes here.
+The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
+
+While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 \end{abstract}
-% IEEEtran.cls defaults to using nonbold math in the Abstract.
-% This preserves the distinction between vectors and scalars. However,
-% if the journal you are submitting to favors bold math in the abstract,
-% then you can use LaTeX's standard command \boldmath at the very start
-% of the abstract to achieve this. Many IEEE journals frown on math
-% in the abstract anyway. In particular, the Computer Society does
-% not want either math or citations to appear in the abstract.
 
-% Note that keywords are not normally used for peerreview papers.
+% Keywords (normally not used for peer reviews)
+\ifPeerReview\else
 \begin{IEEEkeywords}
-Computer Society, IEEEtran, journal, \LaTeX, paper, template.
-\end{IEEEkeywords}}
-
+Beamforming, adaptive beamforming, sonar, active, complexity.
+\end{IEEEkeywords}
+\fi}
+% \fi
 
 % make the title area
 \maketitle
 
-
-% To allow for easy dual compilation without having to reenter the
-% abstract/keywords data, the \IEEEcompsoctitleabstractindextext text will
-% not be used in maketitle, but will appear (i.e., to be "transported")
-% here as \IEEEdisplaynotcompsoctitleabstractindextext when compsoc mode
-% is not selected <OR> if conference mode is selected - because compsoc
-% conference papers position the abstract like regular (non-compsoc)
-% papers do!
+% This command fixes abstract positioning for compsoc articles:
 \IEEEdisplaynotcompsoctitleabstractindextext
-% \IEEEdisplaynotcompsoctitleabstractindextext has no effect when using
-% compsoc under a non-conference mode.
 
-
-% For peer review papers, you can put extra information on the cover
-% page as needed:
+% (Optional) Add some extra info on cover page of peer review papers:
 % \ifCLASSOPTIONpeerreview
 % \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
 % \fi
-%
-% For peerreview papers, this IEEEtran command inserts a page break and
-% creates the second title. It will be ignored for other modes.
+
+% Insert page break and insert second title (peer review mode)
 \IEEEpeerreviewmaketitle
 
 
@@ -203,22 +195,7 @@ Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 
 
 
-% The very first letter is a 2 line initial drop letter followed
-% by the rest of the first word in caps (small caps for compsoc).
-% 
-% form to use if the first word consists of a single letter:
-% \IEEEPARstart{A}{demo} file is ....
-% 
-% form to use if you need the single drop letter followed by
-% normal text (unknown if ever used by IEEE):
-% \IEEEPARstart{A}{}demo file is ....
-% 
-% Some journals put the first two words in caps:
-% \IEEEPARstart{T}{his demo} file is ....
-% 
-% Here we have the typical use of a "T" for an initial drop letter
-% and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
+\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.\todo[inline]{break} This is because , as demo file is intended to serve as a ``starter file''
 for IEEE Computer Society journal papers produced under \LaTeX\ using
 IEEEtran.cls version 1.7 and later.
 % You must have at least 2 lines in the paragraph with the drop letter
