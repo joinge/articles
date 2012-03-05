@@ -9,7 +9,7 @@
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
-\newif\ifTODO\TODOtrue                         % Use todo notes?
+\newif\ifTODO\TODOtrue                        % Use todo notes?
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -28,10 +28,7 @@
 % IEEE ''APPROVED'' PACKAGES %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% \input{preamble}
 
-% *** GRAPHICS RELATED PACKAGES ***
-%
 \ifCLASSINFOpdf
    \usepackage[dvips]{graphicx}                 % Might not work. Use 'latex' instead of 
    \ifFlatArchive\else                          % 'pdflatex'
@@ -45,21 +42,6 @@
 \fi
 
 \RequirePackage[table,dvipsnames,svgnames]{xcolor}
-
-\ifTODO
-   \setlength{\marginparwidth}{1cm}
-%    \setlength{\marginparpush}{1cm}
-%    \setlength\marginpar{1.5cm}
-   \addtolength\marginparsep{0.1cm}
-%    \definecolor{lightblue}{rgb}{0.8,0.8,1}
-%    \newlength\textwidthold
-%    \setlength\textwidthold{\textwidth}
-%    \setlength\textwidth{\columnwidth}
-   \usepackage{./todonotes}
-%    \setlength\textwidth\textwidthold
-\else
-   \usepackage[disable]{todonotes} 
-\fi
 
 \usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
 \interdisplaylinepenalty=2500                   % Allows multiline equations to be broken
@@ -113,7 +95,24 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+\ifTODO
+% \setlength\marginparsep{10pt}
+% \setlength\marginparwidth{20pt}
+% \setlength\marginparpush{25pt}
+% \addtolength\columnwidth{-1cm}
+%    \setlength{\marginparwidth}{0cm}
+%    \setlength{\marginparpush}{1cm}
+%    \setlength\marginpar{1.5cm}
+%    \addtolength\marginparsep{0.5cm}
+%    \definecolor{lightblue}{rgb}{0.8,0.8,1}
+%    \newlength\textwidthold
+%    \setlength\textwidthold{\textwidth}
+%    \setlength\textwidth{\columnwidth}
+   \usepackage{./todonotes}
+%    \setlength\textwidth\textwidthold
+\else
+   \usepackage[disable]{todonotes} 
+\fi
 
 
 % correct bad hyphenation here
