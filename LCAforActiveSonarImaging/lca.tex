@@ -3,13 +3,13 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview \PeerReviewfalse            % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewfalse             % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
-\newif\ifTODO\TODOtrue                          % Use todo notes?
+\newif\ifTODO\TODOfalse                         % Use todo notes?
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -21,6 +21,8 @@
 \else
 \documentclass[journal]{IEEEtran}
 \fi
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEE ''APPROVED'' PACKAGES %
@@ -40,6 +42,15 @@
    \ifFlatArchive\else
       \graphicspath{./gfx/}
    \fi
+\fi
+
+\RequirePackage[table,dvipsnames,svgnames]{xcolor}
+
+\ifTODO
+   \definecolor{lightblue}{rgb}{0.8,0.8,1}
+   \usepackage[backgroundcolor=LightBlue]{todonotes}
+\else
+   \usepackage[disable]{todonotes} 
 \fi
 
 \usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
@@ -94,14 +105,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\RequirePackage[table,dvipsnames,svgnames]{xcolor}
 
-\ifTODO
-   \definecolor{lightblue}{rgb}{0.8,0.8,1}
-   \usepackage[backgroundcolor=LightBlue]{todonotes}
-\else
-   \usepackage[disable]{todonotes} 
-\fi
 
 
 % correct bad hyphenation here
