@@ -99,85 +99,18 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % \setcounter{todoidx}
 
 \ifTODO
+   \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
    \setlength\marginparsep{3pt}
    \setlength\marginparwidth{42pt}
-
-   \RequirePackage{tikz}
-
-%    \define@key{boxedtheorem}{titlecolor}{\def\titlecolor{#1}}
-%    \define@key{boxedtheorem}{titlebackground}{\def\titlebackground{#1}}
-%    \define@key{boxedtheorem}{background}{\def\background{#1}}
-%    \define@key{boxedtheorem}{titleboxcolor}{\def\titleboxcolor{#1}}
-%    \define@key{boxedtheorem}{boxcolor}{\def\boxcolor{#1}}
-%    \define@key{boxedtheorem}{thcounter}{\def\thcounter{#1}}
-%    \define@key{boxedtheorem}{size}{\def\size{#1}}
-%    \presetkeys{boxedtheorem}{titlecolor = black, titlebackground = white, background = white,%
-%                              titleboxcolor = black, boxcolor = black, thcounter=, size = .9\textwidth}{}
-%    \newcommand{\colors}[1][]{%
-%       \setkeys{boxedtheorem}{#1}
-%       \tikzstyle{fancytitle} =[draw=\titleboxcolor, rounded corners, fill=\titlebackground,
-%                               text= \titlecolor]
-%       \tikzstyle{mybox} = [draw=\boxcolor, fill=\background, very thick,
-%                            rectangle, rounded corners, inner sep=10pt, inner ysep=20pt]
-%    }
-% 
-%    \newsavebox{\boiboite}
-%    \newcommand{\titre}{Titre}
-%    \newenvironment{boite}[2][]%
-%       {%
-%       \renewcommand{\titre}{#2}
-%       \colors[#1]
-%       \begin{lrbox}{\boiboite}%
-%       \begin{minipage}[!h]{\size}
-%       }%
-%       {%
-%       \end{minipage}
-%       \end{lrbox}
-%       \begin{center}
-%       \begin{tikzpicture}
-%       \node [mybox] (box){\usebox{\boiboite}};
-%       \node[fancytitle, right=10pt] at (box.north west) {\titre};
-%       \end{tikzpicture}
-%       \end{center}
-%       }
-% 
-%    \newcommand{\newboxedtheorem}[4][]{%
-%       \colors[#1]
-%       \@ifnotempty{#4}{%
-%          \@ifundefined{the#4}{\@ifundefined{\thcounter}{\newcounter{#4}}{%
-%          \newcounter{#4}[\thcounter ] } } { }%
-%       }
-%       \newenvironment{#2}[1][]{%
-%       \@ifnotempty{#4}{\refstepcounter{#4}}
-%       \begin{boite}[#1]{\textbf{#3\@ifnotempty{#4}{ \csname the#4\endcsname}}\@ifnotempty{##1}{
-%       (##1)}\textbf{.}}
-%       }%
-%       {%
-%       \end{boite}
-%       }
-%    }
-
-      \newsavebox{\notebox}
-      \tikzstyle{fancytitle} =[draw=black, rounded corners, fill=white,
-                              text=black]
-      \tikzstyle{mybox} = [draw=gray, fill=gray, very thick,
-                           rectangle, rounded corners, inner sep=10pt, inner ysep=20pt]
-   
-%    \newlength\marginparwidthsmall
-%    \setlength\marginparwidthsmall{\marginparwidth}
-%    \addtolength\marginparwidthsmall{-7pt}
-     \newcommand\todo[1]{%
-         \marginpar{%
-            \begin{tikzpicture}
-            \node [mybox] (box){\usebox{\notebox}};
-            \node[fancytitle, right=10pt] at (box.north west) {Note};
-            \end{tikzpicture}}}
-%    \newcommand\todo[1]{%
-%       \addtocounter{todoidx}{1}%
-%       {\color{Red}\fbox{\bf\thetodoidx{}}}%
-%       \marginpar{%
-%          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
-%          \colorbox{red}{\fbox{\parbox{\marginparwidthsmall}{#1}}}}}
+   \newlength\marginparwidthsmall
+   \setlength\marginparwidthsmall{\marginparwidth}
+   \addtolength\marginparwidthsmall{-7pt}
+   \newcommand\todo[1]{%
+      \addtocounter{todoidx}{1}%
+      {\color{Red}\fbox{\bf\thetodoidx{}}}%
+      \marginpar{%
+         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{#1}}}}
 \else
 %    \usepackage[disable]{./todonotes} 
    \newcommand\todo[1]{}
@@ -191,10 +124,9 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  \RequirePackage{layout}  
+
 \begin{document}
-\layout
-%
+
 \title{Low Complexity Adaptive Beamformer\\ for Active Sonar Imaging}
 
 \author{Jo~Inge~Buskenes, %
@@ -203,9 +135,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
 of Informatics, University of Oslo, Norway.}% <-this % stops a space
 
-% \thanks{Manuscript received April%       \node [mybox] (box){\usebox{\boiboite}};
-%       \node[fancytitle, right=10pt] at (box.north west) {\titre};
-%       \end{tikzpicture}}} 19, 2005; revised January 11, 2007.}
+% \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
 
 % The paper headers
@@ -277,10 +207,31 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % after \section in the above as the hack puts \section within a raised box.
 
 
+\IEEEPARstart{T}{o} form images from a modern phased array sonar system the received waveform is usually recorded, and then processed by a digital beamformer. Estimating one pixel at a time, the beamformer adjusts the arrays spatial response to ensure the maximum gain in the direction of the pixel of interest, while maintaining maximum suppression at all other angles. 
 
-\IEEEPARstart{A}{daptive} beamformers have only recently been introduced in active sonar imaging.\todo{break at something} This is because , as demo file is intended to serve as a ``starter file''
-for IEEE Computer Society journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
+The imaging capabilities of a modern phased array sonar system depend on physical attributes such element response and array geometry, the transmitted signal, as well as the beamforming method being used on transmission and reception. Beamforming is the concept of applying delays and weights to the sensors channels to steer the arrays response to points of interest. 
+
+
+\begin{itemize}
+\item Why beamforming?
+\item Adaptive beamformers
+\item Challenges in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive.
+\item LCA
+\end{itemize}
+
+
+
+, and maximum suppression of while ensuring that the beamformer digitally  before each of the pixels are estimated one at a time. The resolution and contrast of such a system will depend on the systems spatial response, which ideally should be narrow  be very sharp in the desired direction its ability to achieve  fundamental principle of forming a sonar image is to record the received wavefield, 
+
+image quality of a phased array sonar imaging systems depend on  the choice of weights to apply to each of the sensors are crucial. 
+
+A modern phased array imaging system may be thought of as a spatial filter. To achieve the best possible performance, the 
+
+resolution and contrast 
+
+Adaptive beamformers have only recently been introduced in active sonar imaging. For a while they were considered unsuited for this purpose because the backscattered signal is largely correlated with the 
+
+
 
 We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
 
@@ -301,26 +252,7 @@ An attactive trait of the LCA is its low computational complexity; while the MV 
 \subsection{Subsection Heading Here}
 Subsection text here.
 
-% needed in second column of first page if using \IEEEpubid
-%\IEEEpubidadjcol
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
-
-
-% An example of a floating figure using the graphicx package.
-% Note that \label must occur AFTER (or within) \caption.
-% For figures, \caption should occur after the \includegraphics.
-% Note that IEEEtran v1.7 and later has special internal code that
-% is designed to preserve the operation of \label within \caption
-% even when the captionsoff option is in effect. However, because
-% of issues like this, it may be the safest practice to put all your
-% \label just after \caption rather than within \caption{}.
-%
-% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
-% option should be used if it is desired that the figures are to be
-% displayed while in draft mode.
-%
 %\begin{figure}[!t]
 %\centering
 %\includegraphics[width=2.5in]{myfigure}
@@ -330,10 +262,6 @@ Subsubsection text here.
 %\caption{Simulation Results}
 %\label{fig_sim}
 %\end{figure}
-
-% Note that IEEE typically puts floats only at the top, even when this
-% results in a large percentage of a column being occupied by floats.
-% However, the Computer Society has been known to put floats at the bottom.
 
 
 % An example of a double column floating figure using two subfigures.
@@ -478,6 +406,8 @@ H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 
 \end{thebibliography}
+
+\bibliography{../../Library/library}
 
 % biography section
 % 
