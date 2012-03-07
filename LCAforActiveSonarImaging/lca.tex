@@ -116,6 +116,127 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
    \newcommand\todo[1]{}
 \fi
 
+%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% MACROS %       
+%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+\newcommand\Grey[1]{{\color{Grey}#1}}
+\newcommand\Red[1]{{\color{Red}#1}}
+\newcommand\Blue[1]{{\color{Blue}#1}}
+\newcommand\DarkBlue[1]{{\color{DarkBlue}#1}}
+\newcommand\LightBlue[1]{{\color{LightBlue}#1}}
+\newcommand\Brown[1]{{\color{Brown}#1}}
+\newcommand\Green[1]{{\color{Green}#1}}
+\newcommand\SeaGreen[1]{{\color{SeaGreen}#1}}
+\newcommand\Yellow[1]{{\color{yellow}#1}}
+\newcommand\Orange[1]{{\color{orange}#1}}
+
+\newcommand\nn{\nonumber\\}
+
+\newcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+\newcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand\case[1]{\begin{cases}#1\end{cases}}
+\newcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+
+\newcommand\rand{\text{rand}}
+\newcommand\randn{\text{randn}}
+\newcommand\rect{\text{rect}}
+\newcommand\sinc{\text{sinc}}
+\newcommand\tr{\text{tr}}
+\newcommand\adj{\text{adj}}
+
+% \newcommand\max{\text{max}}
+% \newcommand\min{\text{min}}
+
+\newcommand\qqquad{\quad\qquad}
+\newcommand\qqqquad{\qquad\qquad}
+
+\renewcommand\l[1]{\left#1}
+\renewcommand\r[1]{\right#1}
+
+% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+
+%Keyword colouring:
+\newcommand\kw[1]{#1}
+\newcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+
+\newcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+\newcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+\newcommand\var[3]{#1_\text{#2}\of{#3}}
+
+\newcommand\diag{\text{diag}}
+
+% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+\newcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+\newcommand\mathnorm{\textstyle}
+\newcommand\mathbig[1]{\displaystyle#1\mathnorm}
+\newcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+\newcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+\newcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+\newcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+
+\newcommand\sumu[1]{\sum\limits^{#1}\,}
+\newcommand\suml[1]{\sum\limits_{#1}\,}
+\newcommand\sumb[2]{\sum\limits_{#1}^{#2}\,}
+
+\newcommand\produ[1]{\prod\limits^{#1}\,}
+\newcommand\prodl[1]{\prod\limits_{#1}\,}
+\newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
+
+%Math macros:
+\newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
+\newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
+
+\renewcommand\d[1]{\scriptstyle\kw{\,d\parm{#1}}\displaystyle}
+
+% These commands are mutually exclusive. Remember to "renew" in v2.
+\newcommand\intb[4]{\int\limits_{#3}^{#4} #1 \d{#2}} % \int{exp}{var}{from}{to}
+\newcommand\intl[3]{\int\limits_{#3} #1 \d{#2}} % \int{exp}{var}{for all}
+\newcommand\intu[2]{\int #1 \d{#2}} % \int{exp}{var}{for all}
+
+\newcommand\T{^{\scriptscriptstyle T}}
+\renewcommand\H{^{\scriptscriptstyle H}}
+
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\newcommand\mat[1]{\boldsymbol{#1}}
+
+
+\renewcommand*\a{\vec a}
+\renewcommand*\i{\vec i}
+\renewcommand*\k{\vec k}
+\newcommand*\n{\vec n}
+\newcommand*\p{\vec p}
+\newcommand*\s{\vec s}
+\newcommand*\w{\vec w}
+\newcommand*\x{\vec x}
+\newcommand*\y{\vec y}
+
+\newcommand*\A{\mat A}
+\newcommand*\B{\mat B}
+\newcommand*\C{\mat C}
+\newcommand*\E{\mat E}
+% \renewcommand*\H{\mat H}
+\renewcommand*\P{\mat P}
+\newcommand*\eP{\mat{\hat P}}
+\newcommand*\R{\mat R}
+\newcommand*\Ri{\R^{-1}}
+\newcommand*\eR{\mat{\hat R}}
+\newcommand*\W{\mat W}
+\newcommand*\X{\mat X}
+\newcommand*\Y{\mat Y}
+
+\renewcommand*\L{\mat \Lambda}
+\newcommand*\U{\mat U}
+% \renewcommand*\t{\mathtiny{^T}}
+% \newcommand*\h{\mathtiny{^H}}
+\renewcommand*\t{^T}
+\newcommand*\h{^H}
+
+\newcommand\D{\vec\nabla} %Del: Vector differential operator - nabla
+\newcommand\Dx{\vec\nabla\times}
+\newcommand\Dd{\vec\nabla\cdot}
+
 
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
@@ -207,7 +328,7 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % after \section in the above as the hack puts \section within a raised box.
 
 
-\IEEEPARstart{T}{o} form images from a modern phased array sonar system the received waveform is usually recorded, and then processed by a digital beamformer. Estimating one pixel at a time, the beamformer adjusts the arrays spatial response to ensure the maximum gain in the direction of the pixel of interest, while maintaining maximum suppression at all other angles. 
+\IEEEPARstart{T}{o} form images from a modern phased array sonar system the received wavefield is usually recorded, and then postprocessed by a digital beamformer. The beamformer applies delays and weights to the sensor channels, the beamformer adjusts the arrays spatial response to focus at one pixel at a time.  such that signals emanating from regions of interest add constructively, while ensuring that noise and interference from other angles do not. 
 
 The imaging capabilities of a modern phased array sonar system depend on physical attributes such element response and array geometry, the transmitted signal, as well as the beamforming method being used on transmission and reception. Beamforming is the concept of applying delays and weights to the sensors channels to steer the arrays response to points of interest. 
 
@@ -215,20 +336,25 @@ The imaging capabilities of a modern phased array sonar system depend on physica
 \item Why beamforming?
 \item Adaptive beamformers
 \item Challenges in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive.
-\item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}
+\item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was first?}
 \item Outline: Start with Capon's response when means for robustification are added.
 \end{itemize}
 
 
 Outline:
 \begin{itemize}
-\item Capon's resonse 
+\item Capon's resonse when applying robustification
 \item Choice of window functions makes little difference.
 \item Steering and mainlobewidths have outer bounds.
 \item Beamspace?
 \item Chosen window plots - what may they tell us? Variance intensity values when using various windows.
 \item Assymmetric windows?
 \end{itemize}
+
+\begin{align}
+z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w[n]\H\x_m[n-\Delta_m]
+\end{align}
+
 
 
 , and maximum suppression of while ensuring that the beamformer digitally  before each of the pixels are estimated one at a time. The resolution and contrast of such a system will depend on the systems spatial response, which ideally should be narrow  be very sharp in the desired direction its ability to achieve  fundamental principle of forming a sonar image is to record the received wavefield, 
