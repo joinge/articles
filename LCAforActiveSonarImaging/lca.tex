@@ -274,6 +274,13 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
+
+\begin{itemize}
+\item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
+\item But: Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust. Computationally complex O($M^3$), and although subspace/beamspace methods exist, 
+\item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
+\end{itemize}
+
 The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
 
 While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
@@ -308,26 +315,18 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 
 \section{Introduction}
-% Computer Society journal papers do something a tad strange with the very
-% first section heading (almost always called "Introduction"). They place it
-% ABOVE the main text! IEEEtran.cls currently does not do this for you.
-% However, You can achieve this effect by making LaTeX jump through some
-% hoops via something like:
-%
-%\ifCLASSOPTIONcompsoc
-%  \noindent\raisebox{2\baselineskip}[0pt][0pt]%
-%  {\parbox{\columnwidth}{\section{Introduction}\label{sec:introduction}%
-%  \global\everypar=\everypar}}%
-%  \vspace{-1\baselineskip}\vspace{-\parskip}\par
-%\else
-%  \section{Introduction}\label{sec:introduction}\par
-%\fi
-%
-% Admittedly, this is a hack and may well be fragile, but seems to do the
-% trick for me. Note the need to keep any \label that may be used right
-% after \section in the above as the hack puts \section within a raised box.
 
 
+\begin{itemize}
+\item Sell it!
+\item As briefly as possible, introduce beamforming.
+\item Adaptive beamformers
+\item Challenges in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive.
+\item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was first?}
+\item Outline: Start with Capon's response when means for robustification are added.
+\end{itemize}
+
+\ \\
 \IEEEPARstart{T}{o} form images from a modern phased array sonar system the received wavefield is usually recorded, and then postprocessed by a digital beamformer. The beamformer applies delays and weights to the sensor channels, the beamformer adjusts the arrays spatial response to focus at one pixel at a time.  such that signals emanating from regions of interest add constructively, while ensuring that noise and interference from other angles do not. 
 
 The imaging capabilities of a modern phased array sonar system depend on physical attributes such element response and array geometry, the transmitted signal, as well as the beamforming method being used on transmission and reception. Beamforming is the concept of applying delays and weights to the sensors channels to steer the arrays response to points of interest. 
@@ -351,11 +350,28 @@ Outline:
 \item Assymmetric windows?
 \end{itemize}
 
+
 \begin{align}
-z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w[n]\H\x_m[n-\Delta_m]
+z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\x[n-\Delta_m]
 \end{align}
 
 
+\section{Methods}
+
+Basically, we are working with a practical implementation of the Capon beamformer that computes a set of weights $\vec w$ for every single sample $n$ by solving:
+\begin{gather*}
+\vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
+\end{gather*}%
+where
+% \newcommand\X{\text{\raisebox{2pt}{$\vec\chi$}}}
+\begin{gather*}
+\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a \qquad\qquad\text{is the solution to}\qquad\qquad \hat{\mat R}\text{\raisebox{1.9pt}{$\vec\chi$}} = \vec a.
+\end{gather*}
+Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
+\begin{gather*}
+r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
+\end{gather*}
+where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. \emph{Diagonal loading} is usually also applied to constrain the adaptability and ensure numerical stability, but this operation is insignificant in the context of performance and will be ignored.
 
 , and maximum suppression of while ensuring that the beamformer digitally  before each of the pixels are estimated one at a time. The resolution and contrast of such a system will depend on the systems spatial response, which ideally should be narrow  be very sharp in the desired direction its ability to achieve  fundamental principle of forming a sonar image is to record the received wavefield, 
 
