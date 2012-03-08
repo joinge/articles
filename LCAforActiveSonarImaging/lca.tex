@@ -147,7 +147,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\adj{\text{adj}}
 
 % \newcommand\max{\text{max}}
-% \newcommand\min{\text{min}}
+\newcommand\argmin{\text{argmin}}
 
 \newcommand\qqquad{\quad\qquad}
 \newcommand\qqqquad{\qquad\qquad}
@@ -361,16 +361,33 @@ z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
 \end{align}
 where
 \begin{align}
-\w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \quad \text{and} \quad\Xd[n] = \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}
+\w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \quad \text{and} \quad\Xd[n] = \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.
 \end{align}
 
+Minimum variance distortionless resonse
+\begin{align}
+\underset{\w[n]}{\argmin}\, E\{ |z[n]|^2 \} = \underset{\w[n]}{\argmin}\, \w\H[n]\R[n]\w[n], 
+\end{align}
+subject to
+\begin{align}
+\w\H[n]\a = 1,
+\end{align}
+where
+\begin{align}
+\R[n] = E\{ \x\x\H \}.
+\end{align}s<
+If $\eR$ is the estimate of $\R$, the solution to the MVDR beamformer is
 \begin{gather*}
 \vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
-\end{gather*}%
-
+\end{gather*}
+A robust estimate of $\eR$ is found by
 \begin{itemize}
+\item Spatial averaging to decorrelate noise from signal. \emph{Subarray averaging} used here.
+\item Temporal averaging to ensure valid speckle statistics.
+\item \emph{Diagonal loading} to ensure  numerical stability prior to inversion.
 \item Choice of robustification parameters (C-I) \cite{}
 \end{itemize}
+
 
 \section{Results}
 
