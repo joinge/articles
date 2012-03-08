@@ -237,6 +237,10 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\Dx{\vec\nabla\times}
 \newcommand\Dd{\vec\nabla\cdot}
 
+\newenvironment{outline}
+{\begin{itemize}}
+{\end{itemize}}
+
 
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
@@ -275,11 +279,11 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 
-\begin{itemize}
+\begin{outline}
 \item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
 \item But: Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust. Computationally complex O($M^3$), and although subspace/beamspace methods exist, 
 \item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
-\end{itemize}
+\end{outline}
 
 The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
 
