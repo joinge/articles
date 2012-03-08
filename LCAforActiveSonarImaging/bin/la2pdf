@@ -54,6 +54,18 @@ echo ':)  SUCCESS: dvipdfmx'
   
   
 # Run bibtex:
+# sed s/'\\aa '/'\{\\aa\}'/g
+
+echo "$(grep '\\bibdata' ${1}.aux)"
+BIBPATH=$(grep '\\bibdata' ${1}.aux | sed -e s/'\\bibdata{\([a-zA-ZæøåÆØÅ\/\.]*\)}'/'\1'/g)
+echo $BIBPATH
+sed -i s/'\\aa\s*'/'å'/g $BIBPATH.bib
+sed -i s/'\\ae\s*'/'æ'/g $BIBPATH.bib
+sed -i s/'\\o\s*'/'ø'/g $BIBPATH.bib
+# sed -i s/'\\aa\s*'/'\{\\aa\}'/g $BIBPATH.bib
+# sed -i s/'\\ae\s*'/'\{\\ae\}'/g $BIBPATH.bib
+# sed -i s/'\\o\s*'/'\{\\o\}'/g $BIBPATH.bib
+
 echo ':) Building bibliography..'
 bibtex ${1}.aux
 
