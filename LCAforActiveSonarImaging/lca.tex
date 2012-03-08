@@ -237,10 +237,27 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\Dx{\vec\nabla\times}
 \newcommand\Dd{\vec\nabla\cdot}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
+\usepackage{amsmath,amssymb}
+
 \newenvironment{outline}
 {\begin{itemize}}
 {\end{itemize}}
 
+%    \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+%    \setlength\marginparsep{3pt}
+%    \setlength\marginparwidth{42pt}
+%    \newlength\marginparwidthsmall
+%    \setlength\marginparwidthsmall{\marginparwidth}
+%    \addtolength\marginparwidthsmall{-7pt}
+%    \newcommand\todo[1]{%
+%       \addtocounter{todoidx}{1}%
+%       {\color{Red}\fbox{\bf\thetodoidx{}}}%
+%       \marginpar{%
+%          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+%          \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{#1}}}}
+% 
 
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
@@ -279,11 +296,20 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 
-\begin{outline}
+\begin{itemize}
 \item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
-\item But: Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust. Computationally complex O($M^3$), and although subspace/beamspace methods exist, 
+\item But: Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust.
+Computationally complex O($M^3$), and although subspace/beamspace methods exist,
+\begin{itemize}
+\item Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust.
 \item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
-\end{outline}
+\item Computationally complex O($M^3$), and although subspace/beamspace methods exist, 
+\end{itemize}
+\item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
+\end{itemize}
+
+
+
 
 The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
 
