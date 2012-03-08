@@ -224,6 +224,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand*\eR{\mat{\hat R}}
 \newcommand*\W{\mat W}
 \newcommand*\X{\mat X}
+\newcommand*\Xd{\X_{\!\Delta}}
 \newcommand*\Y{\mat Y}
 
 \renewcommand*\L{\mat \Lambda}
@@ -356,12 +357,25 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 \section{Methods}
 
 \begin{align}
-z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\X_\Delta[n]
+z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
 \end{align}
 where
 \begin{align}
-\w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \qquad \text{and} \X_\Delta[n] = 
+\w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \quad \text{and} \quad\Xd[n] = \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}
 \end{align}
+
+\begin{gather*}
+\vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
+\end{gather*}%
+
+\begin{itemize}
+\item Choice of robustification parameters (C-I) \cite{}
+\end{itemize}
+
+\section{Results}
+
+
+
 
 \section{Conclusion}
 
