@@ -118,6 +118,16 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
    \newcommand\todo[1]{}
 \fi
 
+\newenvironment{narrow}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}}%
+\item[]}{\end{list}}
+
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % MACROS %       
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -508,15 +518,15 @@ where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the nu
 % The subfigure.sty package works much the same way, except \subfigure is
 % used instead of \subfloat.
 %
-%\begin{figure*}[!t]
-%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-%\label{fig_second_case}}}
-%\caption{Simulation results}
-%\label{fig_sim}
-%\end{figure*}
+% \begin{figure*}[!t]
+% \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
+% \label{fig_first_case}}
+% \hfil
+% \subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
+% \label{fig_second_case}}}
+% \caption{Simulation results}
+% \label{fig_sim}
+% \end{figure*}
 %
 % Note that often IEEE papers with subfigures do not employ subfigure
 % captions (using the optional argument to \subfloat), but instead will
