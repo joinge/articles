@@ -111,6 +111,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
       \marginpar{%
          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
          \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{#1}}}}
+
+   \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
 \else
 %    \usepackage[disable]{./todonotes} 
    \newcommand\todo[1]{}
@@ -347,7 +349,8 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 \item Adaptive beamformer's potential lies in its ability to suppress interference power
 \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
 \begin{itemize}
-\item Increases variance of speckle, spatial compunting needed \cite{Vignon2009}. Subarray averaging applied here \cite{Synnevag2007}
+\item Noise and signal is correlated. Spatial averaging required. 
+\item Increases variance of speckle (not only in active systems?), spatial compunting \cite{Vignon2009} (US) or time averaging?. Subarray averaging applied here \cite{Synnevag2007} (US) \todo{Is it bad to mix ultrasound/ sonar refs?}
 \end{itemize}
 \item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was that guy in the 80ties?}
 \item Outline: 
@@ -359,9 +362,12 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 \item Start with Kaiser, see that other window functions also work well.
 \end{itemize}
 \end{itemize}
+\todopar{Out of the blue idea: Weigh CF with LCA? This guy did it with MVDR \cite{Wang2009}. Probably you know already... Okay, back on track.}
 
 
 \section{Methods}
+
+\todopar{Threw some formulas in to get a feel of them}
 
 \begin{align}
 z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
@@ -382,7 +388,7 @@ subject to
 where
 \begin{align}
 \R[n] = E\{ \x\x\H \}.
-\end{align}s<
+\end{align}
 If $\eR$ is the estimate of $\R$, the solution to the MVDR beamformer is
 \begin{gather*}
 \vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
@@ -395,14 +401,35 @@ A robust estimate of $\eR$ is found by
 \item Choice of robustification parameters \cite{Synnevag2007}
 \end{itemize}
 
+Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
+\begin{gather*}
+r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
+\end{gather*}
+where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
+
+\emph{Diagonal loading} chosen as \cite{Synnevag2007}
+\begin{align}
+\varepsilon = \Delta \cdot \tr\{\eR[n]\}
+\end{align}
 
 \section{Results}
 
-\begin{figure}[!t]\centering
-% \includegraphics[width=2.5in]{}
-\caption{Simulation Results}
-\label{fig_sim}
-\end{figure}
+% \begin{figure}[!t]\centering
+% % \includegraphics[width=2.5in]{}
+% \caption{Simulation Results}
+% \label{fig_sim}
+% \end{figure}
+
+\input{gfx/gfx_input}
+% \begin{figure*}[!t]
+% \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
+% \label{fig_first_case}}
+% \hfil
+% \subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
+% \label{fig_second_case}}}
+% \caption{Simulation results}
+% \label{fig_sim}
+% \end{figure*}
 
 
 
@@ -447,11 +474,7 @@ A robust estimate of $\eR$ is found by
 % \begin{gather*}
 % \text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a \qquad\qquad\text{is the solution to}\qquad\qquad \hat{\mat R}\text{\raisebox{1.9pt}{$\vec\chi$}} = \vec a.
 % \end{gather*}
-% Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
-% \begin{gather*}
-% r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-% \end{gather*}
-% where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. \emph{Diagonal loading} is usually also applied to constrain the adaptability and ensure numerical stability, but this operation is insignificant in the context of performance and will be ignored.
+
 % 
 % , and maximum suppression of while ensuring that the beamformer digitally  before each of the pixels are estimated one at a time. The resolution and contrast of such a system will depend on the systems spatial response, which ideally should be narrow  be very sharp in the desired direction its ability to achieve  fundamental principle of forming a sonar image is to record the received wavefield, 
 % 
@@ -465,25 +488,6 @@ A robust estimate of $\eR$ is found by
 % 
 % 
 % 
-% We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-% 
-% An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
-% 
-% We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-% 
-% An attactive trait of the LCA\todo{break at something} is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
-% 
-% We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-% 
-% An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
-% 
-% \hfill mds
-%  
-% \hfill January 11, 2007
-% 
-% \subsection{Subsection Heading Here}
-% Subsection text here.
-
 
 %\begin{figure}[!t]
 %\centering
