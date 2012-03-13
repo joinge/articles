@@ -7,8 +7,12 @@
 
 % Example definitions.
 % --------------------
-\def\x{{\mathbf x}}
-\def\L{{\cal L}}
+%\def\x{{\mathbf x}}
+%\def\L{{\cal L}}
+
+%%% My commands
+\newcommand{\mat}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
 
 % Title.
 % ------
@@ -48,6 +52,42 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
+Introduction to Capon adaptive beamforming, ultrasound imaging and GPU.
+
+Delay and sum beamformer (DAS):
+\begin{align}
+z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
+\end{align}
+where $M$ is the number of elements.
+
+Capon weights: 
+\begin{align}
+\vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
+\end{align}
+where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed.
+
+Estimation of $\mat{R}[n]$: $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$.
+
+In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L$ subarrays and $N_{avg}$ time samples.
+\begin{align}
+\mat{\hat{R}} = \frac{\sum_{n_{avg}=-N_{avg}}^{N_{avg}} \sum_{l=0}^{M-L+1} \vec{x}_l[n+n_{avg}]\vec{x}_l[n+n_{avg}]^H}{(2N_{avg} + 1)(M-L+1)},
+\end{align}
+where $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
+
+\section{Method}\label{sec:meth}
+\subsection{Building the Sample Covariance Matrix}
+Building $R$ using a sliding window approach across the subarrays. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block.
+
+\subsection{Solving Small Linear Systems}
+Gauss Jordan elimination to solve $\mat{R}^{-1}\vec{1}$.
+
+\section{Results}\label{sec:res}
+
+Present images before and after Capon weights has been applied. Present graph showing running times for Cython-Capon v.s. CUDA-Capon for different choices of parameters.
+
+\section{Discussion}\label{sec:dis}
+
+\section{Conclusion}\label{sec:con}
 
 
 %\begin{abstract}
