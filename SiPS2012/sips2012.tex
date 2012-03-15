@@ -10,6 +10,9 @@
 %\def\x{{\mathbf x}}
 %\def\L{{\cal L}}
 
+%%% My packages
+\usepackage{amsfonts}
+
 %%% My commands
 \newcommand{\mat}[1]{\mathbf{#1}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
@@ -52,7 +55,7 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-Introduction to Capon adaptive beamforming, ultrasound imaging and GPU.
+Introduction to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
 
 Delay and sum beamformer (DAS):
 \begin{align}
@@ -60,34 +63,48 @@ z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x
 \end{align}
 where $M$ is the number of elements.
 
-Capon weights: 
+Capon weights are found by solving the following minimization problem:
+\begin{align}
+&\min_{\vec{w}} E\{|z[n]|^2\} = \vec{w}^H\mat{R}\vec{w}\\
+&\text{subjected to } \vec{w}^H\vec{1} = 1,
+\end{align}
+where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$.
+
+The solution to this minimization problem is
 \begin{align}
 \vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
 \end{align}
-where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed.
+where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed and $\vec{w} \in \mathbb{C}^M$.
 
 Estimation of $\mat{R}[n]$: $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$.
 
-In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L$ subarrays and $N_{avg}$ time samples.
+In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ subarrays and $N_{avg}$ time samples.
 \begin{align}
-\mat{\hat{R}} = \frac{\sum_{n_{avg}=-N_{avg}}^{N_{avg}} \sum_{l=0}^{M-L+1} \vec{x}_l[n+n_{avg}]\vec{x}_l[n+n_{avg}]^H}{(2N_{avg} + 1)(M-L+1)},
+\mat{\hat{R}} = \frac{1}{(2N_{avg} + 1)K}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K} \vec{x}_l[n']\vec{x}_l[n']^H,
 \end{align}
-where $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
+where $K = M-L+1$, $Y_{avg}\sim \tau/T_s$ ($\tau$ is the imaging pulse length and $T_s$ is the sampling period.) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
+
+Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change.
 
 \section{Method}\label{sec:meth}
 \subsection{Building the Sample Covariance Matrix}
-Building $R$ using a sliding window approach across the subarrays. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block.
+Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. We therefore restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limitied amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
 
-\subsection{Solving Small Linear Systems}
-Gauss Jordan elimination to solve $\mat{R}^{-1}\vec{1}$.
+\subsection{Solving Multiple Small Linear Systems}
+Most focus on large matrices in the literature.
+We have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{R}\vec{b} = \vec{1}$, where $\vec{b} = \mat{R}^{-1}\vec{1}$. Can include details on GPU implementation of $\mat{U}^H\mat{D}\mat{U}$, but this has not proved to be faster than NVIDIA's GJ implementation. However, the complexity for solving with $\mat{U}^H\mat{D}\mat{U}$ decomposition is supposed to be $1/3$ of GJ.
 
 \section{Results}\label{sec:res}
 
-Present images before and after Capon weights has been applied. Present graph showing running times for Cython-Capon v.s. CUDA-Capon for different choices of parameters.
+Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing running times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. 
+
+(A prerequisite for this is to get the GPU-processing up and running on simulated data before Easter!! Maybe also a Matlab plug-in.)
 
 \section{Discussion}\label{sec:dis}
+Discuss results presented in Section \ref{sec:res}.
 
 \section{Conclusion}\label{sec:con}
+...
 
 
 %\begin{abstract}
