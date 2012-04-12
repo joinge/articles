@@ -349,10 +349,25 @@ Beamforming, adaptive beamforming, sonar, active, complexity. \todo{not entirely
 
 \section{Introduction}
 
+The use of phased arrays in modern sonar imaging systems allow each sensor to be independently delayed and weighted 
+Delays and weights are applied to each of the sensor channels to ensure that signals emanating from a pixel of interest add constructively, while noise and interference from other regions add destructively. This method of adjusting the spatial focus of the antenna is commonly referred to as a beamformer. A
+
+Beamformer algorithms are distinction 
+
+The Minimum Variance One of the most well established adaptive 
+
+One of the main issues with adaptive beamformers is their computational complexity, and .
+
+Most modern active sonar imaging systems make use of phased arrays to transmit and receive wavefields. On reception, each pixel in the image is estimated by digitally steering the arrays response to the corresponding region in space, a concept called beamforming. This is achieved by applying a suitable set of delays and weights to each of the sensor channels to ensure that signals coming from the region of interest add constructively, while attempting to make sure noise and interference from all other regions cancel out. 
+
+If a beamformer only employ a static set of weights and delays, it is referred to as a conventional one. Adaptive beamformers, on the other hand, attempts to find an optimal spatial response that best fits the incoming wavefield.  The most common approach is perform a rough adjustment using a static set of delays, and compute a new set of weights at each time instant. 
+
+Conventional beamformers employ a static set of weights and delays, 
+
 \todopar{Case:
 \begin{itemize}
-\item UFFC(?)
-\item Ultrasound. Arrays up to 128 channels. Processing power vital. What's the best way to implement 
+\item JOE
+\item Sonar. Channel count up to 32/64 ish channels?
 \item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
 \item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
 \end{itemize}
