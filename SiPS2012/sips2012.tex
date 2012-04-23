@@ -74,7 +74,7 @@ The solution to this minimization problem is
 \begin{align}
 \vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
 \end{align}
-where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed and $\vec{w} \in \mathbb{C}^M$.
+where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed to broadside,  and $\vec{w} \in \mathbb{C}^M$.
 
 Estimation of $\mat{R}[n]$: $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$.
 
@@ -88,11 +88,13 @@ Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, $\mat{\hat{R
 
 Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change.
 
+Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Buttler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
+
 \section{Method}\label{sec:meth}
 \subsection{Building the Sample Covariance Matrix}
 Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. It is therefore natural to restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limited amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
 
-Discuss the bottleneck adaptive diagonal loading causes. 
+Discuss the bottleneck adaptive diagonal loading causes. Possible solutions includes, use trace from previous image, use pre-calculated array power, constant weight.
 
 Time averaging takes a lot of resources. It has been shown that time averaging can maintain both resolution and delay-and-sum-like speckle. The same speckle statistics can be obtain with small subarrays, but then we loose resolution. Small sub-arrays benefits from being less computational demanding.   
 
