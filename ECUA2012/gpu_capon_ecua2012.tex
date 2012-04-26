@@ -9,98 +9,29 @@
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
-\newif\ifTODO\TODOtrue                        % Use todo notes?
+\newif\ifTODO\TODOtrue                          % Use todo notes?
 
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% IEEEtran %
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%%%%%%%%%%%%%%                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% ECUA style %
+%%%%%%%%%%%%%%                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\ifPeerReview
-\documentclass[12pt,journal,captionsoff,onecolumn]{IEEEtran}
-\newcommand\CLASSINPUTbaselinestretch{1.66}     % http://theoval.cmp.uea.ac.uk/~nlct/latex/thesis/node17.html
-\else
-\documentclass[journal]{IEEEtran}
-\fi
-
-% \RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1)
-% \RequirePackage[T1]{fontenc}%                 % Set font encoding
-% \usepackage[norsk]{babel}
+\documentclass[10pt,a4paper]{article}
+\usepackage{template/ecua}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% IEEE ''APPROVED'' PACKAGES %
+% ECUA ''APPROVED'' PACKAGES %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-\ifCLASSINFOpdf
-   \usepackage[dvips]{graphicx}                 % Might not work. Use 'latex' instead of 
-   \ifFlatArchive\else                          % 'pdflatex'
-      \graphicspath{./gfx/}
-   \fi
-\else
-   \usepackage[dvips]{graphicx}
-   \ifFlatArchive\else
-      \graphicspath{./gfx/}
-   \fi
-\fi
-
-\RequirePackage[table,dvipsnames,svgnames]{xcolor}
-
-\usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
-\interdisplaylinepenalty=2500                   % Allows multiline equations to be broken
-
-% \RequirePackage{amssymb}
-
-\RequirePackage{array}
-
-\ifCLASSOPTIONcompsoc
-   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\else
-   \usepackage[caption=false,font=footnotesize]{subfig}
-\fi
-\ifCLASSOPTIONcaptionsoff                       % IEEE promoted hack to turn off captions from the 
-   \let\MYorigsubfloat\subfloat                 % subfloat package should the captionsoff option
-   \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}} % be specified.
-\fi
-
-\ifFloatAtEnd
-\ifCLASSOPTIONcaptionsoff                       % Places float at the end of the document when the
-  \usepackage[nomarkers]{endfloat}              % captionsoff options is specified to IEEEtrans.cls
-  \let\MYoriglatexcaption\caption               % (PeerReview mode)
-  \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
-\fi
-\fi
-
-\usepackage{fixltx2e}                           % Fix some twocolumn float problems
-
-%\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
-                                                % (double column figures on top/bottom)
-
-\usepackage{url}                                % Support for handling and breaking URLs
-
-% NOTE: PDF hyperlink and bookmark features are not required in IEEE
-%       papers and their use requires extra complexity and work.
-\newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
-pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
-colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-pdftitle={Low Complexity Adaptive Beamformer for Active Sonar Imaging},
-pdfsubject={},
-pdfauthor={Jo Inge Buskenes},
-pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
-\ifCLASSINFOpdf
-   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
-\else
-   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
-   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
-\fi
+% load some other useful packages
+\usepackage{cite} % improved formatting for citation lists
+\usepackage{graphicx}
 
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\usepackage[maxfloats=25]{morefloats}
+\usepackage[table,dvipsnames,svgnames]{xcolor}
 \newcounter{todoidx}
-\usepackage[toc,nonumberlist]{glossaries}
-% \setcounter{todoidx}
 
 \ifTODO
    \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
@@ -288,67 +219,24 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% \usepackage{yfonts}
+\title{A GPU Implementation of Capon for an Active Sonar System}
 
+\author{%
+\begin{tabular}{p{30mm}p{125mm}}
+Jo~Inge~Buskenes & Department of Informatics, University of Oslo, Norway \\
+Jon~Petter~Aasen & Department of Informatics, University of Oslo, Norway \\
+Carl-Inge~Colombo~Nilsen & Department of Informatics, University of Oslo, Norway \\
+\end{tabular}
+}
 
 \begin{document}
 
-\title{A GPU Implementation of Capon for an Active Sonar System}
-
-\author{Jo~Inge~Buskenes, %
-        Jon~Petter~Aasen, %
-        Carl-Inge~Colombo~Nilsen%
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
-of Informatics, University of Oslo, Norway.}% <-this % stops a space
-
-% \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
-}
-
-% The paper headers
-\markboth{IEEE Journal of Oceanic Engineering}%
-{A GPU Implementation of Capon for an Active Sonar System}
-
-% Publishers ID mark:
-%\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
-
-% use for special paper notices
-%\IEEEspecialpapernotice{(Invited Paper)}
-
-% for Computer Society papers, we must declare the abstract and index terms
-% PRIOR to the title within the \IEEEcompsoctitleabstractindextext IEEEtran
-% command as these need to go into the title area created by \maketitle.
-\IEEEcompsoctitleabstractindextext{%
-\begin{abstract}
-
-\begin{itemize}
-\item Todo.
-\end{itemize}
-
-\end{abstract}
-
-% Keywords (normally not used for peer reviews)
-\ifPeerReview\else
-\begin{IEEEkeywords}
-Beamforming, adaptive beamforming, sonar, active, complexity. \todo{not entirely true?}
-\end{IEEEkeywords}
-\fi}
-% \fi
-
-% make the title area
 \maketitle
 
-% This command fixes abstract positioning for compsoc articles:
-\IEEEdisplaynotcompsoctitleabstractindextext
-
-% (Optional) Add some extra info on cover page of peer review papers:
-% \ifCLASSOPTIONpeerreview
-% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
-% \fi
-
-% Insert page break and insert second title (peer review mode)
-\IEEEpeerreviewmaketitle
-
 \section{Introduction}
+
+When forming images from an active sonar system employing a phased array, the lateral \gls{SNR} and resolution will largely depend on the choice of weights applied to each of the array channels. 
+The Capon beamformer has been around for quite som time now. It is adaptive 
 
 Delays and weights are applied to each of the sensor channels to ensure that signals emanating from a pixel of interest add constructively, while noise and interference from other regions add destructively. This method of adjusting the spatial focus of the antenna is commonly referred to as a beamformer. A
 
@@ -485,7 +373,7 @@ Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 
 
 
-\subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
+% \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
 
 There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
 
@@ -506,9 +394,6 @@ There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R
 
 
 \section{Results/Discussion}
-
-
-
 
 
 \begin{itemize}
@@ -670,90 +555,15 @@ The conclusion goes here.
 % DOCUMENT APPENDICES %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\appendices
 
-
-
-% use section* for acknowledgement
-\ifCLASSOPTIONcompsoc
-  \section*{Acknowledgments}
-\else
-  \section*{Acknowledgment}
-\fi
-
+\section*{Acknowledgments}
 
 The authors would like to thank...
 
 
-% Can use something like this to put references on a page
-% by themselves when using endfloat and the captionsoff option.
-\ifCLASSOPTIONcaptionsoff
-  \newpage
-\fi
-
-
-
-% trigger a \newpage just before the given reference
-% number - used to balance the columns on the last page
-% adjust value as needed - may need to be readjusted if
-% the document is modified later
-%\IEEEtriggeratref{8}
-% The "triggered" command can be changed if desired:
-%\IEEEtriggercmd{\enlargethispage{-5in}}
-
-% references section
-
-\bibliographystyle{IEEEtran}
+\bibliographystyle{./ecua}
 \bibliography{../../Library/library}
 
-% End up doing this:
-% \begin{thebibliography}{1}
-% 
-% \bibitem{IEEEhowto:kopka}
-% H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
-%   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-% 
-% \end{thebibliography}
-
-
-
-% biography section
-% 
-% If you have an EPS/PDF photo (graphicx package needed) extra braces are
-% needed around the contents of the optional argument to biography to prevent
-% the LaTeX parser from getting confused when it sees the complicated
-% \includegraphics command within an optional argument. (You could create
-% your own custom macro containing the \includegraphics command to make things
-% simpler here.)
-%\begin{biography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
-% or if you just want to reserve a space for a photo:
-
-\vfill 
-
-\begin{IEEEbiography}{Noname dude}
-He doesn't exist.
-\end{IEEEbiography}
-
-% if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-Not in at the moment.
-\end{IEEEbiographynophoto}
-
-%\newpage
-
-% \begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-% Not in at the moment.
-% \end{IEEEbiographynophoto}
-
-%\vfill
-
-% Can be used to pull up biographies so that the bottom of the last one
-% is flush with the other column.
-%\enlargethispage{-5in}
-
-\markboth{}%
-{}
-% \input{gfx/gfx_input}
 
 \end{document}
 
