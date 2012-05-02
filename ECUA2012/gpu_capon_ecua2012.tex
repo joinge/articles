@@ -30,6 +30,7 @@
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\usepackage{glossaries}
 \usepackage[table,dvipsnames,svgnames]{xcolor}
 \newcounter{todoidx}
 
@@ -39,7 +40,7 @@
    \setlength\marginparwidth{35pt}
    \newlength\marginparwidthsmall
    \setlength\marginparwidthsmall{\marginparwidth}
-   \addtolength\marginparwidthsmall{-7pt}
+   \addtolength\marginparwidthsmall{+6mm}
    \newcommand\todo[1]{%
       \addtocounter{todoidx}{1}%
       {\color{Red}\fbox{\bf\thetodoidx{}}}%
@@ -133,6 +134,8 @@
 \newcommand\prodl[1]{\prod\limits_{#1}\,}
 \newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
 
+\newcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
+
 %Math macros:
 \newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
 \newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
@@ -150,7 +153,8 @@
 \renewcommand\vec[1]{\boldsymbol{#1}}
 \newcommand\mat[1]{\boldsymbol{#1}}
 
-
+\newcommand\1{\vec 1}
+\newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
 \renewcommand*\i{\vec i}
 \renewcommand*\k{\vec k}
@@ -214,6 +218,14 @@
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
 
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% GLOSSARY %
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\makeglossaries
+\input{../../Library/glossary}
+
+
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT START %
@@ -222,10 +234,11 @@
 \title{A GPU Implementation of Capon for an Active Sonar System}
 
 \author{%
-\begin{tabular}{p{30mm}p{125mm}}
+\begin{tabular}{p{45mm}p{125mm}}
 Jo~Inge~Buskenes & Department of Informatics, University of Oslo, Norway \\
-Jon~Petter~Aasen & Department of Informatics, University of Oslo, Norway \\
+Jon~Petter~Aasen & Mi Lab, Norwegian University of Science and Technology, Norway \\
 Carl-Inge~Colombo~Nilsen & Department of Informatics, University of Oslo, Norway \\
+Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 \end{tabular}
 }
 
@@ -235,100 +248,47 @@ Carl-Inge~Colombo~Nilsen & Department of Informatics, University of Oslo, Norway
 
 \section{Introduction}
 
-When forming images from an active sonar system employing a phased array, the lateral \gls{SNR} and resolution will largely depend on the choice of weights applied to each of the array channels. 
-The Capon beamformer has been around for quite som time now. It is adaptive 
+% Images from a phased array active sonar system are formed in the post-processing by focusing on one pixel at a time. This is achieved by delaying and weighting each of the array's channels, providing coarse and fine adjustments to the region of focus, respectively. This is commonly referred to as beamforming. Assuming far-field conditions, the delays are usually chosen to steer the pixel of interest to broadside, and the weights chosen to reject the noise impinging on the array from non-broadside directions.
+% 
+% The algorithm responsible for carrying out this task is referred to as a beamformer. Depending on whether data is evaluated when choosing a suitable set of delays and weights, beamformers can be branded either conventional or adaptive. A good example of the former is the The Delay-and-Sum (DAS) beamformer, which - as the name implies - simply delay the sensor channels appropriately prior to summing them up. Applying various weight sets, or windows, to the data prior to summation allows the lateral \gls{SNR} to be improved, but at the inevitable expense of a deteriorated lateral resolution. \todo{aka. the curse of physics.}
+% 
+% The Minimum Variance Distortionless Response (MVDR) (or Capon) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
-Delays and weights are applied to each of the sensor channels to ensure that signals emanating from a pixel of interest add constructively, while noise and interference from other regions add destructively. This method of adjusting the spatial focus of the antenna is commonly referred to as a beamformer. A
+The image of modern phased array active sonar systems suffer from poor resolution and \gls{SNR} laterally. This is because the lateral extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
-Beamformer algorithms are distinction 
+The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
 
-The Minimum Variance One of the most well established adaptive 
+However, despite its inherent potential the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
 
-One of the main issues with adaptive beamformers is their computational complexity, and .
+Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread Matlab and C implementations.
 
-Most modern active sonar imaging systems record and process the incoming wavefield through the use of phased arrays. A pixel value in the image is estimated by digitally steering the arrays response to the corresponding region in space. This concept is called beamforming and involves applying a suitable set of delays and weights to each of the sensor channels to cause constrictive interference of the signals coming from the region of interest, and destructive interference of anything else. Ideally, we want a spatial response 
-
-If a beamformer only employ a static set of weights and delays, it is referred to as a conventional one. Applying , which  Various weight sets, or windows, may be added, Adaptive beamformers, on the other hand, attempts to find an optimal spatial response that best fits the incoming wavefield.  The most common approach is perform a rough adjustment using a static set of delays, and compute a new set of weights at each time instant. 
-
-
-
-\todopar{Case:
-\begin{itemize}
-\item JOE
-\item Sonar. Channel count up to 32/64 ish channels?
-\item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
-\item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
-\end{itemize}
-}
-
-\begin{itemize}
-\item As briefly as possible, introduce beamforming.
-\item Adaptive beamformer's potential lies in its ability to suppress interference power
-\item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
-\item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
-\begin{itemize}
-\item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
-\item Iterative methods: Woodbury, Conjugated gradients
-\item Beamspace
-\item LCA (or other methods, as reference)
-\end{itemize}
-\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
-\item In most imaging applications 
-Outline:
-\begin{itemize}
-\item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
-\item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
-\item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
-\item Beamspace
-\item LCA (or other methods, as reference)
-\end{itemize}
-\end{itemize}
+% - Who's done stuff on GPU beamforming before?
+% 
+% - Complex data
+% - 
 
 
+\newpage
 \section{Methods}
 
+Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m$. The beamformer output $z[n]$ is then given as
 \begin{align}
-z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
+z[n] = \w\H[n]\X[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.
 \end{align}
-where
-\begin{align}
-\w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \quad \text{and} \quad\Xd[n] = \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.
-\end{align}
-
-Minimum variance distortionless resonse \cite{Capon1969}
-\begin{align}
-\underset{\w[n]}{\argmin}\, E\{ |z[n]|^2 \} = \underset{\w[n]}{\argmin}\, \w\H[n]\R[n]\w[n], 
-\end{align}
-subject to
-\begin{align}
-\w\H[n]\a = 1,
-\end{align}
-where
-\begin{align}
-\R[n] = E\{ \x\x\H \}.
-\end{align}
-If $\eR$ is the estimate of $\R$, the solution to the MVDR beamformer is
+The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power $z[n]$, while ensuring unity gain in the look direction. Assuming predelayed data, the solution to this optimization problem is given as
 \begin{gather*}
-\vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
+\vec w[n] = \frac{\eRi[n]\1}{\1\T\eRi[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
 \end{gather*}
-A robust estimate of $\eR$ is found by
-\begin{itemize}
-\item Spatial averaging to decorrelate noise from signal. \emph{Subarray averaging} used here.
-\item Temporal averaging to ensure valid speckle statistics.
-\item \emph{Diagonal loading} to ensure  numerical stability prior to inversion.
-\item Choice of robustification parameters \cite{Synnevag2007}
-\end{itemize}
-
-Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
+where $\1$ is a row vector of ones, and $\eR$ is an estimate of the spatial covariance matrix. To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
 \begin{gather*}
-r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
+r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
 \end{gather*}
-where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
-
-\emph{Diagonal loading} chosen as \cite{Synnevag2007}
+where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
 \begin{align}
-\varepsilon = \Delta \cdot \tr\{\eR[n]\}
+\eR = \eR + \I \cdot d \cdot \tr\{\eR[n]\}.
 \end{align}
+
+
 
 \subsection{Traditional approach}
 
@@ -340,7 +300,7 @@ r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
 \end{align*}
 which can be easily rewritten in a sliding window fashion
 \begin{align*}
-r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+\hat r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
                          + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
 \end{align*}
 Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
@@ -378,28 +338,11 @@ Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
 
 
-\subsection{Iterative methods}
-
-\begin{itemize}
-\item Woodbury
-\item Conjugated gradients
-\end{itemize}
-
-
-\subsection{Beamspace}
-
-\begin{itemize}
-\item Some minimum of background, and good references.
-\end{itemize}
-
-
 \section{Results/Discussion}
 
-
 \begin{itemize}
-\item Compare computational complexity vs. memory constraints for the various methods. Supporting plots.
-\item Relate this to whether the favourable architecture is a CPU or a GPU \todo{check ``when to gpu article''}
-\item Run benchmarks on some sonar dataset(s)
+\item Execution time plots. For given of M/L, plot for different Yavg (note negligible diagonal loading).
+\item An image? Holmengrå?
 \end{itemize}
 
 
@@ -407,6 +350,39 @@ There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R
 
 \begin{itemize}
 \item When to use what.
+\end{itemize}
+
+
+\todopar{Case:
+\begin{itemize}
+\item JOE
+\item Sonar. Channel count up to 32/64 ish channels?
+\item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
+\item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
+\end{itemize}
+}
+
+\begin{itemize}
+\item As briefly as possible, introduce beamforming.
+\item Adaptive beamformer's potential lies in its ability to suppress interference power
+\item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
+\item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
+\begin{itemize}
+\item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+\item Iterative methods: Woodbury, Conjugated gradients
+\item Beamspace
+\item LCA (or other methods, as reference)
+\end{itemize}
+\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+\item In most imaging applications 
+Outline:
+\begin{itemize}
+\item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+\item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
+\item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
+\item Beamspace
+\item LCA (or other methods, as reference)
+\end{itemize}
 \end{itemize}
 
 
@@ -561,7 +537,7 @@ The conclusion goes here.
 The authors would like to thank...
 
 
-\bibliographystyle{./ecua}
+\bibliographystyle{./template/ecua}
 \bibliography{../../Library/library}
 
 
