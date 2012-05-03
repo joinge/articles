@@ -263,6 +263,12 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
+
+Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, and the \gls{MVDR} beamformer is no exception. Each pixel in the image can be processed independently, and 
+
+
+Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited.\todo{repetition} There is also a considerable latency involved when accessing on-board memory, but these memory transfers are asynchronous and may be hidden.
+
 \todo{Get some references in here...}
 % - Who's done stuff on GPU beamforming before?
 % 
@@ -297,14 +303,6 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 \begin{align}
 \eR[n] = \eR[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR[n]\}.\label{finalR}
 \end{align}
-To sum it up, for each range line, and for each sample $n$ in this line we must
-\begin{enumerate}
-\item Compute the spatial covariance matrix $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}).
-\item Compute $\eRi[n]\1$ (from equation \ref{weights}).
-\item Insert the result from step (2) into equation \ref{weights} to find the weights.
-\item Insert the result from step (3) into equation \ref{z} to acquire the pixel value.
-\end{enumerate}
-
 
 
 % To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
@@ -316,11 +314,25 @@ To sum it up, for each range line, and for each sample $n$ in this line we must
 
 \section{Implementation}
 
-Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited. There is also a considerable latency involved when accessing on-board memory, so assessing various memory access schemes is crucial to achieve optimal performance.
+By the methods just presented, we observe that for each range line, and for each sample $n$, the following steps must be carried out:
+\begin{enumerate}
+\item \emph{Compute the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}).
+\item Compute $\eRi[n]\1$ (from equation \ref{weights}).
+\item Substitute the solution for $\eRi[n]\1$ into equation \ref{weights} to find the weights.
+\item Apply the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}) to acquire the pixel value $z[n]$.
+\end{enumerate}
 
-Hence, the programming strategy should be to decompose the algorithm into as many threads as possible, each being computationally intense and be light on memory access and consumption. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
 
+Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited.\todo{repetition} There is also a considerable latency involved when accessing on-board memory, but these memory transfers are asynchronous and may be hidden.
 
+decompose the algorithm into as many threads as possible, each being computationally intense and be light on memory access and consumption. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
+
+How may this be decomposed? Already decomposed at pixel-level.
+
+We implement the 
+Our implementation of th
+
+When 
 
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
