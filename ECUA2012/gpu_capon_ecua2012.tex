@@ -281,33 +281,33 @@ The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimiz
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},
 \end{gather}
-where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of both spatial and temporal averaging. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is then given as
+where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is given as
 \begin{gather}
-\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T.
+\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
 \end{gather}
-Then the average of all these subarrays are computed,
+and the spatially averaged sample covariance matrix $\tilde R$ is given as
 \begin{gather}
-\tilde\R[n] = \frac{1}{M-L+1} \sumb{i=0}{M-L+1} \x_{i+k}[n]\x_{i+k}\H[n]
+\tilde\R[n] = \frac{1}{M-L+1} \sumb{i=0}{M-L+1} \x_{i+k}[n]\x_{i+k}\H[n].
 \end{gather}
-Finally, 
+Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the final sample covariance matrix $\eR$,
 \begin{gather}
-\tilde\R[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \x[n']\x\H['n]
+\eR[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \tilde\R[n'].
 \end{gather}
-
-
-To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
-\begin{gather}
-r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-\end{gather}
-where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
+Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
 \begin{align}
 \eR = \eR + \I \cdot d \cdot \tr\{\eR[n]\}.
 \end{align}
 
+% To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
+% \begin{gather}
+% r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
+% \end{gather}
+% where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. 
+
 
 \section{Implementation}
 
-Massively parallel hardware such as \glspl{GPU} is  have a potential for accelerating a great many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the penalty of such a design is that the amount of memory available locally for each core is very limited. There is also a considerable latency involved when moving data between the \gls{CPU} and these cores, so assessing various memory access schemes is crucial to achieve optimal performance.
+Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the penalty of this design is that the amount of memory available locally for each core is very limited. There is also a considerable latency involved when moving data between the \gls{CPU} and these cores, so assessing various memory access schemes is crucial to achieve optimal performance.
 
 Hence, the programming strategy should be to decompose the algorithm into as many threads as possible, each being computationally intense and be light on the memory consumption and access. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
 
