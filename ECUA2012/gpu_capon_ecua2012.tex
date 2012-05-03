@@ -275,19 +275,19 @@ Perhaps surprisingly, we will show that the suggested means for making the \gls{
 
 Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
-z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
 \end{align}
 The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
 \begin{gather}
-\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
 where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is given as
 \begin{gather}
 \x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
 \end{gather}
-and the spatially averaged sample covariance matrix $\tilde R$ is given as
+and the spatially averaged sample covariance matrix, $\tilde R$, is given as
 \begin{gather}
-\tilde\R[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].
+\tilde\R[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].\label{spatialR}
 \end{gather}
 Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the final sample covariance matrix $\eR$,
 \begin{gather}
@@ -295,9 +295,16 @@ Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the f
 \end{gather}
 Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
 \begin{align}
-\eR[n] = \eR[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR[n]\}.
+\eR[n] = \eR[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR[n]\}.\label{finalR}
 \end{align}
-When 
+To sum it up, for each range line, and for each sample $n$ in this line:
+\begin{enumerate}
+\item Compute the spatial covariance matrix $\eR[n]$ (equation \ref{spatialR}-\ref{finalR})
+\item Compute $\eRi[n]\1$ (from equation \ref{weights})
+\item Insert the result from step (2) into equation \ref{weights} to find the weights
+\item Insert the result from step (3) into equation \ref{z} to acquire the pixel value.
+\end{enumerate}
+
 
 
 % To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
