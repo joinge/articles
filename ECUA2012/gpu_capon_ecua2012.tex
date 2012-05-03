@@ -254,13 +254,13 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 % 
 % The Minimum Variance Distortionless Response (MVDR) (or Capon) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
-The image of modern phased array active sonar systems suffer from poor resolution and \gls{SNR} laterally. This is because the lateral extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
+The image of modern phased array active sonar systems suffer from poor lateral resolution and \gls{SNR}. This is because the lateral extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
 The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
 
-However, despite its inherent potential the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
+However, despite its inherent potential, the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
 
-Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread Matlab and C implementations.
+Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
 % - Who's done stuff on GPU beamforming before?
 % 
@@ -275,22 +275,38 @@ Consider an $M$ element phased array. Let the sample recorded by the $m$'th chan
 \begin{align}
 z[n] = \w\H[n]\X[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.
 \end{align}
-The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power $z[n]$, while ensuring unity gain in the look direction. Assuming predelayed data, the solution to this optimization problem is given as
-\begin{gather*}
+The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. Assuming predelayed data, the solution to this optimization problem is given as
+\begin{gather}
 \vec w[n] = \frac{\eRi[n]\1}{\1\T\eRi[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
-\end{gather*}
+\end{gather}
 where $\1$ is a row vector of ones, and $\eR$ is an estimate of the spatial covariance matrix. To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
-\begin{gather*}
+\begin{gather}
 r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-\end{gather*}
+\end{gather}
 where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
 \begin{align}
 \eR = \eR + \I \cdot d \cdot \tr\{\eR[n]\}.
 \end{align}
 
 
+\section{Implementation}
 
-\subsection{Traditional approach}
+A massively parallel hardware such as \glspl{GPU} have a potential for accelerating a great many signal processing tasks, but fully exploiting this potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the amount of memory available locally for core is very limited. There is also a considerable latency involved in moving data between the \gls{CPU} and these cores, but as the data transfer is asynchronous this latency is largely hidden as long as the threads running on each core are computationally intensive.
+
+thread = computationally intense and low memory consumption.
+consecutive threads should have linear memory access patterns
+all threads should have the same single line of execution
+
+
+
+down to these cores and back to the \gls{CPU} is also when copying data to and from the \gls{GPU} are also rather high, so each core should be   performing calculations there, and copying the data back to the \gls{CPU}
+
+ but in order to fully exploit this potential we must be aware of its limitations.  
+
+When adapting an algorithm to a massively parallel hardware such as \glspl{GPU}, one must be familiar with its limitations in order to that the potential that lies within these chips can not be fully realised 
+
+When trying to fit any algorithm to massively parallel hardware such as \glspl{GPU}, one must be careful to select a proper decomposition scheme for the device at hand. Modern \glspl{GPU} have several hundred computing cores, but only a limited amount of  are  various decomposition schemes should be contemplated before performing the implecareful decomposition of the 
+
 
 Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
 
