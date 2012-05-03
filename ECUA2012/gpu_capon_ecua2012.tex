@@ -287,7 +287,7 @@ where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. S
 \end{gather}
 and the spatially averaged sample covariance matrix $\tilde R$ is given as
 \begin{gather}
-\tilde\R[n] = \frac{1}{M-L+1} \sumb{i=0}{M-L+1} \x_{i+k}[n]\x_{i+k}\H[n].
+\tilde\R[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].
 \end{gather}
 Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the final sample covariance matrix $\eR$,
 \begin{gather}
@@ -295,8 +295,10 @@ Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the f
 \end{gather}
 Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
 \begin{align}
-\eR = \eR + \I \cdot d \cdot \tr\{\eR[n]\}.
+\eR[n] = \eR[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR[n]\}.
 \end{align}
+When 
+
 
 % To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
 % \begin{gather}
@@ -311,10 +313,8 @@ Massively parallel hardware such as \glspl{GPU} have a potential for acceleratin
 
 Hence, the programming strategy should be to decompose the algorithm into as many threads as possible, each being computationally intense and be light on the memory consumption and access. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
 
-If we evaluate the \gls{MVDR} beamformer, the two computationally dominating steps is to
-
 \begin{itemize}
- \item asf
+ \item 
 \end{itemize}
 
 
