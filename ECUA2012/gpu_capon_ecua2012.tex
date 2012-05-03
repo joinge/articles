@@ -272,15 +272,22 @@ Perhaps surprisingly, we will show that the suggested means for making the \gls{
 \newpage
 \section{Methods}
 
-Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m$. The beamformer output $z[n]$ is then given as
+Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
 z[n] = \w\H[n]\X[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.
 \end{align}
-The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. Assuming predelayed data, the solution to this optimization problem is given as
+The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
 \begin{gather}
-\vec w[n] = \frac{\eRi[n]\1}{\1\T\eRi[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},
 \end{gather}
-where $\1$ is a row vector of ones, and $\eR$ is an estimate of the spatial covariance matrix. To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
+where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. 
+\begin{gather}
+R[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \x[n']\x\H['n]
+\end{gather}
+
+
+
+To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
 \begin{gather}
 r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
 \end{gather}
@@ -302,6 +309,10 @@ If we evaluate the \gls{MVDR} beamformer, the two computationally dominating ste
  \item asf
 \end{itemize}
 
+
+\begin{gather}
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
+\end{gather}
 
 all threads should have the same single line of execution
 
