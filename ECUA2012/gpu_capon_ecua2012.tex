@@ -264,6 +264,8 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
 
+CUDA...
+
 Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, and the \gls{MVDR} beamformer is no exception. Each pixel in the image can be processed independently, and 
 
 
@@ -314,13 +316,18 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 
 \section{Implementation}
 
-By the methods just presented, we observe that for each range line, and for each sample $n$, the following steps must be carried out:
+A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a clever decomposition scheme for the methods just presented. In particular, we want to distinguish between the following steps:
 \begin{enumerate}
-\item \emph{Compute the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}).
-\item Compute $\eRi[n]\1$ (from equation \ref{weights}).
-\item Substitute the solution for $\eRi[n]\1$ into equation \ref{weights} to find the weights.
-\item Apply the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}) to acquire the pixel value $z[n]$.
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). In this step we launch a thread per diagonal in the upper half triangular of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$ at the time, and both reads and writes are kept coalesced.
+\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is wiser to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. After we optimized step 1, this remains at the most computationally intensive task.
+\item \emph{Computing the subarray weights} by substituting $\eRi[n]\1$ into equation \ref{weights}.
+\item \emph{Acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}).
 \end{enumerate}
+
+
+Our implementation is based on launching Since these steps have a different nature, 
+
+\subsection{Computing $\eR[n]$}
 
 
 Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited.\todo{repetition} There is also a considerable latency involved when accessing on-board memory, but these memory transfers are asynchronous and may be hidden.
