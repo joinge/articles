@@ -292,18 +292,23 @@ where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the su
 
 \section{Implementation}
 
+Massively parallel hardware such as \glspl{GPU} is  have a potential for accelerating a great many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the penalty of such a design is that the amount of memory available locally for each core is very limited. There is also a considerable latency involved when moving data between the \gls{CPU} and these cores, so assessing various memory access schemes is crucial to achieve optimal performance.
 
-A massively parallel hardware such as \glspl{GPU} have a potential for accelerating a great many signal processing tasks, but fully exploiting this potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the amount of memory available locally for core is very limited. There is also a considerable latency involved in moving data between the \gls{CPU} and these cores, but as the data transfer is asynchronous this latency is largely hidden as long as the threads running on each core are computationally intensive.
+Hence, the programming strategy should be to decompose the algorithm into as many threads as possible, each being computationally intense and be light on the memory consumption and access. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
 
-thread = computationally intense and low memory consumption.
-consecutive threads should have linear memory access patterns
+If we evaluate the \gls{MVDR} beamformer, the two computationally dominating steps is to
+
+\begin{itemize}
+ \item asf
+\end{itemize}
+
+
 all threads should have the same single line of execution
-
 
 
 \section{Results}
 
-Benchmarks were carried out on a test system comprised of a quad-core Intel Xeon E5620 running at 2.4GHz, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This \gls{GPU}
+Benchmarks were carried out on a test system comprised of a quad-core Intel Xeon E5620 running at 2.4GHz, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores, 6Gb of onboard \gls{RAM}, 
 
 To test the \gls{CUDA} implementation of the \gls{MVDR} beamformer, we have chosen a dataset from the $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. \todo{Data???}.
 
