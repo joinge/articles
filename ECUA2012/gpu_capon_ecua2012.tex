@@ -262,6 +262,7 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
+\todo{Get some references in here...}
 % - Who's done stuff on GPU beamforming before?
 % 
 % - Complex data
@@ -291,11 +292,22 @@ where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the su
 
 \section{Implementation}
 
+
 A massively parallel hardware such as \glspl{GPU} have a potential for accelerating a great many signal processing tasks, but fully exploiting this potential is not always trivial. Modern \gls{GPU} chips may contain hundreds of processing cores, but the amount of memory available locally for core is very limited. There is also a considerable latency involved in moving data between the \gls{CPU} and these cores, but as the data transfer is asynchronous this latency is largely hidden as long as the threads running on each core are computationally intensive.
 
 thread = computationally intense and low memory consumption.
 consecutive threads should have linear memory access patterns
 all threads should have the same single line of execution
+
+
+
+\section{Results}
+
+Benchmarks were carried out on a test system comprised of a quad-core Intel Xeon E5620 running at 2.4GHz, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This \gls{GPU}
+
+To test the \gls{CUDA} implementation of the \gls{MVDR} beamformer, we have chosen a dataset from the $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. \todo{Data???}.
+
+
 
 
 
