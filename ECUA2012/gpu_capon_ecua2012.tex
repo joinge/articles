@@ -255,7 +255,7 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 % The Minimum Variance Distortionless Response (MVDR) (or Capon) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
 
-Modern phased array active sonar systems are often limited by its lateral resolution and \gls{SNR} of the system. This is because of the the lateral extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
+Modern phased array active sonar systems are often limited by their lateral resolution and \gls{SNR}, which is due to limited lateral extent of the array the spatial extent of the array sample the extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
 The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
 
@@ -281,14 +281,15 @@ The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimiz
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},
 \end{gather}
-where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. First, we split the segmenting the array into subarrays where all but one element overlap, and call the output vectors
+where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of both spatial and temporal averaging. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is then given as
 \begin{gather}
 \x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T.
 \end{gather}
-
+Then the average of all these subarrays are computed,
 \begin{gather}
 \tilde\R[n] = \frac{1}{M-L+1} \sumb{i=0}{M-L+1} \x_{i+k}[n]\x_{i+k}\H[n]
 \end{gather}
+Finally, 
 \begin{gather}
 \tilde\R[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \x[n']\x\H['n]
 \end{gather}
