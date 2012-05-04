@@ -315,6 +315,13 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 
 
 \newpage
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{gfx/img_holmengraa.pdf}
+\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
+\end{figure}
+
+
 \section{Implementation}
 
 A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise decomposition scheme for the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
@@ -328,18 +335,21 @@ A modern \gls{GPU} is an hardware architecture comprised of several hundred comp
 
 \section{Results}
 
-We have tested the \gls{CUDA} implementation of the \gls{MVDR} beamformer on experimental dat from $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. 
+We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (fig. \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth.
 
 The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
 
+
 \begin{figure}[!t]
 \centering
-\includegraphics{gfx/benchmark.png}
-\caption{Capon benchmarks.}
-\label{fig_sim}
+\includegraphics[width=\linewidth]{gfx/benchmark.pdf}
+\caption{Capon benchmarks.}\label{benchmarks}
 \end{figure}
 
-% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}. It is about 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
+
+
+
+% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}.  depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
 
 % In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
 
