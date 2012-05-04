@@ -16,13 +16,15 @@
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \ifPeerReview
-\documentclass[12pt,journal,captionsoff,onecolumn,english]{IEEEtran}
+\documentclass[12pt,journal,captionsoff,onecolumn]{IEEEtran}
 \newcommand\CLASSINPUTbaselinestretch{1.66}     % http://theoval.cmp.uea.ac.uk/~nlct/latex/thesis/node17.html
 \else
 \documentclass[journal]{IEEEtran}
 \fi
 
-
+% \RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1)
+% \RequirePackage[T1]{fontenc}%                 % Set font encoding
+% \usepackage[norsk]{babel}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEE ''APPROVED'' PACKAGES %
@@ -97,6 +99,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 \usepackage[maxfloats=25]{morefloats}
 \newcounter{todoidx}
+\usepackage[toc,nonumberlist]{glossaries}
 % \setcounter{todoidx}
 
 \ifTODO
@@ -129,6 +132,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \setlength{\parsep}{\parskip}}%
 \item[]}{\end{list}}
 
+\usepackage{float}
 
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % MACROS %       
@@ -236,6 +240,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand*\R{\mat R}
 \newcommand*\Ri{\R^{-1}}
 \newcommand*\eR{\mat{\hat R}}
+\newcommand*\eRi{\hat{\mat R}\,\!^{-1}}
+\newcommand*\Navg{N_\text{avg}}
 \newcommand*\W{\mat W}
 \newcommand*\X{\mat X}
 \newcommand*\Xd{\X_{\!\Delta}}
@@ -282,17 +288,16 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
-% \RequirePackage[T1]{fontenc}%                 % Set font encoding
+% \usepackage{yfonts}
 
 
 \begin{document}
 
-\title{Low Complexity Adaptive Beamformer\\ for Active Sonar Imaging}
+\title{A GPU Implementation of Capon for an Active Sonar System}
 
 \author{Jo~Inge~Buskenes, %
-        Andreas~Austeng, %
-        Carl-Inge~Columbo~Nilsen%
+        Jon~Petter~Aasen, %
+        Carl-Inge~Colombo~Nilsen%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
 of Informatics, University of Oslo, Norway.}% <-this % stops a space
 
@@ -301,7 +306,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 
 % The paper headers
 \markboth{IEEE Journal of Oceanic Engineering}%
-{Low Complexity Adaptive Beamformer for Active Sonar Imaging}
+{A GPU Implementation of Capon for an Active Sonar System}
 
 % Publishers ID mark:
 %\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
@@ -316,14 +321,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 \begin{abstract}
 
 \begin{itemize}
-\item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
-\item But:
-\begin{itemize}
-\item Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust.
-\item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
-\item Computationally complex O($M^3$) due to inversion of a spatial covariance matrix. LCA is only O($MW$). Even if Capon subspace/beamspace versions exist, they remain more complex than the LCA, and is not as ideally suited for implementation of SIMD hardware (GPUs, DSPs, ...).
-\end{itemize}
-\item LCA is inherently robust, is ``parameter free'' once setup with a well designed window set, and can often be implemented with minor modifications to already existing DAS beamformers.
+\item Todo.
 \end{itemize}
 
 \end{abstract}
@@ -331,7 +329,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % Keywords (normally not used for peer reviews)
 \ifPeerReview\else
 \begin{IEEEkeywords}
-Beamforming, adaptive beamforming, sonar, active, complexity.
+Beamforming, adaptive beamforming, sonar, active, complexity. \todo{not entirely true?}
 \end{IEEEkeywords}
 \fi}
 % \fi
@@ -352,32 +350,54 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 \section{Introduction}
 
+Delays and weights are applied to each of the sensor channels to ensure that signals emanating from a pixel of interest add constructively, while noise and interference from other regions add destructively. This method of adjusting the spatial focus of the antenna is commonly referred to as a beamformer. A
+
+Beamformer algorithms are distinction 
+
+The Minimum Variance One of the most well established adaptive 
+
+One of the main issues with adaptive beamformers is their computational complexity, and .
+
+Most modern active sonar imaging systems record and process the incoming wavefield through the use of phased arrays. A pixel value in the image is estimated by digitally steering the arrays response to the corresponding region in space. This concept is called beamforming and involves applying a suitable set of delays and weights to each of the sensor channels to cause constrictive interference of the signals coming from the region of interest, and destructive interference of anything else. Ideally, we want a spatial response 
+
+If a beamformer only employ a static set of weights and delays, it is referred to as a conventional one. Applying , which  Various weight sets, or windows, may be added, Adaptive beamformers, on the other hand, attempts to find an optimal spatial response that best fits the incoming wavefield.  The most common approach is perform a rough adjustment using a static set of delays, and compute a new set of weights at each time instant. 
+
+
+
+\todopar{Case:
+\begin{itemize}
+\item JOE
+\item Sonar. Channel count up to 32/64 ish channels?
+\item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
+\item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
+\end{itemize}
+}
 
 \begin{itemize}
-\item Sell it!
 \item As briefly as possible, introduce beamforming.
 \item Adaptive beamformer's potential lies in its ability to suppress interference power
 \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
+\item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
 \begin{itemize}
-\item Noise and signal is correlated. Spatial averaging required. 
-\item Increases variance of speckle (not only in active systems?), spatial compunting \cite{Vignon2009} (US) or time averaging?. Subarray averaging applied here \cite{Synnevag2007} (US) \todo{Is it bad to mix ultrasound/ sonar refs?}
+\item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+\item Iterative methods: Woodbury, Conjugated gradients
+\item Beamspace
+\item LCA (or other methods, as reference)
 \end{itemize}
-\item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was that guy in the 80ties?}
-\item Outline: 
+\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+\item In most imaging applications 
+Outline:
 \begin{itemize}
-\item Methods.
-\item See what happens to Capon's response %\cite{Synnevag2007}  when means for robustification are added.
-\item Setup the window set for LCA to match this.
-\item Notice that the LCA performs like Capon, even with a small window database.
-\item Start with Kaiser, see that other window functions also work well.
+\item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+\item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
+\item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
+\item Beamspace
+\item LCA (or other methods, as reference)
 \end{itemize}
 \end{itemize}
-\todopar{Out of the blue idea: Weigh CF with LCA? This guy did it with MVDR \cite{Wang2009}. Probably you know already... Okay, back on track.}
 
 
 \section{Methods}
-
-\todopar{Threw some formulas in to get a feel of them}
 
 \begin{align}
 z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
@@ -422,31 +442,86 @@ where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the nu
 \varepsilon = \Delta \cdot \tr\{\eR[n]\}
 \end{align}
 
-\section{Results}
+\subsection{Traditional approach}
 
-% \begin{figure}[!t]\centering
-% % \includegraphics[width=2.5in]{}
-% \caption{Simulation Results}
-% \label{fig_sim}
-% \end{figure}
+Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
 
-See end of document...
-% \begin{figure*}[!t]
-% \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-% \label{fig_first_case}}
-% \hfil
-% \subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-% \label{fig_second_case}}}
-% \caption{Simulation results}
-% \label{fig_sim}
-% \end{figure*}
+These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
+\begin{align*}
+r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
+\end{align*}
+which can be easily rewritten in a sliding window fashion
+\begin{align*}
+r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
+\end{align*}
+Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
+\begin{figure}[H]
+% \begin{narrow}{-3.5cm}{-3.5cm}
+\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
+% \end{narrow}
+\end{figure}
+The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
+{\renewcommand*{\arraystretch}{1.8}
+\begin{align*}
+\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
+&= \left[\;
+\begin{matrix}
+\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+\end{matrix}
+\;\right]
+\end{align*}}%
+Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
 
+{\bf Method complexity:}\\
+\begin{tabular}{l l}
+No optimizations            & $2M^2\,(2\Navg+1)$ \\
+Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
+Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
+\end{tabular}\\\\
+
+
+
+\subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
+
+There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
+
+
+\subsection{Iterative methods}
+
+\begin{itemize}
+\item Woodbury
+\item Conjugated gradients
+\end{itemize}
+
+
+\subsection{Beamspace}
+
+\begin{itemize}
+\item Some minimum of background, and good references.
+\end{itemize}
+
+
+\section{Results/Discussion}
+
+
+
+
+
+\begin{itemize}
+\item Compare computational complexity vs. memory constraints for the various methods. Supporting plots.
+\item Relate this to whether the favourable architecture is a CPU or a GPU \todo{check ``when to gpu article''}
+\item Run benchmarks on some sonar dataset(s)
+\end{itemize}
 
 
 \section{Conclusion}
 
 \begin{itemize}
-\item Something similar to the abstract.
+\item When to use what.
 \end{itemize}
 
 
