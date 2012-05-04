@@ -319,7 +319,7 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 
 A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise decomposition scheme for the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). Here we launch a thread per diagonal in the upper half triangular of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$, and manage to keep both data reads and writes coalesced.
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). Here we create threads that slide along the diagonals of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$, and manage to keep both data reads and writes coalesced.
 \item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. This is by far the most computationally intensive task, and a key area of focus for further improvements.
 \item \emph{Computing the subarray weights} by substituting $\eRi[n]\1$ into equation \ref{weights}.
 \item \emph{Acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}).
@@ -328,9 +328,20 @@ A modern \gls{GPU} is an hardware architecture comprised of several hundred comp
 
 \section{Results}
 
-To test the \gls{CUDA} implementation of the \gls{MVDR} beamformer, we have chosen a dataset from the $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}, \todo{Data???} for 
+We have tested the \gls{CUDA} implementation of the \gls{MVDR} beamformer on experimental dat from $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. 
 
 The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
+
+\begin{figure}[!t]
+\centering
+\includegraphics{gfx/benchmark.png}
+\caption{Capon benchmarks.}
+\label{fig_sim}
+\end{figure}
+
+% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}. It is about 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
+
+% In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
 
 
 
