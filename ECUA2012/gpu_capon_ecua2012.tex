@@ -223,8 +223,9 @@
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \makeglossaries
-\input{../../Library/glossary}
-
+%\input{../../Library/glossary}
+% windows hack for JP
+\renewcommand\gls[1]{#1}
 
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -278,7 +279,7 @@ REFERENCES!!! (all over..)
 
 
 \newpage
-\section{Methods}
+\section{Methods}\label{methods}
 
 Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
@@ -322,14 +323,15 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 
 
 \section{Implementation}
-
-A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+The paradigm of \gls{GPU} computing is formalized as the execution of thousand of threads, where each thread runs a copy of a common function, also know as a kernel. Threads are organized in blocks, and blocks further into a grid of blocks. The threads index in this grid usually decides the data to be process and the instruction path to go along. A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory an registers. This suggests that the algorithm should be decomposed into as many lightweight threads as possible. For a typical array configuration, using a single thread per pixel for Capon is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). Here we create threads that slide along the diagonals of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$, and manage to keep both data reads and writes coalesced.
-\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. This is by far the most computationally intensive task, and a key area of focus for further improvements.
-\item \emph{Computing the subarray weights} by substituting $\eRi[n]\1$ into equation \ref{weights}.
-\item \emph{Acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}).
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we can exploit the fact that entries on the diagonals overlaps across subarrays and time. 
+%Finished threads can also wrap around and start on diagonals on the lower half triangular. 
+In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
+\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, but achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
+\item \emph{Computing the subarray weights} by substituting $\beta = \eRi[n]\1$ into equation \ref{weights}, $\vec w[n] = \frac{\beta}{\1\T\beta}$. A group of L threads per pixel was used to reduce shared memory pressure and to obtain coalesced reads and a minimum of writes. \emph{Finally we acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}). When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to M in size and applied directly on $\x[n]$ and summed.  
 \end{enumerate}
+For the GPU, the largest bottleneck is the transfer of memory from CPU-side (Host) to the GPU-side (Device). In the upcoming results, Host to Device transfer are not taken into account. The reasoning behind this is the fact that Capon beamforming requires already delayed data. For efficiency, this should also be carried out on the GPU, leaving the challenging task of overcoming the limited Host-Device memory bandwidth to those who implement the delay part of delay-and-sum. 
 
 
 TODO:
@@ -339,6 +341,7 @@ TODO:
 \item Doesn't sell well that we used nVidias solver, especially when that's the bottleneck in the design...
 \end{itemize}
 
+\newpage
 
 \section{Results}
 
