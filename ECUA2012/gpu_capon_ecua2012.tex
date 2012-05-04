@@ -314,47 +314,23 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 % where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. 
 
 
+\newpage
 \section{Implementation}
 
-A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a clever decomposition scheme for the methods just presented. In particular, we want to distinguish between the following steps:
+A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise decomposition scheme for the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). In this step we launch a thread per diagonal in the upper half triangular of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$ at the time, and both reads and writes are kept coalesced.
-\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is wiser to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. After we optimized step 1, this remains at the most computationally intensive task.
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). Here we launch a thread per diagonal in the upper half triangular of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$, and manage to keep both data reads and writes coalesced.
+\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. This is by far the most computationally intensive task, and a key area of focus for further improvements.
 \item \emph{Computing the subarray weights} by substituting $\eRi[n]\1$ into equation \ref{weights}.
 \item \emph{Acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}).
 \end{enumerate}
 
 
-Our implementation is based on launching Since these steps have a different nature, 
-
-\subsection{Computing $\eR[n]$}
-
-
-Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, but fully exploiting their potential is not always trivial. Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited.\todo{repetition} There is also a considerable latency involved when accessing on-board memory, but these memory transfers are asynchronous and may be hidden.
-
-decompose the algorithm into as many threads as possible, each being computationally intense and be light on memory access and consumption. Consecutive threads should also access consecutive memory regions, to enable coalesced data transfers, and have the same line of execution.
-
-How may this be decomposed? Already decomposed at pixel-level.
-
-We implement the 
-Our implementation of th
-
-When 
-
-\begin{gather}
-\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1} = \frac{\vec\beta[n]}{\1\T\vec\beta[n]},
-\end{gather}
-
-all threads should have the same single line of execution
-
-
 \section{Results}
 
-Benchmarks were carried out on a test system comprised of a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. 
+To test the \gls{CUDA} implementation of the \gls{MVDR} beamformer, we have chosen a dataset from the $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}, \todo{Data???} for 
 
-To test the \gls{CUDA} implementation of the \gls{MVDR} beamformer, we have chosen a dataset from the $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. \todo{Data???}.
-
-
+The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
 
 
 
