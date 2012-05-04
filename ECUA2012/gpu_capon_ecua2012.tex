@@ -264,14 +264,13 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
 
-CUDA...
+\begin{itemize}
+\item Adaptive beamformer's potential lies in its ability to suppress interference power
+\item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
+\item CUDA?
+\end{itemize}
 
-Massively parallel hardware such as \glspl{GPU} have a potential for accelerating many signal processing tasks, and the \gls{MVDR} beamformer is no exception. Each pixel in the image can be processed independently, and 
-
-
-Modern \gls{GPU} chips contain several hundred processing cores, but the amount of memory available locally for each core is very limited.\todo{repetition} There is also a considerable latency involved when accessing on-board memory, but these memory transfers are asynchronous and may be hidden.
-
-\todo{Get some references in here...}
+REFERENCES!!! (all over..)
 % - Who's done stuff on GPU beamforming before?
 % 
 % - Complex data
@@ -333,12 +332,17 @@ A modern \gls{GPU} is an hardware architecture comprised of several hundred comp
 \end{enumerate}
 
 
+TODO:
+\begin{itemize}
+\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+\item Introduce CUDA, or ditch it?
+\item Doesn't sell well that we used nVidias solver, especially when that's the bottleneck in the design...
+\end{itemize}
+
+
 \section{Results}
 
-We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (fig. \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth.
-
-The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
-
+We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from $M=32$ element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}\todo{specify SAS somewhere here..}. The sonar was attached to the HUGIN \gls{AUV}, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (fig. \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. 
 
 \begin{figure}[!t]
 \centering
@@ -346,75 +350,16 @@ The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVid
 \caption{Capon benchmarks.}\label{benchmarks}
 \end{figure}
 
+Benchmarks\\
+The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
 
 
-
-% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}.  depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
-
-% In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
-
-
-
-down to these cores and back to the \gls{CPU} is also when copying data to and from the \gls{GPU} are also rather high, so each core should be   performing calculations there, and copying the data back to the \gls{CPU}
-
- but in order to fully exploit this potential we must be aware of its limitations.  
-
-When adapting an algorithm to a massively parallel hardware such as \glspl{GPU}, one must be familiar with its limitations in order to that the potential that lies within these chips can not be fully realised 
-
-When trying to fit any algorithm to massively parallel hardware such as \glspl{GPU}, one must be careful to select a proper decomposition scheme for the device at hand. Modern \glspl{GPU} have several hundred computing cores, but only a limited amount of  are  various decomposition schemes should be contemplated before performing the implecareful decomposition of the 
-
-
-Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
-
-These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
-\begin{align*}
-r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
-\end{align*}
-which can be easily rewritten in a sliding window fashion
-\begin{align*}
-\hat r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
-                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
-\end{align*}
-Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
-\begin{figure}[H]
-% \begin{narrow}{-3.5cm}{-3.5cm}
-\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
-\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
-% \end{narrow}
-\end{figure}
-The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
-{\renewcommand*{\arraystretch}{1.8}
-\begin{align*}
-\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
-&= \left[\;
-\begin{matrix}
-\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-\end{matrix}
-\;\right]
-\end{align*}}%
-Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
-
-{\bf Method complexity:}\\
-\begin{tabular}{l l}
-No optimizations            & $2M^2\,(2\Navg+1)$ \\
-Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
-Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
-\end{tabular}\\\\
-
-
-
-% \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
-
-There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
-
-
-\section{Results/Discussion}
+\section{Discussion}
 
 \begin{itemize}
-\item Execution time plots. For given of M/L, plot for different Yavg (note negligible diagonal loading).
-\item An image? Holmengrå?
+\item Relate Capon image to DAS image
+\item Discuss the benchmarks
+\item Need for speed: HUGIN 4 banks of 32 elements, can be processed faster than the ping repetition rate, with margins to spare.
 \end{itemize}
 
 
@@ -425,38 +370,106 @@ There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R
 \end{itemize}
 
 
-\todopar{Case:
-\begin{itemize}
-\item JOE
-\item Sonar. Channel count up to 32/64 ish channels?
-\item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
-\item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
-\end{itemize}
-}
 
-\begin{itemize}
-\item As briefly as possible, introduce beamforming.
-\item Adaptive beamformer's potential lies in its ability to suppress interference power
-\item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
-\item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
-\begin{itemize}
-\item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
-\item Iterative methods: Woodbury, Conjugated gradients
-\item Beamspace
-\item LCA (or other methods, as reference)
-\end{itemize}
-\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
-\item In most imaging applications 
-Outline:
-\begin{itemize}
-\item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
-\item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
-\item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
-\item Beamspace
-\item LCA (or other methods, as reference)
-\end{itemize}
-\end{itemize}
+% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}.  depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
 
+% % In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
+% 
+% 
+% 
+% down to these cores and back to the \gls{CPU} is also when copying data to and from the \gls{GPU} are also rather high, so each core should be   performing calculations there, and copying the data back to the \gls{CPU}
+% 
+%  but in order to fully exploit this potential we must be aware of its limitations.  
+% 
+% When adapting an algorithm to a massively parallel hardware such as \glspl{GPU}, one must be familiar with its limitations in order to that the potential that lies within these chips can not be fully realised 
+% 
+% When trying to fit any algorithm to massively parallel hardware such as \glspl{GPU}, one must be careful to select a proper decomposition scheme for the device at hand. Modern \glspl{GPU} have several hundred computing cores, but only a limited amount of  are  various decomposition schemes should be contemplated before performing the implecareful decomposition of the 
+% 
+% 
+% Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
+% 
+% These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
+% \begin{align*}
+% r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
+% \end{align*}
+% which can be easily rewritten in a sliding window fashion
+% \begin{align*}
+% \hat r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+%                          + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
+% \end{align*}
+% Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
+% \begin{figure}[H]
+% % \begin{narrow}{-3.5cm}{-3.5cm}
+% \includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+% \caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
+% % \end{narrow}
+% \end{figure}
+% The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
+% {\renewcommand*{\arraystretch}{1.8}
+% \begin{align*}
+% \hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
+% &= \left[\;
+% \begin{matrix}
+% \color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+%                                        & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+%                                        &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+% \end{matrix}
+% \;\right]
+% \end{align*}}%
+% Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
+% 
+% {\bf Method complexity:}\\
+% \begin{tabular}{l l}
+% No optimizations            & $2M^2\,(2\Navg+1)$ \\
+% Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
+% Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
+% \end{tabular}\\\\
+
+
+
+% \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
+% 
+% There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
+% 
+% 
+% \section{Results/Discussion}
+% 
+% 
+% 
+% 
+% 
+% \todopar{Case:
+% \begin{itemize}
+% \item JOE
+% \item Sonar. Channel count up to 32/64 ish channels?
+% \item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
+% \item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
+% \end{itemize}
+% }
+% 
+% \begin{itemize}
+% \item As briefly as possible, introduce beamforming.
+% \item Adaptive beamformer's potential lies in its ability to suppress interference power
+% \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
+% \item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
+% \begin{itemize}
+% \item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+% \item Iterative methods: Woodbury, Conjugated gradients
+% \item Beamspace
+% \item LCA (or other methods, as reference)
+% \end{itemize}
+% \item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+% \item In most imaging applications 
+% Outline:
+% \begin{itemize}
+% \item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
+% \item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
+% \item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
+% \item Beamspace
+% \item LCA (or other methods, as reference)
+% \end{itemize}
+% \end{itemize}
+% 
 
 % \ \\
 % \IEEEPARstart{T}{o} form images from a modern phased array sonar system the received wavefield is usually recorded, and then postprocessed by a digital beamformer. The beamformer applies delays and weights to the sensor channels, the beamformer adjusts the arrays spatial response to focus at one pixel at a time.  such that signals emanating from regions of interest add constructively, while ensuring that noise and interference from other angles do not. 
@@ -575,36 +588,36 @@ Outline:
 % Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
 % floats. This can be corrected via the \fnbelowfloat command of the
 % stfloats package.
-
-
-
-\section{Conclusion}
-The conclusion goes here.
-
-
-
-
-
-% if have a single appendix:
-%\appendix[Proof of the Zonklar Equations]
-% or
-%\appendix  % for no appendix heading
-% do not use \section anymore after \appendix, only \section*
-% is possibly needed
-
-% use appendices with more than one appendix
-% then use \section to start each appendix
-% you must declare a \section before using any
-% \subsection or using \label (\appendices by itself
-% starts a section numbered zero.)
-%
+% 
+% 
+% 
+% \section{Conclusion}
+% The conclusion goes here.
+% 
+% 
+% 
+% 
+% 
+% % if have a single appendix:
+% %\appendix[Proof of the Zonklar Equations]
+% % or
+% %\appendix  % for no appendix heading
+% % do not use \section anymore after \appendix, only \section*
+% % is possibly needed
+% 
+% % use appendices with more than one appendix
+% % then use \section to start each appendix
+% % you must declare a \section before using any
+% % \subsection or using \label (\appendices by itself
+% % starts a section numbered zero.)
+% %
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT APPENDICES %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-\section*{Acknowledgments}
+% 
+\section{Acknowledgments}
 
 The authors would like to thank...
 
