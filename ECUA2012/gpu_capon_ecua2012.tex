@@ -288,7 +288,7 @@ The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimiz
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is given as
+where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is given as
 \begin{gather}
 \x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
 \end{gather}
@@ -323,7 +323,7 @@ Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of t
 
 \section{Implementation}
 
-A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise decomposition scheme for the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory. This suggests that the algorithm should be decomposed into as many lightweight threads as possible, and using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods just presented. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
 \item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). Here we create threads that slide along the diagonals of $\eR$, and let finished threads wrap around and start on diagonals on the lower half triangular. This way we process one row of $\eR$, and manage to keep both data reads and writes coalesced.
 \item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, but achieved the best performance by using an unofficial batch solver from nVidia. This is by far the most computationally intensive task, and a key area of focus for further improvements.

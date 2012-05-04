@@ -1,0 +1,89 @@
+% File:         ecua.sty
+% Author:    C.Capus
+% Date:       28.01.12
+% Version:  1.0.0
+%
+% LaTeX style file for ECUA Conference Papers
+% Initial revision written for ECUA 2012
+% Please contact c.capus@hw.ac.uk if you have problems using it
+% Note: LaTeX system must have the Helvetica font family installed
+% Note: requires Piet van Oostrum's fancyhdr package for header and footer layout
+%
+% REVISIONS
+% 28.01.12	1.0.0		Initial revision to set up fonts and page layouts
+
+
+% sequester some necessary packages
+\usepackage{fancyhdr}   % used to define standard Proceedings headers and footers
+
+% set default sans serif font
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\sfdefault}{phv}
+\renewcommand{\ttdefault}{pcr}
+\renewcommand{\familydefault}{\sfdefault}
+
+% set up page margins
+\setlength{\oddsidemargin}{1.6mm} % +25.4mm default
+\setlength{\evensidemargin}{1.6mm} % +25.4mm default
+\setlength{\topmargin}{-15.4mm} % +25.4mm default
+\setlength{\headheight}{10mm}
+\setlength{\headsep}{10mm}
+\setlength{\footskip}{10mm}
+\setlength{\textheight}{237mm}
+\setlength{\textwidth}{156mm}
+
+% redefine \maketitle for standard Proceedings layout
+\renewcommand{\maketitle} {
+	\renewcommand{\tabcolsep}{0.5mm}
+	\vspace*{5mm}
+%	\noindent{\raggedright\MakeUppercase{\LARGE\bf\@title}\par}
+	{\fontsize{16}{18}\selectfont%
+	\noindent{\raggedright\MakeUppercase{\bf\@title}\par}}
+	\vspace{2mm}
+	\noindent{\hspace{-\tabcolsep}\@author}
+	% suppress floats from top of first page
+	\suppressfloats[t]
+	\renewcommand{\tabcolsep}{0.75em}
+}
+
+% fix paragraph spacing and identation
+\setlength{\parindent}{0em}
+\setlength{\parskip}{2.0ex plus0.5ex minus 0.5ex}
+
+% set up standard ECUA headers and footers
+\pagestyle{fancy}
+\lhead{\bf{Proceedings of the 11th European Conference on Underwater Acoustics}}
+\chead{}\rhead{}
+\lfoot{\bf{}}
+\cfoot{}\rfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% redefine section headers to force uppercase type
+\renewcommand{\section} {\@startsection {section}{1}{0pt}%
+	{-2ex plus -.5ex minus -.2ex}{1.0ex plus .2ex minus .2ex}%
+	{\Large\bf\MakeUppercase}
+}
+% redefine subsection and subsubsection headers
+\renewcommand{\subsection} {\@startsection {subsection}{1}{0pt}%
+	{-1.5ex plus -.5ex minus -.2ex}{1.0ex plus .2ex minus .2ex}%
+	{\large\bf\MakeUppercase}
+}
+\renewcommand{\subsubsection} {\@startsection {subsubsection}{1}{0pt}%
+	{-1.5ex plus -.5ex minus -.2ex}{1.0ex plus .2ex minus .2ex}%
+	{\large\bf}
+}
+
+% redefine biblabel to match standard
+\makeatletter
+\renewcommand{\@biblabel}[1]{#1.\quad}
+\makeatother
+
+% fix some bad hyphenations
+% \hyphenation{freq-uency bio-acous-tics acous-tics}
+
+% extra code for \BibTeX definition
+\ifx\BibTeX\undefined
+	\def\BibTeX{B{\textsc  i\kern-.025em \textsc b}\kern-.07em \TeX}%
+\fi
+
