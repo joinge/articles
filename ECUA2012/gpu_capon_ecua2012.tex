@@ -264,10 +264,10 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
-The feasibility of using the Capon beamformer in active sonar imaging has been demonstrated in e.g. \cite{}\todo{...}.
+The feasibility of using the Capon beamformer in active sonar imaging has been demonstrated in e.g. \cite{Blomberg2012a,Blomberg2011,Dursun2009}.
 E.g. 
 
-GPU ultrasound (\cite{So2011}
+GPU ultrasound (\cite{So2011,Chen2011})
 
 Complex data, all robustification techniques.
 
@@ -287,10 +287,9 @@ REFERENCES!!! (all over..)
 \newpage
 \section{Methods}\label{methods}
 
-The principle of active sonar imaging is to transmit pulses that reflect off some interesting surface, and try to estimate some of its properties by inspecting the received echoes. When a receiver array is used, data from each sensor is coherently combined to   When an array of sensors  sensors, which  and then use them to estimateThe signal returns are often recorded using phased arrays, which enable 
-A common active sonar system transmits and receives encoded signals using phased arrays. Such arrays allow the  to transmit encoded signals that using a phased array usually operates by transmitting encoded signals towards some surface of interest, and record the returns using a . The signal returns are then recorded by 
-An active sonar system transmit signals 
-Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
+An active sonar imaging system usually transmits encoded signals signals towards a surface interest, and record the resulting reflections using receiver arrays. The receiver outputs may then be coherently combined in the post-processing to focus on a point in the image. This process is called beamforming, and the combination process involves assigning suitable delays and weights to the array's channels.
+
+Now consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
 \end{align}
