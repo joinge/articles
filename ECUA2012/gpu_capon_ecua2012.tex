@@ -278,6 +278,7 @@ Complex data, all robustification techniques.
 \end{itemize}
 
 REFERENCES!!! (all over..)
+\todo{Capon or MVDR?}
 % - Who's done stuff on GPU beamforming before?
 % 
 % - Complex data
@@ -287,7 +288,7 @@ REFERENCES!!! (all over..)
 \newpage
 \section{Methods}\label{methods}
 
-An active sonar imaging system usually transmits encoded signals signals towards a surface interest, and record the resulting reflections using receiver arrays. The receiver outputs may then be coherently combined in the post-processing to focus on a point in the image. This process is called beamforming, and the combination process involves assigning suitable delays and weights to the array's channels.
+An active sonar imaging system usually transmits encoded signals signals towards a surface interest, and record the resulting reflections using an array of receivers. This is allows the receiver outputs to be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is usually referred to as beamforming.
 
 Now consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
@@ -297,21 +298,24 @@ The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimiz
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. Spatial averaging\todo{not quite there yet} is achieved by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. Let $x_l[n]$ represent the datavector from subarray $l$,
+where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
+
+\emph{Spatial averaging} is achieved by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
-\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T.
+\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
 \end{gather}
-The spatially averaged sample covariance matrix, $\tilde R$, is given as
+then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as
 \begin{gather}
-\tilde\R[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].\label{spatialR}
+\eR_\text{s}[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].\label{spatialR}
 \end{gather}
-Finally, we take the average of $2N_\text{avg}+1$ temporal samples to form the final sample covariance matrix $\eR$,
+
+\emph{Temporal averaging} can now be introduced by taking the average of $2N_\text{avg}+1$ temporal samples of $\eR_\text{s}[n]$. Let the result be called $\eR_\text{t,s}[n]$,
 \begin{gather}
-\eR[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \tilde\R[n'].
+\eR_\text{t,s}[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \eR_\text{s}[n'].
 \end{gather}
-Finally, to make sure that $\eR$ is well conditioned, we add a fraction $d$ of the total power of $\eR$ to its diagonal\cite{Synnevag2007},
+Finally, to ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007},
 \begin{align}
-\eR[n] = \eR[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR[n]\}.\label{finalR}
+\eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\}.\label{finalR}
 \end{align}
 
 
@@ -353,7 +357,9 @@ TODO:
 
 \section{Results}
 
-We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}\todo{specify SAS somewhere here..}. The sonar was attached to the HUGIN \gls{AUV}, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (fig. \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$.
+We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
+
+Figure \ref{holmengraa} demonstrates the potential of the Capon beamformer. 
 
 \begin{figure}[!t]
 \centering
