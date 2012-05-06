@@ -264,6 +264,12 @@ However, despite its inherent potential, the \gls{MVDR} beamformer has yet to se
 
 Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
+The feasibility of using the Capon beamformer in active sonar imaging has been demonstrated in e.g. \cite{}\todo{...}.
+E.g. 
+
+GPU ultrasound (\cite{So2011}
+
+Complex data, all robustification techniques.
 
 \begin{itemize}
 \item Adaptive beamformer's potential lies in its ability to suppress interference power
@@ -281,6 +287,9 @@ REFERENCES!!! (all over..)
 \newpage
 \section{Methods}\label{methods}
 
+The principle of active sonar imaging is to transmit pulses that reflect off some interesting surface, and try to estimate some of its properties by inspecting the received echoes. When a receiver array is used, data from each sensor is coherently combined to   When an array of sensors  sensors, which  and then use them to estimateThe signal returns are often recorded using phased arrays, which enable 
+A common active sonar system transmits and receives encoded signals using phased arrays. Such arrays allow the  to transmit encoded signals that using a phased array usually operates by transmitting encoded signals towards some surface of interest, and record the returns using a . The signal returns are then recorded by 
+An active sonar system transmit signals 
 Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
@@ -289,11 +298,11 @@ The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimiz
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by performing some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. We start with the former, by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. The data vector $x_l[n]$ from subarray $l$ is given as
+where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics. Spatial averaging\todo{not quite there yet} is achieved by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. Let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
-\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
+\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T.
 \end{gather}
-and the spatially averaged sample covariance matrix, $\tilde R$, is given as
+The spatially averaged sample covariance matrix, $\tilde R$, is given as
 \begin{gather}
 \tilde\R[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].\label{spatialR}
 \end{gather}
