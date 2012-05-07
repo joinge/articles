@@ -272,21 +272,25 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 \newpage
 \section{Methods}\label{methods}
 
-The fundamental problem of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can perform this task by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that mitigates the difference in transmitter-pixel-receiver propagation time. the delays are usually simply chosen to . 
+The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that mitigates the difference in transmitter-pixel-receiver propagation time. 
 
-Now consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
+Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$. To simplify the upcoming notation, let sample $x_m[n]$ delayed by a factor $\Delta_m$ be written as
 \begin{align}
-z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
+x^\Delta_m = x_m[n-\Delta_m[n]].
+\end{align}
+The beamformer output $z[n]$ is then simply the weighted sum of all the delayed data samples:
+\begin{align}
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x^\Delta_0[n]\\x^\Delta_1[n]\\\vdots\\x^\Delta_{M-1}[n]}.\label{z}
 \end{align}
 The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$, which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
 
-\emph{Spatial averaging} is achieved by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
+\emph{Spatial averaging} is achieved by grouping array's channels into $M-L-1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
-\x_l[n] = \bmat{x_l[n-\Delta_l] & x_{l+1}[n-\Delta_l] & \dots & x_{l+L-1}[n-\Delta_{l+L-1}]}\T,
+\x_l[n] = \bmat{x^\Delta_l[n] & x^\Delta_{l+1}[n] & \dots & x^\Delta_{l+L-1}[n]}\T,
 \end{gather}
 then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as
 \begin{gather}
@@ -297,7 +301,7 @@ then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is gi
 \begin{gather}
 \eR_\text{t,s}[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \eR_\text{s}[n'].
 \end{gather}
-Finally, to ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007},
+Finally, to ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007}:
 \begin{align}
 \eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\}.\label{finalR}
 \end{align}
