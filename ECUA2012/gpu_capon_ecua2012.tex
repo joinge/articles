@@ -359,7 +359,7 @@ TODO:
 
 We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
-Figure \ref{holmengraa} demonstrates the potential of the Capon beamformer. 
+The Holmengraa demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship edges come out as sharper, and the shadows are less noisy. \todo{DAS faster, get it in somehow..}
 
 \begin{figure}[!t]
 \centering
@@ -367,8 +367,13 @@ Figure \ref{holmengraa} demonstrates the potential of the Capon beamformer.
 \caption{Capon benchmarks.}\label{benchmarks}
 \end{figure}
 
-Benchmarks\\
-The test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops.
+
+
+The Capon parameters influence the complexity of the algorithm. Runtime scale proportionally with the number of image pixels, $M$\todo{prolly not accurate} and $N_\text{avg}$, but not with $L$. To 
+
+Figure \ref{benchmarks}. Here the number of channels was set to $M=32$, and 
+
+test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. 
 
 
 \section{Discussion}
