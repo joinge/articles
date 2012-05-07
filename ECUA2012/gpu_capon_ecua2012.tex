@@ -365,18 +365,15 @@ We have tested our \gls{GPU} implementation of the Capon beamformer on experimen
 \caption{Capon benchmarks. \protect\newline A 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading.}\label{benchmarks}
 \end{figure}
 
-To test the runtime speed of our \gls{GPU} implementation of Capon, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$, and processed a 55\,kpixel image with $d=2\%$ diagonal loading.  
+To test the runtime speed of our \gls{GPU} implementation of Capon, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$ and added $d=2\%$ diagonal loading. The test image was a 55\,kpixels sectorscan.
 
 \section{Discussion}
 
-Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3Mpx image in milliseconds, our Matlab implementation of Capon needed minutes.
+Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation of Capon needed minutes.
 
-As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improve matters.  and the \gls{} hence the runtimes are seen are   much smaller than the Holmengraa image, but the relative performance increase seen when accelerating the algorithm with a \gls{GPU} is still accurate. 
+As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which corresponds to a speedup factor of 75 and 435, respectively.
 
-The Capon parameters influence the complexity of the algorithm. Runtime scale proportionally with the number of image pixels, $M$\todo{prolly not accurate} and $N_\text{avg}$, but not with $L$. To 
-
-Figure \ref{benchmarks}. Here the number of channels was set to $M=32$, and 
-
+Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in the \gls{GPU} implementation, and for larger $L$'s it dominates. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g. a batch based Cholesky or UHDU solver should cut the runtimes quite a bit further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which explains why the complexity curve of these implementation is roughly proportional with $L$, while the \gls{GPU} implementation is not.
 
 
 \begin{itemize}
