@@ -232,7 +232,7 @@
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\title{A GPU Implementation of \gls{MVDR} for an Active Sonar System}
+\title{A GPU Implementation of MVDR for an Active Sonar System}
 
 \author{%
 \begin{tabular}{p{45mm}p{125mm}}
@@ -257,13 +257,13 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 
 Modern phased array active sonar systems are often limited by their lateral resolution and \gls{SNR}. This is due to the limited lateral extent of the array, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
-The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the power accumulated by the array from other directions. This ability to suppress interference power improves the image detail level and \gls{SNR}, and the effect can be dramatic if the noise and interference is primarily focused around specific angles.The feasibility of using the \gls{MVDR} beamformer in active sonar imaging has been demonstrated in e.g. \cite{Blomberg2012a,Blomberg2011,Dursun2009}.
+The Minimum Variance Distortionless Response (MVDR, or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the power accumulated by the array from other directions. This ability to suppress interference power improves the image detail level and \gls{SNR}, and the effect can be dramatic if the noise and interference is primarily focused around specific angles. The feasibility of using the \gls{MVDR} beamformer in active sonar imaging has been demonstrated in e.g.~\cite{Blomberg2012a,Blomberg2011,Dursun2009}.
 
-However, despite its inherent potential, the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$). This makes it impractical in many situations, and even infeasible in high channel systems. \todo{mention disadvantage of tuning parameters?}
+However, despite its inherent potential, the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$). This makes it impractical in many situations, and even infeasible in high channel systems~\cite{So2011}. \todo{mention disadvantage of tuning parameters?}
 
 We will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single thread implementations in C. 
 
-Yay or nay? $\Rightarrow$ GPU ultrasound (\cite{So2011,Chen2011}). Complex data, all robustification techniques.
+% Yay or nay? $\Rightarrow$ GPU ultrasound (\cite{So2011,Chen2011}). Complex data, all robustification techniques.
 
 
 
@@ -318,16 +318,14 @@ Finally, to ensure a well conditioned sample covariance matrix, we add a fractio
 
 \section{Implementation}
 
-Beamforming is a process well suited for acceleration by parallelisation, because each pixel can be processed idependently. \todo{blend it in}
+When processing images it might be well worth having a look at the \gls{GPU}, as this is a task it was made for. A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
 
-A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
-
-This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory consumption. For a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory consumption. Beamforming fits well into this scheme, as each pixel can be processed idependently. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we can exploit the fact that entries on the diagonals overlaps across subarrays and time. 
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploit the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
 %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
-In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
-\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, but achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
+% In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
+\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
 \item \emph{Computing the beamformer output} $z[n]$.  by substituting $\beta = \eRi[n]\1$ into equation \ref{weights}, $\vec w[n] = \frac{\beta}{\1\T\beta}$. A group of L threads per pixel was used to reduce shared memory pressure and to obtain coalesced reads and a minimum of writes. \emph{Finally we acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}). When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to M in size and applied directly on $\x[n]$ and summed.  
 \end{enumerate}
 For the GPU, the largest bottleneck is the transfer of memory from CPU-side (Host) to the GPU-side (Device). In the upcoming results, Host to Device transfer are not taken into account. The reasoning behind this is the fact that \gls{MVDR} beamforming requires already delayed data. For efficiency, this should also be carried out on the GPU, leaving the challenging task of overcoming the limited Host-Device memory bandwidth to those who implement the delay part of delay-and-sum. 
