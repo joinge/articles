@@ -223,16 +223,16 @@
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \makeglossaries
-%\input{../../Library/glossary}
+\input{../../Library/glossary}
 % windows hack for JP
-\renewcommand\gls[1]{#1}
+% \renewcommand\gls[1]{#1}
 
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT START %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\title{A GPU Implementation of Capon for an Active Sonar System}
+\title{A GPU Implementation of \gls{MVDR} for an Active Sonar System}
 
 \author{%
 \begin{tabular}{p{45mm}p{125mm}}
@@ -253,18 +253,18 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 % 
 % The algorithm responsible for carrying out this task is referred to as a beamformer. Depending on whether data is evaluated when choosing a suitable set of delays and weights, beamformers can be branded either conventional or adaptive. A good example of the former is the The Delay-and-Sum (DAS) beamformer, which - as the name implies - simply delay the sensor channels appropriately prior to summing them up. Applying various weight sets, or windows, to the data prior to summation allows the lateral \gls{SNR} to be improved, but at the inevitable expense of a deteriorated lateral resolution. \todo{aka. the curse of physics.}
 % 
-% The Minimum Variance Distortionless Response (MVDR) (or Capon) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
+% The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
 
 Modern phased array active sonar systems are often limited by their lateral resolution and \gls{SNR}, which is due to limited lateral extent of the array the spatial extent of the array sample the extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
-The Capon (or \gls{MVDR}) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
+The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
 
-However, despite its inherent potential, the Capon beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
+However, despite its inherent potential, the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
 
-Perhaps surprisingly, we will show that the suggested means for making the Capon behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
+Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
-The feasibility of using the Capon beamformer in active sonar imaging has been demonstrated in e.g. \cite{Blomberg2012a,Blomberg2011,Dursun2009}.
+The feasibility of using the \gls{MVDR} beamformer in active sonar imaging has been demonstrated in e.g. \cite{Blomberg2012a,Blomberg2011,Dursun2009}.
 E.g. 
 
 GPU ultrasound (\cite{So2011,Chen2011})
@@ -278,7 +278,7 @@ Complex data, all robustification techniques.
 \end{itemize}
 
 REFERENCES!!! (all over..)
-\todo{Capon or MVDR?}
+\todo{\gls{MVDR} or MVDR?}
 % - Who's done stuff on GPU beamforming before?
 % 
 % - Complex data
@@ -294,7 +294,7 @@ Now consider an $M$ element phased array. Let the sample recorded by the $m$'th 
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
 \end{align}
-The Capon beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
+The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
@@ -335,7 +335,15 @@ Finally, to ensure a well conditioned sample covariance matrix, we add a fractio
 
 
 \section{Implementation}
-The paradigm of \gls{GPU} computing is formalized as the execution of thousand of threads, where each thread runs a copy of a common function, also know as a kernel. Threads are organized in blocks, and blocks further into a grid of blocks. The threads index in this grid usually decides the data to be process and the instruction path to go along. A modern \gls{GPU} is an hardware architecture comprised of several hundred computing cores, each having access to a very limited amount of local memory an registers. This suggests that the algorithm should be decomposed into as many lightweight threads as possible. For a typical array configuration, using a single thread per pixel for Capon is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+
+The paradigm of \gls{GPU} computing is formalized as the execution of thousand of threads, where each thread runs a copy of a common function, also know as a kernel. Threads are organized in blocks, and blocks further into a grid of blocks. The threads index in this grid usually decides the data to be process and the instruction path to go along.
+
+A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that runs a copy of a common function referred to as a kernel. This is a design that shows great promise in terms of computing power, but the tradeoff is that each computing core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency. 
+
+
+data level of parallelism comes with some challenges though. First,  Data must distruted to the threads that need it, and Data must be distributed to   A fundamental limitation with such a design is that each computing core is left with a minimum of local memory, and 
+
+having access to a very limited amount of local memory an registers. This suggests that the algorithm should be decomposed into as many lightweight threads as possible. For a typical array configuration, using a single thread per pixel for \gls{MVDR} is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
 \item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we can exploit the fact that entries on the diagonals overlaps across subarrays and time. 
 %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
@@ -343,12 +351,12 @@ In this way we process one row of $\eR$ per kernel iteration, and manage to keep
 \item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, but achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
 \item \emph{Computing the subarray weights} by substituting $\beta = \eRi[n]\1$ into equation \ref{weights}, $\vec w[n] = \frac{\beta}{\1\T\beta}$. A group of L threads per pixel was used to reduce shared memory pressure and to obtain coalesced reads and a minimum of writes. \emph{Finally we acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}). When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to M in size and applied directly on $\x[n]$ and summed.  
 \end{enumerate}
-For the GPU, the largest bottleneck is the transfer of memory from CPU-side (Host) to the GPU-side (Device). In the upcoming results, Host to Device transfer are not taken into account. The reasoning behind this is the fact that Capon beamforming requires already delayed data. For efficiency, this should also be carried out on the GPU, leaving the challenging task of overcoming the limited Host-Device memory bandwidth to those who implement the delay part of delay-and-sum. 
+For the GPU, the largest bottleneck is the transfer of memory from CPU-side (Host) to the GPU-side (Device). In the upcoming results, Host to Device transfer are not taken into account. The reasoning behind this is the fact that \gls{MVDR} beamforming requires already delayed data. For efficiency, this should also be carried out on the GPU, leaving the challenging task of overcoming the limited Host-Device memory bandwidth to those who implement the delay part of delay-and-sum. 
 
 
 TODO:
 \begin{itemize}
-\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+\item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing \gls{MVDR} 
 \item Introduce CUDA, or ditch it?
 \item Doesn't sell well that we used nVidias solver, especially when that's the bottleneck in the design...
 \end{itemize}
@@ -357,37 +365,36 @@ TODO:
 
 \section{Results}
 
-We have tested our \gls{GPU} implementation of the Capon beamformer on experimental data from the 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
+We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from the 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{gfx/benchmark.pdf}
-\caption{Capon benchmarks. \protect\newline A 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading.}\label{benchmarks}
+\caption{\gls{MVDR} benchmarks. \protect\newline A 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading.}\label{benchmarks}
 \end{figure}
 
-To test the runtime speed of our \gls{GPU} implementation of Capon, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$ and added $d=2\%$ diagonal loading. The test image was a 55\,kpixels sectorscan.
+To test the runtime speed of our \gls{GPU} implementation of \gls{MVDR}, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$ and added $d=2\%$ diagonal loading. The test image was a 55\,kpixels sectorscan.
 
 \section{Discussion}
 
-Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation of Capon needed minutes.
+Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation of \gls{MVDR} needed minutes.
 
 As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which corresponds to a speedup factor of 75 and 435, respectively.
 
 Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in the \gls{GPU} implementation, and for larger $L$'s it dominates. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g. a batch based Cholesky or UHDU solver should cut the runtimes quite a bit further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which explains why the complexity curve of these implementation is roughly proportional with $L$, while the \gls{GPU} implementation is not.
 
-
 \begin{itemize}
-\item Relate Capon image to DAS image
-\item Discuss the benchmarks
 \item Need for speed: HUGIN 4 banks of 32 elements, can be processed faster than the ping repetition rate, with margins to spare.
 \end{itemize}
 
 
 \section{Conclusion}
 
-\begin{itemize}
-\item When to use what.
-\end{itemize}
+The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. Each pixel in the image can be processed independently, and the steps within each pixel will also benefit from parallelisation. We implemented the \gls{MVDR} bench Compared to an optimized C and Matlab implementation, our \gls{GPU}
+
+
+We achieved speedups Our \gls{GPU} implementation 
+Using \glspl{GPU} to accelerate the is a 
 
 
 
@@ -462,8 +469,8 @@ Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in 
 % \begin{itemize}
 % \item JOE
 % \item Sonar. Channel count up to 32/64 ish channels?
-% \item Other articles evaluates Capon image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional Capon algorithm or by implementing specific versions on a GPU.
-% \item This article compare a few promising ways to implement Capon in general, in light of general complexity and suitability for implementation on a CPU and GPU.
+% \item Other articles evaluates \gls{MVDR} image quality, and some have shown that speedups can be achieved by reducing the complexity of the traditional \gls{MVDR} algorithm or by implementing specific versions on a GPU.
+% \item This article compare a few promising ways to implement \gls{MVDR} in general, in light of general complexity and suitability for implementation on a CPU and GPU.
 % \end{itemize}
 % }
 % 
@@ -471,14 +478,14 @@ Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in 
 % \item As briefly as possible, introduce beamforming.
 % \item Adaptive beamformer's potential lies in its ability to suppress interference power
 % \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
-% \item The three main ways to implement Capon \cite{Capon1969} is \todo{not entirely true?}
+% \item The three main ways to implement \gls{MVDR} \cite{\gls{MVDR}1969} is \todo{not entirely true?}
 % \begin{itemize}
 % \item Traditional way: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
 % \item Iterative methods: Woodbury, Conjugated gradients
 % \item Beamspace
 % \item LCA (or other methods, as reference)
 % \end{itemize}
-% \item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
+% \item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing \gls{MVDR} 
 % \item In most imaging applications 
 % Outline:
 % \begin{itemize}
@@ -500,7 +507,7 @@ Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in 
 % 
 % Outline:
 % \begin{itemize}
-% \item Capon's resonse when applying robustification
+% \item \gls{MVDR}'s resonse when applying robustification
 % \item Choice of window functions makes little difference.
 % \item Steering and mainlobewidths have outer bounds.
 % \item Beamspace?
@@ -516,7 +523,7 @@ Interesting to note is also that solving $\eRi\1$ remain the main bottleneck in 
 % 
 % \section{Methods}
 % 
-% Basically, we are working with a practical implementation of the Capon beamformer that computes a set of weights $\vec w$ for every single sample $n$ by solving:
+% Basically, we are working with a practical implementation of the \gls{MVDR} beamformer that computes a set of weights $\vec w$ for every single sample $n$ by solving:
 % \begin{gather*}
 % \vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
 % \end{gather*}%
