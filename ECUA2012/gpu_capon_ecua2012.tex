@@ -70,6 +70,8 @@
 % MACROS %       
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\newcommand\Eq[1]{Equation (\ref{#1})}
+\newcommand\Fig[1]{Figure \ref{#1}}
 
 \newcommand\Grey[1]{{\color{Grey}#1}}
 \newcommand\Red[1]{{\color{Red}#1}}
@@ -311,17 +313,18 @@ where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation
 \newpage
 \section{Implementation}
 
-Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for acceleration by parallel hardware \cite{Nilsen2009}. Of particular interest these days is perhaps the \gls{GPU}, which is tailored for image processing, are available off-the-shelf at reasonable prices, and are found in most desktop computers already. A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
+Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. Of particular interest is the \gls{GPU}~\cite{Nilsen2009}, which is tailored for image processing, are available off-the-shelf at reasonable prices, and are found in most desktop computers already. A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
 
-This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory consumption. Beamforming fits well into this scheme, as each pixel can be processed idependently. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, we the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (equation \ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploit the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
 %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
 % In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
-\item \emph{Computing} $\eRi[n]\1$ (from equation \ref{weights}). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
-\item \emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into equation \ref{weights}, $\vec w[n] = \frac{\beta}{\1\T\beta}$. A group of L threads per pixel was used to reduce shared memory pressure and to obtain coalesced reads and a minimum of writes. \emph{Finally we acquire the pixel value $z[n]$} by applying the weights to each data vector $\x_l[n]$, and sum them all up (as in equation \ref{z}). When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to M in size and applied directly on $\x[n]$ and summed.  
+\item \emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
+\item \emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
 \end{enumerate}
-For the GPU, the largest bottleneck is the transfer of memory from CPU-side (Host) to the GPU-side (Device). In the upcoming results, Host to Device transfer are not taken into account. The reasoning behind this is the fact that \gls{MVDR} beamforming requires already delayed data. For efficiency, this should also be carried out on the GPU, leaving the challenging task of overcoming the limited Host-Device memory bandwidth to those who implement the delay part of delay-and-sum. 
+
+In the upcoming results, we have beamformed pre-delayed data. This is a large dataset, and the latency experienced when copying it from the \gls{CPU} side to the \gls{GPU} was significant. However, in a practical system only the channel data should be transferred as the \gls{GPU} can effortlessly also perform simple delaying of data. The remaining latency can be easily hidden as long as the \gls{GPU} is kept busy, hence the data transfer times will not be reported in the upcoming results.
 
 \begin{figure}[!t]
 \centering
@@ -340,7 +343,7 @@ TODO:
 \newpage
 \section{Results}
 
-We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from the 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
+We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from the 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 \begin{figure}[!t]
 \centering
@@ -348,7 +351,7 @@ We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on expe
 \caption{\gls{MVDR} benchmarks. \protect\newline A 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading.}\label{benchmarks}
 \end{figure}
 
-To test the runtime speed of our \gls{GPU} implementation of \gls{MVDR}, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). For this test we used a 55\,kpixels sectorscan image. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$ and added $d=2\%$ diagonal loading. 
+To test the runtime speed of our \gls{GPU} implementation of \gls{MVDR}, we have compared it to an optimized single thread C and Matlab implementation (\Fig{benchmarks}). For this test we used a 55\,kpixels sectorscan image. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$ and added $d=2\%$ diagonal loading. 
 
 \section{Discussion}
 
