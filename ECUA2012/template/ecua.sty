@@ -63,12 +63,16 @@
 % % \titleformat{<command>}[<shape>]{<format}{<label>}{<sep>}{<before>}[<after>]
 % % 
 \titleformat{\section}[block]{\bfseries\Large\MakeUppercase\bfseries}
-{\thesection.\enspace}%\thesubsubsection}%  {\footnotesize \enspace \emph{Sec.}  }
+{\thesection\enspace\enspace}%\thesubsubsection}%  {\footnotesize \enspace \emph{Sec.}  }
 {0pt}{\MakeUppercase}[]
 \titlespacing*{\section}{0pt}{2ex plus .5ex minus .2ex}{1.0ex plus .2ex minus .2ex}
 
+\titleformat{\subsection}[block]{\bfseries\large\MakeUppercase\bfseries}
+{}%\thesubsubsection}%  {\footnotesize \enspace \emph{Sec.}  }
+{0pt}{\MakeUppercase}[]
+\titlespacing*{\section}{0pt}{2ex plus .5ex minus .2ex}{1.0ex plus .2ex minus .2ex}
 
-% redefine section headers to force uppercase type
+% % redefine section headers to force uppercase type
 % \renewcommand\section{\@startsection {section}{1}{0pt}%
 % 	{-2ex plus -.5ex minus -.2ex}{1.0ex plus .2ex minus .2ex}%
 % 	{\Large\bfseries\MakeUppercase}

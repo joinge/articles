@@ -255,9 +255,9 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 % 
 % The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
-Modern phased array active sonar systems are often limited by their lateral resolution and \gls{SNR}. This is due to the limited lateral extent of the array, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
+In a typical active sonar imaging scenario encoded signals are transmitted towards a surface of interest, and the resulting reflections are recorded using an array of receivers. The receiver outputs can then be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is commonly referred to as beamforming.
 
-When designing an active sonar system one usually finds the image quality limited by the laterial resolution and contrast. This is a physical limitation related to the lateral array geometry and the frequency of the transmitted signal. 
+In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
 
 The Minimum Variance Distortionless Response (MVDR, or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the power accumulated by the array from other directions. This ability to suppress interference power improves the image detail level and \gls{SNR}, and the effect can be dramatic if the noise and interference is primarily focused around specific angles. The feasibility of using the \gls{MVDR} beamformer in active sonar imaging has been demonstrated in e.g.~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
@@ -403,9 +403,9 @@ Using \glspl{GPU} to accelerate the is a
 % \renewcommand\section[1]{{\Large\bf\MakeUppercase #1}}
 % \renewcommand\section*[1]{{\Large\bf\MakeUppercase #1}}
 
-\section{Acknowledgments}
+\section*{Acknowledgments}
 
-The authors would like to thank...
+The authors would like to thank nVidia for providing us their unofficial linear equation batch solver, and Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing us with experimental data.
 
 
 \bibliographystyle{./template/ecua}
