@@ -255,7 +255,7 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 % 
 % The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
-In a typical active sonar imaging scenario encoded signals are transmitted towards a surface of interest, and the resulting reflections are recorded using an array of receivers. These receivers may be independently delayed and weighted to adjust the array's point of focus, a concept commonly referred to as beamforming.
+In a typical active sonar imaging scenario encoded signals are transmitted towards a surface of interest, and the resulting reflections are recorded using an array of receivers. The receiver outputs are then coherently combined in the post-processing to focus on specific points in the image. This involves assigning suitable delays and weights to the array's channels, a concept commonly referred to as beamforming.
 
 In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
 
@@ -272,9 +272,7 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 \newpage
 \section{Methods}\label{methods}
 
-The receiver outputs can then be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is commonly referred to as beamforming.
-
-In a typical active sonar imaging scenario encoded signals are transmitted towards a surface interest, and the resulting reflections are recorded using an array of receivers. This is favourable setup as it allows the receiver outputs to be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is commonly referred to as beamforming.
+The fundamental problem of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can perform this task by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that mitigates the difference in transmitter-pixel-receiver propagation time. the delays are usually simply chosen to . 
 
 Now consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
