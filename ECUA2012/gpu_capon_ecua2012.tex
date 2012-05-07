@@ -274,7 +274,7 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 
 The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that mitigates the difference in transmitter-pixel-receiver propagation time. 
 
-Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$. To simplify the upcoming notation, let sample $x_m[n]$ delayed by a factor $\Delta_m$ be written as
+Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$. To simplify the upcoming notation, let sample $x_m[n]$ delayed by a factor $\Delta_m$ be written as:
 \begin{align}
 x^\Delta_m = x_m[n-\Delta_m[n]].
 \end{align}
@@ -282,17 +282,17 @@ The beamformer output $z[n]$ is then simply the weighted sum of all the delayed 
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x^\Delta_0[n]\\x^\Delta_1[n]\\\vdots\\x^\Delta_{M-1}[n]}.\label{z}
 \end{align}
-The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
+The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to ensure a numerically well conditioned $\eR$~\cite{Synnevag2009a}.
 
 \emph{Spatial averaging} is achieved by grouping array's channels into $M-L-1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
 \x_l[n] = \bmat{x^\Delta_l[n] & x^\Delta_{l+1}[n] & \dots & x^\Delta_{l+L-1}[n]}\T,
 \end{gather}
-then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as
+then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as:
 \begin{gather}
 \eR_\text{s}[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L+1} \x_l[n]\x_l\H[n].\label{spatialR}
 \end{gather}
@@ -303,22 +303,15 @@ then the a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is gi
 \end{gather}
 Finally, to ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007}:
 \begin{align}
-\eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\}.\label{finalR}
+\eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
 \end{align}
+where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation.
 
-
-% To ensure robustness in an active sonar setting, we perform subarray averaging in order to decorrelate noise from the signal, and some degree of temporal averaging to retain \gls{DAS}-like speckle statistics. The $(i,j)$'th element of the sample covariance matrix, $\hat r_{ij}$, is then given as
-% \begin{gather}
-% r_{ij}[n] = \frac{1}{(M-L+1)(2N_{\text{avg}}+1)}\sumb{k=0}{M-L} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-% \end{gather}
-% where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $L$ is the subarray size, and $2N_{\text{avg}}+1$ is the number of temporal samples to perform averaging over. 
-
-   
 
 \newpage
 \section{Implementation}
 
-When processing images it might be well worth having a look at the \gls{GPU}, as this is a task it was made for. A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
+Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for acceleration by parallel hardware \cite{Nilsen2009}. Of particular interest these days is perhaps the \gls{GPU}, which is tailored for image processing, are available off-the-shelf at reasonable prices, and are found in most desktop computers already. A modern \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a processes with some inherent latency.
 
 This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory consumption. Beamforming fits well into this scheme, as each pixel can be processed idependently. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, we seek to devise a way to decompose the methods presented in section \ref{methods}. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
@@ -383,7 +376,7 @@ TP = 215px 3Hz = 1.28Mpx/s \\
 
 \section{Conclusion}
 
-The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. Each pixel in the image can be processed independently, and the steps within each pixel will also benefit from parallelisation. We implemented the \gls{MVDR} bench Compared to an optimized C and Matlab implementation, our \gls{GPU}
+
 
 In a sonar processing chain, using one or more \glspl{GPU} can help offload the CPU. 
 
