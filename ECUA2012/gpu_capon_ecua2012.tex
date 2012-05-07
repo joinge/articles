@@ -258,11 +258,11 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 
 Modern phased array active sonar systems are often limited by their lateral resolution and \gls{SNR}, which is due to limited lateral extent of the array the spatial extent of the array sample the extent of the array is too small compared to the wavelength of the received signal, and while it is possible to trade resolution for improved \gls{SNR} by applying various weightsets to the array channels, one always end up with a compromise between the two. By introducing adaptive techniques, however, it is possible to resolve lateral details that would otherwise have been missed.
 
-The \gls{MVDR} (or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
+The Capon (or \gls{MVDR}) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. Whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with much improved lateral detail level.
 
-However, despite its inherent potential, the \gls{MVDR} beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
+However, despite its inherent potential, the Capon beamformer has yet to see widespread adoption in the active sonar community. There may be several reasons for this. First, the method is not inherently robust, and will suffer from a phenomena called signal cancellation in active systems. Second, in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while \gls{DAS} is only at O($M$).
 
-Perhaps surprisingly, we will show that the suggested means for making the \gls{MVDR} behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
+Perhaps surprisingly, we will show that the suggested means for making the Capon behave well in active systems will also make it less computationally complex. Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of 2-3 orders of magnitude compared to optimized single thread implementations in C and Matlab.
 
 The feasibility of using the Capon beamformer in active sonar imaging has been demonstrated in e.g. \cite{Blomberg2012a,Blomberg2011,Dursun2009}.
 E.g. 
@@ -288,17 +288,17 @@ REFERENCES!!! (all over..)
 \newpage
 \section{Methods}\label{methods}
 
-An active sonar imaging system usually transmits encoded signals signals towards a surface interest, and record the resulting reflections using an array of receivers. This is allows the receiver outputs to be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is usually referred to as beamforming.
+In a typical active sonar imaging scenario encoded signals are transmitted towards a surface interest, and the resulting reflections are recorded using an array of receivers. This is favourable setup as it allows the receiver outputs to be coherently combined in the post-processing to focus on specific points in the image. The combination process involves assigning suitable delays and weights to the array's channels, and is commonly referred to as beamforming.
 
 Now consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights and delays be  $w_m[n]$ and $\Delta_m[n]$. The beamformer output $z[n]$ is then given as
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n-\Delta_0]\\x_1[n-\Delta_1]\\\vdots\\x_{M-1}[n-\Delta_{M-1}]}.\label{z}
 \end{align}
-The \gls{MVDR} beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
+The Capon beamformer \cite{Capon1969} finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$, which will require some degree of spatial averaging to avoid signal cancellation, and temporal averaging to achieve \gls{DAS}-like speckle statistics.
 
 \emph{Spatial averaging} is achieved by segmenting the array into $M-L-1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
@@ -357,9 +357,7 @@ TODO:
 
 \section{Results}
 
-We have tested \gls{GPU} implementation of the \gls{MVDR} beamformer on experimental data from 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
-
-The Holmengraa demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship edges come out as sharper, and the shadows are less noisy. \todo{DAS faster, get it in somehow..}
+We have tested \gls{GPU} implementation of the Capon beamformer on experimental data from 32 element Kongsberg Maritime HISAS1030 synthetic aperture sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV} and used in strip-map mode, and the imaged object was the 1500 dwt oil tanker wreck Holmengraa (Figure \ref{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The Capon image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 \begin{figure}[!t]
 \centering
@@ -367,16 +365,19 @@ The Holmengraa demonstrates the Capon beamformer's ability to suppress interfere
 \caption{Capon benchmarks.}\label{benchmarks}
 \end{figure}
 
+To test the runtime speed of our \gls{GPU} implementation of Capon, we have compared it to an optimized single thread $C$ and $Matlab$ implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$, and processed a $640\times 86$ pixel image with $d=2\%$ diagonal loading.  
 
+\section{Discussion}
+
+Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3Mpx image in milliseconds, our Matlab implementation of Capon needed minutes.
+
+Figure \ref{benchmarks} shows how a \gls{GPU} can be used to improve matters. The test image here was 55kpx, hence much smaller than the Holmengraa image, but the relative performance increase seen when accelerating the algorithm with a \gls{GPU} is still accurate. 
 
 The Capon parameters influence the complexity of the algorithm. Runtime scale proportionally with the number of image pixels, $M$\todo{prolly not accurate} and $N_\text{avg}$, but not with $L$. To 
 
 Figure \ref{benchmarks}. Here the number of channels was set to $M=32$, and 
 
-test system was a quad-core Intel Xeon E5620, 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. 
 
-
-\section{Discussion}
 
 \begin{itemize}
 \item Relate Capon image to DAS image
