@@ -362,16 +362,16 @@ We have tested our \gls{GPU} implementation of the Capon beamformer on experimen
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{gfx/benchmark.pdf}
-\caption{Capon benchmarks. An 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading. }\label{benchmarks}
+\caption{Capon benchmarks. \protect\newline A 55\,kpx image processed with $M=32$ channels and $d=2\%$ diagonal loading.}\label{benchmarks}
 \end{figure}
 
 To test the runtime speed of our \gls{GPU} implementation of Capon, we have compared it to an optimized single thread C and Matlab implementation (Figure \ref{benchmarks}). The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of roughly 1Tflops. We kept the channel count at $M=32$, and processed a 55\,kpixel image with $d=2\%$ diagonal loading.  
 
 \section{Discussion}
 
-Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3Mpx image in milliseconds, our Matlab implementation of Capon needed minutes.
+Figure \ref{holmengraa} demonstrates the Capon beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3Mpx image in milliseconds, our Matlab implementation of Capon needed minutes.
 
-Figure \ref{benchmarks} shows how a \gls{GPU} can be used to improve matters.  The test image used here was 55kpx,   and the \gls{} hence the runtimes are seen are   much smaller than the Holmengraa image, but the relative performance increase seen when accelerating the algorithm with a \gls{GPU} is still accurate. 
+As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improve matters.  and the \gls{} hence the runtimes are seen are   much smaller than the Holmengraa image, but the relative performance increase seen when accelerating the algorithm with a \gls{GPU} is still accurate. 
 
 The Capon parameters influence the complexity of the algorithm. Runtime scale proportionally with the number of image pixels, $M$\todo{prolly not accurate} and $N_\text{avg}$, but not with $L$. To 
 
