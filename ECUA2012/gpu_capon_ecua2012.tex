@@ -253,9 +253,9 @@ Andreas-Austeng & Department of Informatics, University of Oslo, Norway
 
 Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
 
-The Minimum Variance Distortionless Response (MVDR) adaptive beamformer has recently been introduced in active sonar imaging. While displaying great potential for creating high quality images, it is computationally intensive and relies on robustification. These are important reasons why the MV beamformer is not in widespread use today.
+The Minimum Variance Distortionless Response (MVDR) adaptive beamformer has recently been introduced in active sonar imaging. While displaying great potential for creating high quality images, it is computationally intensive and relies on robustification. These are important reasons why the MVDR beamformer is not in widespread use today.
 
-We propose means for adapting the MV beamformer and its robustification techniques to fit a modern Graphics Processing Unit (GPU) architecture. These devices have in recent years
+We propose means for adapting the MVDR beamformer and its robustification techniques to fit a modern Graphics Processing Unit (GPU) architecture. These devices have in recent years
 emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
 
 We benchmarked optimized implementations of the MV beamformer in Matlab and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a mid-range nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. We found that the GPU rendered more than 1Mpixels/s, representing a speedup of more than two orders of magnitude over C, and three orders of magnitude over Matlab. If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in realtime would be possible with this performance. The CPU would then be free to take on the rest of the beamforming as well.
@@ -310,7 +310,7 @@ where $\1$ is a row vector of ones that represents broadside steering, and $\R=E
 \begin{gather}
 \x_l[n] = \bmat{x^\Delta_l[n] & x^\Delta_{l+1}[n] & \dots & x^\Delta_{l+L-1}[n]}\T,
 \end{gather}
-then the ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as:
+then a ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is given as:
 \begin{gather}
 \eR_\text{s}[n] = \frac{1}{M-L+1} \sumb{l=0}{M-L} \x_l[n]\x_l\H[n].\label{spatialR}
 \end{gather}
@@ -330,9 +330,9 @@ where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation
 
 Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. A technology of particular interest here are \glspl{GPU}~\cite{Nilsen2009}, which are tailored for image processing, available off-the-shelf at reasonable prices, and are found in most desktop computers already. The \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel.  However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
 
-This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented in section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 \begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads is created that slide along the diagonals of $\eR$. In this way we exploit the fact that entries on the diagonals overlap across subarrays and time, and keep the number of data reads and writes at a minimum.
 %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
 % In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
 \item \emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. 
@@ -353,7 +353,7 @@ In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVid
 \newpage
 \section{Results}
 
-We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two different experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and one one of the datasets used in sidescan mode to image the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
+We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two different experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}, which was attached to the HUGIN \gls{AUV}. In the first dataset, the sonar was used in sidescan mode to image the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 \begin{figure}[!t]
 \centering
@@ -370,9 +370,11 @@ Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to supp
 As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the \gls{GPU} implementation, respectively.
 
 \newpage
-Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and the complexity depends on the subarray size $L$'s. This means the overall complexity of the \gls{MVDR} beamformer is actually reduced when we apply subarray averaging. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the \gls{GPU} implementation.
+Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and the complexity depends on the subarray size $L$'s. This means the overall complexity of the \gls{MVDR} beamformer is actually reduced when we apply subarray averaging.
 
-If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
+The nVidia batch solver is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$. Therefore the implementation can be further optimized by implementing e.g.\ a batch based Cholesky solver. Both the C and Matlab implementation in this benchmark are Cholesky based, which partially explains why the complexity curves of these implementations differ.
+
+If the HISAS1030 sonar was attached to a platform moving at 1.8\,m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
 % HUGIN: 1.8m/s - range 250m \\
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
