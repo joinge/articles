@@ -374,13 +374,7 @@ Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in
 
 \section{Conclusion}
 
-The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. Each pixels in the image can be processed independently, and the various steps within each pixel . 
-
-In a sonar processing chain, using one or more \glspl{GPU} can help offload the CPU. 
-
-
-We achieved speedups Our \gls{GPU} implementation 
-Using \glspl{GPU} to accelerate the is a 
+The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. This is because the computations are independent on a pixel level, and partially also within each pixel. We were able to achieve speedup factors of 2-3 orders of magnitude by implementing our active sonar capable \gls{MVDR} implementation on a high-end \gls{GPU}. In sonar processing chains where the \gls{CPU} strain is considerable, simply being able to offloading some computationally intensive tasks to an idling \gls{GPU} might be just what is needed.
 
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
