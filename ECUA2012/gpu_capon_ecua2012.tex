@@ -370,9 +370,10 @@ Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to supp
 
 As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the \gls{GPU} implementation, respectively.
 
+\newpage
 Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the \gls{GPU} implementation.
 
-If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. Then the throughput required for creating critically sampled 32-beam sectorscan images in realtime would be roughly 1\,Mpixels/s. This is something our \gls{GPU} implementation could handle alone, leaving the \gls{CPU} free to take on other assignments.
+If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. Furthermore, the HISAS1030's bandwidth is 30\,kHz, so we set this to be the complex sampling frequency, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation could handle, leaving the \gls{CPU} free to take on other assignments.
 
 % HUGIN: 1.8m/s - range 250m \\
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
@@ -413,7 +414,7 @@ The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \g
 
 \section*{Acknowledgments}
 
-The authors would like to thank nVidia for providing us their unofficial linear equation batch solver, and Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing us with experimental data.
+The authors would like to thank nVidia for providing them their unofficial linear equation batch solver, and Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data.
 
 
 \newpage
