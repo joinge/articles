@@ -359,10 +359,10 @@ We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{gfx/benchmark.pdf}
-\caption{\gls{MVDR} benchmarks. Forming a 55\,kpixels image from a $M=32$ channel array.}\label{benchmarks}
+\caption{\gls{MVDR} benchmarks. Forming a 55\,kpixel image from a $M=32$ channel array.}\label{benchmarks}
 \end{figure}
 
-The other dataset was a 55\,kpixels sectorscan test image. We used it to benchmark our \gls{MVDR} implementation, and compared the result with the runtimes of an optimized single-thread C and Matlab implementation (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of performing roughly 1Tflops.
+The other dataset was a 55\,kpixel sectorscan test image. We used it to benchmark our \gls{MVDR} implementation, and compared the result with the runtimes of an optimized single-thread C and Matlab implementation (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of performing roughly 1Tflops.
 
 \section{Discussion}
 
@@ -392,7 +392,7 @@ If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maxi
 
 \section{Conclusion}
 
-The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. This is because the computations involved are independent on a pixel level, and partially also within each pixel. We were able to achieve speedup factors of 2-3 orders of magnitude by implementing our active sonar capable \gls{MVDR} implementation on a high-end \gls{GPU}. This performance is sufficient for computing critically sampled full-coverage sectorsscan images from the HISAS1030 sonar in realtime. Furthermore, even if such processing speeds are not required, it might be advantageous to relieve the \gls{CPU} from some of its workload. After all, these chips are designed to cooperate.
+The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. This is because the computations involved are independent on a pixel level, and partially also within each pixel. We were able to achieve speedup factors of 2-3 orders of magnitude by implementing our active sonar capable \gls{MVDR} implementation on a high-end \gls{GPU}. This performance is sufficient for computing critically sampled full-coverage sectorsscan images from the HISAS1030 sonar in realtime. Furthermore, even if such processing speeds are not required, it might be advantageous to relieve the \gls{CPU} from some of its workload. After all, these chips were designed to cooperate.
 
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
