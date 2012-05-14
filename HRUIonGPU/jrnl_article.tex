@@ -401,7 +401,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Implementing Capon Adaptive Beamforming on the GPU for Real Time Ultrasound Imaging}
+\title{Implementing Capon Adaptive Beamforming on the GPU for Real Time Cardiac Ultrasound Imaging}
 %
 %
 % author names and IEEE memberships
@@ -442,7 +442,7 @@ GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this %
 
 % The paper headers
 \markboth{Transactions on Ultrasonics and Ferroelectrics and Frequency Control,~Vol.~x, No.~y, January~2013?}%
-{\AA{}sen \MakeLowercase{\textit{et al.}}: Implementing Capon Adaptive Beamforming on the GPU for Real Time Ultrasound Imaging}
+{\AA{}sen \MakeLowercase{\textit{et al.}}: Capon Adaptive Beamforming on the GPU}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 % 
@@ -485,7 +485,7 @@ The abstract goes here.
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Adaptive beamforming, Capon beamformer, Graphics Processing Unit, Parallel Computing, Ultrasound Imaging.
+Adaptive beamforming, Capon beamformer, Graphics Processing Unit, GPGPU, Parallel Computing, Ultrasound Imaging.
 \end{IEEEkeywords}
 
 
@@ -524,11 +524,17 @@ Adaptive beamforming, Capon beamformer, Graphics Processing Unit, Parallel Compu
 
 \IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
 
+Capon beamforming has recently shown promising results in several studies. Although it improves the lateral resolution, widespread use has been limited by its computational complexity. Luckily, the calculation of the Capon weights is well suited for a GPU (Graphics Processing Unit) implementation, since the calculation is both independent across pixels, and partially intra-pixel.
+
+In this paper we introduce the first GPU implementation of the Capon beamformer capable of processing a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing. Both types of smoothing are important for maintaining delay-and-sum-like speckle and at the same time keep the high resolution property. This is achieved using complex base band data, which reduces the size of each range line to a minimum. In addition, complex data results in complex weights; hence this is a correct implementation of Capon beamforming with all degrees of freedom preserved.
+
 Delay and sum beamformer (DAS):
 \begin{align}
 z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
 \end{align}
 where $M$ is the number of elements.
+
+\subsection{Capon Beamforming}
 
 Capon weights are found by solving the following minimization problem:
 \begin{align}
@@ -538,7 +544,7 @@ Capon weights are found by solving the following minimization problem:
 where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$.
 
 The solution to this minimization problem is
-\begin{align}
+\begin{align}\label{eq:w}
 \vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
 \end{align}
 where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed to broadside,  and $\vec{w} \in \mathbb{C}^M$.
@@ -554,8 +560,6 @@ where $K = M-L+1$, $Y_{avg}\sim \tau/T_s$ ($\tau$ is the imaging pulse length an
 Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, $\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}$. A weighting proportional to the output power is beneficial, and the trace of $\mat{\hat{R}}$, $\epsilon = d*tr\{\mat{\hat{R}}\}$, has previously shown good results in the literature (cite). 
 
 Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change.
-
-Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
 
 \subsection{GPU Compute Model}
 In this section we briefly discuss the principle behind GPU computing. CUDA by Nvidia has been our choice of GPU developer environment. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper will apply for other massive parallel implementation environments like e.g. OpenCL. The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
@@ -581,27 +585,33 @@ Time averaging takes a lot of resources. It has been shown that time averaging c
 %it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory and executing time consuming mathematical functions. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is %therefore important.   
 
 \subsection{Solving Multiple Small Linear Systems}
-Most focus on large matrices in the literature.
-We have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{R}\vec{b} = \vec{1}$, where $\vec{b} = \mat{R}^{-1}\vec{1}$. Can include details on GPU implementation of $\mat{U}^H\mat{D}\mat{U}$, but this has not proved to be faster than NVIDIA's GJ implementation. However, the complexity for solving with $\mat{U}^H\mat{D}\mat{U}$ decomposition is supposed to be $1/3$ of GJ.
+The focus has mostly been on large systems in the literature, and GPU libraries usually lack a comprehensive collection of batched solvers. The reason for this is two-folded, first the GPU needs to solve thousand of small systems in order to beat the low memory latency of the CPU, second there is a range of system dimensions that does not fit well with the GPU architecture, where only a small amount of near-core memory is available. Because of this, it has been proven hard to optimize a manageable set of solvers that provides speedups compared with the CPU in all cases.
+
+For the results presented in this paper, we have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{R}\vec{b} = \vec{1}$, where $\vec{b} = \mat{R}^{-1}\vec{1}$. Can include details on GPU implementation of $\mat{U}^H\mat{D}\mat{U}$, but this has not proved to be faster than NVIDIA's GJ implementation. However, the complexity for solving with $\mat{U}^H\mat{D}\mat{U}$ decomposition is supposed to be $1/2$ of GJ.
 
 In the final journal article we could discuss Conjugated gradient and Woodbury and the benefits they bring.
+
+\subsection{Compute Beamformer Output}
 
 \section{Real Time Performance for $L > 16$}
 
 \subsection{Beamspace Processing}
+Nilsen et. al has proposed to apply beamspace processing to further reduce the required computations. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. The beamspace version of Capon is derived by replacing the covariance matrix in Eq. \ref{eq:w} with the beamspace covariance matrix $\mat{R}_{BS} = \vec{x}_{BS}\vec{x}_{BS}^H$.  
 
-\subsection{Recursive Capon}
+\subsection{Iterative Capon}
+The idea behind iterative Capon is to perform Capon using small subarrays in several iterations until there is only two subarrays to sum. In this way we fix the size of L, hence the complexity of solving $\mat{R}\vec{b} = \vec{1}$. However, for each iteration we re-obtain L-1 degrees of freedom until all are retrieved after $K = M-L+1$ iterations. Since subarray averaging has been applied to decorrelated the signal, we might loose this effect when reestablishing all degrees of freedom. The number of iterations should therefore be restricted to $K/2$ to equal our standard choice of $L = M/2$ when it comes to degrees of freedom.   
 
 \section{Results}\label{sec:res}
 
-Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing running times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2*Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
+Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing executing times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2*Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
 
-(A prerequisite for this is to get the GPU-processing up and running on simulated data before Easter!! Maybe also a Matlab plug-in.)
-
-\subsection{Compute Beamformer Output}
+Present images, both simulated and in-vivo, processed using beamspace Capon and iterative Capon. Comment on the differences between the two and on how much they deviates from the full method.
+Show beampatterns for the two compared with the full method. Show executing times for the two methods compared with the full method on the GPU.
 
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
+
+For a typical cardiac ultrasound image of 80*400 pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, $M=64$ element phased array, the result is 10fps (subarray length $L=M/2$, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the frame rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector (40*400 pixels), hence with the same parameters the frame rate increases to 87fps. The bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16, real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
 
 \section{Conclusion}\label{sec:con}
 ...
