@@ -401,7 +401,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Implementing Capon Adaptive Beamforming on the GPU for Real Time Ultrasound Imaging}
+\title{Capon Adaptive Beamforming Applied on Moving Objects - An Analysis of Local Shift Invariance}
 %
 %
 % author names and IEEE memberships
@@ -413,7 +413,7 @@
 % was not built to handle multiple paragraphs
 %
 
-\author{J. P. \AA{}sen, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
+\author{J. P. \AA{}sen, C.-I. C. Nilsen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
 \thanks{M. Shell is with the Department
 of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
 GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
@@ -442,7 +442,7 @@ GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this %
 
 % The paper headers
 \markboth{Transactions on Ultrasonics and Ferroelectrics and Frequency Control,~Vol.~x, No.~y, January~2013?}%
-{\AA{}sen \MakeLowercase{\textit{et al.}}: Implementing Capon Adaptive Beamforming on the GPU for Real Time Ultrasound Imaging}
+{\AA{}sen \MakeLowercase{\textit{et al.}}: The Capon Adaptive Beamformer Applied on Moving Objects }
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 % 
@@ -485,7 +485,7 @@ The abstract goes here.
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Adaptive beamforming, Capon beamformer, Graphics Processing Unit, Parallel Computing, Ultrasound Imaging.
+Adaptive beamforming, Capon beamformer, Shift Invariance, Ultrasound Imaging.
 \end{IEEEkeywords}
 
 
@@ -522,7 +522,11 @@ Adaptive beamforming, Capon beamformer, Graphics Processing Unit, Parallel Compu
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
 
-\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
+\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming and temporal artifacts.
+
+With the introduction of a fast implementation of the Capon adaptive beamformer, a stream of images can now be processed at interactive frame rates. A natural question then is how a moving object behaves throughout the stream of images. An important property of an ultrasound imaging system is its local shift invariance. An object’s appearance should be preserved when moved slightly, or if the ultrasound probe moves. The Capon beamformer has previously only been investigated intra-frame; it is therefore unknown how it works when applied in a real-time ultrasound setting.
+
+In this paper we analyze the shift invariance property of the Capon beamformer by studying simulated and in vivo images of moving objects. We show that when imaging moving point scatterers using the Capon beamformer with the same beam spacing as used for delay-and-sum, artifacts arise in the image, manifested as oscillating point scatteres. (TODO: Process csound data to see if we need over sampling on in vivo data, How often do we have bright point scatterers in vivo?).
 
 Delay and sum beamformer (DAS):
 \begin{align}
@@ -557,51 +561,29 @@ Building and calculating the inverse of $\hat{R}$ is computational demanding, li
 
 Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
 
-\subsection{GPU Compute Model}
-In this section we briefly discuss the principle behind GPU computing. CUDA by Nvidia has been our choice of GPU developer environment. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper will apply for other massive parallel implementation environments like e.g. OpenCL. The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
-
-\subsection{Optimizing kernel launch}
-Set the size of grid adaptively based on $L$, $M$ and $Yavg$.
-
-It is better to slide in space than time. $K$ is typically much larger than $2*Yavg + 1$.
-
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
 
-\section{Parallel Capon}\label{sec:meth}
-\subsection{Building Multiple Sample Covariance Matrices}
-Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. It is therefore natural to restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limited amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
+\section{Temporal Artifacts}
 
-Discuss the bottleneck adaptive diagonal loading causes. Possible solutions includes, use trace from previous image, use pre-calculated array power, constant weight.
+\section{Causes}\label{sec:meth}
+   
+\subsection{Local Shift Variance}
 
-Time averaging takes a lot of resources. It has been shown that time averaging can maintain both resolution and delay-and-sum-like speckle. The same speckle statistics can be obtain with small subarrays, but then we loose resolution. Small sub-arrays benefits from being less computational demanding.   
+\section{Cures}
 
-%\subsubsection{CUDA Compute Model}
-%The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), %where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, %with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point 
-%it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory and executing time consuming mathematical functions. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is %therefore important.   
+\subsection{Multiple Parallel Recieve Lines}
 
-\subsection{Solving Multiple Small Linear Systems}
-Most focus on large matrices in the literature.
-We have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{R}\vec{b} = \vec{1}$, where $\vec{b} = \mat{R}^{-1}\vec{1}$. Can include details on GPU implementation of $\mat{U}^H\mat{D}\mat{U}$, but this has not proved to be faster than NVIDIA's GJ implementation. However, the complexity for solving with $\mat{U}^H\mat{D}\mat{U}$ decomposition is supposed to be $1/3$ of GJ.
-
-In the final journal article we could discuss Conjugated gradient and Woodbury and the benefits they bring.
-
-\section{Real Time Performance for $L > 16$}
-
-\subsection{Beamspace Processing}
-
-\subsection{Recursive Capon}
+\subsection{Phase Rotation}
 
 \section{Results}\label{sec:res}
 
-Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing running times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2*Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
-
-(A prerequisite for this is to get the GPU-processing up and running on simulated data before Easter!! Maybe also a Matlab plug-in.)
-
-\subsection{Compute Beamformer Output}
-
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
+
+The figure below shows a lateral shift invariance plots for a well sampled delay-and-sum image (a), the same sampling with Capon processing (b), and 4x over sampling processed with Capon. The shift invariance plots the beamprofile (TODO: Make the shift invariance plot). The results show that when using the Capon beamformer we have to over sample with a factor four to remove the blinking artifact. This can be done without affecting frame rate by using the available parallel receive-lines found on most ultrasound systems. May also use phase rotation. 
+
+TODO: Add citations – Hergum/Bjåstad Local shift invariance and MLA’s… Is there any publications stating that Capon do not work on moving objects?
 
 \section{Conclusion}\label{sec:con}
 ...
@@ -785,10 +767,6 @@ The authors would like to thank... \cite{Synnevag2009}
 \newpage
 
 \begin{IEEEbiography}{Jon Petter \AA{}sen}
-Biography text here.
-\end{IEEEbiography}
-
-\begin{IEEEbiography}{Jo Inge Buskenes}
 Biography text here.
 \end{IEEEbiography}
 
