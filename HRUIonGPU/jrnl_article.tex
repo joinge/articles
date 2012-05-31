@@ -536,7 +536,7 @@ z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n].
 \end{align}
 In conventional beamforming, the weight $w_m \in \mathbb{R}$ is usually applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
 
-The basic idea of an adaptive beamformer is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we now have data-dependent weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
+The basic idea of an adaptive beamformer is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
 \begin{align}
 &\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
 &\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
@@ -556,7 +556,7 @@ In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation an
 where $K = M-L+1$, $N = 2N_{avg} + 1\sim \tau/T_s$ ($\tau$ is the pulse length and $T_s$ is the sampling period) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
 Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, 
 \begin{align}
-\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}
+\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}.
 \end{align}
 A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\hat{R}}$, 
 \begin{align}
@@ -572,7 +572,7 @@ In this section we briefly discuss the principle behind GPU computing. CUDA by N
 
 The CUDA compute model is based on execution of a kernel-function across a grid of compute threads. Each position in the grid holds a block of threads.
 %Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. 
-From a CUDA perspective the GPU consist of one or more stream multi processors (SM's), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. More important, the SM has a limited amount of near-core memory and registers available. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. This pose a real challenge as the target problem has to map to the parallel framework both on a grid, block and memory consumption level in order to benefits from parallel acceleration.    
+From a CUDA perspective the GPU consist of one or more stream multi processors (SM's), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. More important, the SM has a limited amount of near-core memory and registers available. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. This pose a real challenge as the target problem then has to map to the parallel framework both on a grid, block and memory consumption level in order to benefits from parallel acceleration.    
 
 %When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
 
@@ -592,7 +592,7 @@ As mentioned, widespread use of Capon adaptive beamforming has been limited by i
 \item Solve the linear system of equations $\mat{\hat{R}}\vec{b} =\vec{ 1}$
 \item Calculate $\vec{w} = \vec{b}/|\vec{b}|$ and the amplitude $\vec{w}^H\vec{x}$
 \end{enumerate}
-The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and to achieve real time performance it is therefore important to find novel solutions to these steps. 
+The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and real time performance can only be achieved by finding novel solutions to these two steps. 
 
 \subsection{Building Multiple Sample Covariance Matrices}
 The straight forward sum in Eq. \ref{eq:R} has complexity $O(L^2KN) = O(L^3)$ if $L$ is large. Note that N typically is small compared to L and M. For smaller $L$ the construction of $\mat{\hat{R}}$ is therefore dominated by $M$. The quadratic complexity for large $L$ can be improved by exploiting the overlap from element to element on the diagonals of $\mat{\hat{R}}$ (ref figure). This overlap is present both across subarrays and time.
