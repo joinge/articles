@@ -1,0 +1,150 @@
+
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% DOCUMENTCLASS %                                See full option description in "mytemplate.cls"
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+ 
+\documentclass[
+   article                                      % Document type (non-standard)
+ , 12pt                                         % Text size
+%  , draft
+%  , final                                        % Quality
+ , xelatex                                      % Use the XeLaTeX compiler
+%  , biblatex                                     % Use 'biblatex' for references (best by far)
+ , bibtex                                       % Use 'bibtex' for references (oldschool :)
+%  , movie
+%  , notodos                                      % Disable todos
+ , layout
+%  , defaultformat                                % Attempt to use default formatting options
+%  , glossary                                     % Use a glossary
+]{common/mytemplate}
+
+% \bibliography{references}
+\hypersetup{
+   bookmarksopen=true
+ , bookmarksopenlevel=2
+}
+% Load the references.bib file
+% \bibliography{references}
+
+
+
+\begin{document}
+% \setlength{\headrulewidth}{0.0pt}
+
+%~~ TitlePage ~~%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\thispagestyle{empty}
+\pagenumbering{arabic} %Normal numbers
+
+\begin{center}
+
+{\Large Design Suggestion}\\[0.2cm]
+{\itshape for a}\\[0.2cm]
+{\Large GPU Based Sonar Template Simulator}\\[2cm]
+{\itshape by}\\[0.2cm]
+\begin{minipage}{0.35\textwidth}\small\centering
+Jo Inge \textsc{Buskenes}\\
+\textnormal{\color{SeaGreen}joibu (at) ifi.uio.no}
+\end{minipage}
+\begin{minipage}{0.35\textwidth}\small\centering
+Jon Petter \textsc{Åsen}\\
+\textnormal{\color{SeaGreen}jpaasen (at) ifi.uio.no}
+\end{minipage}\\[2cm]
+{\itshape on the behalf of}\\[0.2cm]
+\begin{minipage}[t]{0.49\textwidth}\centering
+  \centering\includegraphics[height=3cm]{gfx/FFILogo.png}\\
+  \textsc{The Norwegian Defence Research Establishment (FFI)}
+\end{minipage}\\[0.5cm]
+\begin{minipage}[t]{0.4\textwidth}\small\centering
+Øivind \textsc{Midtgård}\\
+\textnormal{\color{SeaGreen}oivind.midtgaard (at) ffi.no}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}\small\centering
+Herman \textsc{Midelfart}\\
+\textnormal{\color{SeaGreen}herman.midelfart (at) ffi.no}
+\end{minipage}\\[0.3cm]
+\begin{minipage}{0.32\textwidth}\small\centering
+Roy Edgar \textsc{Hansen}\\
+\textnormal{\color{SeaGreen}roy-edgar.hansen (at) ffi.no}
+\end{minipage}
+\vfill
+\small
+\today
+\end{center}
+
+
+\clearpage
+\pagestyle{fancy}
+%~~ Sections ~~%                                %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+
+
+\section{Introduction}
+
+Template matching is a common technique used when classifying objects in SAS images. The principle is to isolate an image segment containing an object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a suitable set of template images, considering the vast span of possible seafloor and object characteristics.
+
+FFI target this challenge by using a sonar simulator that can take a seafloor model or data as input, in which various target objects are postitioned in various ways. For each object configuration the scene is rendered and the result added to the template set. But while producing templates on-the-fly is a very flexible solution, it is also computationally demanding.
+
+This is why we are investiging the feasibility of using a GPU to speed up the simulations.
+
+\begin{figure}[b]
+\graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}
+\caption{Simulator specifications.}\label{specs}
+\end{figure}
+
+\section{Specification}
+
+Most of the specifications received from FFI are illustrated in Figure \ref{specs}. 
+
+
+\section{Design Suggestion}
+
+The way we see it, there are two possible approaches to implementing the mentioned simulator (figure \ref{implementation}). One can either
+
+\begin{figure}[b]
+\begin{narrow}{-2.5cm}{-2.5cm}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}
+\end{narrow}
+\caption{Two possible implementation strategies.}\label{implementation}
+\end{figure}
+
+\begin{itemize0}
+\item use OpenGL to produce depth-maps of the scene, and CUDA to illuminate it as a sonar would, or
+\item use OpenGL to render the full scene with lighting.
+\end{itemize0}
+
+In either case the simulator will take a seafloor and target model as input, and generate a simulated sonar image. To offload the CPU further, the GPU can then proceed to compute the correlation between the template and the isolated image segment, and an image mask. This should be fairly easy to implement, will compute efficiently on the GPU, and allows us to avoid sending each template back to the CPU over the limited bandwidth CPU$\leftrightarrow$GPU bus. Note that these steps will have to be carried out in CUDA regardless of the approach selected.
+
+\subsection{Using OpenGL only for the simulations?}
+
+When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
+
+Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, if we can treat sound as ``light'', we believe it to be better to use OpenGL simulate the entire scene and generate the required 2D views and perspectives of it. The advantage of doing ``everything'' in OpenGL is pretty obvious, we may then support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
+
+We have compared the two methods in Table \ref{comparison}.
+
+
+
+\begin{table}[H]\centering
+\begin{tabular}[c]{l l l}\hline
+\rowcolor{tabBlue}                  & CUDA/OpenGL    & OpenGL only \\\hline
+Development time (estimate)         & 6 weeks        & 4 weeks     \\
+Development complexity              & Moderate       & Low \\
+Amount of code                      & More           & Less \\
+Maintainability                     & Moderate       & Moderate \\
+Code readability                    & Moderate       & Moderate \\
+Signal model                        & Arbitrary      & Light rays  \\
+Sound$\rightarrow$light calibration & Not necessary  & Necessary(?) \\
+Multipath support                   & Possible       & Possible \\
+Speckle support                     & Possible       & Hard \\
+Diffraction support                 & Possible       & Hard \\
+ATI/nVidia support                  & nVidia only    & Both \\
+\end{tabular}
+\vspace{5pt}\caption{Comparison of implementation approaches}\label{comparison}
+\end{table}
+
+
+\section{Final thoughts}
+
+We propose using OpenGL to simulate the scene, and model the array as lightsources. This will make it unsuitable for simulating speckle and diffraction effects, but a ``simple'' simulator should probably not take such effects into account anyhow. Penetrable objects can be simulated in either case, although we are not sure whether the 
+
+
+\end{document}
