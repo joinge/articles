@@ -524,56 +524,84 @@ Adaptive beamforming, Capon beamformer, Graphics Processing Unit, GPGPU, Paralle
 % and "HIS" in caps to complete the first word.
 
 %\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
+\IEEEPARstart{C}{apon} adaptive beamforming applied in a medical ultrasound setting has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. Although the method introduce some interesting trade-offs in addition to just improved resolution, like maintaining image resolution combined with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}, widespread use has been limited by the tremendous computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied on typical cardiac data sets. To accomplish this task we make use of the massive parallel processing power found in modern graphics processing units (GPU's), combined with novel methods to reduce the computational complexity as the problem size grows. Chen et al. \cite{Chen2011a, Chen2011} have previously implemented the Capon beamformer on a GPU, however their implementation was based on real data, where the Capon beamformer assumes complex. Using real data will results in symmetric windows, and even if the number of samples they managed to process per second was high, both the number of floating point operations per sample and the imaging region is reduced compared with use of complex data. It is therefore crucial to use complex data within the Capon beamformer framework, both for reducing the amount of data per image, and to allow for asymmetric windows.
 
-\IEEEPARstart{W}{hen} sensing the world around us with an array of elements, we perform a spatio-temporal filtering operation known as beamforming. The conventional form of beamforming is delay-and-sum (DAS), where the signal from each element, $\vec{x}_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a factor $w_m$,
+In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of Capon beamforming, before we in Section \ref{sec:meth2} introduce methods to apply when the problem size increases. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
+
+\section{Background}
+\subsection{Capon Beamforming}
+When sensing the world around us with an array of elements, we perform a spatio-temporal filtering operation known as beamforming. The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a factor $w_m$,
 \begin{align}
 z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n].
 \end{align}
-The weight $\vec{w}$, is usually applied to trade resolution for a better signal-to-noise (SNR) ratio. Hence, we increase the main lobe width of the system while gaining a lower side lobe level. 
+In conventional beamforming, the weight $w_m \in \mathbb{R}$ is usually applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
 
-The basic idea of the Capon beamformer is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria. For a base-band data vector $\vec{x}_m \in \mathbb{C}^M$, we now have a data-dependent weight, $\vec{w}(\vec{x}[n])$ that when applied on $\vec{x}$, is the best approximation to the selected criteria. Using the Capon criterion, the adaptive weights are found by solving the following minimization problem:
+The basic idea of an adaptive beamformer is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
 \begin{align}
-&\min_{\vec{w}} E\{|z[n]|^2\} = \vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
-&\text{subjected to } \vec{w}^H\vec{1} = 1,\label{eq:constraint}
+&\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
+&\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
 \end{align}
-where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$ is the signal covariance matrix.
-Thus, we minimize the output power, while maintaining unit gain in the look direction. The constraint in Eq. \ref{eq:constraint} is there to avoid the trivial solution $\vec{w} = 0$, and a distorted respons at broadside. The solution to the minimization problem in Eq. \ref{eq:minz} is
+where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$ is the spatial covariance matrix, and $\vec{a}$ is the far-field steering direction.
+Thus, we minimize the output power, while maintaining unit gain in the look direction. The constraint in Eq. \ref{eq:constraint} is there to avoid the trivial solution $\vec{w} = 0$, and a distorted respons in the direction of $\vec{a}$. The solution to the minimization problem in Eq. \ref{eq:minz} and \ref{eq:constraint} is
 \begin{align}\label{eq:w}
 \vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
 \end{align}
-where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed to broadside. In practice, the covariance matrix has to be approximated by the sample covariance matrix, $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$. In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be an inaccurate estimate, and in addition poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favors weights with opposite phase. In this way, the beamformer output can be zero at broadside (with signal pressent), even with the distortion-less criterion applied.
+where $\vec{a} = \vec{1}$ when $\vec{x}$ is pre-delayed to broadside. 
 
-In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ subarrays and $N$ time samples.
+In practice, the covariance matrix has to be approximated by the sample covariance matrix, $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$. In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate \cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Synnevag2009a}. In this way, the beamformer output can be zero at broadside, even when there is signal present and the distortion-less criterion is applied. 
+In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N$ time samples \cite{Synnevag2007, Synnevag2007a}.
 \begin{align}
-\mat{\hat{R}} = \frac{1}{NK}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K} \vec{x}_l[n']\vec{x}_l[n']^H,
+\mat{\hat{R}} = \frac{1}{NK}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K} \vec{x}_l[n']\vec{x}_l[n']^H,\label{eq:R}
 \end{align}
 where $K = M-L+1$, $N = 2N_{avg} + 1\sim \tau/T_s$ ($\tau$ is the pulse length and $T_s$ is the sampling period) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
-Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, $\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}$. A weighting proportional to the output power is beneficial, and the trace of $\mat{\hat{R}}$, $\epsilon = d*tr\{\mat{\hat{R}}\}$, has previously shown good results in the literature (cite). 
+Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, 
+\begin{align}
+\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}.
+\end{align}
+A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\hat{R}}$, 
+\begin{align}
+\epsilon = d*tr\{\mat{\hat{R}}\},
+\end{align}
+has previously shown good results in the literature \cite{Synnevag2007}. 
 
-Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change. 
-In this paper we introduce the first GPU implementation of the Capon beamformer capable of processing a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing. Both types of smoothing are important for maintaining delay-and-sum-like speckle and at the same time keep the high resolution property. This is achieved using complex base band data, which reduces the size of each range line to a minimum. In addition, complex data results in complex weights; hence this is a correct implementation of Capon beamforming with all degrees of freedom preserved. For high channel count systems we propose two ways of reducing computational complexity while maintaining 
+%Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change. 
+%In this paper we introduce the first GPU implementation of the Capon beamformer capable of processing a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing. Both types of smoothing are important for maintaining delay-and-sum-like speckle and at the same time keep the high resolution property. This is achieved using complex base band data, which reduces the size of each range line to a minimum. In addition, complex data results in complex weights; hence this is a correct implementation of Capon beamforming with all degrees of freedom preserved. For high channel count systems we propose two ways of reducing computational complexity while maintaining 
 
-\section{GPU Compute Model}
-This turned out to be to technical?
-In this section we briefly discuss the principle behind GPU computing. CUDA by Nvidia has been our choice of GPU developer environment. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper will apply for other massive parallel implementation environments like e.g. OpenCL. The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
+\subsection{GPU Compute Model}
+In this section we briefly discuss the principle behind GPU computing. CUDA by Nvidia has been our choice of GPU developer environment \cite{Nvidia2011}. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper applies for other massive parallel implementation environments like e.g. OpenCL as well. 
 
-\subsection{Optimizing kernel launch}
-Set the size of grid adaptively based on $L$, $M$ and $Yavg$.
+The CUDA compute model is based on execution of a kernel-function across a grid of compute threads. Each position in the grid holds a block of threads.
+%Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. 
+From a CUDA perspective the GPU consist of one or more stream multi processors (SM's), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. More important, the SM has a limited amount of near-core memory and registers available. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. This pose a real challenge as the target problem then has to map to the parallel framework both on a grid, block and memory consumption level in order to benefits from parallel acceleration.    
 
-It is better to slide in space than time. $K$ is typically much larger than $2*Yavg + 1$.
+%When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
+
+%More important, the CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
+
+%\subsection{Optimizing kernel launch}
+%Set the size of grid adaptively based on $L$, $M$ and $Yavg$.
+%It is better to slide in space than time. $K$ is typically much larger than $2*Yavg + 1$.
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
 
 \section{Parallel Capon}\label{sec:meth}
-Capon beamforming has recently shown promising results in several studies. Although it improves the lateral resolution, widespread use has been limited by its computational complexity. However, the calculation of Capon weights is well suited for a GPU (Graphics Processing Unit) implementation, since the calculation is both independent across pixels, and partially intra-pixel.
+As mentioned, widespread use of Capon adaptive beamforming has been limited by its computational complexity. However, the calculation of Capon weights is well suited for a GPU implementation, since the calculations are both independent across pixels, and partially intra-pixel. On a top level it is trivial to recognise that one grid cell of threads should process one pixel in the final image. Continuing, on a pixel-level, the algorithm can be broken down into three main steps that to some extent can be further divided into a small set of parallel processes. For each data vector $\vec{x}$ in the image:
+\begin{enumerate}
+\item Build the sample covariance matrix $\mat{\hat{R}}$
+\item Solve the linear system of equations $\mat{\hat{R}}\vec{b} =\vec{ 1}$
+\item Calculate $\vec{w} = \vec{b}/|\vec{b}|$ and the amplitude $\vec{w}^H\vec{x}$
+\end{enumerate}
+The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and real time performance can only be achieved by finding novel solutions to these two steps. 
 
 \subsection{Building Multiple Sample Covariance Matrices}
-Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. It is therefore natural to restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limited amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
+The straight forward sum in Eq. \ref{eq:R} has complexity $O(L^2KN) = O(L^3)$ if $L$ is large. Note that N typically is small compared to L and M. For smaller $L$ the construction of $\mat{\hat{R}}$ is therefore dominated by $M$. The quadratic complexity for large $L$ can be improved by exploiting the overlap from element to element on the diagonals of $\mat{\hat{R}}$ (ref figure). This overlap is present both across subarrays and time.
 
-Discuss the bottleneck adaptive diagonal loading causes. Possible solutions includes, use trace from previous image, use pre-calculated array power, constant weight.
+%Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. It is therefore natural to restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limited amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
 
-Time averaging takes a lot of resources. It has been shown that time averaging can maintain both resolution and delay-and-sum-like speckle. The same speckle statistics can be obtain with small subarrays, but then we loose resolution. Small sub-arrays benefits from being less computational demanding.   
+%Discuss the bottleneck adaptive diagonal loading causes. Possible solutions includes, use trace from previous image, use pre-calculated array power, constant weight.
+
+%Time averaging takes a lot of resources. It has been shown that time averaging can maintain both resolution and delay-and-sum-like speckle. The same speckle statistics can be obtain with small subarrays, but then we loose resolution. Small sub-arrays benefits from being less computational demanding.   
 
 %\subsubsection{CUDA Compute Model}
 %The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), %where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, %with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point 
@@ -588,10 +616,10 @@ In the final journal article we could discuss Conjugated gradient and Woodbury a
 
 \subsection{Compute Beamformer Output}
 
-\section{Real Time Performance for $L > 16$}
+\section{Real Time Performance for $L > 16$}\label{sec:meth2}
 
 \subsection{Beamspace Processing}
-Nilsen et. al has proposed to apply beamspace processing to further reduce the required computations. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. The beamspace version of Capon is derived by replacing the covariance matrix in Eq. \ref{eq:w} with the beamspace covariance matrix $\mat{R}_{BS} = \vec{x}_{BS}\vec{x}_{BS}^H$.  
+Nilsen et. al \cite{Nilsen2009} has proposed to apply beamspace processing to further reduce the required computations. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. The beamspace version of Capon is derived by replacing the covariance matrix in Eq. \ref{eq:w} with the beamspace covariance matrix $\mat{R}_{BS} = \vec{x}_{BS}\vec{x}_{BS}^H$.  
 
 \subsection{Iterative Capon}
 The idea behind iterative Capon is to perform Capon using small subarrays in several iterations until there is only two subarrays to sum. In this way we fix the size of L, hence the complexity of solving $\mat{R}\vec{b} = \vec{1}$. However, for each iteration we re-obtain L-1 degrees of freedom until all are retrieved after $K = M-L+1$ iterations. Since subarray averaging has been applied to decorrelated the signal, we might loose this effect when reestablishing all degrees of freedom. The number of iterations should therefore be restricted to $K/2$ to equal our standard choice of $L = M/2$ when it comes to degrees of freedom.   
@@ -761,7 +789,7 @@ The authors would like to thank... \cite{Synnevag2009}
 \bibliographystyle{IEEEtran}
 % argument is your BibTeX string definitions and bibliography database(s)
 %\bibliography{IEEEabrv,../bib/paper}
-\bibliography{mybib}
+\bibliography{mybib} % link to mendeley organized bibtex-file
 %
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
