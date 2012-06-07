@@ -117,7 +117,16 @@ In addition we see that each approach shares the same initial steps. The risk of
 
 \subsection{Using only OpenGL for the simulator?}
 
-\begin{table}[b]\centering
+
+When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
+
+Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
+
+The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. However, this will also lead to increased code complexity and development time, and  will naturally increase. However, we expect that such features will be more realizable in CUDA than OpenGL.  
+
+We have compared the two methods in Table \ref{comparison}.
+
+\begin{table}[t]\centering
 \begin{tabular}[c]{l l l}\hline
 \rowcolor{tabBlue}                  & CUDA/OpenGL    & OpenGL only \\\hline
 Development time (per person)       & 6 weeks        & 4 weeks     \\
@@ -135,15 +144,6 @@ ATI/nVidia support                  & nVidia only    & Both \\
 \end{tabular}
 \vspace{5pt}\caption{Comparison of implementation approaches}\label{comparison}
 \end{table}
-
-When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
-
-Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
-
-The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. However, this will also lead to increased code complexity and development time, and  will naturally increase. However, we expect that such features will be more realizable in CUDA than OpenGL.  
-
-We have compared the two methods in Table \ref{comparison}.
-
 
 
 \section{Final thoughts}
