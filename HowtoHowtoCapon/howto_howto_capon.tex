@@ -444,7 +444,49 @@ Finally, to ensure a well conditioned sample covariance matrix, we add a fractio
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation.
 
 
+\section{Arithmetic optimizations}
+
+Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
+
+These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
+\begin{align*}
+r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
+\end{align*}
+which can be easily rewritten in a sliding window fashion
+\begin{align*}
+r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
+\end{align*}
+Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
+\begin{figure}[H]
+% \begin{narrow}{-3.5cm}{-3.5cm}
+\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
+% \end{narrow}
+\end{figure}
+The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
+{\renewcommand*{\arraystretch}{1.8}
+\begin{align*}
+\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
+&= \left[\;
+\begin{matrix}
+\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+\end{matrix}
+\;\right]
+\end{align*}}%
+Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
+
+
+
 \section{Implementation}
+
+- Compute bound vs. bandwidth bound
+
+- Order of summations - memory vs. computations
+- Order of summations - beamspace capable
+
 
 Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. A technology of particular interest here are \glspl{GPU}~\cite{Nilsen2009}, which are tailored for image processing, available off-the-shelf at reasonable prices, and are found in most desktop computers already. The \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel.  However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
 
@@ -623,44 +665,7 @@ r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{av
 \end{gather*}
 where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
 
-% \emph{Diagonal loading} chosen as \cite{Synnevag2007}
-% \begin{align}
-% \varepsilon = \Delta \cdot \tr\{\eR[n]\}
-% \end{align}
-% 
-\subsection{Traditional approach}
 
-Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
-
-These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
-\begin{align*}
-r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
-\end{align*}
-which can be easily rewritten in a sliding window fashion
-\begin{align*}
-r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
-                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
-\end{align*}
-Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
-\begin{figure}[H]
-% \begin{narrow}{-3.5cm}{-3.5cm}
-\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
-\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
-% \end{narrow}
-\end{figure}
-The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
-{\renewcommand*{\arraystretch}{1.8}
-\begin{align*}
-\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
-&= \left[\;
-\begin{matrix}
-\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-\end{matrix}
-\;\right]
-\end{align*}}%
-Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
 
 {\bf Method complexity (instructions):}\\
 \begin{tabular}{l l}
