@@ -447,6 +447,17 @@ where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation
 
 \section{Arithmetic optimizations}
 
+
+\begin{itemize}
+\item Arrange order of summations to reduce data dimensions as early as possible.
+\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
+\item Compute R sub for each time sample, and average these. Rsub is symmetric.
+\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
+\item 
+\end{itemize}
+
+
+
 Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
 
 These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
@@ -492,6 +503,19 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 
 \section{GPU challenges}
 
+
+
+People friendly:
+\begin{itemize}
+\item More and more compute units, but less memory for each.
+\item Need to keep each compute unit busy.
+\item Few data transfers, lots of computations.
+\item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
+\item Memory latency hidden as long as it takes longer to compute than to move data around.
+\item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
+\end{itemize}
+
+
 \begin{itemize}
 \item Hiding memory access.
 \begin{itemize}
@@ -500,6 +524,7 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 \end{itemize}
 \item Register pressure and shared memory. Thread context must fit in local memories.
 \item Warp computational intensity should be high to make up for the memory cost.
+\item Optimized for small L, high M, hardly any time averaging. A typical sonar scenario.
 \end{itemize}
 
 
@@ -512,6 +537,8 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 - Order of summations - beamspace capable
 
 - Size of L vs size of M:
+
+
 
 For each matrix we need to store 
 
