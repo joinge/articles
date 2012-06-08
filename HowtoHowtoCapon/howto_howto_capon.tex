@@ -479,6 +479,17 @@ The final step is to average all the subarray matrices to form $\hat{\mat R}$ by
 \end{align*}}%
 Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
 
+\begin{itemize}
+\item Switching summations. Sum of covariance coefficients in two dimensions.
+\begin{itemize}
+\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+\item Job queue (how does this work)
+\end{itemize}
+\item Register pressure and shared memory. Thread context must fit in local memories.
+\item Warp computational intensity should be high to make up for the memory cost.
+\end{itemize}
+
+
 \section{GPU challenges}
 
 \begin{itemize}
