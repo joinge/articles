@@ -511,6 +511,9 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 - Order of summations - memory vs. computations
 - Order of summations - beamspace capable
 
+- Size of L vs size of M:
+
+For each matrix we need to store 
 
 Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. A technology of particular interest here are \glspl{GPU}~\cite{Nilsen2009}, which are tailored for image processing, available off-the-shelf at reasonable prices, and are found in most desktop computers already. The \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel.  However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
 
