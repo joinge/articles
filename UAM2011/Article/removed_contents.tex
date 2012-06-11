@@ -1,0 +1,22 @@
+
+Let us consider an array with $M$ sensors, where the $m$'th element records a signal $x_m[n]$ at instant $n$. If we apply delays $\Delta_m$ and weights $w_m[n]$ to each of these channels, the beamformer output $z[n]$ is given as:
+%
+\begin{flalign}
+z[n] = \sumb{m=0}{M-1} w_m[n]\,x_m[n-\Delta_m] = \w\H[n]\,\X[n],
+\end{flalign}
+%
+where $\w\H[n] = \bmat{w_1[n] & \dots & w_{M-1}[n]}\T$ and $\X = \bmat{w_1[n-\Delta_1] & \dots & w_{M-1}[n-\Delta_{M-1}] }$. The delays chosen such that signals emanating from the direction of interest sum coherently, while noise and interference from other directions do not. The delays are usually derived from geometry alone. The choice of window, however, promote narrow mainlobe and suppressed sidelobe levels. DAS use predefined windows that allows for a suitable compromise between mainlobe width and sidelobe levels. Adaptive beamformers, however, compute the set of weights based on analytical evaluation of the data.
+As mentioned the MV beamformer compute the set of weights that miminizes the beamformer output power for each time instant,
+\begin{flalign}
+\min E\big\{ |z[n]|^2 \big\} = \w\H[n]\, \R[n]\, \w \qquad \text{subject to} \qquad \w\H[n] \a = 1.
+\end{flalign}
+The contraint is added to ensure a unit gain in the look direction. 
+
+% 
+% \begin{align}
+% \w[n] = \frac{\Ri[n]\,\a}{\a\H\,\Ri[n]\,\a}
+% \end{align}
+
+For the LCMV beamformer we have created an assortion of Kaiser window functions. The Kaiser function allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$. In addition we apply steering $\varphi$ and constrain the window to unit gain in the look direction. We achieved good results by choosing 5 uniformly distributed $\beta$'s in the range $[0.05, 0.5]$, and 5 uniformly distributed $\phi$'s in the range $-0.8\frac{\lambda}{D}, 0.8\frac{\lambda}{D}$.
+
+For statistical robustness the LCMV beamformer was set apply the window with the best performance in a 11 pixel region in range of the image to the center pixel in that region. Likewise, the MV beamformer was set up with range averaging using a window with 11 values, and with 3\% regularisation.
