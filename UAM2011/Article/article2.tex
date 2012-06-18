@@ -1,0 +1,179 @@
+
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% DOCUMENTCLASS %                                See full option description in "mytemplate.cls"
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+ 
+\documentclass[
+   UAM                                          % Document type (non-standard)
+%  , draft
+%  , final                                        % Quality
+%  , xelatex                                      % Use the XeLaTeX compiler
+%  , biblatex                                     % Use 'biblatex' for references (best by far)
+ , bibtex                                       % Use 'bibtex' for references (oldschool :)
+%  , movie
+%  , notodos                                      % Disable todos
+ , layout
+%  , defaultformat                                % Attempt to use default formatting options
+%  , glossary                                     % Use a glossary
+]{common/mytemplate}
+
+% \bibliography{references}
+\hypersetup{
+   bookmarksopen=true
+ , bookmarksopenlevel=2
+}
+% Load the references.bib file
+% \bibliography{references}
+
+\newlength\oldparindent
+\setlength\oldparindent{\parindent}
+
+\newlength\figwidth
+\setlength\figwidth{0.7\linewidth}
+
+% \setlength\floatsep{\baselineskip}
+\setcounter{topnumber}{1}
+% \setlength\baselineskip{12pt}
+% \selectfont
+\begin{document}
+% \fontsize{12pt}{12pt}\selectfont
+
+\layout
+\pagestyle{plain}
+% \layout
+% \printinunitsof{cm}
+% \prntlen{\baselineskip}
+% \the\textwidth
+% \the\linewidth
+% \prntlen{\textwidth}\\
+% \prntlen\linewidth\\
+% \prntlen\oddsidemargin\\
+% \prntlen\oddsidemargin
+% \newpage
+
+
+
+\title{A Low Complexity Adaptive Beamformer\\for Active Sonar Imaging}%
+%
+\author{J.I.Buskenes\firstAddress, A.Austeng\firstAddress, C.-I.C.Nilsen\firstAddress}%
+%
+\begin{contact}
+  \firstAddress Dept. of Informatics, P.Box 1080 Blindern, N-0316 OSLO
+\end{contact}%
+%
+\begin{contact}
+Jo Inge Buskenes\\
+Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
+\href{mailto:joibu@ifi.uio.no}{joibu@ifi.uio.no}
+\end{contact}%
+%
+\begin{abstract}
+The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels. While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA is of O($MW$). Here $M$ is the number of channels, $W$ the number of windows. Hence the proposed method performs like a MV beamformer or better, but at a fraction of the computational cost.
+\end{abstract}%
+%
+\keywords{Beamforming, Capon, Minimum variance, Low Complexity, Sonar}
+
+% \titlepage
+
+\newpage
+% \the\lineheight
+\section{Introduction}
+
+In active sonar array imaging, an acoustic wave is transmitted and the received echoes are recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the arrays spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
+
+Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a predefined window. Adaptive beamformers find an optimal window for each pixel in the resulting image. These windows are usually found by solving an optimization problem based on the data.
+
+The Minimum Variance (MV) beamformer selects the window that minimizes the beamformer's output power~\cite{cap69}. It has previously been investigated for active sonar imaging in e.g. \cite{saf09}. We suggest a Low Complexity Adaptive (LCA) beamformer, which for each pixel applies a set of predefined windows and selects one of them based on the MV criterion. Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
+
+
+% 959 27 818 
+
+% When the wavefield is sampled using an array of sensors, the data from each sensor may be 
+% 
+% Traditional beamformers such as Delay-and-Sum (DAS) apply predefined windows to all incoming data. However, due to the non-stationary nature of sonar data, the optimal window for any given time instant will generally differ from the next. This is where adaptive beamformers thrive, because they compute the optimal window coefficients for the data at each time instant. The choice of optimisation criteria is what mainly differentiates the various adaptive beamformers. The Minimum Variance (MV) beamformer, for instance, selects the set of weights that minimizes the beamformer output power for any given time instant~\cite{cap69}.
+
+
+\section{Background}
+
+% Adaptive beamformers usually compute the window coefficients by estimating and inverting a spatial covariance matrix. There are two inherent problems to this procedure. First, for improved estimation accuracy the data is either averaged in space or time, and the significance of the covariance matrix can be reduced using a regularisation parameter~\cite{Carl Inge}. These are all attempts to constrain the beamformer to ensure the window coefficience are not over-adapted to the data. Second, inverting the covariance matrix has a computational complexity of O($M^3$)~\cite{Carl Inge}. For larger arrays the computational burden becomes significant, and the question arises whether this processing power can be better utilised. 
+
+The MV beamformer computes the window coefficients by estimating and inverting a spatial covariance matrix. For improved estimation accuracy the data is averaged in space or time, or both. In addition, a certain amount of diagonal loading is often added to the covariance matrix before inversion. These actions, while leading to statistical robustness, often also deteriorate the beamformers performance. Also, the inversion of the covariance matrix has a computational complexity of O($M^3$), where $M$ is the number of elements. The computational burden makes the MV beamformer for large arrays less attractive, and sometimes even infeasible.
+
+Based on the proposed method by Synnevaag~\cite{syn08}, we have implemented the LCA beamformer that keeps the minimum variance
+optimisation criterion but reduces the solution space to a discrete set of predefined windows. This reduces the computational complexity to O($MW$), where $W$ is the number of windows in the set. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$. In addition we apply steering to each of the windows and constrain the window design to ensure unit gain in the look direction.
+
+The following will show that the proposed method performs similarly to or better than the MV method.
+
+\begin{figure}[tp]\centering%
+\subfigure{%
+\graphicsAI[width=\linewidth]{gfx/img_das_lca_mv.pdf}%
+}
+\subfigure{
+\graphicsAI[width=\linewidth]{gfx/img_das_lca_mv_mean100.pdf}%
+}\label{speckle}%
+% \caption{\parbox[t]{1.50cm}{Top:\protect\newline Bottom:}\parbox[t]{6.8cm}{Image of a single speckle realisation.\protect\newline Mean image of 100 speckle realisations.}}%
+\end{figure}%
+\begin{figure}[t]\centering%
+\graphicsAI[width=\linewidth]{gfx/img_mean_cut.pdf}%
+\caption{Cut through shadow and highlight region of the mean image.}\label{cutmean}%
+\end{figure}
+% \begin{figure}[t]\centering
+% % \graphicsAI[drawing,width=\linewidth]{gfx/the_box.svg}\\
+% \includegraphics[width=\linewidth]{gfx/selected_windows.pdf}
+% \caption{Selected windows}\label{selected_windows}
+% \end{figure}
+% \begin{figure}[t]\centering
+% \includegraphics[width=\linewidth]{gfx/selected_windows_angle.pdf}
+% \caption{Selected windows - Colored by angle}\label{selected_windows_angle}
+% \includegraphics[width=\linewidth]{gfx/selected_windows_sym_angle.pdf}
+% \caption{Selected windows - Colored symmetrically by angle}\label{selected_windows_sym}
+% \end{figure}
+\begin{figure}[t]\centering
+\graphicsAI[width=\linewidth]{gfx/img_holmengraa.pdf}%
+\caption{HISAS Synthetic Aperture Sonar (SAS) image of the shipwreck Holmengraa}\label{holmengraa}%
+\end{figure}
+
+% Adaptive beamformers usually compute the window coefficients by estimating and inverting a spatial covariance matrix. There are two inherent problems to this procedure. First, for improved estimation accuracy the data is either averaged in space or time, and the significance of the covariance matrix can be reduced using a regularisation parameter~\cite{Carl Inge}. These are all attempts to constrain the beamformer to ensure the window coefficience are not over-adapted to the data. Second, inverting the covariance matrix has a computational complexity of O($M^3$)~\cite{Carl Inge}. For larger arrays the computational burden becomes significant, and the question arises whether this processing power can be better utilised. 
+% 
+% Based on the proposed method by Synnevåg~\cite{syn08}, we have implemented a Low Complexity Adaptive (LCA) beamformer that keeps the minimum variance optimisation criteria but reduces the solution space to a discrete set of predefined windows. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$. In addition we apply steering $\varphi$ to each of the windows and and constrain the window design to ensure unit gain in the look direction.
+
+\section{Experimental Setup}
+
+For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in these experiments by letting the LCA beamformer select among 10 Kaiser windows with uniformly distributed parameters ($\beta$) in the range $[0.05, 0.5]$ and a rectangular window. Each window is steered in 10 different directions, uniformly distributed within 80\% of the mainlobe width caused by the rectangular window, which is the most narrow. This adds to a total of 110 windows.
+
+For statistical robustness the LCA beamformer was set to apply the most frequently selected window in an 11 pixel range region to the center pixel in that region. The MV beamformer estimated the covariance matrix as described in~\cite{syn08} by averaging over 16 subarrays and 11 range pixels, and applying 3\% diagonal loading.
+
+% Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
+
+% \newpage
+\section{Results and Discussion}
+
+% We have tested the beamformers using data aquired by the Kongsberg Maritime HISAS1030 sonar~\cite{Hansen,Callow,et.al}, and on simulations of the same sonar with 100 realisations of speckle. The simulations contained a few highlighted cylindric regions with 2\,m diameter and a constant intensity 15.4\,dB over the average speckle level. We focus on an object centered at 41\,m range and -3 degrees azimuth angle. The images produced for a single speckle realisation, and the mean image of all 100 realisations in \Fig{speckle}. Each image was normalised by their respective speckle level, and the dynamic range was clamped at \{-30, 15\}\,dB. The physical extent of the of the simulated object is superimposed for reference. %\ref{saf09}
+
+We see that both the adaptive beamformers have far better angular sidelobe suppression than DAS, and produce a more clearly defined shadow. This is also observed in \fig{cutmean}, which displays a cut through the shadow and highlight region of the image. The transition region between highlight and shadow is shortest for the LCA, implying that its angular resolution is better than that of the MV beamformer. This is advantageous since it causes less leakage of highlight into shadow areas, thereby resulting in a more accurate representation of the object size. The slightly inferior MV resolution is due to the subarray averaging, which makes the effective array smaller.
+
+We have found that the tendency of the LCA to perform similarly to the MV beamformer is consistent in most scenarios, except when it is of essence that strong interferers close to object being imaged are present. In such cases the MV beamformer is expected to take advantage of its full solution space to design a spatial response with zero sensitivity at the interferers angles, while LCA will be limted to the spatial responses that we selected. In short, whenever a scenario comes along that favors a spatial response we did not think of, the MV will triumph. On the other hand, increasing the LCA solution space will at some point leave it with nearly the same freedom as the MV, without suffering from statistical instability.
+
+By studying the LCA performance on the 100 speckle realisations, we found the choice of window to be highly dependent on the phenomena being imaged. In speckle regions LCA favored narrow spatial responses with minor steering, while in shadow regions a wide and fully steered responses were often selected. There was also a clear distinction between the responses selected in sidelobe regions and in speckle regions.
+
+% \Fig{hist} illustrates how often a particular window is chosen in general. There are 10 $\phi$'s for each of the 10 $\beta$'s. The first 10 values are rectangular windows. Value 5 is a non-steered rectangular window, and we see that this is most frequently selected. At higher steering angles the windows are rarely selected, and thus we might get better results by tightening our steering boundaries. At value 15 we find inverted Kaiser windows with $\beta = 0.05$, and then $\beta$ is increased in increments of 0.505 for every 10th value. At value 65 the $\beta$ value is 2.025, and these and the remaining windows are hardly selected.
+
+In \Fig{holmengraa} the wreck Holmengraa is imaged using the LCA and DAS beamformer. It is 26\,m long and 6\,m wide, and lies on a slanted seabed at 77\, depth. Again, the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
+
+
+\section{Conclusion}
+
+The LCA method delivers performance similar to the MV method, but at a fraction of the computational cost. This is verified in our simulations of speckle, and on experimental data.If the windows are With a careful window design, If the window database is designed wisely,  a window database to suit 
+
+% \printreferences
+% If bibtex:
+\bibliography{references2}
+
+% If biblatex (file is loaded in preamble):
+% \printreferences
+
+\end{document}

@@ -113,20 +113,23 @@ The way we see it, there are two possible approaches to implementing the mention
 
 In either case the simulator will take a seafloor and target model as input, and generate a simulated sonar image. To offload the CPU further, the GPU can then proceed to compute the correlation between the template and the isolated image segment, and an image mask. This should be fairly easy to implement, will compute efficiently on the GPU, and allows us to avoid sending each template back to the CPU over the limited bandwidth CPU$\leftrightarrow$GPU bus. Note that these steps will have to be carried out in CUDA regardless of the approach selected.
 
-In addition we see that each approach shares the same initial steps. The risk of selecting a OpenGL-only implementation is therefore reduced, since a CUDA implementation for the middle step can be selected based on experience with the initial steps in OpenGL.    
+In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
 
 \subsection{Using only OpenGL for the simulator?}
 
+
 When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
 
-Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, if we can treat sound as ``light'', we believe it to be better to use OpenGL simulate the entire scene and generate the required 2D views and perspectives of it. The advantage of doing ``everything'' in OpenGL is pretty obvious, we may then support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast. A CUDA implementation will benefit from more flexibility when it comes to simulating sound propagation in a non-ideal medium, and translucent objects.  With more complex models both the code complexity and developing time will naturally increase. However, we expect that such features will be more realizable in CUDA than OpenGL.  
+Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
+
+The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. However, this will also lead to increased code complexity and development time, and  will naturally increase. However, we expect that such features will be more realizable in CUDA than OpenGL.  
 
 We have compared the two methods in Table \ref{comparison}.
 
-\begin{table}[H]\centering
+\begin{table}[t]\centering
 \begin{tabular}[c]{l l l}\hline
 \rowcolor{tabBlue}                  & CUDA/OpenGL    & OpenGL only \\\hline
-Development time (estimate)         & 6 weeks        & 4 weeks     \\
+Development time (per person)       & 6 weeks        & 4 weeks     \\
 Development complexity              & Moderate       & Low \\
 Amount of code                      & More           & Less \\
 Maintainability                     & Moderate       & Moderate \\
@@ -136,6 +139,7 @@ Sound$\rightarrow$light calibration & Not necessary  & Necessary(?) \\
 Multipath support                   & Possible       & Possible \\
 Speckle support                     & Possible       & Hard \\
 Diffraction support                 & Possible       & Hard \\
+Complex image                       & Easy           & Hard \\
 ATI/nVidia support                  & nVidia only    & Both \\
 \end{tabular}
 \vspace{5pt}\caption{Comparison of implementation approaches}\label{comparison}
@@ -144,6 +148,29 @@ ATI/nVidia support                  & nVidia only    & Both \\
 
 \section{Final thoughts}
 
-We propose using OpenGL to simulate the scene, and model the array as lightsources. This will make it unsuitable for simulating speckle and diffraction effects, but a "simple'' simulator should probably not take such effects into account anyhow. Penetrable objects can be simulated in either case, although we are not sure whether the OpenGL framework can support this with ease inside its framework limits. An OpenGL implementation will be highly portable, and believed to support the functionality need to generate a good enough template image.
+We propose using OpenGL to simulate the scene, and model the array as lightsources. This will make it unsuitable for simulating speckle and diffraction effects, but a "simple'' simulator should probably not take such effects into account anyhow. Penetrable objects can be simulated in either case, although we are not sure whether the OpenGL framework can support this with ease. An OpenGL implementation will be highly portable, and believed to support the functionality needed to generate a good enough template image.
+
+We aim to start development in July. The goal is to have an OpenGL prototype ready within a couple weeks, and from there decide which approach to go for. We propose monthly progress reports and meetings to discuss further 
+development.
+
+
+
+
+
+\newpage
+
+\section{Ideas for paper}
+
+\begin{itemize}
+\item With effects such as layover, shadows, limited resolution (detail retention capability), and complex object and surface shapes, computing the actual scenario based on the sonar image is hard.
+\item Better to perform fast, recursive simulations instead?
+\item Adaptive images in a video makes it much easier to understand what is going on. Need much better erfora
+\item Litits: massive storage, fixed templates, amplitude/noise sensitive
+\item Alternatives: Pattern recognition (hard to extract decent features, selection, fixed templates) and model-based (massive computational requirements)
+\item Why models? Hard to get accurate models from limted amount dat, targets not always availagme, variations in target/terrain.
+\item CAD models. Sufficient complexity? Materials? Transparency, characterisation, multilauers.
+\item Accuracy vs. comp. speed.
+\end{itemize}
+
 
 \end{document}

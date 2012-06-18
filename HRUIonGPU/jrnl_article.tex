@@ -274,7 +274,7 @@
 % IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later 
 % (recommended due to many improvements over 1.2) of subfig.sty supports
 % the caption=false option directly:
-%\usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage[caption=false,font=footnotesize]{subfig}
 %
 % The latest version and documentation can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
@@ -342,8 +342,8 @@
 % captions of packages such as subfig.sty that lack options to turn off
 % the subcaptions:
 % For subfig.sty:
-% \let\MYorigsubfloat\subfloat
-% \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}}
+%\let\MYorigsubfloat\subfloat
+%\renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}}
 % For subfigure.sty:
 % \let\MYorigsubfigure\subfigure
 % \renewcommand{\subfigure}[2][\relax]{\MYorigsubfigure[]{#2}}
@@ -639,10 +639,24 @@ Let one thread read one element of $\vec{b}$, scale it with the inverse sum, and
 \subsection{Beamspace Processing}
 Nilsen et. al \cite{Nilsen2009} has proposed to apply beamspace processing to further reduce the required computations. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. The beamspace version of Capon is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{R}_{BS} = \vec{x}_{BS}\vec{x}_{BS}^H$, where $\mat{B} \in \mathbb{C}^{N_b,M}$, and $N_b$ is the number of selected beams. Note that when subarray averaging is applied, the transformation must be done per subarray, yielding subarrays that no longer overlap in space. Hence, the amount of data is change from $M$ to $KN_b$ per sample.
 
+(Go in detail about the implementation using sliding DFT).
+
 \subsection{Iterative Capon}
-The idea behind iterative Capon is to perform Capon using small subarrays in several iterations until there is only two subarrays to sum. In this way we fix the size of L, hence the complexity of solving $\mat{R}\vec{b} = \vec{1}$. However, for each iteration we re-obtain L-1 degrees of freedom until all are retrieved after $K = M-L+1$ iterations. Since subarray averaging has been applied to decorrelated the signal, we might loose this effect when reestablishing all degrees of freedom. The number of iterations should therefore be restricted to $K/2$ to equal the normal choice of $L = M/2$ when it comes to degrees of freedom.   
+The idea behind iterative Capon is to perform Capon using small subarrays in several iterations until there is only two subarrays to sum. In this way we fix the size of L, hence the complexity of solving $\mat{R}\vec{b} = \vec{1}$. However, for each iteration we re-obtain L-1 degrees of freedom until all are retrieved after $K = M-L+1$ iterations. Since subarray averaging has been applied to decorrelated the signal, we might loose this effect when reestablishing all degrees of freedom. The number of iterations should therefore be restricted to $K/2$ to equal the normal choice of $L = M/2$ when it comes to degrees of freedom.  
+
+\subsection{Toeplitz-based solver} 
+(cite new article). Discuss it.
 
 \section{Results}\label{sec:res}
+
+\begin{figure*}[!t]
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32.png} \label{fig:benchUS32}}
+\hfil
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64.png}%
+\label{fig:benchUS64}}}
+\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) A 32 elements array. (b) A 64 elements array.}
+\label{fig:bench}
+\end{figure*}
 
 Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing executing times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2*Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
 
@@ -650,6 +664,8 @@ Present images, both simulated and in-vivo, processed using beamspace Capon and 
 Show beampatterns for the two compared with the full method. Show executing times for the two methods compared with the full method on the GPU.
 
 Describe the base band (IQ-demodulation) process that the data has been undergoing.
+
+How has the data been acquired?
 
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.

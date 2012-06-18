@@ -137,6 +137,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % MACROS %       
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\newcommand\Eq[1]{Equation (\ref{#1})}
+\newcommand\Fig[1]{Figure \ref{#1}}
 
 \newcommand\Grey[1]{{\color{Grey}#1}}
 \newcommand\Red[1]{{\color{Red}#1}}
@@ -201,6 +203,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\prodl[1]{\prod\limits_{#1}\,}
 \newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
 
+\newcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
+
 %Math macros:
 \newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
 \newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
@@ -218,7 +222,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \renewcommand\vec[1]{\boldsymbol{#1}}
 \newcommand\mat[1]{\boldsymbol{#1}}
 
-
+\newcommand\1{\vec 1}
+\newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
 \renewcommand*\i{\vec i}
 \renewcommand*\k{\vec k}
@@ -260,6 +265,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \usepackage{tikz}
 \usetikzlibrary{shapes,snakes}
 \usepackage{amsmath,amssymb}
+\usepackage{glossaries}
 
 \newenvironment{outline}
 {\begin{itemize}}
@@ -282,6 +288,12 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
 
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% GLOSSARY %
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\makeglossaries
+\input{../../Library/glossary}
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT START %
@@ -292,11 +304,12 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 \begin{document}
 
-\title{Howto howto Capon}
+\title{A Robust and Optimized GPU Implementation of the MVDR beamformer}
 
 \author{Jo~Inge~Buskenes, %
         Jon~Petter~Aasen, %
         Carl-Inge~Colombo~Nilsen%
+        Andreas~Austeng%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
 of Informatics, University of Oslo, Norway.}% <-this % stops a space
 
@@ -305,7 +318,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 
 % The paper headers
 \markboth{IEEE Journal of Oceanic Engineering}%
-{Low Complexity Adaptive Beamformer for Active Sonar Imaging}
+{A Robust and Optimized GPU Implementation of the MVDR beamformer}
 
 % Publishers ID mark:
 %\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
@@ -328,7 +341,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % Keywords (normally not used for peer reviews)
 \ifPeerReview\else
 \begin{IEEEkeywords}
-Beamforming, adaptive beamforming, sonar, active, complexity. \todo{not entirely true?}
+Beamforming, adaptive beamforming, sonar, active, complexity.
 \end{IEEEkeywords}
 \fi}
 % \fi
@@ -394,7 +407,6 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 
 
 
-\newpage
 \section{Methods}\label{methods}
 
 The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that compensates for the difference in transmitter-pixel-receiver propagation time.
@@ -433,8 +445,102 @@ Finally, to ensure a well conditioned sample covariance matrix, we add a fractio
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation.
 
 
-\newpage
+\section{Arithmetic optimizations}
+
+
+\begin{itemize}
+\item Arrange order of summations to reduce data dimensions as early as possible.
+\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
+\item Compute R sub for each time sample, and average these. Rsub is symmetric.
+\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
+\item 
+\end{itemize}
+
+
+
+Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
+
+These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
+\begin{align*}
+r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
+\end{align*}
+which can be easily rewritten in a sliding window fashion
+\begin{align*}
+r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
+\end{align*}
+Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
+\begin{figure}[H]
+% \begin{narrow}{-3.5cm}{-3.5cm}
+\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
+% \end{narrow}
+\end{figure}
+The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
+{\renewcommand*{\arraystretch}{1.8}
+\begin{align*}
+\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
+&= \left[\;
+\begin{matrix}
+\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+\end{matrix}
+\;\right]
+\end{align*}}%
+Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
+
+\begin{itemize}
+\item Switching summations. Sum of covariance coefficients in two dimensions.
+\begin{itemize}
+\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+\item Job queue (how does this work)
+\end{itemize}
+\item Register pressure and shared memory. Thread context must fit in local memories.
+\item Warp computational intensity should be high to make up for the memory cost.
+\end{itemize}
+
+
+\section{GPU challenges}
+
+
+
+People friendly:
+\begin{itemize}
+\item More and more compute units, but less memory for each.
+\item Need to keep each compute unit busy.
+\item Few data transfers, lots of computations.
+\item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
+\item Memory latency hidden as long as it takes longer to compute than to move data around.
+\item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
+\end{itemize}
+
+
+\begin{itemize}
+\item Hiding memory access.
+\begin{itemize}
+\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+\item Job queue (how does this work)
+\end{itemize}
+\item Register pressure and shared memory. Thread context must fit in local memories.
+\item Warp computational intensity should be high to make up for the memory cost.
+\item Optimized for small L, high M, hardly any time averaging. A typical sonar scenario.
+\end{itemize}
+
+
+
 \section{Implementation}
+
+- Compute bound vs. bandwidth bound
+
+- Order of summations - memory vs. computations
+- Order of summations - beamspace capable
+
+- Size of L vs size of M:
+
+
+
+For each matrix we need to store 
 
 Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. A technology of particular interest here are \glspl{GPU}~\cite{Nilsen2009}, which are tailored for image processing, available off-the-shelf at reasonable prices, and are found in most desktop computers already. The \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel.  However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
 
@@ -453,20 +559,19 @@ In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVid
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\linewidth]{gfx/img_holmengraa.pdf}
+\includegraphics[width=\linewidth]{gfx/img_holmengraa.ps}
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
 \end{figure}
 
 
-\newpage
 \section{Results}
 
 We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two different experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and one one of the datasets used in sidescan mode to image the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\linewidth]{gfx/benchmark.pdf}
-\caption{\gls{MVDR} benchmarks. Forming a 55\,kpixel image from a $M=32$ channel array.}\label{benchmarks}
+\includegraphics[width=\linewidth]{gfx/benchmark.ps}
+\caption{\protect\gls{MVDR} benchmarks. Forming a 55\,kpixel image from a $M=32$ channel array.}\label{benchmarks}
 \end{figure}
 
 The other dataset was a 55\,kpixel sectorscan test image. We used it to benchmark our \gls{MVDR} implementation, and compared the result with the runtimes of an optimized single-thread C and Matlab implementation (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of performing roughly 1Tflops.
@@ -605,64 +710,30 @@ The authors would like to thank nVidia for providing them their unofficial linea
 % \item Choice of robustification parameters \cite{Synnevag2007}
 % \end{itemize}
 % 
-% Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
-% \begin{gather*}
-% r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-% \end{gather*}
-% where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
-% 
-% \emph{Diagonal loading} chosen as \cite{Synnevag2007}
-% \begin{align}
-% \varepsilon = \Delta \cdot \tr\{\eR[n]\}
-% \end{align}
-% 
-% \subsection{Traditional approach}
-% 
-% Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
-% 
-% These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
-% \begin{align*}
-% r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
-% \end{align*}
-% which can be easily rewritten in a sliding window fashion
-% \begin{align*}
-% r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
-%                          + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
-% \end{align*}
-% Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
-% \begin{figure}[H]
-% % \begin{narrow}{-3.5cm}{-3.5cm}
-% \includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
-% \caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
-% % \end{narrow}
-% \end{figure}
-% The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
-% {\renewcommand*{\arraystretch}{1.8}
-% \begin{align*}
-% \hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
-% &= \left[\;
-% \begin{matrix}
-% \color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-%                                        & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-%                                        &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-% \end{matrix}
-% \;\right]
-% \end{align*}}%
-% Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
-% 
-% {\bf Method complexity:}\\
-% \begin{tabular}{l l}
-% No optimizations            & $2M^2\,(2\Navg+1)$ \\
-% Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
-% Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
-% \end{tabular}\\\\
-% 
-% 
+
+
+\newpage
+Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
+\begin{gather*}
+r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
+\end{gather*}
+where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
+
+
+
+{\bf Method complexity (instructions):}\\
+\begin{tabular}{l l}
+No optimizations            & $2M^2\,(2\Navg+1)$ \\
+Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
+Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
+\end{tabular}\\\\
+
+
 % 
 % \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
 % 
 % There are two ways of finding $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$, either by solving the equation directly or by inverting $\hat{\mat R}$ first. Solving the equation is less computationally intensive than inverting $\hat{\mat R}$, and seems like the obvious choice. However, with iterative methods for updating $\eRi$ for each range pixel the situation is changed...
-% 
+
 % 
 % \subsection{Iterative methods}
 % 
