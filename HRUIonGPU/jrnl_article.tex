@@ -529,6 +529,16 @@ Adaptive beamforming, Capon beamformer, Graphics Processing Unit, GPGPU, Paralle
 In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of the Capon beamformer, before in Section \ref{sec:meth2} we introduce methods to apply as the problem size increases. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
 
 \section{Background}
+
+\begin{figure*}[t!]
+\centerline{\subfloat[]{\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png} \label{fig:mvbf}}
+\hfil
+\subfloat[]{\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
+\label{fig:gpulayout}}}
+\caption{}
+\label{fig:fig1}
+\end{figure*}
+
 \subsection{Capon Beamforming}
 When sensing the world around us with an array of elements, we perform a spatio-temporal filtering operation known as beamforming. The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a factor $w_m$,
 \begin{align}
@@ -569,12 +579,11 @@ d &= 1/L
 \end{align}
 introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much of the resent literature on Capon beamforming for medical ultrasound imaging \cite{Nilsen2009, Wang2009, Mehdizadeh2012}. 
 
-\begin{figure}
-\includegraphics[width=3.5in]{gfx/beamforming_mv_lowres.png}%
-\label{fig:mv}
-\caption{}
-\label{fig:mv}
-\end{figure}
+%\begin{figure}
+%\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png}
+%\caption{}
+%\label{fig:mv}
+%\end{figure}
 
 %Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change. 
 %In this paper we introduce the first GPU implementation of the Capon beamformer capable of processing a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing. Both types of smoothing are important for maintaining delay-and-sum-like speckle and at the same time keep the high resolution property. This is achieved using complex base band data, which reduces the size of each range line to a minimum. In addition, complex data results in complex weights; hence this is a correct implementation of Capon beamforming with all degrees of freedom preserved. For high channel count systems we propose two ways of reducing computational complexity while maintaining 
@@ -605,6 +614,12 @@ As mentioned, widespread use of Capon adaptive beamforming has been limited by i
 \item Calculate $\vec{w} = \vec{b}/\vec{1}^H\vec{b}$ and the amplitude $\vec{w}^H\vec{x}$
 \end{enumerate}
 The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and real time performance can only be achieved by exploring novel solutions to reduce complexity. 
+
+%\begin{figure}
+%\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
+%\caption{}
+%\label{fig:gpulayout}
+%\end{figure}
 
 \subsection{Calculating Multiple Sample Covariance Matrices}
 The straight forward sum in (\ref{eq:R}) has complexity $O(L^2KN) = O(L^3)$ if $L$ is a small fraction of $M$. This is actually the same as for inverting a $L \times L$ matrix. However, little attention has been devoted to this step in the literature until now. Note that for a typical array configuration, N is usually small compared to L and M. Hence, for a small $L$ the construction of $\mat{\hat{R}}$ is dominated by $M$, since $K = M - L + 1$. From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all the others. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on $L$, $L_{max}=32$, if we want to avoid block-to-block synchronization.
