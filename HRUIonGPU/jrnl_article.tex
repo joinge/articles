@@ -475,7 +475,18 @@
 
 \begin{abstract}
 %\boldmath
-The abstract goes here.
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.  
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.  
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -535,7 +546,7 @@ In the next section we present background information about the Capon beamformer
 \hfil
 \subfloat[]{\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
 \label{fig:gpulayout}}}
-\caption{}
+\caption{a) Beamforming with adaptive weights $\vec{w}[n]$. Impinging signal is demodulated and aligned in phase by applying steering and focusing delays $\Delta_m[n]$. Capon adaptive weights are then calculated based on the in-phase data, and finally the output is formed by a weighted coherent sum. b) Calculation of Capon adaptive weights mapped to GPU architecture. A recorded echo across the array for a given range and angle (selected cell) is assigned to a group of $L$ threads that can run independently of all other groups. Note that several samples can be processed per block of threads if $L$ is small. The task of these $L$ threads is to calculate the Capon beamformer output in the three depicted steps.}
 \label{fig:fig1}
 \end{figure*}
 
@@ -546,7 +557,7 @@ z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n].
 \end{align}
 In conventional beamforming, the weighting $\vec{w}$ is usually real, and applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
 
-The basic idea of an adaptive beamformer is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
+The basic idea of an adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
 \begin{align}
 &\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
 &\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
@@ -591,7 +602,7 @@ introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much o
 \subsection{GPU Compute Model}
 In this section we briefly discuss the principle behind GPU computing, laying the basis for further discussion on parallel implementation strategies. CUDA by Nvidia has been our choice of GPU developer environment \cite{Nvidia2011}. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper applies for other massive parallel implementation environments as well, like e.g. OpenCL. 
 
-The CUDA compute model is based on execution of a kernel-function across a grid of compute threads. Each position in the grid holds a block of threads, with maximal size of 1024 threads, that can be easily synchronized if needed. 
+The CUDA compute model is based on execution of a kernel-function across a grid of compute threads. As depicted in Figure \ref{fig:gpulayout}, each position in the grid holds a block of threads, with maximal size of 1024 threads, that can be easily synchronized if needed. 
 %Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. 
 From a CUDA perspective the GPU consist of one or more stream multi processors (SM's), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. More important, the SM has a limited amount of near-core memory and registers available. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. Global read and writes on the GPU, in addition to CPU-GPU transfers have high penalty, and should be minimized as much as possible. All of these constraints combined pose a real challenge as the target problem has to map on to the parallel framework both on a grid, block and memory consumption level in order to benefits from parallel acceleration. In the next section, we will describe how this mapping should be done for Capon beamforming of ultrasound data.    
 
@@ -614,6 +625,8 @@ As mentioned, widespread use of Capon adaptive beamforming has been limited by i
 \item Calculate $\vec{w} = \vec{b}/\vec{1}^H\vec{b}$ and the amplitude $\vec{w}^H\vec{x}$
 \end{enumerate}
 The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and real time performance can only be achieved by exploring novel solutions to reduce complexity. 
+
+(The three steps have, for modularity, been implemented using three different kernels. Joining all kernels into one could possible lead to an increase in speed.)
 
 %\begin{figure}
 %\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
@@ -676,11 +689,20 @@ The idea behind iterative Capon is to perform Capon using small subarrays in sev
 \section{Results}\label{sec:res}
 
 \begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32.png} \label{fig:benchUS32}}
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32_lr.png} \label{fig:benchUS32}}
 \hfil
-\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64.png}%
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64_lr.png}%
 \label{fig:benchUS64}}}
 \caption{Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) A 32 elements array. (b) A 64 elements array.}
+\label{fig:bench}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32_lr.png} \label{fig:benchUS32}}
+\hfil
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64_lr.png}%
+\label{fig:benchUS64}}}
+\caption{(TODO: Add the right figure) Benchmark of GPU Beamspace Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of number of elements $M$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) 3 beams. (b) 5 beams.}
 \label{fig:bench}
 \end{figure*}
 
@@ -696,6 +718,9 @@ How has the data been acquired?
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
 
+We expect that a large speedup had the Capon beamformer been implemented on the CPU using threads and SIMD (single instruction multiple data) instructions. 
+
+(results)?
 For a typical cardiac ultrasound image of 80*400 pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, $M=64$ element phased array, the result is 10fps (subarray length $L=M/2$, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the frame rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector (40*400 pixels), hence with the same parameters the frame rate increases to 87fps. The bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16, real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
 
 \section{Conclusion}\label{sec:con}
