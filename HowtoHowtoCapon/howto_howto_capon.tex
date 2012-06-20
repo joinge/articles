@@ -587,6 +587,15 @@ Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in
 
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
+
+- Sidescan: 40kHz 
+
+What may this performance be used for? Let us assume that the 32 element, 1.2\,m long HISAS1030 array is mounted on a platform moving at 1.8\,m/s. Then the pulse repetition frequency (PRF) could be set to 3\,Hz to ensure critical along-track sampling, 
+To illustrate what this performance might be used for, consider a moving platform travelling at 1.8\,m/s. 
+If the sonar system is Maximum range 
+There is a limit to the along-track sampli
+To avoid along track undersampling, the 
+
 % HUGIN: 1.8m/s - range 250m \\
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
 % $N_{range px} = \frac{2\,250m}{1500m/s}40kHz = 13.3kpx$ \\
