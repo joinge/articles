@@ -384,14 +384,59 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
 
-In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. The image is then formed in the post-processing by coherently combining the receiver outputs focus at one pixel at the time. This focusing concept is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+The image quality is mainly limited by beampattern of the imaging arrays.  resolution and noise suppression
+
+The quality of sonar images 
+
+An essential part of a sonar imaging system is the beamformer. 
 
 
+A sonar image is typically formed by using receive beamforming to focus on one pixel at a time. The beamformer's ability to suppress interference   to focus on one pixel at the time. How well a pixel value is estimated, and thus how 
 
-In conventional beamforming 
+A sonar image is built one pixel at the time the 
+
+The image quality of a sonar system will depend on the imaging arrays ability to focus in 
+
+Adaptive beamforming is a has recently been introduced in active 
+
+Forming images done by combining data from multiple receivers in a way that to obtain focus on one pixel at the time, and assigning the output value to the intensity of that pixel. The 
+
+Most modern active sonar systems employ phased arrays to 
+The basic way of a sonar image was formed 
+
+A sonar system's ability to 
+
+Adaptive beamforming has 
+
+The image quality 
+
+To improve the image quality of 
+
+In high resolution sonar imaging the 
+
+The image 
 
 
-In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
+In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. A image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+
+Ideally, 
+
+The formation of a sonar image is 
+
+The principle of forming an image in active sonar systems usually 
+
+A common way of creating high resolution sonar images is to use multielement arrays to  
+
+In sonar imaging a common compromise 
+
+A common way of creating sonar images is to use 
+
+The drive 
+
+The pursuit of 
+
+Adaptive beamforming 
+
 
 The Minimum Variance Distortionless Response (MVDR, or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the power accumulated by the array from other directions. Its ability to suppress interference power and improve image quality in active sonar systems has been demonstrated in e.g.~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
@@ -404,6 +449,28 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 
 
 \section{Methods}\label{methods}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{myfigure}
+where an .eps filename suffix will be assumed under latex, 
+and a .pdf suffix will be assumed for pdflatex; or what has been declared
+via \DeclareGraphicsExtensions.
+\caption{Simulation Results}
+\label{fig_sim}
+\end{figure}
+
+
+
+In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. A image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+
+
+
+In conventional beamforming 
+
+
+In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
+
 
 The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that compensates for the difference in transmitter-pixel-receiver propagation time.
 
