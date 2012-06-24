@@ -1,0 +1,73 @@
+ 
+
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% DOCUMENTCLASS %                                See full option description in "mytemplate.cls"
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+ 
+\documentclass[
+%  , draft
+%  , final                                        % Quality
+%   xelatex                                      % Use the XeLaTeX compiler?
+%  , biblatex                                     % Use 'biblatex' for references (best by far)
+  bibtex                                       % Use 'bibtex' for references (oldschool :)
+]{uam}
+
+% If biblatex is used: Load those references loaded in preamble:
+% \bibliography{references}
+
+\begin{document}
+
+\pagestyle{plain}
+
+% Note. Keep the %'s on the title page to ensure that no extra paragraphs are added.
+%       We don't want Latex to apply magic rubber'lengths here, we want control.
+%       Eventually I'll need to redo the \titlepage command, but not now...
+
+\title{Keep on Rockin'}
+%
+\author{J.I.Buskenes\firstAddress, A.Austeng\firstAddress, C.-I.C.Nilsen\secondAddress}
+%
+\begin{contact}
+  \firstAddress Institute of Informatics, P.Box 1080 Blindern, N-0316 OSLO \\
+  \secondAddress No street, $\infty\infty\infty\infty$ NEVER EVER LAND
+\end{contact}
+%
+\begin{contact}
+Jo Inge Buskenes \\
+Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO \\
+\href{mailto:joibu@ifi.uio.no}{joibu@ifi.uio.no}
+\end{contact}
+%
+\begin{abstract}
+Mauris a dui ac velit lacinia sodales sit amet at libero. Nam lobortis ante non velit tincidunt vestibulum. Nunc eu ipsum quis ante fermentum tincidunt. Donec ac lorem et tortor vulputate elementum. Pellentesque vel velit sed neque sagittis pretium. Duis posuere sagittis arcu sed imperdiet. Morbi sed ligula a tellus pulvinar tincidunt. Pellentesque lacinia urna vel velit lobortis fermentum. Ut eu metus in nulla pharetra lacinia. Nullam lacus velit, viverra sed aliquet id, laoreet ut enim. Suspendisse dictum sem sit amet lorem tincidunt mollis. In vestibulum, dui id faucibus aliquam, purus libero consequat leo, quis condimentum sem quam ut dui. Mauris ut vestibulum augue. In porttitor orci vel nulla aliquam pretium. Donec nunc erat, ultrices ac tincidunt nec, condimentum eget elit. Aenean lacinia purus eu tellus tincidunt blandit. Suspendisse potenti. In rutrum urna eget dolor interdum non tristique lorem egestas. In hac habitasse platea dictumst.
+\end{abstract}
+%
+\keywords{Beamforming, Adaptive beamforming, Capon, High resolution, Complexity, Sonar}
+
+
+\newpage
+\section{Contents}
+
+Lots of cryptic stuff...
+
+
+\section*{Acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements}
+
+Yeah whatever... \cite{JohnDoe10}
+
+
+% I use a custom command here since biblatex is different to bibtex in syntax here.
+% Feel free to mail me complaints. :)
+% \printreferences
+
+% If bibtex:
+\bibliography{references}
+
+\the\abovecaptionskip
+\the\belowcaptionskip
+% If biblatex (file is loaded in preamble):
+% \printreferences
+
+
+\end{document}

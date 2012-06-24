@@ -1,0 +1,47 @@
+\definecolor{beamer@uio}{rgb}{0.698,0.157,0.211}
+\DeclareOptionBeamer{matnat}{%
+  \definecolor{beamer@uio}{rgb}{0,0.364,0.208}}
+
+\pgfdeclareimage[height=1.6cm]{uio-logo}{/local/share/logo/uiologo-grov}
+\pgfdeclareimage[width=1.6cm]{ifi-logo}{/local/share/logo/ifi_logo}
+
+\newcommand{\UiOlogo}[1]{\logo{\pgfuseimage{#1}}}
+
+\usepackage{type1ec}
+\ProcessOptionsBeamer
+
+\mode<presentation>
+\useoutertheme{smoothbars}
+\useoutertheme{miniframes}
+\usecolortheme{rose}
+
+\setbeamercolor{structure}{fg=beamer@uio}
+\setbeamercolor{separation line}{use=structure,bg=structure.fg!80!bg}
+
+\defbeamertemplate*{footline}{UiO}
+{%
+  \hbox to \textwidth{% Box added for UiO
+    \kern 0.02cm
+    \raisebox{0cm}[0cm]{\pgfuseimage{uio-logo}}\hfill \vbox{% Box added for UiO
+    \begin{beamercolorbox}[wd=11cm,colsep=1.5pt]{upper separation line foot}
+    \end{beamercolorbox}
+    \begin{beamercolorbox}[wd=11cm,ht=2.5ex,dp=1.125ex,%
+      leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
+      \leavevmode{\usebeamerfont{title in head/foot}\insertshorttitle}%
+      \hfill%
+      {\usebeamerfont{author in head/foot}\usebeamercolor[fg]{author in head/foo
+t}\insertshortauthor}%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=11cm,colsep=1.5pt]{lower separation line foot}
+    \end{beamercolorbox}
+  }}%
+}
+
+\defbeamertemplate*{sidebar right}{UiO}
+{
+  \vfill%
+  \llap{\insertlogo\hskip0.02cm}%
+  \vskip2pt%
+}
+
+\mode<all>

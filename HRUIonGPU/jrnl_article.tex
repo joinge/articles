@@ -1,0 +1,949 @@
+
+%% bare_jrnl.tex
+%% V1.3
+%% 2007/01/11
+%% by Michael Shell
+%% see http://www.michaelshell.org/
+%% for current contact information.
+%%
+%% This is a skeleton file demonstrating the use of IEEEtran.cls
+%% (requires IEEEtran.cls version 1.7 or later) with an IEEE journal paper.
+%%
+%% Support sites:
+%% http://www.michaelshell.org/tex/ieeetran/
+%% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
+%% and
+%% http://www.ieee.org/
+
+
+
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. IEEE's font choices can trigger bugs that do  ***
+% *** not appear when using other class files.                            ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE! 
+%% User assumes all risk.
+%% In no event shall IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential, or any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%
+%% File list of work: IEEEtran.cls, IEEEtran_HOWTO.pdf, bare_adv.tex,
+%%                    bare_conf.tex, bare_jrnl.tex, bare_jrnl_compsoc.tex
+%%*************************************************************************
+
+% Note that the a4paper option is mainly intended so that authors in
+% countries using A4 can easily print to A4 and see how their papers will
+% look in print - the typesetting of the document will not typically be
+% affected with changes in paper size (but the bottom and side margins will).
+% Use the testflow package mentioned above to verify correct handling of
+% both paper sizes by the user's LaTeX system.
+%
+% Also note that the "draftcls" or "draftclsnofoot", not "draft", option
+% should be used if it is desired that the figures are to be displayed in
+% draft mode.
+%
+\documentclass[journal]{IEEEtran}
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[journal]{../sty/IEEEtran}
+
+
+
+
+
+% Some very useful LaTeX packages include:
+% (uncomment the ones you want to load)
+
+
+% *** MISC UTILITY PACKAGES ***
+%
+%\usepackage{ifpdf}
+% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
+% compilation based on whether the output is pdf or dvi.
+% usage:
+% \ifpdf
+%   % pdf code
+% \else
+%   % dvi code
+% \fi
+% The latest version of ifpdf.sty can be obtained from:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/oberdiek/
+% Also, note that IEEEtran.cls V1.7 and later provides a builtin
+% \ifCLASSINFOpdf conditional that works the same way.
+% When switching from latex to pdflatex and vice-versa, the compiler may
+% have to be run twice to clear warning/error messages.
+
+
+
+
+
+
+% *** CITATION PACKAGES ***
+%
+%\usepackage{cite}
+% cite.sty was written by Donald Arseneau
+% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
+% \cite{} output to follow that of IEEE. Loading the cite package will
+% result in citation numbers being automatically sorted and properly
+% "compressed/ranged". e.g., [1], [9], [2], [7], [5], [6] without using
+% cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
+% \cite will automatically add leading space, if needed. Use cite.sty's
+% noadjust option (cite.sty V3.8 and later) if you want to turn this off.
+% cite.sty is already installed on most LaTeX systems. Be sure and use
+% version 4.0 (2003-05-27) and later if using hyperref.sty. cite.sty does
+% not currently provide for hyperlinked citations.
+% The latest version can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
+% The documentation is contained in the cite.sty file itself.
+
+
+
+
+
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+% graphicx was written by David Carlisle and Sebastian Rahtz. It is
+% required if you want graphics, photos, etc. graphicx.sty is already
+% installed on most LaTeX systems. The latest version and documentation can
+% be obtained at: 
+% http://www.ctan.org/tex-archive/macros/latex/required/graphics/
+% Another good source of documentation is "Using Imported Graphics in
+% LaTeX2e" by Keith Reckdahl which can be found as epslatex.ps or
+% epslatex.pdf at: http://www.ctan.org/tex-archive/info/
+%
+% latex, and pdflatex in dvi mode, support graphics in encapsulated
+% postscript (.eps) format. pdflatex in pdf mode supports graphics
+% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
+% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
+% not a bitmapped formats (.jpeg, .png). IEEE frowns on bitmapped formats
+% which can result in "jaggedy"/blurry rendering of lines and letters as
+% well as large increases in file sizes.
+%
+% You can find documentation about the pdfTeX application at:
+% http://www.tug.org/applications/pdftex
+
+
+
+
+
+% *** MATH PACKAGES ***
+%
+%\usepackage[cmex10]{amsmath}
+% A popular package from the American Mathematical Society that provides
+% many useful and powerful commands for dealing with mathematics. If using
+% it, be sure to load this package with the cmex10 option to ensure that
+% only type 1 fonts will utilized at all point sizes. Without this option,
+% it is possible that some math symbols, particularly those within
+% footnotes, will be rendered in bitmap form which will result in a
+% document that can not be IEEE Xplore compliant!
+%
+% Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+%\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
+
+
+
+
+
+% *** SPECIALIZED LIST PACKAGES ***
+%
+%\usepackage{algorithmic}
+% algorithmic.sty was written by Peter Williams and Rogerio Brito.
+% This package provides an algorithmic environment fo describing algorithms.
+% You can use the algorithmic environment in-text or within a figure
+% environment to provide for a floating algorithm. Do NOT use the algorithm
+% floating environment provided by algorithm.sty (by the same authors) or
+% algorithm2e.sty (by Christophe Fiorio) as IEEE does not use dedicated
+% algorithm float types and packages that provide these will not provide
+% correct IEEE style captions. The latest version and documentation of
+% algorithmic.sty can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithms/
+% There is also a support site at:
+% http://algorithms.berlios.de/index.html
+% Also of interest may be the (relatively newer and more customizable)
+% algorithmicx.sty package by Szasz Janos:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/
+
+
+
+
+% *** ALIGNMENT PACKAGES ***
+%
+%\usepackage{array}
+% Frank Mittelbach's and David Carlisle's array.sty patches and improves
+% the standard LaTeX2e array and tabular environments to provide better
+% appearance and additional user controls. As the default LaTeX2e table
+% generation code is lacking to the point of almost being broken with
+% respect to the quality of the end results, all users are strongly
+% advised to use an enhanced (at the very least that provided by array.sty)
+% set of table tools. array.sty is already installed on most systems. The
+% latest version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/required/tools/
+
+
+%\usepackage{mdwmath}
+%\usepackage{mdwtab}
+% Also highly recommended is Mark Wooding's extremely powerful MDW tools,
+% especially mdwmath.sty and mdwtab.sty which are used to format equations
+% and tables, respectively. The MDWtools set is already installed on most
+% LaTeX systems. The lastest version and documentation is available at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/mdwtools/
+
+
+% IEEEtran contains the IEEEeqnarray family of commands that can be used to
+% generate multiline equations as well as matrices, tables, etc., of high
+% quality.
+
+
+%\usepackage{eqparbox}
+% Also of notable interest is Scott Pakin's eqparbox package for creating
+% (automatically sized) equal width boxes - aka "natural width parboxes".
+% Available at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/eqparbox/
+
+
+
+
+
+% *** SUBFIGURE PACKAGES ***
+%\usepackage[tight,footnotesize]{subfigure}
+% subfigure.sty was written by Steven Douglas Cochran. This package makes it
+% easy to put subfigures in your figures. e.g., "Figure 1a and 1b". For IEEE
+% work, it is a good idea to load it with the tight package option to reduce
+% the amount of white space around the subfigures. subfigure.sty is already
+% installed on most LaTeX systems. The latest version and documentation can
+% be obtained at:
+% http://www.ctan.org/tex-archive/obsolete/macros/latex/contrib/subfigure/
+% subfigure.sty has been superceeded by subfig.sty.
+
+
+
+%\usepackage[caption=false]{caption}
+%\usepackage[font=footnotesize]{subfig}
+% subfig.sty, also written by Steven Douglas Cochran, is the modern
+% replacement for subfigure.sty. However, subfig.sty requires and
+% automatically loads Axel Sommerfeldt's caption.sty which will override
+% IEEEtran.cls handling of captions and this will result in nonIEEE style
+% figure/table captions. To prevent this problem, be sure and preload
+% caption.sty with its "caption=false" package option. This is will preserve
+% IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later 
+% (recommended due to many improvements over 1.2) of subfig.sty supports
+% the caption=false option directly:
+\usepackage[caption=false,font=footnotesize]{subfig}
+%
+% The latest version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
+% The latest version and documentation of caption.sty can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/caption/
+
+
+
+
+% *** FLOAT PACKAGES ***
+%
+%\usepackage{fixltx2e}
+% fixltx2e, the successor to the earlier fix2col.sty, was written by
+% Frank Mittelbach and David Carlisle. This package corrects a few problems
+% in the LaTeX2e kernel, the most notable of which is that in current
+% LaTeX2e releases, the ordering of single and double column floats is not
+% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
+% single column figure to be placed prior to an earlier double column
+% figure. The latest version and documentation can be found at:
+% http://www.ctan.org/tex-archive/macros/latex/base/
+
+
+
+%\usepackage{stfloats}
+% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
+% the ability to do double column floats at the bottom of the page as well
+% as the top. (e.g., "\begin{figure*}[!b]" is not normally possible in
+% LaTeX2e). It also provides a command:
+%\fnbelowfloat
+% to enable the placement of footnotes below bottom floats (the standard
+% LaTeX2e kernel puts them above bottom floats). This is an invasive package
+% which rewrites many portions of the LaTeX2e float routines. It may not work
+% with other packages that modify the LaTeX2e float routines. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/sttools/
+% Documentation is contained in the stfloats.sty comments as well as in the
+% presfull.pdf file. Do not use the stfloats baselinefloat ability as IEEE
+% does not allow \baselineskip to stretch. Authors submitting work to the
+% IEEE should note that IEEE rarely uses double column equations and
+% that authors should try to avoid such use. Do not be tempted to use the
+% cuted.sty or midfloat.sty packages (also by Sigitas Tolusis) as IEEE does
+% not format its papers in such ways.
+
+
+%\ifCLASSOPTIONcaptionsoff
+%  \usepackage[nomarkers]{endfloat}
+% \let\MYoriglatexcaption\caption
+% \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
+%\fi
+% endfloat.sty was written by James Darrell McCauley and Jeff Goldberg.
+% This package may be useful when used in conjunction with IEEEtran.cls'
+% captionsoff option. Some IEEE journals/societies require that submissions
+% have lists of figures/tables at the end of the paper and that
+% figures/tables without any captions are placed on a page by themselves at
+% the end of the document. If needed, the draftcls IEEEtran class option or
+% \CLASSINPUTbaselinestretch interface can be used to increase the line
+% spacing as well. Be sure and use the nomarkers option of endfloat to
+% prevent endfloat from "marking" where the figures would have been placed
+% in the text. The two hack lines of code above are a slight modification of
+% that suggested by in the endfloat docs (section 8.3.1) to ensure that
+% the full captions always appear in the list of figures/tables - even if
+% the user used the short optional argument of \caption[]{}.
+% IEEE papers do not typically make use of \caption[]'s optional argument,
+% so this should not be an issue. A similar trick can be used to disable
+% captions of packages such as subfig.sty that lack options to turn off
+% the subcaptions:
+% For subfig.sty:
+%\let\MYorigsubfloat\subfloat
+%\renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}}
+% For subfigure.sty:
+% \let\MYorigsubfigure\subfigure
+% \renewcommand{\subfigure}[2][\relax]{\MYorigsubfigure[]{#2}}
+% However, the above trick will not work if both optional arguments of
+% the \subfloat/subfig command are used. Furthermore, there needs to be a
+% description of each subfigure *somewhere* and endfloat does not add
+% subfigure captions to its list of figures. Thus, the best approach is to
+% avoid the use of subfigure captions (many IEEE journals avoid them anyway)
+% and instead reference/explain all the subfigures within the main caption.
+% The latest version of endfloat.sty and its documentation can obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/endfloat/
+%
+% The IEEEtran \ifCLASSOPTIONcaptionsoff conditional can also be used
+% later in the document, say, to conditionally put the References on a 
+% page by themselves.
+
+
+
+
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+%
+%\usepackage{url}
+% url.sty was written by Donald Arseneau. It provides better support for
+% handling and breaking URLs. url.sty is already installed on most LaTeX
+% systems. The latest version can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/contrib/misc/
+% Read the url.sty source comments for usage information. Basically,
+% \url{my_url_here}.
+
+
+
+
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+%%% My packages
+\usepackage{amsmath,epsfig}
+\usepackage{amsfonts}
+
+%%% My commands
+\newcommand{\mat}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+
+\begin{document}
+%
+% paper title
+% can use linebreaks \\ within to get better formatting as desired
+\title{Implementing Capon Adaptive Beamforming on the GPU for Real Time Cardiac Ultrasound Imaging}
+%
+%
+% author names and IEEE memberships
+% note positions of commas and nonbreaking spaces ( ~ ) LaTeX will not break
+% a structure at a ~ so this keeps an author's name from being broken across
+% two lines.
+% use \thanks{} to gain access to the first footnote area
+% a separate \thanks must be used for each paragraph as LaTeX2e's \thanks
+% was not built to handle multiple paragraphs
+%
+
+\author{J. P. \AA{}sen, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
+%\thanks{M. Shell is with the Department
+%of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
+%GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
+%\thanks{J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
+%\thanks{Manuscript received April 19, 2005; revised January 11, 2007.}}
+}
+
+% note the % following the last \IEEEmembership and also \thanks - 
+% these prevent an unwanted space from occurring between the last author name
+% and the end of the author line. i.e., if you had this:
+% 
+% \author{....lastname \thanks{...} \thanks{...} }
+%                     ^------------^------------^----Do not want these spaces!
+%
+% a space would be appended to the last name and could cause every name on that
+% line to be shifted left slightly. This is one of those "LaTeX things". For
+% instance, "\textbf{A} \textbf{B}" will typeset as "A B" not "AB". To get
+% "AB" then you have to do: "\textbf{A}\textbf{B}"
+% \thanks is no different in this regard, so shield the last } of each \thanks
+% that ends a line with a % and do not let a space in before the next \thanks.
+% Spaces after \IEEEmembership other than the last one are OK (and needed) as
+% you are supposed to have spaces between the names. For what it is worth,
+% this is a minor point as most people would not even notice if the said evil
+% space somehow managed to creep in.
+
+
+
+% The paper headers
+\markboth{Transactions on Ultrasonics and Ferroelectrics and Frequency Control,~Vol.~x, No.~y, January~2013?}%
+{\AA{}sen \MakeLowercase{\textit{et al.}}: Capon Adaptive Beamforming on the GPU}
+% The only time the second header will appear is for the odd numbered pages
+% after the title page when using the twoside option.
+% 
+% *** Note that you probably will NOT want to include the author's ***
+% *** name in the headers of peer review papers.                   ***
+% You can use \ifCLASSOPTIONpeerreview for conditional compilation here if
+% you desire.
+
+
+
+
+% If you want to put a publisher's ID mark on the page you can do it like
+% this:
+%\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
+% Remember, if you use this you must call \IEEEpubidadjcol in the second
+% column for its text to clear the IEEEpubid mark.
+
+
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+
+
+
+% make the title area
+\maketitle
+
+
+\begin{abstract}
+%\boldmath
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.  
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.  
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. 
+\end{abstract}
+% IEEEtran.cls defaults to using nonbold math in the Abstract.
+% This preserves the distinction between vectors and scalars. However,
+% if the journal you are submitting to favors bold math in the abstract,
+% then you can use LaTeX's standard command \boldmath at the very start
+% of the abstract to achieve this. Many IEEE journals frown on math
+% in the abstract anyway.
+
+% Note that keywords are not normally used for peerreview papers.
+\begin{IEEEkeywords}
+Adaptive beamforming, Capon beamformer, Graphics Processing Unit, GPGPU, Parallel Computing, Ultrasound Imaging.
+\end{IEEEkeywords}
+
+
+
+
+
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+
+
+\section{Introduction}
+% The very first letter is a 2 line initial drop letter followed
+% by the rest of the first word in caps.
+% 
+% form to use if the first word consists of a single letter:
+% \IEEEPARstart{A}{demo} file is ....
+% 
+% form to use if you need the single drop letter followed by
+% normal text (unknown if ever used by IEEE):
+% \IEEEPARstart{A}{}demo file is ....
+% 
+% Some journals put the first two words in caps:
+% \IEEEPARstart{T}{his demo} file is ....
+% 
+% Here we have the typical use of a "T" for an initial drop letter
+% and "HIS" in caps to complete the first word.
+
+%\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
+\IEEEPARstart{C}{apon} adaptive beamforming applied in a medical ultrasound setting has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. Although the method introduce some interesting trade-offs in addition to just improved resolution, like maintaining image resolution combined with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}, widespread use has been limited by the tremendous computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied in a typical cardiac ultrasound setting. To accomplish this task we make use of the massive parallel processing power found in modern graphics processing units (GPU's), combined with novel methods to reduce the computational complexity as the problem size grows. Earlier attempts on real time Capon beamforming have been focused around radar and passive sonar systems using intricate systolic array processors \cite{McWhirter1989, Moonen1993, Sinha2002}.  A systolic array processor is custom made hardware, and even if the computational throughput might be higher for selected problems compared with a GPU, the cost related to development and flexibility is considered much higher. For medical ultrasound, Chen et al. \cite{Chen2011a, Chen2011} have previously implemented the Capon beamformer on a GPU, however their implementation was based on real data, where the Capon beamformer assumes complex. Using real data will results in symmetric windows, and even if the number of samples they managed to process per second was high, both the number of floating point operations per sample and the imaging region is reduced using real data compared with use of complex data. It is crucial to use complex data within the Capon beamformer framework, both for reducing the amount of data per image, and to allow for asymmetric windows. All results in this paper is reported with use of critically sampled complex data, both laterally and in range.  
+
+In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of the Capon beamformer, before in Section \ref{sec:meth2} we introduce methods to apply as the problem size increases. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
+
+\section{Background}
+
+\begin{figure*}[t!]
+\centerline{\subfloat[]{\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png} \label{fig:mvbf}}
+\hfil
+\subfloat[]{\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
+\label{fig:gpulayout}}}
+\caption{a) Beamforming with adaptive weights $\vec{w}[n]$. Impinging signal is demodulated and aligned in phase by applying steering and focusing delays $\Delta_m[n]$. Capon adaptive weights are then calculated based on the in-phase data, and finally the output is formed by a weighted coherent sum. b) Calculation of Capon adaptive weights mapped to GPU architecture. A recorded echo across the array for a given range and angle (selected cell) is assigned to a group of $L$ threads that can run independently of all other groups. Note that several samples can be processed per block of threads if $L$ is small. The task of these $L$ threads is to calculate the Capon beamformer output in the three depicted steps.}
+\label{fig:fig1}
+\end{figure*}
+
+\subsection{Capon Beamforming}
+When sensing the world around us with an array of elements, we perform a spatio-temporal filtering operation known as beamforming. The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a factor $w_m$,
+\begin{align}
+z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n].
+\end{align}
+In conventional beamforming, the weighting $\vec{w}$ is usually real, and applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
+
+The basic idea of an adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
+\begin{align}
+&\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
+&\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
+\end{align}
+where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$ is the spatial covariance matrix, and $\vec{a} = \left[ \begin{array}{cccc} e^{-jk_{\tilde{x}}\tilde{x}_0}& e^{-jk_{\tilde{x}}\tilde{x}_1}& ...& e^{-jk_{\tilde{x}}\tilde{x}_{M-1}}\end{array}\right] ^T$ is a far-field steering vector towards angle $\theta = \arcsin(\frac{\lambda k_{\tilde{x}}}{2\pi})$.
+Thus, we minimize the output power, while maintaining unit gain in the look direction. The constraint in (\ref{eq:constraint}) is there to avoid the trivial solution $\vec{w} = 0$, and a distorted respons in the direction of $\vec{a}$. The solution to the minimization problem in (\ref{eq:minz}) and (\ref{eq:constraint}) is
+\begin{align}\label{eq:w}
+\vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
+\end{align}
+where $\vec{a} = [1_0 1_1... 1_{M-1}]^T = \vec{1}$ when $\vec{x}$ is pre-delayed to broadside. 
+
+In practice, the covariance matrix has to be approximated by the sample covariance matrix, 
+\begin{align}
+\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H.
+\end{align} 
+In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate \cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Synnevag2009a}. In this way, the beamformer output can be zero at broadside, even when there is signal present and the distortion-less criterion is applied. 
+In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N$ time samples \cite{Synnevag2007, Synnevag2007a}.
+\begin{align}
+\mat{\hat{R}}[n] = \frac{1}{NK}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K-1} \vec{x}_l[n']\vec{x}_l[n']^H,\label{eq:R}
+\end{align}
+where $K = M-L+1$, $N = 2N_{avg} + 1\sim \tau/T_s$ ($\tau$ is the pulse length and $T_s$ is the sampling period) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
+Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, 
+\begin{align}
+\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}.
+\end{align}
+A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\hat{R}}$, 
+\begin{align}\label{eq:diag}
+\epsilon &= d*tr\{\mat{\hat{R}}\}, \\
+d &= 1/L
+\end{align}
+introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much of the resent literature on Capon beamforming for medical ultrasound imaging \cite{Nilsen2009, Wang2009, Mehdizadeh2012}. 
+
+%\begin{figure}
+%\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png}
+%\caption{}
+%\label{fig:mv}
+%\end{figure}
+
+%Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change. 
+%In this paper we introduce the first GPU implementation of the Capon beamformer capable of processing a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing. Both types of smoothing are important for maintaining delay-and-sum-like speckle and at the same time keep the high resolution property. This is achieved using complex base band data, which reduces the size of each range line to a minimum. In addition, complex data results in complex weights; hence this is a correct implementation of Capon beamforming with all degrees of freedom preserved. For high channel count systems we propose two ways of reducing computational complexity while maintaining 
+
+\subsection{GPU Compute Model}
+In this section we briefly discuss the principle behind GPU computing, laying the basis for further discussion on parallel implementation strategies. CUDA by Nvidia has been our choice of GPU developer environment \cite{Nvidia2011}. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper applies for other massive parallel implementation environments as well, like e.g. OpenCL. 
+
+The CUDA compute model is based on execution of a kernel-function across a grid of compute threads. As depicted in Figure \ref{fig:gpulayout}, each position in the grid holds a block of threads, with maximal size of 1024 threads, that can be easily synchronized if needed. 
+%Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. 
+From a CUDA perspective the GPU consist of one or more stream multi processors (SM's), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. More important, the SM has a limited amount of near-core memory and registers available. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. Global read and writes on the GPU, in addition to CPU-GPU transfers have high penalty, and should be minimized as much as possible. All of these constraints combined pose a real challenge as the target problem has to map on to the parallel framework both on a grid, block and memory consumption level in order to benefits from parallel acceleration. In the next section, we will describe how this mapping should be done for Capon beamforming of ultrasound data.    
+
+%When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
+
+%More important, the CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is therefore important.  
+
+%\subsection{Optimizing kernel launch}
+%Set the size of grid adaptively based on $L$, $M$ and $Yavg$.
+%It is better to slide in space than time. $K$ is typically much larger than $2*Yavg + 1$.
+
+% needed in second column of first page if using \IEEEpubid
+%\IEEEpubidadjcol
+
+\section{Parallel Capon}\label{sec:meth}
+As mentioned, widespread use of Capon adaptive beamforming has been limited by its computational complexity. However, the calculation of Capon weights is well suited for a GPU implementation, since the calculations are both independent across pixels, and partially intra-pixel. Based on memory dependencies it is trivial to recognise that one block of threads should process at least one pixel in the final image. Continuing, on a pixel-level, the algorithm can be broken down into three main steps that to some extent can be further divided into a small set of parallel processes. That is, for each data vector $\vec{x}$ in the image:
+\begin{enumerate}
+\item Calculate the sample covariance matrix $\mat{\hat{R}}$ as in (\ref{eq:R})
+\item Solve the linear system of equations $\mat{\hat{R}}\vec{b} =\vec{ 1}$
+\item Calculate $\vec{w} = \vec{b}/\vec{1}^H\vec{b}$ and the amplitude $\vec{w}^H\vec{x}$
+\end{enumerate}
+The computational complexity of these three steps, with $L = M/2$, is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively. For larger $L$'s, the first two steps quickly becomes unmanageable, and real time performance can only be achieved by exploring novel solutions to reduce complexity. 
+
+(The three steps have, for modularity, been implemented using three different kernels. Joining all kernels into one could possible lead to an increase in speed.)
+
+%\begin{figure}
+%\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
+%\caption{}
+%\label{fig:gpulayout}
+%\end{figure}
+
+\subsection{Calculating Multiple Sample Covariance Matrices}
+The straight forward sum in (\ref{eq:R}) has complexity $O(L^2KN) = O(L^3)$ if $L$ is a small fraction of $M$. This is actually the same as for inverting a $L \times L$ matrix. However, little attention has been devoted to this step in the literature until now. Note that for a typical array configuration, N is usually small compared to L and M. Hence, for a small $L$ the construction of $\mat{\hat{R}}$ is dominated by $M$, since $K = M - L + 1$. From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all the others. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on $L$, $L_{max}=32$, if we want to avoid block-to-block synchronization.
+
+The quadratic complexity with $L$ and linear complexity with $N$ can be reduced by realizing that the calculation in (\ref{eq:R}) overlap both across subarrays and in time. The $(i,j)$ element of $\mat{\hat{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j > 0$ by subtracting $x_{i-1}x_{j-1}^*$ and adding $x_{i+K-1}x_{j+K-1}^*$. The same is true in time where $\mat{\hat{R}}[n]$ can be calculated from $\mat{\hat{R}}[n-1]$ by subtracting $\mat{\hat{R}}[n-N_{avg}-1]$ and adding $\mat{\hat{R}}[n+N_{avg}]$. Both sliding across subarrays and in time can be realized simultaneously if we hold $\vec{x}\vec{x}^H[n]$ averaged over $N$ time samples in memory and calculate $\mat{\hat{R}}$ averaged over subarrays from that buffer (figure). However, since $N$ typically is small, and we have a limited amount of memory per thread on the GPU, we have chosen to focus on sliding across subarrays only. In that case, the complexity of calculating $\mat{\hat{R}}$ is reduced to $O(L^2)$. Another aspect is that sliding will break independence in the sliding dimension. With our choice of calculating $\mat{\hat{R}}$, calculations are still independent across time, but not across subarrays. We therefore have selected to use on thread per column in $\mat{\hat{R}}$, and for small $L$'s several covariance matrices are calculated per thread block. Maximum supported $L$ is with this approach increased to 512, however for small $L$ high $M$ configurations, memory consumption per thread will be to high to achieve full occupancy of the GPU.
+
+Taking symmetry into account, only the upper half of $\mat{\hat{R}}$ needs to be calculated. However, the way we have decided to organize the GPU compute threads per $\mat{\hat{R}}$, the lower triangle can be calculated with little overhead on the GPU. This also means that we do not relay on a symmetric solver to solve $\mat{\hat{R}}\vec{b} = \vec{1}$, even if that could have saved some instructions. The memory layout for the upper triangle only is also believed to be cumbersome. 
+
+Diagonal loading as a constant value can be added with marginal cost, but the adaptive diagonal loading factor in (\ref{eq:diag}) is a different story. In this case, the trace of $\mat{\hat{R}}$ has to be known before diagonal elements are written back to global memory. Since one row for all $\mat{\hat{R}}$'s is written to global memory per kernel iteration, the solution was to hold the diagonal elements in a local buffer until the trace was accumulated, and then do scattered writes of the diagonal elements to global memory. 
+
+%For subarray averaging, the first row and column of $\mat{\hat{R}}$ has to be fully calculated, and for time averaging $\mat{\hat{R}}[0]$ has to be fully calculated.
+
+%Since $L$ usually is larger than $N$, we have 
+
+%Building $\hat{\mat{R}}$ using a sliding window approach across $K$ and $N_{avg}$. We have a limited amount of fast, near-core memory on the GPU. On NVIDIA architecture this memory is known as shared memory, and is restricted to 48KB per compute block. The maximum block size of 32x32, further restrict how large arrays we can handle inside a single compute block. It is therefore natural to restrict $L$ to a maxima of $32$ elements. Since $L \le M/2$, $M \le 64$. We can not afford to hold the full $\hat{\mat{R}}$ ($M = L$) when $\hat{\mat{R}} > 32$, because of limited amount of memory. ... Explain in detail how \texttt{buildR} is implemented in a kernel. ... Give more details on how much shared memory we have, and how it can be divided between compute blocks occupying one stream multiprocessor (SM).
+
+%Discuss the bottleneck adaptive diagonal loading causes. Possible solutions includes, use trace from previous image, use pre-calculated array power, constant weight.
+
+%Time averaging takes a lot of resources. It has been shown that time averaging can maintain both resolution and delay-and-sum-like speckle. The same speckle statistics can be obtain with small subarrays, but then we loose resolution. Small sub-arrays benefits from being less computational demanding.   
+
+%\subsubsection{CUDA Compute Model}
+%The CUDA compute model is based on execution of a kernel across a grid of compute threads. Each position in the grid holds a block of threads. Each block is further divided into groups of 32 threads, known as a warp. The maximum number of threads inside a block is restricted to 512, hence 16 warps. From a CUDA perspective the GPU consist of one or more stream multi processors (SM), %where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. The CUDA 2.x compute capability (CC) has available 48 KB of near-core shared memory per SM that can be utilized by resident blocks. The maximum number of resident blocks per SM is 8, but in addition the maximum number of resident warps per SM is restricted to 48. Hence, %with a block size of 512 only $48/(512/32) = 3$ blocks can occupy the SM at once. In addition, if one thread where to use 64B of shared memory the number of allowed resident blocks with a block size of 512 would be reduced to 1. Up to a curtain point 
+%it is beneficial to have as many warps as possible occupying the SM at once to hide latency from accessing memory and executing time consuming mathematical functions. The SM has for CC 2.x 32K 32-bit long registers. When implementing algorithms on the GPU it is important to keep data as close to the core as possible. Utilizing available registers and shared memory to its maximum is %therefore important.   
+
+\subsection{Solving Multiple Small Linear Systems}
+When it comes to solving systems of linear equations on the GPU the focus has mostly been on large systems in the literature, and GPU libraries usually lack a comprehensive collection of batched solvers. The reason for this is two-folded, first the GPU needs to solve thousand of small systems in order to beat the low memory latency of the CPU, second there is a range of system dimensions that does not fit well with the GPU architecture, where only a small amount of near-core memory registers are available. Because of this, it has been proven hard to optimize a manageable set of solvers that provides speedups compared with the CPU in every cases.
+
+For the results presented in this paper, we have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{R}\vec{b} = \vec{1}$, where $\vec{b} = \mat{R}^{-1}\vec{1}$. However we will go through an implementation of an $\mat{U}^H\mat{D}\mat{U}$-decomposition-based solver to point out challenges when implementing batched solving of small linear systems on the GPU. ... (Unsure if this should be included).
+
+%Can include details on GPU implementation of $\mat{U}^H\mat{D}\mat{U}$, but this has not proved to be faster than NVIDIA's GJ implementation. However, the complexity for solving with $\mat{U}^H\mat{D}\mat{U}$ decomposition is supposed to be $1/2$ of GJ.
+
+For the smallest systems a direct solver using one thread per system is preferable. For this purpose we have implemented Cramer's rule for $3 \times 3$ (, $2 \times 2$?  and $4 \times 4$?) matrices.
+
+%In the final journal article we could discuss Conjugated gradient and Woodbury and the benefits they bring.
+Other solvers that provides different benefits includes Conjugated gradient and the use of the Woodbury matrix identity. 
+
+\subsection{Compute Beamformer Output}
+(Still just notes) One thread per weight ($L$ threads). Let one thread sum the solution vector $\vec{b}$, or let several threads cooperate to form the sum using a binary reduction sum.
+Let one thread read one element of $\vec{b}$, scale it with the inverse sum, and optionally write it back to global memory. The final output can be formed by either reduce the data down to length $L$, or increase the weight vector to length $M$. Since we have decided to have $L$ threads per output, the data is reduced to length $L$ by calculating $x_{r} = \sum_{k=r}^{r+K-1}x_{k}$ for $r \in [0, L-1]$. Each thread now computes $z_r = w_r^*x_r$, and finally one thread computes and outputs $z = \sum_{r=0}^{L-1}$ to global memory. The last sum can also be performed using a binary reduction sum across several threads for increased speed.
+
+\section{Real Time Performance for $L > 16$}\label{sec:meth2}
+
+\subsection{Beamspace Processing}
+Nilsen et. al \cite{Nilsen2009} has proposed to apply beamspace processing to further reduce the required computations. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. The beamspace version of Capon is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{R}_{BS} = \vec{x}_{BS}\vec{x}_{BS}^H$, where $\mat{B} \in \mathbb{C}^{N_b,M}$, and $N_b$ is the number of selected beams. Note that when subarray averaging is applied, the transformation must be done per subarray, yielding subarrays that no longer overlap in space. Hence, the amount of data is change from $M$ to $KN_b$ per sample.
+
+(Go in detail about the implementation using sliding DFT).
+
+\subsection{Iterative Capon}
+The idea behind iterative Capon is to perform Capon using small subarrays in several iterations until there is only two subarrays to sum. In this way we fix the size of L, hence the complexity of solving $\mat{R}\vec{b} = \vec{1}$. However, for each iteration we re-obtain L-1 degrees of freedom until all are retrieved after $K = M-L+1$ iterations. Since subarray averaging has been applied to decorrelated the signal, we might loose this effect when reestablishing all degrees of freedom. The number of iterations should therefore be restricted to $K/2$ to equal the normal choice of $L = M/2$ when it comes to degrees of freedom.  
+
+\subsection{Toeplitz-based solver} 
+(cite new article). Discuss it.
+
+\section{Results}\label{sec:res}
+
+\begin{figure*}[!t]
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32_lr.png} \label{fig:benchUS32}}
+\hfil
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64_lr.png}%
+\label{fig:benchUS64}}}
+\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) A 32 elements array. (b) A 64 elements array.}
+\label{fig:bench}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_32_lr.png} \label{fig:benchUS32}}
+\hfil
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_us_64_lr.png}%
+\label{fig:benchUS64}}}
+\caption{(TODO: Add the right figure) Benchmark of GPU Beamspace Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of number of elements $M$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) 3 beams. (b) 5 beams.}
+\label{fig:bench}
+\end{figure*}
+
+Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing executing times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2*Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
+
+Present images, both simulated and in-vivo, processed using beamspace Capon and iterative Capon. Comment on the differences between the two and on how much they deviates from the full method.
+Show beampatterns for the two compared with the full method. Show executing times for the two methods compared with the full method on the GPU.
+
+Describe the base band (IQ-demodulation) process that the data has been undergoing.
+
+How has the data been acquired?
+
+\section{Discussion}\label{sec:dis}
+Discuss results presented in Section \ref{sec:res}.
+
+We expect that a large speedup had the Capon beamformer been implemented on the CPU using threads and SIMD (single instruction multiple data) instructions. 
+
+(results)?
+For a typical cardiac ultrasound image of 80*400 pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, $M=64$ element phased array, the result is 10fps (subarray length $L=M/2$, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the frame rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector (40*400 pixels), hence with the same parameters the frame rate increases to 87fps. The bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16, real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
+
+\section{Conclusion}\label{sec:con}
+...
+
+
+% An example of a floating figure using the graphicx package.
+% Note that \label must occur AFTER (or within) \caption.
+% For figures, \caption should occur after the \includegraphics.
+% Note that IEEEtran v1.7 and later has special internal code that
+% is designed to preserve the operation of \label within \caption
+% even when the captionsoff option is in effect. However, because
+% of issues like this, it may be the safest practice to put all your
+% \label just after \caption rather than within \caption{}.
+%
+% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
+% option should be used if it is desired that the figures are to be
+% displayed while in draft mode.
+%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{myfigure}
+% where an .eps filename suffix will be assumed under latex, 
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{Simulation Results}
+%\label{fig_sim}
+%\end{figure}
+
+% Note that IEEE typically puts floats only at the top, even when this
+% results in a large percentage of a column being occupied by floats.
+
+
+% An example of a double column floating figure using two subfigures.
+% (The subfig.sty package must be loaded for this to work.)
+% The subfigure \label commands are set within each subfloat command, the
+% \label for the overall figure must come after \caption.
+% \hfil must be used as a separator to get equal spacing.
+% The subfigure.sty package works much the same way, except \subfigure is
+% used instead of \subfloat.
+%
+%\begin{figure*}[!t]
+%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
+%\label{fig_second_case}}}
+%\caption{Simulation results}
+%\label{fig_sim}
+%\end{figure*}
+%
+% Note that often IEEE papers with subfigures do not employ subfigure
+% captions (using the optional argument to \subfloat), but instead will
+% reference/describe all of them (a), (b), etc., within the main caption.
+
+
+% An example of a floating table. Note that, for IEEE style tables, the 
+% \caption command should come BEFORE the table. Table text will default to
+% \footnotesize as IEEE normally uses this smaller font for tables.
+% The \label must come after \caption as always.
+%
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+%\caption{An Example of a Table}
+%\label{table_example}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c|}
+%\hline
+%One & Two\\
+%\hline
+%Three & Four\\
+%\hline
+%\end{tabular}
+%\end{table}
+
+
+% Note that IEEE does not put floats in the very first column - or typically
+% anywhere on the first page for that matter. Also, in-text middle ("here")
+% positioning is not used. Most IEEE journals use top floats exclusively.
+% Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
+% floats. This can be corrected via the \fnbelowfloat command of the
+% stfloats package.
+
+
+
+%\section{Conclusion}
+%The conclusion goes here.
+
+
+
+
+
+% if have a single appendix:
+%\appendix[Proof of the Zonklar Equations]
+% or
+%\appendix  % for no appendix heading
+% do not use \section anymore after \appendix, only \section*
+% is possibly needed
+
+% use appendices with more than one appendix
+% then use \section to start each appendix
+% you must declare a \section before using any
+% \subsection or using \label (\appendices by itself
+% starts a section numbered zero.)
+%
+
+
+%\appendices
+%\section{Proof of the First Zonklar Equation}
+%Appendix one text goes here.
+
+% you can choose not to have a title for an appendix
+% if you want by leaving the argument blank
+%\section{}
+%Appendix two text goes here.
+
+
+% use section* for acknowledgement
+\section*{Acknowledgment}
+
+
+The authors would like to thank... \cite{Synnevag2009}
+
+
+% Can use something like this to put references on a page
+% by themselves when using endfloat and the captionsoff option.
+\ifCLASSOPTIONcaptionsoff
+  \newpage
+\fi
+
+
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+\bibliography{mybib} % link to mendeley organized bibtex-file
+%\bibliography{IEEEabrv,mybib} 
+% <OR> manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+%\begin{thebibliography}{1}
+
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+%  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+
+%\end{thebibliography}
+
+% biography section
+% 
+% If you have an EPS/PDF photo (graphicx package needed) extra braces are
+% needed around the contents of the optional argument to biography to prevent
+% the LaTeX parser from getting confused when it sees the complicated
+% \includegraphics command within an optional argument. (You could create
+% your own custom macro containing the \includegraphics command to make things
+% simpler here.)
+%\begin{biography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
+% or if you just want to reserve a space for a photo:
+
+% insert where needed to balance the two columns on the last page with
+% biographies
+\newpage
+
+\begin{IEEEbiography}{Jon Petter \AA{}sen}
+Biography text here.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}{Jo Inge Buskenes}
+Biography text here.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}{Carl-Inge Colombo Nilsen}
+Biography text here.
+\end{IEEEbiography}
+
+% insert where needed to balance the two columns on the last page with
+% biographies
+\newpage
+
+\begin{IEEEbiography}{Andreas Austeng}
+Biography text here.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}{Sverre Holm}
+Biography text here.
+\end{IEEEbiography}
+
+
+% You can push biographies down or up by placing
+% a \vfill before or after them. The appropriate
+% use of \vfill depends on what kind of text is
+% on the last page and whether or not the columns
+% are being equalized.
+
+%\vfill
+
+% Can be used to pull up biographies so that the bottom of the last one
+% is flush with the other column.
+%\enlargethispage{-5in}
+
+
+
+% that's all folks
+\end{document}
+
+

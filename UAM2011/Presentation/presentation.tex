@@ -1,0 +1,836 @@
+\documentclass[
+    beamer                                       % Document type (non-standard)
+%  , handout
+ , xelatex                                      % Use the XeLaTeX compiler
+%  , movie
+]{common/mytemplate}
+
+% \mode<handout>{\setbeamercolor{background canvas}{bg=black!5}}
+
+\usepackage{template/beamerthemeUiO}
+% \usepackage{common/oxygentheme}
+% \setbeameroption{show only notes}
+% \setbeameroption{notes on second screen=left}
+
+% \newcommand\remotesource{http://www.joinge.net/compet}
+
+\title{A Low Complexity Adaptive Beamformer for Active Sonar Imaging}
+\subtitle{}
+\author[]{Jo Inge Buskenes$^{\text{a}}$, Andreas~Austeng$^{\text{a}}$, Carl-Inge~Colombo~Nilsen$^{\text{a}}$}
+\date[Jo Inge Buskenes at UAM, Kos/Greece, June\ 2011]{Kos, Greece, June 2011}
+\institute[Dept.\ of Informatics, University of Oslo]{\bf$^{\text{a}}$Department of Informatics, University
+  of Oslo}
+% \date{Sist revidert: 27.01.2009}
+
+\definecolor{LightBlue}{rgb}{0.3,0.3,1}
+\definecolor{DarkBlue}{rgb}{0.2,0.2,0.7}
+\setbeamercolor{block title}{bg=DarkBlue,fg=white}%bg=background, fg= foreground
+\setbeamercolor{block body}{bg=gray!20,fg=black}%bg=background, fg= foreground
+\setbeamertemplate{blocks}[rounded]
+
+\begin{document}
+
+% \frame{\titlepage}
+% \begin{frame}
+%   \frametitle{}
+% 
+%   \begin{center}
+%   \newcommand\titleSpace{0.05cm}
+% 
+%   {\Large A Data Dependent Beamformer}\\[\titleSpace]
+%   {\small for}\\[\titleSpace]
+%   {\Large Active Sonar Imaging}
+% 
+% %   \graphicsAI[width=\linewidth]{../software/user-apps/web/images/top.png}
+% 
+%   \begin{minipage}{0.4\linewidth}\centering
+%   Jo Inge Buskenes\\
+%   20.08.2010
+%   \end{minipage}%
+%   \begin{minipage}{0.2\linewidth}\centering
+%   \graphicsAI[width=\linewidth]{gfx/uioLogo.eps}
+%   \end{minipage}%
+%   \begin{minipage}{0.4\linewidth}\centering
+%   University of Oslo\\Faculty of Mathematics and Natural Sciences
+%   \end{minipage}%
+%   \end{center}
+% \end{frame}
+
+\begin{frame}
+\vspace*{2\baselineskip}
+  \titlepage
+\end{frame}
+\note{\null{}}
+
+% \AtBeginSection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents %[currentsection,hideallsubsections]
+%   }
+% }
+
+% \AtBeginSubsection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide]
+%   }
+% }
+
+\newcommand<>{\highlighton}[1]{%
+  \alt#2{\structure{#1}}{{#1}}
+}
+
+\newcommand{\icon}[1]{\pgfimage[height=1em]{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Content starts here %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{
+\renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+\begin{frame}
+\frametitle{Context}
+\framesubtitle{Active Sonar}
+\vspace{-25pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{0pt}
+\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
+\end{narrow}
+\end{figure}
+% \begin{itemize}
+% \item Each pixel value is estimated by focusing the receiver on that point.
+% \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Context}
+\framesubtitle{Imaging techniques}
+\vspace{-10pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{0pt}
+\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
+\end{narrow}
+\end{figure}
+A phased array can be used in several imaging modes:
+\begin{itemize}
+\item \emph{Sector scan}: Image computed from a single ping
+\item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+\item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+\end{itemize}
+\begin{block}{Proposed method: Generic, can be used in all modes}
+\vspace{-25pt}
+\end{block}
+\end{frame}
+}
+
+\section*{}
+\begin{frame}
+  \frametitle{Agenda}
+  \tableofcontents%[%section=1,
+                   %hidesubsections]
+\end{frame}
+
+\renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+
+
+
+% \begin{frame}
+% \frametitle{Acknowledgements}
+% \framesubtitle{}
+% \vspace{-3pt}
+% \begin{itemize}
+% \item Kongsberg Maritime.
+% \item FFI guys.
+% \end{itemize}
+% \end{frame}
+
+% General system, may be applied to several different datasets
+
+\section{Introduction}
+
+% \subsection{Active sonar imaging}
+\begin{frame}
+\frametitle{Active Sonar Imaging}
+\framesubtitle{Basic Principle}
+\vspace{-25pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{0pt}
+\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
+\end{narrow}
+\end{figure}
+% \begin{itemize}
+% \item Each pixel value is estimated by focusing the receiver on that point.
+% \end{itemize}
+\end{frame}
+
+\subsection{Beamforming - Basic concept}
+\begin{frame}
+\frametitle{Beamforming}
+\framesubtitle{The Delay-and-Sum (DAS) beamformer}
+\vspace{5pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{-0.5cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/BeamformingPrinciple.svg} %{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{itemize}
+\item For each pixel coordinate: Delays and weights are applied to each channel prior to summation.
+\item \emph{Delays} $\Rightarrow$ Allow signals from the pixel location to sum constructively, and noise and interference to sum destructively.
+\item \emph{Weights} $\Rightarrow$ Allow us to trade resolution for SNR. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Beamforming}
+\framesubtitle{The Delay-and-Sum (DAS) beamformer}
+\vspace{5pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{-0.5cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/BeamformingPrincipleSensitivity.svg} %{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{itemize}
+\item For each pixel coordinate: Delays and weights are applied to each channel prior to summation.
+\item \emph{Delays} $\Rightarrow$ Allow signals from the pixel location to sum constructively, and noise and interference to sum destructively.
+\item \emph{Weights} $\Rightarrow$ Allow us to trade resolution for SNR. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Beamforming}
+\framesubtitle{The Minimum Variance beamformer}
+\begin{block}{The Minimum Variance (MV) Criterion}
+Minimize the beamformers output power while maintaining unity gain in the look direction
+% \todo[inline]{Use fancy figure to illustrate this. Fix the awful box layout.}
+\end{block}
+\begin{itemize}
+\item Dynamically \emph{computes} the window that fulfills the MV criterion
+\item Problems:
+\begin{itemize}
+\item Performance compromised by required robustification techniques\\
+E.g. Subarray averaging is needed to deal with coherent reflections $\Rightarrow$ makes the effective array smaller
+\item Large computational complexity of up to O(M$^3$), with $M$ being the number of channels
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{The Low Complexity Adaptive (LCA) beamformer}
+\begin{frame}
+\frametitle{Beamforming}
+\framesubtitle{Alternative method: Low Complexity Adaptive (LCA) beamformer}
+\begin{itemize}
+\item Dynamically \emph{selects} the window \emph{out of a predefined set of windows} that fulfills the MV criterion
+\item Hypothesis: By designing the window set such that most common solutions found by the MV beamformer are there, the LCA and MV beamformer should perform similarly.
+\item $\Rightarrow$ This method will inherently be robust
+\item $\Rightarrow$ Computational complexity of O($M\,W$), where $W$ is the number of windows in the set
+\end{itemize}
+Previously investigated by J.F.Synnevåg et. al. in Ulstrasound imaging
+\end{frame}
+
+
+% \section{Results}
+\begin{frame}
+\frametitle{Experimental Setup}
+\framesubtitle{}
+\vspace{-3pt}
+\begin{itemize}
+\item Window set made up of Kaiser functions:
+\begin{itemize}
+\item 5 uniformly spaced $\beta$-values $\Rightarrow$ varying tradeoffs between mainlobe widths and sidelobe suppression
+\item Each window is steered in 5 uniformly spaced directions within $\pm$80\% of the mainlobe-width of a rectangular window, which is the narrowest
+\item Total: 25 windows
+\end{itemize}
+\item Tested on data acquired by the Kongsberg Martime HISAS1030 sonar, and on simulations of the same sonar with 100 realisations of speckle (data from the Norwegian Defence Research Establishment (FFI))
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Experimental Setup}
+\framesubtitle{HISAS 1030}
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=0.6\linewidth]{gfx/hisas_on_hugin.jpg} %{../Docs/GeiloSrc/Figs/das.pdf}
+\end{figure}
+\begin{itemize}
+\item High resolution interferometric SAS
+\item 2x32 element phased array transmitter/receiver
+\item Array length: 120cm
+\item Sampling frequency: 100kHz
+\item Opening angle: 15deg (TX), 23deg (RX)
+\end{itemize}
+\end{frame}
+
+\section{Results from HISAS 1030}
+\subsection{Speckle simulations}
+\begin{frame}
+\frametitle{Results (simulations)}
+\framesubtitle{A simulated object of 2m diameter at 41m range}
+\vspace{-3pt}
+\begin{figure}[H]
+\mbox{}\hfill\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/single_img.svg}
+\end{figure}
+\vspace{-110pt}
+\parbox[t]{0.15\linewidth}{\bf\color{blue}\centering Single\\realisation:}
+% \begin{block}{Disadvantages}
+\vspace{60pt}
+\begin{itemize}
+\item Both adaptive beamformers offer better sidelobe suppression than DAS. This cause less energy to leak from highlight areas into surrounding areas\\$\Rightarrow$ More accurate representation of object size
+\item LCA provides slightly improved shadow definition than the MV
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Results (simulations)}
+\framesubtitle{A simulated object of 2m diameter at 41m range}
+\vspace{-3pt}
+\begin{figure}[H]
+\mbox{}\hfill\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/mean_imgs.svg}
+\end{figure}
+\vspace{-110pt}
+\parbox[t]{0.25\linewidth}{\bf\color{blue}\centering Mean of 100\\realisations:}
+% \begin{block}{Disadvantages}
+\vspace{60pt}
+\begin{itemize}
+\item Both adaptive beamformers offer better sidelobe suppression than DAS. This cause less energy to leak from highlight areas into surrounding areas\\$\Rightarrow$ More accurate representation of object size
+\item LCA provides slightly improved shadow definition than the MV
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Results (simulations)}
+\framesubtitle{Cut through shadow and highlight}
+\parbox{0.55\linewidth}{
+\begin{itemize}
+\item Again: LCA and MV performs similarly, both outperforming DAS
+\end{itemize}}
+\vspace{-67pt}
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=1\linewidth]{gfx/mean_imgs_cut_marked.svg}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Results (simulation): Window selection}
+\framesubtitle{The most common window for each pixel}
+\vspace{-5pt}
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/selected_windows_mean.svg}
+\end{figure}
+\begin{itemize}
+\item The LCA beamformer selects windows that steer into regions with less energy, as one might expect
+\item Perhaps this metric can be used to detect object boundaries and sidelobes (Synnevåg et. al. in Ultrasound)? 
+\end{itemize}
+\end{frame}
+
+% \begin{frame}
+% \frametitle{Results: Window selection}
+% \framesubtitle{Symmetric angle}
+% \vspace{-5pt}
+% \begin{figure}[H]
+% \graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/selected_windows_mean_sym_angle.svg}
+% \end{figure}
+% % \begin{itemize}
+% % \item The LCA beamformer selects windows that are steered into the shadow, as one might expect.
+% % \item Perhaps this metric can be used to detect object boundaries and sidelobes? 
+% % \end{itemize}
+% \end{frame}
+
+
+\begin{frame}
+\frametitle{Results (simulations): Window selection}
+\framesubtitle{Selected windows - Variying $\beta$-values}
+\vspace{-5pt}
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/selected_windows_mean_beta.svg}
+\end{figure}
+\begin{itemize}
+\item Narrow responses are favored in speckle regions, while wide responses are favored in highlight and speckle regions
+\end{itemize}
+\end{frame}
+
+\subsection{Experimental data}
+\begin{frame}
+\frametitle{Results (experimental): The shipwreck Holmengraa}
+\framesubtitle{The 1500dwt oil tanker Holmengraa is 68m long, 9m wide, and lies at a slanted seabed at 77m depth.}
+\vspace{-5pt}
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/img_holmengraa.pdf}
+\end{figure}
+\vspace{-5pt}
+\begin{itemize}
+\item This is a sidescan image made by the HISAS1030 sonar
+\item LCA produces a better outline of the wreck than DAS, and a cleaner shadow
+\item The LCA and MV image produced identical results here
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Conclusion}
+\framesubtitle{}
+\vspace{-5pt}
+\begin{itemize}
+\item The Low Complexity Adaptive (LCA) beamformer performs like the MV...
+\item ...at a fraction of the computational cost...
+\item ...and it is inherently numerically and statistically robust
+\item A suitable set of windows are not that hard to design, and we experienced good results using only a few tens of windows in the set
+\end{itemize}
+\end{frame}
+
+% \begin{frame}
+% \frametitle{Positron Emission Tomography}
+% \framesubtitle{Advantages \& Disadvantages}
+% \begin{columns}\begin{column}{0.5\linewidth}
+% \begin{block}{Advantages}
+% \begin{itemize}
+% \item High quality metabolic information %High level soft-tissue detail
+%   \note{Since the radiotracer can be designed to probe into specific biological processes. High spatial resolution and contrast. Mention e.g. cancer, biological activity}
+% \item Information on biologic activity used to diagnose cardiovascular and neurological diseases, and cancer
+% \item Non-invasive
+%   \note{Allows the body to act as its own control}
+% \end{itemize}
+% \end{block}
+% \end{column}\begin{column}{0.5\linewidth}
+% \begin{block}{Disadvantages}
+% \begin{itemize}
+% \item Moderate radiation exposure
+%   \note{A patient can only undergo treatment a few times}
+% \item Expensive
+%   \note{New technology, radiotracer generated using cyclotron, ...}
+% \item Radioisotopes must produced with cyclotrons
+% \item Lacks anatomic information
+% \item Not in all hospitals
+% \end{itemize}
+% \end{block}
+% \end{column}
+% \end{columns}
+% \end{frame}
+% 
+% 
+% \begin{frame}
+% \frametitle{Positron Emission Tomography}
+% \framesubtitle{Technology Comparison}
+% \begin{figure}[t]\centering%
+% \graphicsAI[width=\linewidth]{gfx/presentation/technologies.svg}
+% \end{figure}
+% \note{PET provides information regarding the body metabolism}
+% \note{MRI provides anatomical information (soft+hard tissue - structure)}
+% \note{Optimal solution to merge these two}
+% \note{Radiography only hard tissue + some improvements in CT}
+% \end{frame}
+% 
+% 
+% \begin{frame}
+% \frametitle{Positron Emission Tomography}
+% \framesubtitle{Problems in traditional PET system with radially oriented crystals}
+% \vspace{-5pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1->[drawing,width=0.9\linewidth]{gfx/presentation/coincidence_problems_geometry.svg}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item<1-> Parallax error and escaped $\gamma$-rays heavy affects image quality
+% \item<1-> It is impossible to know whether two interactions were caused by the same radioisotope, but:
+% \begin{itemize}
+% \item<1-> Scattered $\gamma$'s have less energy: Apply energy window.
+% \item<1-> $\gamma$'s from the same radioisotope are closely separated in time: Apply timing window.
+% \end{itemize}
+% \end{itemize}
+% \end{frame}
+% 
+% % merge the two
+% 
+% \begin{frame}
+% \frametitle{ComPET}
+% \framesubtitle{A preclinical PET detector developed at the University of Oslo}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1->[drawing,width=\linewidth]{gfx/presentation/compet_geometry.svg}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item<2-> No inter-crystal or -module gaps
+% \item<2-> Very high photon sensitivity and spatial resolution
+%   \note{Photon sens. 15\%, spa.res. less 1mm centre FoV. Detector coverage is large, crystals are efficient. Hard to achieve this combination.}
+% \item<2-> Very compact
+%   \note{Pick up photons escaping the \textsc{Lyso}-crystals, allowing the \textsc{Lyso} interaction depth to be inferred.}
+% \item<2-> MRI compatible
+% \item<2-> 3D event reconstruction
+% \end{itemize}
+% \end{frame}
+% 
+% % 5 layers
+% % each green layer filled with 
+% 
+% \section{Readout System}
+% 
+% 
+% \begin{frame}
+% \frametitle{Readout System}
+% \framesubtitle{The custom analog front-end}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% % \graphicsAI<1>[drawing,width=\linewidth]{gfx/presentation/analog_frontend_1.svg}
+% % \graphicsAI<2>[drawing,width=\linewidth]{gfx/presentation/analog_frontend_2.svg}
+% \graphicsAI<1->[drawing,width=\linewidth]{gfx/presentation/analog_frontend_3.svg}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{enumerate}
+% \item<1-> Geiger mode APDs convert the light to electrical pulses.
+% \item<1-> These are "shaped" to obtain a near linear falloff, while keeping the risetime at a minimum.
+% \item<1-> A comparator is used to create a pulse with length equal to the "time over threshold".
+% \end{enumerate}
+% \begin{block}{Keywords:}<2->
+% Advantages: compact, low-cost, low-power, easily scalable.
+% Disadvantages: not off-the-shelf, raw data is "lost".
+% \end{block}
+% \end{frame}
+% 
+% % we want low energy threshold to accept even comptions
+% % this to allow 
+% 
+% 
+% \begin{frame}
+% \frametitle{Readout System}
+% \framesubtitle{Important design considerations}
+% \begin{itemize}
+% \item<1-> Make sure TOT-data is acquired with sufficient precision
+%   \begin{itemize}
+%   \item High sampling frequency (ideally 1$\,$GHz or more)
+%   \item Low dead-time (less than 20$\,$ns)
+%   \end{itemize}
+% {\centering\graphicsAI<1->[drawing,width=0.9\linewidth]{gfx/presentation/tot_sampling.svg}}
+% \item<2-> Make sure data is not lost, nor deteriorated, once acquired
+%   \begin{itemize}
+%   \item Reduce data-rate. Time windowing and compression.
+%   \item High throughput (up to 100$\,$Mevents/s sustained)
+%   \end{itemize}
+% \end{itemize}
+% % \only<3>{\textbf{Other considerations:\vspace{-10pt}}}
+% \begin{itemize}
+% \item<3-> This is a research project. Additional emphasis on:
+% \begin{itemize}
+% \item<3-> Flexibility, portability, development time, cost, \dots
+% \end{itemize}
+% \end{itemize}
+% \end{frame}
+% 
+% 
+% \begin{frame}
+% \frametitle{Readout System}
+% \framesubtitle{The digital front-end}
+% \begin{itemize}
+% \item The digital readout system is composed of Field Programmable Gate Arrays and evaluation boards
+% \item $\Rightarrow$ Flexible, powerful, re-programmable, available off-the-shelf, reasonably priced
+% \end{itemize}
+% \vspace{-10pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1->[drawing,width=\linewidth]{gfx/presentation/evaluation_boards.svg}
+% \end{figure}
+% \vspace{-10pt}
+% \begin{itemize}
+% \item "Everything is connected to the FPGA"
+% \item What remains is to describe how it should behave!
+% \end{itemize}
+% \end{frame}
+% 
+% % explain what an fpga is
+% 
+% 
+% 
+% \begin{frame}
+% \frametitle{Digital Readout System}
+% \framesubtitle{Step 1: TOT pulse sampling using deserialisers}
+% \begin{figure}[H]
+% \begin{narrow}{-1cm}{-1cm}
+% \graphicsAI[width=\linewidth]{gfx/presentation/functional_buildup_1.svg}
+% \end{narrow}
+% \end{figure}
+% \begin{textblock*}{0.63\linewidth}(165pt,180pt)%
+% \begin{block}{Deserialiser}
+% \begin{itemize}
+% \item TOT pulses are sampled at 1GHz and put into 10 bit frames
+% \end{itemize}
+% \end{block}
+% \end{textblock*}
+% \end{frame}
+% 
+% 
+% % inside Readout Card is the FPGA!
+% % Trigger Unit is external
+% 
+% 
+% \begin{frame}
+% \frametitle{Digital Readout System}
+% \framesubtitle{Step 2: Triggering}
+% \begin{figure}[H]
+% \begin{narrow}{-1cm}{-1cm}
+% \graphicsAI[width=\linewidth]{gfx/presentation/functional_buildup_2.svg}
+% \end{narrow}
+% \end{figure}
+% \begin{textblock*}{0.63\linewidth}(165pt,180pt)%
+% \begin{block}{Triggering}
+% \begin{itemize}
+% \item When interaction $\Rightarrow$ event trigger is sent to Trigger Unit.
+% \item Trigger Unit responds by asserting coincidence window.
+% \end{itemize}
+% \end{block}
+% \end{textblock*}
+% \end{frame}
+% 
+% 
+% 
+% \begin{frame}
+% \frametitle{Digital Readout System}
+% \framesubtitle{Step 3: Parameter Extraction}
+% \begin{figure}[H]
+% \begin{narrow}{-1cm}{-1cm}
+% \graphicsAI[width=\linewidth]{gfx/presentation/functional_buildup_3.svg}
+% \end{narrow}
+% \end{figure}
+% \begin{textblock*}{0.63\linewidth}(165pt,180pt)%
+% \begin{block}{Parameter Extraction}
+% \begin{itemize}
+% \item Upon coincidence validation $\Rightarrow$ TOT \emph{time} and \emph{width} is extracted.
+% \item These parameters, along with channel and event number, is stored in a 32 bit data package.
+% \end{itemize}
+% \end{block}
+% \end{textblock*}
+% \end{frame}
+% 
+% 
+% 
+% \begin{frame}
+% \frametitle{Digital Readout System}
+% \framesubtitle{Step 4: Event Building}
+% \begin{figure}[H]
+% \begin{narrow}{-1cm}{-1cm}
+% \graphicsAI[width=\linewidth]{gfx/presentation/functional_buildup_4.svg}
+% \end{narrow}
+% \end{figure}
+% \begin{textblock*}{0.63\linewidth}(165pt,180pt)%
+% \begin{block}{Event Building}
+% \begin{itemize}
+% \item Event data from all channels are collected and sorted, and stored in a single output buffer.
+% \end{itemize}
+% \end{block}
+% \end{textblock*}
+% \end{frame}
+% 
+% 
+% 
+% \begin{frame}
+% \frametitle{Digital Readout System}
+% \framesubtitle{Step 5: Networking}
+% \begin{figure}[H]
+% \begin{narrow}{-1cm}{-1cm}
+% \graphicsAI[width=\linewidth]{gfx/presentation/functional_buildup_5.svg}
+% \end{narrow}
+% \end{figure}
+% \begin{textblock*}{0.33\linewidth}(165pt,180pt)%
+% \begin{block}{Networking}
+% \begin{itemize}
+% \item A microprocessor sends the data over a network.
+% \end{itemize}
+% \end{block}
+% \end{textblock*}
+% \end{frame}
+% 
+% 
+% 
+% 
+% \section{Results}
+% 
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Parameter histograms - 1GHz sampling frequency - Channel 1}
+%   \begin{itemize}
+%   \item<1-> Setup: Pulse generator $\Rightarrow$ LVDS converter $\Rightarrow$ ML505
+%   \note{Without analog front-end!}
+%   \end{itemize}
+% \vspace{-15pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/run_width_1.svg}
+% \end{figure}
+% \vspace{-25pt}
+% % \begin{itemize}
+% % \item<1-> The readout chain seems operational
+%   \begin{itemize}
+%   \item<1-> Event number \& relative time roughly flat
+%   \item<1-> All TOT widths within 3ns
+%   \end{itemize}
+% % \end{itemize}
+% \end{frame}
+% 
+% % Sending the same pulse multiple times
+% 
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Parameter histograms - 1GHz sampling frequency - Channel 2}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/run_width_2.svg}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item<1-> As the sample expectation approaches a multiple of the sampling period, the standard deviation decreases!
+% \end{itemize}
+% \end{frame}
+% 
+% % emphasise that a bin is 1ns
+% % without front-end!
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Monte Carlo: Fixed with input pulse with additive Gaussian jitter}
+% \vspace{-10pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/variance_plot.eps}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item Jitter of pulse generator + LVDS converter + FPGA system seems to be less than 100ps.
+% \item Time of Flight (ToF) PET possible?
+% \end{itemize}
+% \end{frame}
+% 
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{TOT spectrogram from a Cs-137 and Ba-133 source}
+% \vspace{-10pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/run_sources.eps}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item Energy peaks have known energies: Allows the relationship between TOT width and interaction energy to be investigated.
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Detector Linearity}
+% \vspace{-10pt}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/run_linearity.eps}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item The relation between TOT width and interaction energy seems nearly linear.
+% \item Builds confidence in the readout system.
+% \end{itemize}
+% \end{frame}
+% 
+% 
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Detector Energy Resolution}
+% \begin{itemize}
+% \item Setup:  Positron emitting source $\Rightarrow$ analog front-end
+% \end{itemize}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=\linewidth]{gfx/presentation/run_energy_resolution.eps}
+% \end{figure}
+% \vspace{-20pt}
+% \begin{itemize}
+% \item 1GHz sampling speed yield more than enough TOT width bins to allow decent energy resolution.
+% \end{itemize}
+% \end{frame}
+% 
+% % why does sampling frequency affect the energy resolution?
+% % why does 
+% % just need enough bins to calculate the energy resolution
+% % for given shaping time, the sampling rate just needs to be sufficient
+% % 
+% 
+% \section{Conclusion/Outlook}
+% 
+% \begin{frame}
+% \frametitle{Conclusion}
+% \framesubtitle{}
+% % \begin{figure}[H]%[width=0.5\linewidth]
+% % \graphicsAI<1>[drawing,width=\linewidth]{gfx/presentation/analog_frontend_1.svg}
+% % \end{figure}
+% \begin{itemize}
+% \item<1-> The readout system essentially works.
+%   \begin{itemize}
+%   \item<1-> \emph{Principle OK}. Simulations with various worst case input data scenarios passed.
+%   \item<1-> \emph{Stability OK}. During readouts no data corruption caused by this system were observed.
+%   \item<1-> \emph{Precision OK}. Accuracy of estimating TOT widths near the theoretical maximum when using 1GHz deserialisers.
+%   \end{itemize}
+% \end{itemize}
+% \vspace{-3pt}
+% \onslide<2->\textbf{Outlook}
+% \vspace{-8pt}
+% \begin{itemize}
+% \item<2-> \emph{Scalability}: System must be tested with more channels (only 16 tested).
+% \item<2-> \emph{Throughput}: Network throughput must be addressed (already done by M.Rissi).
+% \item<2-> \emph{Time resolution}: Coincidence logic should be designed to allow timing resolution equal to the sampling period.
+% \item<2-> \emph{User friendliness}: A human-friendly user interface must be created. 
+% \end{itemize}
+% \end{frame}
+% 
+% 
+\begin{frame}
+\frametitle{Questions?}
+\framesubtitle{}
+
+\begin{figure}[H]%[width=0.5\linewidth]
+\graphicsAI<1>[width=0.3\linewidth]{gfx/question.jpg}
+\end{figure}
+\vspace{-10pt}
+\centering\LARGE\textbf{Questions?}
+
+\end{frame}
+
+
+
+\end{document}
+
+
+
+
+% \documentclass[
+%   ucs,
+%   utf8
+%   12pt,                   %extsize
+%   draft,                  %for empty decorations
+%     hyperref={
+%       breaklinks=true,      %Break links when necessary
+%       linktocpage=true,     %Enable link to page?
+%       linkcolor=PineGreen,  %Colour of links to labels within document
+%       citecolor=Brown,      %Colour of links to the biliography
+%       filecolor=Red,        %Colour of links to local files
+%       pagecolor=Red,        %Colour of links to other pages withing document
+%       urlcolor=Blue,        %Colour of the links to external URLs
+%       colorlinks=true,      %??
+%       plainpages=false,     %Store roman/arabic numbering differently to avoid
+%       bookmarksnumbered
+%     },                      %``duplicate'' warning.
+% %   usepdftitle={},         %
+%     xcolor={
+%       table,                %For colour in tabulars (will pull in colortbl)
+%       dvipsnames,
+%       svgnames
+%     }
+%   c,                      %centered
+%   t,                      %top aligned
+%   compress,               %
+%   trans,                  %
+%   noamsthm,               %
+%   notheorems,             %
+%   envcountsec,            %
+%   ignoreonframetext,      %
+%   handout,                %
+%   notes={}                %
+% ]{beamer}
