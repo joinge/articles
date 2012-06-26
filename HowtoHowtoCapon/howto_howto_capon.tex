@@ -331,11 +331,14 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
+Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
 
-\begin{itemize}
-\item Todo.
-\end{itemize}
+The Minimum Variance (MV) adaptive beamformer has recently been introduced in active sonar imaging. While displaying great potential for creating high quality images, it is computationally intensive and relies on robustification. These are important reasons why the MV beamformer is not in widespread use today.
 
+We propose means for adapting the MV beamformer and its robustification techniques to fit a modern Graphics Processing Unit (GPU) architecture. These devices have in recent years
+emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
+
+We benchmarked optimized implementations of the MV beamformer in Matlab and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a mid-range nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. We found that the GPU rendered more than 1Mpixels/s, representing a speedup of more than two orders of magnitude over C, and three orders of magnitude over Matlab. If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in realtime would be possible with this performance. The CPU would then be free to take on the rest of the beamforming as well.
 \end{abstract}
 
 % Keywords (normally not used for peer reviews)
@@ -369,20 +372,7 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 
 
-\section*{Abstract}
 
-Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
-
-The Minimum Variance (MV) adaptive beamformer has recently been introduced in active sonar imaging. While displaying great potential for creating high quality images, it is computationally intensive and relies on robustification. These are important reasons why the MV beamformer is not in widespread use today.
-
-We propose means for adapting the MV beamformer and its robustification techniques to fit a modern Graphics Processing Unit (GPU) architecture. These devices have in recent years
-emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
-
-We benchmarked optimized implementations of the MV beamformer in Matlab and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a mid-range nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. We found that the GPU rendered more than 1Mpixels/s, representing a speedup of more than two orders of magnitude over C, and three orders of magnitude over Matlab. If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in realtime would be possible with this performance. The CPU would then be free to take on the rest of the beamforming as well.
-
-
-
-\newpage
 \maketitle
 
 \section{Introduction}
@@ -393,9 +383,60 @@ We benchmarked optimized implementations of the MV beamformer in Matlab and C, r
 % 
 % The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
-In a typical active sonar imaging scenario encoded signals are transmitted towards a surface of interest, and the resulting reflections are recorded using an array of receivers. The receiver outputs are then coherently combined in the post-processing to focus on specific points in the image. This involves assigning suitable delays and weights to the array's channels, a concept commonly referred to as beamforming.
 
-In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
+The image quality is mainly limited by beampattern of the imaging arrays.  resolution and noise suppression
+
+The quality of sonar images 
+
+An essential part of a sonar imaging system is the beamformer. 
+
+
+A sonar image is typically formed by using receive beamforming to focus on one pixel at a time. The beamformer's ability to suppress interference   to focus on one pixel at the time. How well a pixel value is estimated, and thus how 
+
+A sonar image is built one pixel at the time the 
+
+The image quality of a sonar system will depend on the imaging arrays ability to focus in 
+
+Adaptive beamforming is a has recently been introduced in active 
+
+Forming images done by combining data from multiple receivers in a way that to obtain focus on one pixel at the time, and assigning the output value to the intensity of that pixel. The 
+
+Most modern active sonar systems employ phased arrays to 
+The basic way of a sonar image was formed 
+
+A sonar system's ability to 
+
+Adaptive beamforming has 
+
+The image quality 
+
+To improve the image quality of 
+
+In high resolution sonar imaging the 
+
+The image 
+
+
+In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. A image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+
+Ideally, 
+
+The formation of a sonar image is 
+
+The principle of forming an image in active sonar systems usually 
+
+A common way of creating high resolution sonar images is to use multielement arrays to  
+
+In sonar imaging a common compromise 
+
+A common way of creating sonar images is to use 
+
+The drive 
+
+The pursuit of 
+
+Adaptive beamforming 
+
 
 The Minimum Variance Distortionless Response (MVDR, or Capon) beamformer is one such technique. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the power accumulated by the array from other directions. Its ability to suppress interference power and improve image quality in active sonar systems has been demonstrated in e.g.~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
@@ -408,6 +449,28 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 
 
 \section{Methods}\label{methods}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{myfigure}
+where an .eps filename suffix will be assumed under latex, 
+and a .pdf suffix will be assumed for pdflatex; or what has been declared
+via \DeclareGraphicsExtensions.
+\caption{Simulation Results}
+\label{fig_sim}
+\end{figure}
+
+
+
+In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. A image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+
+
+
+In conventional beamforming 
+
+
+In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
+
 
 The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that compensates for the difference in transmitter-pixel-receiver propagation time.
 
@@ -586,6 +649,15 @@ As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If w
 Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the \gls{GPU} implementation.
 
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
+
+
+- Sidescan: 40kHz 
+
+What may this performance be used for? Let us assume that the 32 element, 1.2\,m long HISAS1030 array is mounted on a platform moving at 1.8\,m/s. Then the pulse repetition frequency (PRF) could be set to 3\,Hz to ensure critical along-track sampling, 
+To illustrate what this performance might be used for, consider a moving platform travelling at 1.8\,m/s. 
+If the sonar system is Maximum range 
+There is a limit to the along-track sampli
+To avoid along track undersampling, the 
 
 % HUGIN: 1.8m/s - range 250m \\
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
