@@ -97,41 +97,41 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {
-\renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
-\begin{frame}
-\frametitle{Context}
-\framesubtitle{Active Sonar}
-\vspace{-25pt}
-\begin{figure}[H]
-\begin{narrow}{-0.5cm}{0pt}
-\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
-\end{narrow}
-\end{figure}
-% \begin{itemize}
-% \item Each pixel value is estimated by focusing the receiver on that point.
-% \end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Context}
-\framesubtitle{Imaging techniques}
-\vspace{-10pt}
-\begin{figure}[H]
-\begin{narrow}{-0.5cm}{0pt}
-\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
-\end{narrow}
-\end{figure}
-A phased array can be used in several imaging modes:
-\begin{itemize}
-\item \emph{Sector scan}: Image computed from a single ping
-\item \emph{Sidescan}: Image created by stacking images from several subsequent pings
-\item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
-\end{itemize}
-% \begin{block}{Proposed method: Generic, can be used in all modes}
+% \renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Active Sonar}
 % \vspace{-25pt}
-% \end{block}
-\end{frame}
-}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
+% \end{narrow}
+% \end{figure}
+% % \begin{itemize}
+% % \item Each pixel value is estimated by focusing the receiver on that point.
+% % \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Imaging techniques}
+% \vspace{-10pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
+% \end{narrow}
+% \end{figure}
+% A phased array can be used in several imaging modes:
+% \begin{itemize}
+% \item \emph{Sector scan}: Image computed from a single ping
+% \item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+% \item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+% \end{itemize}
+% % \begin{block}{Proposed method: Generic, can be used in all modes}
+% % \vspace{-25pt}
+% % \end{block}
+% \end{frame}
+% }
 
 \section*{}
 \begin{frame}
@@ -158,6 +158,28 @@ A phased array can be used in several imaging modes:
 
 \section{Introduction}
 
+
+\begin{frame}
+\frametitle{Context}
+\framesubtitle{Imaging techniques}
+\vspace{-10pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{0pt}
+\hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
+\end{narrow}
+\end{figure}
+A phased array can be used in several imaging modes:
+\begin{itemize}
+\item \emph{Sector scan}: Image computed from a single ping
+\item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+\item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+\end{itemize}
+% \begin{block}{Proposed method: Generic, can be used in all modes}
+% \vspace{-25pt}
+% \end{block}
+\end{frame}
+
+
 % \subsection{Active sonar imaging}
 \begin{frame}
 \frametitle{Active Sonar Imaging}
@@ -172,6 +194,7 @@ A phased array can be used in several imaging modes:
 % \item Each pixel value is estimated by focusing the receiver on that point.
 % \end{itemize}
 \end{frame}
+
 
 \subsection{Beamforming - Basic concept}
 
@@ -377,13 +400,17 @@ A phased array can be used in several imaging modes:
 
 \begin{frame}
 \frametitle{Image Quality}
-\framesubtitle{DAS vs MVDR}
-\vspace{-15pt}
+\framesubtitle{}
+\vspace{-5pt}
 \begin{figure}[H]
-\begin{narrow}{-1cm}{-1cm}
-\graphicsAI<1>[width=\linewidth]{gfx/plot_holmengraa.pdf}%{../Docs/GeiloSrc/Figs/das.pdf}
+\begin{narrow}{-1cm}{-1cm}\centering
+\graphicsAI<1>[width=0.85\linewidth]{gfx/plot_holmengraa_L19_Navg1.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
 \end{narrow}
 \end{figure}
+\vspace{-10pt}
+\begin{itemize}
+\item MVDR $\Rightarrow$ improved edge definition and noise suppression.
+\end{itemize}
 \end{frame}
 
 \subsection{Benchmarks}
@@ -396,21 +423,22 @@ A phased array can be used in several imaging modes:
 \item Test system: Intel Xeon quad core CPU, and a nVidia Gefore GTX480 GPU.
 \end{itemize}
 \begin{figure}[H]\centering
-\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/benchmark.pdf}
+\graphicsAI<1>[drawing,width=0.7\linewidth]{gfx/benchmark.svg}
 \end{figure}
 \vspace{-10pt}
 \begin{itemize}
-\item The GPU version $\approx$ 2 orders of magnitude faster than (plain) C.
+\item GPU version $\approx$ 2 orders of magnitude faster than (plain) C.
 \end{itemize}
 \end{frame}
 
+\section{Case study: Realtime sectorcan imaging}
 
 {
 \setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/use_case_sectorscan.svg}}%
 \begin{frame}
 \vspace{-80pt}\hspace{-25pt}
 \frametitle{\color{white}Realtime requirements?}
-\framesubtitle{\vspace{-10pt}\color{white}Realtime sectorscan imaging}
+\framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
 \vspace{100pt}\ 
 % \begin{figure}[H]
 % \begin{narrow}{-1.6cm}{-1.6cm}
@@ -425,7 +453,7 @@ A phased array can be used in several imaging modes:
 \begin{frame}
 \vspace{-80pt}\hspace{-25pt}
 \frametitle{\color{white}Realtime requirements?}
-\framesubtitle{\vspace{-10pt}\color{white}Realtime sectorscan imaging}
+\framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
 \vspace{100pt}\ 
 % \begin{figure}[H]
 % \begin{narrow}{-1.6cm}{-1.6cm}
@@ -440,7 +468,7 @@ A phased array can be used in several imaging modes:
 \begin{frame}
 \vspace{-80pt}\hspace{-25pt}
 \frametitle{\color{white}Realtime requirements?}
-\framesubtitle{\vspace{-10pt}\color{white}Realtime sectorscan imaging}
+\framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
 \vspace{100pt}\ 
 % \begin{figure}[H]
 % \begin{narrow}{-1.6cm}{-1.6cm}
@@ -463,10 +491,11 @@ A phased array can be used in several imaging modes:
 \end{figure}
 \vspace{-10pt}
 \begin{itemize}
-\item Realtime sectorscan imaging possible for most several configurations.
+\item Realtime sectorscan imaging possible for several configurations.
 \end{itemize}
 \end{frame}
                                                                                                                                                                                                                                                                                                
+\section{Conclusion}
 
 {
 \setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/AUVenv.png}}%
