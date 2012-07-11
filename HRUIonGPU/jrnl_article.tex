@@ -366,7 +366,7 @@
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
-%\usepackage{url}
+\usepackage{url}
 % url.sty was written by Donald Arseneau. It provides better support for
 % handling and breaking URLs. url.sty is already installed on most LaTeX
 % systems. The latest version can be obtained at:
@@ -535,51 +535,52 @@ Adaptive Beamforming, Capon Beamformer, Minimum Variance Beamforming, Graphics P
 % and "HIS" in caps to complete the first word.
 
 %\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming, ultrasound imaging and GPU/CUDA.
-\IEEEPARstart{C}{apon} adaptive beamforming applied in a medical ultrasound setting has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. Although the method introduces some interesting trade-offs in addition to just improved resolution, like maintaining image resolution in combination with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}, widespread use has been limited by the tremendous computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied in a typical cardiac ultrasound setting. To accomplish this task we make use of the massive, and easy accessed, parallel processing power found in modern graphics processing units (GPU's), combined with novel methods to reduce the computational complexity as the problem size grows. 
+\IEEEPARstart{C}{apon} adaptive beamforming \cite{Capon1969} applied in a medical ultrasound setting has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. Although the method introduces some interesting trade-offs in addition to just improved resolution, like maintaining image resolution in combination with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}, widespread use has been limited by the tremendous computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied in a typical cardiac ultrasound setting. To accomplish this task we make use of the massive, and easy accessed, parallel processing power found in modern graphics processing units (GPU's), combined with novel methods to reduce the computational complexity as the problem size grows. 
 
 Previous attempts on implementing a parallel Capon beamformer have mainly been focused around radar and passive sonar systems using custom made systolic array processors \cite{McWhirter1989, Moonen1993, Sinha2002}.
 %A systolic array processor is custom made hardware, and even if the computational throughput might be higher for selected problems compared with a GPU, the cost related to development and flexibility is considered much higher. 
-For medical ultrasound, Chen et al. \cite{Chen2011a, Chen2011} have implemented a Capon beamformer on the GPU that produced real apodization weights from real data. Since a real function is symmetric in frequency space the Capon beamformer is not allowed to shift the main lobe under this constraint, and therefore the full potential is not reached. Shifting the main lobe is an important property of the Capon beamformer in order for it to improve edge definitions and contrast in an ultrasound image. Another aspect of using complex data is the benefits of a lowered sampling rate, keeping the number of samples for a complete image at a minimum. All results in this paper is reported with the use of baseband data.
+For medical ultrasound, Chen et al. \cite{Chen2011a, Chen2011} have implemented a Capon beamformer on the GPU that produced real apodization weights based on real data. Since a real function is symmetric in frequency space the Capon beamformer is not allowed to shift the main lobe under this constraint, and therefore its full potential is not reached. Shifting the main lobe is an important property of the Capon beamformer in order for it to improve edge definitions and contrast throughout an ultrasound image. Another aspect of using complex data is that eventhough the number of aritmetic operations per sample is increased we can now sample at the system bandwidth, keeping the number of samples for a full cardiac imaging sector at a minimum. All results in this paper is reported with the use of baseband data.
 
 %Using real data will results in symmetric windows, and even if the number of samples they managed to process per second was high, both the number of floating point operations per sample and the imaging region is reduced using real data compared with use of complex data. It is crucial to use complex data within the Capon beamformer framework, both for reducing the amount of data per image, and to allow for asymmetric windows. All results in this paper is reported with use of critically sampled complex data, both laterally and in range.  (ikke helt kritisk samplet, ikke si det, bare at det er i baseband).
 
-In previous work (cite JOE) we have applied the GPU-based Capon beamformer in an active sonar system. For sonar the real time requirement is much lower than for ultrasound, which means that most array configurations can be handled by a straight forward implementation.
+% denne må utelates i IUS-artikkelen
+In recent work (cite JOE) we have applied a GPU-based Capon beamformer in an active sonar system. For sonar the real time requirement is much lower than for ultrasound, which means that most common array configurations can be handled using the GPU without taking any additional measures. For ultrasound, and especially cardiac ultrasound, frame rate requirements increase to a level where even a high-end GPU can not do the processing required for a standard implementation of Capon beamforming. Since the execution time for a Capon beamformer highly depends on the number of elements in the given array, we need to find ways of reducing the computational complexity for high channel count ultrasound systems. Different approaches to low complexity Capon beamforming have recently been proposed \cite{Asl2012, Jensen2012}, but in this paper we have implemented the beamspace approach described by Nilsen and Hafizovic \cite{Nilsen2009} on the GPU to increase frame rates for high channel count systems.  
 %(Referer til JOE-artikkelen, få med beskrivelse av hva som blir anerledes for ultralyd.)
 
-In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of the Capon beamformer, before in Section \ref{sec:meth2} we introduce methods to apply as the problem size increases. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
+In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of the Capon beamformer, before in Section \ref{sec:meth2} we introduce the method applied when the problem size increases. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
 
 \section{Background}
 
 \subsection{Capon Beamforming}
 
-Bruk riktig terminologi. $N_{avg}$ er K. Antall sub-arrayer må hete noe annet.
+\textbf{Bruk riktig terminologi. $N_{avg}$ er K. Antall sub-arrayer må hete noe annet. F.eks $N_L$}
 
-Presis på hvilke formler vi skal implementere.
+\textbf{Presis på hvilke formler vi skal implementere.}
 
-De skal forstå MV etter denne seksjonen.
+\textbf{De skal forstå MV etter denne seksjonen.}
 
-Ton ned introduksjonen, og sett opp akkurat de ligningene vi implementerer.
+\textbf{Ton ned introduksjonen, og sett opp akkurat de ligningene vi implementerer.}
 
-(Skriv om den introduserende setningen, start rett på linje to, Kombinere data fra mange sensorer, Leseren kan Ultralyd ikke gpu)
+\textbf{(Skriv om den introduserende setningen, start rett på linje to, Kombinere data fra mange sensorer, Leseren kan Ultralyd ikke gpu)}
 
 
-The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a factor $w_m$,
+The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a per-element factor $w_m$,
 \begin{align}
-z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n]. \label{eq:z}
+z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}^{\Delta}[n]. \label{eq:z}
 \end{align}
 In conventional beamforming, the weighting $\vec{w}$ is usually real, and applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
 
-The basic idea of an adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate the weights on-the-fly, based on the data at hand, and on a selected optimization criteria in such a way that we minimize interference impinging from other directions than the point of focus. For a complex data vector $\vec{x}[n] \in \mathbb{C}^M$, we have for an adaptive beamformer a data-dependent set of weights, $\vec{w}(\vec{x}[n])$, that when applied on $\vec{x}[n]$ is the best approximation to achieving the selected criteria. 
+The basic idea of the Capon adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate a set of weights on-the-fly, based on the data at hand, in such a way that we minimize the beamformer output power while maintaining unit gain at broadside. The result being that interference impinging from other directions than the point of focus is suppressed.
 
-(Vi skal implementer dette. vis bare vektene. Dropp ligning 2, siter, bruk R-hat med en gang. Få med den endelige feilen )
+%\textbf{(Vi skal implementer dette. vis bare vektene. Dropp ligning 2, siter, bruk R-hat med en gang. Få med den endelige feilen )}
 
 \begin{figure}
 \centerline{\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png}}
-\caption{Beamforming with adaptive weights $\vec{w}[n]$. Impinging signal is demodulated and aligned in phase by applying steering and focusing delays $\Delta_m[n]$. Capon adaptive weights are then calculated based on the in-phase data, and finally the output is formed by a weighted coherent sum.}
+\caption{Capon adaptive beamforming. Impinging signal is demodulated, and aligned in phase by applying steering and focusing delays $\Delta_m[n]$. Adaptive weights, $\vec{w}[n]$, are then calculated based on in-phase data, and finally the output is formed by a weighted coherent sum.}
 \label{fig:mvbf}
 \end{figure}
 
-With the Capon beamformer, adaptive weights are found by solving the following minimization problem \cite{Capon1969}:
+The adaptive weights are therefore found by solving the following minimization problem:
 \begin{align}
 &\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
 &\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
@@ -595,7 +596,7 @@ In practice, the covariance matrix has to be approximated by the sample covarian
 \begin{align}
 \mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H.
 \end{align} 
-In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate \cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Synnevag2009a}. In this way, the beamformer output can be zero at broadside, even when there is signal present and the distortion-less criterion is applied. 
+In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate \cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Reddy1987}. In this way, the beamformer output can be zero at broadside, even when there is signal present and the distortion-less criterion is applied. 
 In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N$ time samples \cite{Synnevag2007, Synnevag2007a}.
 \begin{align}
 \mat{\hat{R}}[n] = \frac{1}{NK}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K-1} \vec{x}_l[n']\vec{x}_l[n']^H,\label{eq:R}
@@ -610,10 +611,15 @@ A weighting proportional to the output power is often used to reduce the need of
 \epsilon &= d*tr\{\mat{\hat{R}}\}, \\
 d &= 1/L
 \end{align}
-introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much of the resent literature on Capon beamforming for medical ultrasound imaging \cite{Nilsen2009, Wang2009, Mehdizadeh2012}. 
+introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much of the resent literature on Capon beamforming for medical ultrasound imaging \cite{Nilsen2009, Wang2009, Mehdizadeh2012}. Recently we have also found that this way of doing diagonal loading also has been applied to HF and VHF antenna processing \cite{Featherstone1997}.
+
+Finally we calculate the beamformer output by combining the results from all subarrays.
+\begin{align}
+z[n] = \sum_{l=0}^{l=N_L-1} .
+\end{align}
 
 \begin{figure}
-\centerline{\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}}
+\centerline{\includegraphics[width=3in]{gfx/gpu_layout_vertical_lr.png}}
 \caption{Calculation of Capon adaptive weights mapped to GPU architecture. A recorded echo across the array for a given range and angle (selected cell) is assigned to a group of $L$ threads that can run independently of all other groups. Note that several samples can be processed per block of threads if $L$ is small. The task of these $L$ threads is to calculate the Capon beamformer output in the three depicted steps.}
 \label{fig:gpulayout}
 \end{figure}
@@ -632,9 +638,9 @@ introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much o
 
 \subsection{GPU Compute Model}
 
-(Ta med mer banale ting, dette er GPU for ultralydfolk)
+\textbf{(Ta med mer banale ting, dette er GPU for ultralydfolk)}
 
-Etter denne så må de forstå GPU og hvorfor MV passer.
+\textbf{(Etter denne så må de forstå GPU og hvorfor MV passer.)}
 
 In this section we briefly discuss the principle behind GPU computing, laying the basis for further discussion on parallel implementation strategies. CUDA by Nvidia has been our choice of GPU developer environment \cite{Nvidia2011}. However, even though CUDA has been used to implement the Capon beamformer, the challenges and proposed methods described in this paper applies for other massive parallel implementation environments as well, like e.g. OpenCL. 
 
