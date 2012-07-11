@@ -551,18 +551,17 @@ In the next section we present background information about the Capon beamformer
 
 \section{Background}
 
-\subsection{Capon Beamforming}
+%\subsection{Capon Beamforming}
 
-\textbf{Bruk riktig terminologi. $N_{avg}$ er K. Antall sub-arrayer må hete noe annet. F.eks $N_L$}
+%\textbf{Bruk riktig terminologi. $N_{avg}$ er K. Antall sub-arrayer må hete noe annet. F.eks $N_L$}
 
-\textbf{Presis på hvilke formler vi skal implementere.}
+%\textbf{Presis på hvilke formler vi skal implementere.}
 
-\textbf{De skal forstå MV etter denne seksjonen.}
+%\textbf{De skal forstå MV etter denne seksjonen.}
 
-\textbf{Ton ned introduksjonen, og sett opp akkurat de ligningene vi implementerer.}
+%\textbf{Ton ned introduksjonen, og sett opp akkurat de ligningene vi implementerer.}
 
-\textbf{(Skriv om den introduserende setningen, start rett på linje to, Kombinere data fra mange sensorer, Leseren kan Ultralyd ikke gpu)}
-
+%\textbf{(Skriv om den introduserende setningen, start rett på linje to, Kombinere data fra mange sensorer, Leseren kan Ultralyd ikke gpu)}
 
 The conventional form of beamforming is delay-and-sum (DAS), where the signal recorded on each element, $x_m[n]$, is delayed to broadside with an appropriate delay $\Delta_m[n]$. The beamformer output, $z[n]$, is then the sum of all $M$ channels weighted with a per-element factor $w_m$,
 \begin{align}
@@ -570,9 +569,17 @@ z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}^{\Delta}[n
 \end{align}
 In conventional beamforming, the weighting $\vec{w}$ is usually real, and applied to trade resolution for a better signal-to-noise ratio (SNR). Hence, by increasing the main lobe width of the system while gaining lower side lobe levels. 
 
-The basic idea of the Capon adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate a set of weights on-the-fly, based on the data at hand, in such a way that we minimize the beamformer output power while maintaining unit gain at broadside. The result being that interference impinging from other directions than the point of focus is suppressed.
-
+The basic idea of the Capon adaptive beamformer, as shown in Figure \ref{fig:mvbf}, is to calculate a set of weights on-the-fly, based on the data at hand, in such a way that we minimize the beamformer output power while maintaining unit gain at broadside. The result being that interference impinging from other directions than the point of focus is suppressed \cite{Synnevag2007}.
 %\textbf{(Vi skal implementer dette. vis bare vektene. Dropp ligning 2, siter, bruk R-hat med en gang. Få med den endelige feilen )}
+
+%Formally stated, the adaptive weights are found by solving the following minimization problem:
+%\begin{align}
+%&\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
+%&\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
+%\end{align}
+%where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$ is the spatial covariance matrix, and $\vec{a} = \left[ \begin{array}{cccc} e^{-jk_{\tilde{x}}\tilde{x}_0}& e^{-jk_{\tilde{x}}\tilde{x}_1}& ...& e^{-jk_{\tilde{x}}\tilde{x}_{M-1}}\end{array}\right] ^T$ is a far-field steering vector towards angle $\theta = \arcsin(\frac{\lambda k_{\tilde{x}}}{2\pi})$.
+%The constraint in (\ref{eq:constraint}) is there to avoid the trivial solution $\vec{w} = 0$, and a distorted respons in the direction of $\vec{a}$. 
+%The solution to the minimization problem in (\ref{eq:minz}) and (\ref{eq:constraint}) is
 
 \begin{figure}
 \centerline{\includegraphics[width=3in]{gfx/beamforming_mv_lowres.png}}
@@ -580,43 +587,40 @@ The basic idea of the Capon adaptive beamformer, as shown in Figure \ref{fig:mvb
 \label{fig:mvbf}
 \end{figure}
 
-The adaptive weights are therefore found by solving the following minimization problem:
-\begin{align}
-&\min_{\vec{w}} E\{|z[n]|^2\} = \min_{\vec{w}}\vec{w}^H\mat{R}\vec{w}\label{eq:minz}\\
-&\text{subjected to } \vec{w}^H\vec{a} = 1,\label{eq:constraint}
-\end{align}
-where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$ is the spatial covariance matrix, and $\vec{a} = \left[ \begin{array}{cccc} e^{-jk_{\tilde{x}}\tilde{x}_0}& e^{-jk_{\tilde{x}}\tilde{x}_1}& ...& e^{-jk_{\tilde{x}}\tilde{x}_{M-1}}\end{array}\right] ^T$ is a far-field steering vector towards angle $\theta = \arcsin(\frac{\lambda k_{\tilde{x}}}{2\pi})$.
-Thus, we minimize the output power, while maintaining unit gain in the look direction. The constraint in (\ref{eq:constraint}) is there to avoid the trivial solution $\vec{w} = 0$, and a distorted respons in the direction of $\vec{a}$. The solution to the minimization problem in (\ref{eq:minz}) and (\ref{eq:constraint}) is
+The solution to this optimization problem is given by the following expression:
 \begin{align}\label{eq:w}
-\vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
+\vec{w}[n] = \frac{\mat{\hat{R}}[n]^{-1}\vec{a}}{\vec{a}^H\mat{\hat{R}}[n]^{-1}\vec{a}},
 \end{align}
-where $\vec{a} = [1_0 1_1... 1_{M-1}]^T = \vec{1}$ when $\vec{x}$ is pre-delayed to broadside. 
+where $\vec{a} = [1_0, 1_1, ..., 1_{M-1}]^T = \vec{1}$ when $\vec{x}$ is pre-delayed to broadside, and $\mat{\hat{R}}$ is the sample covariance matrix that can be calculated as $\vec{x}[n]\vec{x}[n]^H$. 
+%\begin{align}
+%\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H.
+%\end{align} 
+Note that this calculation only use a single sample. Typically the sample covariance matrix has to be averaged over several samples in order to ensure numerical stability and statistical robustness. 
 
-In practice, the covariance matrix has to be approximated by the sample covariance matrix, 
+In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over a long sequence of samples\cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{\hat{R}}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Reddy1987}. In this way, the beamformer output can be to low at broadside, even when there is signal present and the distortion-less criterion is applied. 
+
+In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N_K \sim \tau/T_s$ time samples \cite{Synnevag2007, Synnevag2007a}. Where $\tau$ is the pulse length in seconds and $T_s$ is the sampling period. We then get
 \begin{align}
-\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H.
-\end{align} 
-In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over all available samples to improve on the estimate \cite{Krima}. For an active, pulsed system like ultrasound imaging, the available data from which $\mat{R}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favours weights that in the end cancel out the signal \cite{Reddy1987}. In this way, the beamformer output can be zero at broadside, even when there is signal present and the distortion-less criterion is applied. 
-In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N$ time samples \cite{Synnevag2007, Synnevag2007a}.
-\begin{align}
-\mat{\hat{R}}[n] = \frac{1}{NK}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K-1} \vec{x}_l[n']\vec{x}_l[n']^H,\label{eq:R}
+\mat{\breve{R}}[n] = \frac{1}{N_LN_K}\sum_{n'=n-K}^{n+K} \sum_{l=0}^{N_L-1} \vec{x}_l^{\Delta}[n']\vec{x}_l^{\Delta}[n']^H,\label{eq:R}
 \end{align}
-where $K = M-L+1$, $N = 2N_{avg} + 1\sim \tau/T_s$ ($\tau$ is the pulse length and $T_s$ is the sampling period) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
-Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, 
+where $N_L = M-L+1$, $N_K = 2K + 1$, and $\vec{x}_l^{\Delta}$ is the $l^\text{th}$ subarray $[x_l^{\Delta}[n], \dotso, x_{l+L-1}^{\Delta}[n]]$. The dimension of the covariance matrix will after this smoothing be $L \times L$. Hence, the size of $\vec{w}[n]$ and $\vec{a}$ in (\ref{eq:w}) needs to be $L \times 1$ when the covariance matrix in (\ref{eq:R}) is used.
+Finally, the covariance matrix is loaded with a diagonal factor $\epsilon$ to ensure numerical stability, 
 \begin{align}
-\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}.
+\mat{\hat{R}} = \mat{\breve{R}} + \epsilon\mat{I}.
 \end{align}
-A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\hat{R}}$, 
+A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\breve{R}}$, 
 \begin{align}\label{eq:diag}
-\epsilon &= d*tr\{\mat{\hat{R}}\}, \\
-d &= 1/L
+\epsilon &= d*tr\{\mat{\breve{R}}\}, \\
+d &\approx 1/L
 \end{align}
 introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much of the resent literature on Capon beamforming for medical ultrasound imaging \cite{Nilsen2009, Wang2009, Mehdizadeh2012}. Recently we have also found that this way of doing diagonal loading also has been applied to HF and VHF antenna processing \cite{Featherstone1997}.
 
-Finally we calculate the beamformer output by combining the results from all subarrays.
+The beamformer output is in the end calculated by combining all $N_L$ subarrays weighted with the same set of adaptive weights.
 \begin{align}
-z[n] = \sum_{l=0}^{l=N_L-1} .
+z[n] &= \vec{w}[n]^H \sum_{l=0}^{N_L-1} \vec{x}_l^{\Delta}[n] \label{eq:z_mv}\\
+&= (\vec{w}[n]^H \ast{} [1_0, ..., 1_{N_L-1}])\vec{x}^{\Delta}[n] \label{eq:z_mv2}.
 \end{align}
+Note how we can either select to sum all subarrays first in (\ref{eq:z_mv}), or accumulate the right weighting per element in (\ref{eq:z_mv2}).
 
 \begin{figure}
 \centerline{\includegraphics[width=3in]{gfx/gpu_layout_vertical_lr.png}}
