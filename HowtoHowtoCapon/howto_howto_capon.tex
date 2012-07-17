@@ -365,13 +365,6 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 
 
 
-\begin{itemize}
-\item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
-\end{itemize}
-
-
-
-
 
 \maketitle
 
@@ -384,6 +377,9 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % The Minimum Variance Distortionless Response (MVDR) (or \gls{MVDR}) beamformer, have the potential to overcome this limitation. While ensuring unit gain in the look direction, it computes the set of weights that minimizes the energy accumulated by the array from other directions. In other words, whenever the distribution of noise and interference is primarily focused around specific angles, an array response with a high degree of suppression at these angles are chosen, resulting in an image with a lateral \gls{SNR} and resolution superior to anything the \gls{DAS} can come up with.
 
 
+
+Adaptive beamforming 
+A critical part in the sonar image formation is the 
 The image quality is mainly limited by beampattern of the imaging arrays.  resolution and noise suppression
 
 The quality of sonar images 
@@ -447,36 +443,33 @@ We will show that the suggested means for making the \gls{MVDR} behave well in a
 % Yay or nay? $\Rightarrow$ GPU ultrasound (\cite{So2011,Chen2011}). Complex data, all robustification techniques.
 
 
+- Adaptive beamformers offers image quality edge, but are usually computationally complex.
+- Who's tried before?
+- We: Active sonar MVDR, GPU, high performance.
+
 
 \section{Methods}\label{methods}
 
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/implementation.eps}
-\caption{GPU Implementation}
-\label{fig_sim}
-\end{figure}
-
-In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield sampled using a receiver array. A image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
-
-
-
-In conventional beamforming 
-
+In a typical sonar imaging scenario an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield is sampled using a receiver array. An image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
 In conventional beamforming the array sensors are assigned a static set of weights. This allows lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield.
 
+\subsection{Beamforming}
 
-The fundamental task of sonar imaging is to estimate each pixel's individual contribution to the final recorded echo. If the data is digitally stored, we can do this by focusing on one pixel at a time in the post-processing. Since the geometric relationship of the array and image is known, one usually start by selecting delays that compensates for the difference in transmitter-pixel-receiver propagation time.
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/beamforming.eps}
+\caption{Beamforming}\label{beamforming}
+\end{figure}
 
-Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$. To simplify the upcoming notation, let sample $x_m[n]$ delayed by $\Delta_m[n]$ be written as:
+Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$ (Fig. \ref{beamforming}). To simplify the upcoming notation, let sample $x_m[n]$ delayed by $\Delta_m[n]$ be written as:
 \begin{align}
-x^\Delta_m = x_m[n-\Delta_m[n]].
+x^\Delta_m[n] = x_m[n-\Delta_m[n]].
 \end{align}
 The beamformer output $z[n]$ is then simply the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x^\Delta_0[n]\\x^\Delta_1[n]\\\vdots\\x^\Delta_{M-1}[n]}.\label{z}
 \end{align}
-If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. The \gls{MVDR} beamformer~\cite{Capon1969}, however, finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction. The solution to this optimization problem is given as:
+If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. The \gls{MVDR} beamformer, however, finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
@@ -499,8 +492,10 @@ Finally, to ensure a well conditioned sample covariance matrix, we add a fractio
 \begin{align}
 \eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
 \end{align}
-where $\I$ is an identity matrix and $\tr\{\cdot\}$ means matrix trace operation.
-
+where $\I$ is an identity matrix and $\tr\{\cdot\}$ represents the matrix trace operation.
+\begin{align}
+z[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
+\end{align}
 
 \section{Arithmetic optimizations}
 
@@ -560,7 +555,11 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 
 \section{GPU challenges}
 
-
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/implementation.eps}
+\caption{GPU Implementation}
+\label{implementation}
+\end{figure}
 
 People friendly:
 \begin{itemize}
@@ -586,6 +585,7 @@ People friendly:
 
 
 
+
 \section{Implementation}
 
 - Compute bound vs. bandwidth bound
@@ -595,7 +595,9 @@ People friendly:
 
 - Size of L vs size of M:
 
-
+\begin{itemize}
+\item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
+\end{itemize}ss
 
 For each matrix we need to store 
 
