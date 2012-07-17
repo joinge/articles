@@ -1,0 +1,488 @@
+
+%%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% CONDITIONALS %
+%%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\newif\ifPeerReview\PeerReviewfalse             % Whether to create the PeerReview version or
+                                                % Journal version
+\newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
+                                                % subfolders for graphics etc.
+\newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
+                                                % Place floats at end of document?
+\newif\ifTODO\TODOtrue                        % Use todo notes?
+
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% IEEEtran %
+%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\ifPeerReview
+\documentclass[12pt,journal,captionsoff,onecolumn]{IEEEtran}
+\newcommand\CLASSINPUTbaselinestretch{1.66}     % http://theoval.cmp.uea.ac.uk/~nlct/latex/thesis/node17.html
+\else
+\documentclass[journal]{IEEEtran}
+\fi
+
+% \RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1)
+% \RequirePackage[T1]{fontenc}%                 % Set font encoding
+% \usepackage[norsk]{babel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% IEEE ''APPROVED'' PACKAGES %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+\ifCLASSINFOpdf
+   \usepackage[dvips]{graphicx}                 % Might not work. Use 'latex' instead of 
+   \ifFlatArchive\else                          % 'pdflatex'
+      \graphicspath{./gfx/}
+   \fi
+\else
+   \usepackage[dvips]{graphicx}
+   \ifFlatArchive\else
+      \graphicspath{./gfx/}
+   \fi
+\fi
+
+\RequirePackage[table,dvipsnames,svgnames]{xcolor}
+
+\usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
+\interdisplaylinepenalty=2500                   % Allows multiline equations to be broken
+
+% \RequirePackage{amssymb}
+
+\RequirePackage{array}
+
+\ifCLASSOPTIONcompsoc
+   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+   \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
+\ifCLASSOPTIONcaptionsoff                       % IEEE promoted hack to turn off captions from the 
+   \let\MYorigsubfloat\subfloat                 % subfloat package should the captionsoff option
+   \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}} % be specified.
+\fi
+
+\ifFloatAtEnd
+\ifCLASSOPTIONcaptionsoff                       % Places float at the end of the document when the
+  \usepackage[nomarkers]{endfloat}              % captionsoff options is specified to IEEEtrans.cls
+  \let\MYoriglatexcaption\caption               % (PeerReview mode)
+  \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
+\fi
+\fi
+
+\usepackage{fixltx2e}                           % Fix some twocolumn float problems
+
+%\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+                                                % (double column figures on top/bottom)
+
+\usepackage{url}                                % Support for handling and breaking URLs
+
+% NOTE: PDF hyperlink and bookmark features are not required in IEEE
+%       papers and their use requires extra complexity and work.
+\newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
+pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
+colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
+pdftitle={Low Complexity Adaptive Beamformer for Active Sonar Imaging},
+pdfsubject={},
+pdfauthor={Jo Inge Buskenes},
+pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+\ifCLASSINFOpdf
+   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+\else
+   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
+   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% ADDITIONAL PACKAGES %       
+%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\usepackage[maxfloats=25]{morefloats}
+\newcounter{todoidx}
+% \setcounter{todoidx}
+
+\ifTODO
+   \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+   \setlength\marginparsep{1pt}
+   \setlength\marginparwidth{35pt}
+   \newlength\marginparwidthsmall
+   \setlength\marginparwidthsmall{\marginparwidth}
+   \addtolength\marginparwidthsmall{-7pt}
+   \newcommand\todo[1]{%
+      \addtocounter{todoidx}{1}%
+      {\color{Red}\fbox{\bf\thetodoidx{}}}%
+      \marginpar{%
+         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\scriptsize #1}}}}
+
+   \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
+\else
+%    \usepackage[disable]{./todonotes} 
+   \newcommand\todo[1]{}
+\fi
+
+\newenvironment{narrow}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}}%
+\item[]}{\end{list}}
+
+\usepackage{float}
+
+%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% MACROS %       
+%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+\newcommand\Grey[1]{{\color{Grey}#1}}
+\newcommand\Red[1]{{\color{Red}#1}}
+\newcommand\Blue[1]{{\color{Blue}#1}}
+\newcommand\DarkBlue[1]{{\color{DarkBlue}#1}}
+\newcommand\LightBlue[1]{{\color{LightBlue}#1}}
+\newcommand\Brown[1]{{\color{Brown}#1}}
+\newcommand\Green[1]{{\color{Green}#1}}
+\newcommand\SeaGreen[1]{{\color{SeaGreen}#1}}
+\newcommand\Yellow[1]{{\color{yellow}#1}}
+\newcommand\Orange[1]{{\color{orange}#1}}
+
+\newcommand\nn{\nonumber\\}
+
+\newcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+\newcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand\case[1]{\begin{cases}#1\end{cases}}
+\newcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+
+\newcommand\rand{\text{rand}}
+\newcommand\randn{\text{randn}}
+\newcommand\rect{\text{rect}}
+\newcommand\sinc{\text{sinc}}
+\newcommand\tr{\text{tr}}
+\newcommand\adj{\text{adj}}
+
+% \newcommand\max{\text{max}}
+\newcommand\argmin{\text{argmin}}
+
+\newcommand\qqquad{\quad\qquad}
+\newcommand\qqqquad{\qquad\qquad}
+
+\renewcommand\l[1]{\left#1}
+\renewcommand\r[1]{\right#1}
+
+% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+
+%Keyword colouring:
+\newcommand\kw[1]{#1}
+\newcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+
+\newcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+\newcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+\newcommand\var[3]{#1_\text{#2}\of{#3}}
+
+\newcommand\diag{\text{diag}}
+
+% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+\newcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+\newcommand\mathnorm{\textstyle}
+\newcommand\mathbig[1]{\displaystyle#1\mathnorm}
+\newcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+\newcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+\newcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+\newcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+
+\newcommand\sumu[1]{\sum\limits^{#1}\,}
+\newcommand\suml[1]{\sum\limits_{#1}\,}
+\newcommand\sumb[2]{\sum\limits_{#1}^{#2}\,}
+
+\newcommand\produ[1]{\prod\limits^{#1}\,}
+\newcommand\prodl[1]{\prod\limits_{#1}\,}
+\newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
+
+%Math macros:
+\newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
+\newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
+
+\renewcommand\d[1]{\scriptstyle\kw{\,d\parm{#1}}\displaystyle}
+
+% These commands are mutually exclusive. Remember to "renew" in v2.
+\newcommand\intb[4]{\int\limits_{#3}^{#4} #1 \d{#2}} % \int{exp}{var}{from}{to}
+\newcommand\intl[3]{\int\limits_{#3} #1 \d{#2}} % \int{exp}{var}{for all}
+\newcommand\intu[2]{\int #1 \d{#2}} % \int{exp}{var}{for all}
+
+\newcommand\T{^{\scriptscriptstyle T}}
+\renewcommand\H{^{\scriptscriptstyle H}}
+
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\newcommand\mat[1]{\boldsymbol{#1}}
+
+
+\renewcommand*\a{\vec a}
+\renewcommand*\i{\vec i}
+\renewcommand*\k{\vec k}
+\newcommand*\n{\vec n}
+\newcommand*\p{\vec p}
+\newcommand*\s{\vec s}
+\newcommand*\w{\vec w}
+\newcommand*\x{\vec x}
+\newcommand*\y{\vec y}
+
+\newcommand*\A{\mat A}
+\newcommand*\B{\mat B}
+\newcommand*\C{\mat C}
+\newcommand*\E{\mat E}
+% \renewcommand*\H{\mat H}
+\renewcommand*\P{\mat P}
+\newcommand*\eP{\mat{\hat P}}
+\newcommand*\R{\mat R}
+\newcommand*\Ri{\R^{-1}}
+\newcommand*\eR{\mat{\hat R}}
+\newcommand*\eRi{\hat{\mat R}\,\!^{-1}}
+\newcommand*\Navg{N_\text{avg}}
+\newcommand*\W{\mat W}
+\newcommand*\X{\mat X}
+\newcommand*\Xd{\X_{\!\Delta}}
+\newcommand*\Y{\mat Y}
+
+\renewcommand*\L{\mat \Lambda}
+\newcommand*\U{\mat U}
+% \renewcommand*\t{\mathtiny{^T}}
+% \newcommand*\h{\mathtiny{^H}}
+\renewcommand*\t{^T}
+\newcommand*\h{^H}
+
+\newcommand\D{\vec\nabla} %Del: Vector differential operator - nabla
+\newcommand\Dx{\vec\nabla\times}
+\newcommand\Dd{\vec\nabla\cdot}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
+\usepackage{amsmath,amssymb}
+
+\newenvironment{outline}
+{\begin{itemize}}
+{\end{itemize}}
+
+%    \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+%    \setlength\marginparsep{3pt}
+%    \setlength\marginparwidth{42pt}
+%    \newlength\marginparwidthsmall
+%    \setlength\marginparwidthsmall{\marginparwidth}
+%    \addtolength\marginparwidthsmall{-7pt}
+%    \newcommand\todo[1]{%
+%       \addtocounter{todoidx}{1}%
+%       {\color{Red}\fbox{\bf\thetodoidx{}}}%
+%       \marginpar{%
+%          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+%          \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{#1}}}}
+% 
+
+% correct bad hyphenation here
+% \hyphenation{op-tical net-works semi-conduc-tor}
+
+
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% DOCUMENT START %
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% \usepackage{yfonts}
+
+
+\begin{document}
+
+\title{Outline hints}
+
+\author{Authors%
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
+of Informatics, University of Oslo, Norway.}% <-this % stops a space
+
+% \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
+}
+
+% The paper headers
+\markboth{Some journal}%
+{Outline hints}
+
+% Publishers ID mark:
+%\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+% for Computer Society papers, we must declare the abstract and index terms
+% PRIOR to the title within the \IEEEcompsoctitleabstractindextext IEEEtran
+% command as these need to go into the title area created by \maketitle.
+\IEEEcompsoctitleabstractindextext{%
+\begin{abstract}
+
+\begin{itemize}
+\item Todo.
+\end{itemize}
+
+\end{abstract}
+
+% Keywords (normally not used for peer reviews)
+\ifPeerReview\else
+\begin{IEEEkeywords}
+Outline hints
+\end{IEEEkeywords}
+\fi}
+% \fi
+
+% make the title area
+\maketitle
+
+% This command fixes abstract positioning for compsoc articles:
+\IEEEdisplaynotcompsoctitleabstractindextext
+
+% (Optional) Add some extra info on cover page of peer review papers:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+
+% Insert page break and insert second title (peer review mode)
+\IEEEpeerreviewmaketitle
+
+\section{Prerequisites}
+
+\begin{itemize}
+\item Research articles. Take note of journals aim for these. Perhaps take impact factor into account.
+\item For a given journal, make note of typical article and section lengths.
+\item Notice language and outline of such articles as well.
+\end{itemize}
+
+IMRAD style:
+
+\section{Abstract}
+
+\begin{itemize}
+\item Past tense.
+\end{itemize}
+
+
+\section{Introduction}
+
+\begin{itemize}
+\item Establish audience, and outline what they need to know.
+\item Purpose: What the audience need to know in order to understand the findings of the paper.
+\item Reason: Why is the research in this field necessary, and where does this individual contribution fit in?
+\item Active voice.
+\item Present tense, as focus will be put on the problem at hand, and respect should be paid to established knowledge.
+\end{itemize}
+
+\begin{enumerate}
+\item Nature and scope of the problem, with all possible clarity. Motivate!!! Why the subject was chosen, why it is important.
+\item Brief review of present litterature for orientation purposes. 
+\item Method of investigation? Optionally, why was it chosen? Mediate our way of thinking!
+\item Principal results. Some overlap with abstract ok.
+\item Principal conclustions suggested by the results (don't keep the reader in suspense). Some overlap with abstract ok.
+\end{enumerate}
+\begin{itemize}
+\item Funnel effect desirable: Importance of overall topic, summarize knowledge about an aspect of it, identify an uresolved question of that aspect, say how paper answers that question.
+\end{itemize}
+
+\section{Methods}
+
+\begin{itemize}
+\item Describe and defend method sufficently to allow experiment to be repeated.
+\item Even though most readers will skip it since method is stated in introduction, results will not be taken seriously if method is insufficiently documented.
+\item Use subheadings to group methods, try to make them match the ones used in Results.
+\item Like a cookbook: ``How'', and ``how much'' should be precisely answered.
+\item Statistical knowledge - of established knowledge - should not be included. If deemed important, cite relevant litterature.
+\item When referencing, state the findings, but omit the reasons behind the findings.
+\item Passive voice appropriate, of use of ``we''.
+\item Past tense.
+\end{itemize}
+
+
+\section{Results}
+
+\begin{itemize}
+\item Digest results until only the vital pieces of information remains. Make what is important stand out.
+\item Drop variables that are neglible, and be sure to mention it.
+\item If negative aspects are meaningful, include them.
+\item Strive for clarity! This is the new piece of information offered to the world. Make sure it sees it.
+\item Results define everything. The introduction and methods explain why and how they come into existence, discusstion explains what they mean.
+\item Avoid redundancy. State data in figures/tables, not in text.
+\item Although dominated by passive voice, add some active voice to the mix too.
+\item Past tense on own results.
+\end{itemize}
+
+\begin{enumerate}
+\item Overall description of the experiment, providing ``big picture'' without repeating technicalities of methods section.
+\item Results, with crystal clarity.
+\end{enumerate}
+
+\section{Discussion}
+
+\begin{enumerate}
+\item Present principles, relationships, and generalizations shown by the Results. Discuss, not recapitulate.
+\item Point out exceptions, lack of correlation, or unsettled points.
+\item Show how results and interpretations agree/contrast with previously published work, and with own expectations.
+\item Discuss theoretical implications, as well as possible practical applications. This will largely affect how significant the article will be percieved.
+\item State conclusions are clearly as possible.
+\item Summarize evidence for each conclusion. Beware of causality leaps!
+\item Discussion pairs Introduction. Be sure to answer any question asked there. Don't recapitulate, but extend from where introduction left off.
+\item Be sure to emphasize that this is a ``small truth'', not the ``whole truth''.
+\item Active voice.
+\end{enumerate}
+
+
+\section{Conclusion}
+
+\begin{enumerate}
+\item Take a step back. Summarize experiment, relating it to the big picture.
+\item Discuss further work
+\item Did the results support / reject the hypothesis stated in the introduction?
+\item If the used should remember just one sentence from your article, state it here!
+\end{enumerate}
+
+\section{Revision}
+
+\begin{itemize}
+\item Information selection wise?
+\item Information accurate?
+\item Consistency?
+\item Organization logical?
+\item Clear wording?
+\item Points stated brielfy, simply, directly?
+\item Grammar, spelling, word use, correct?
+\item Check figures and tables for errors/consistency.
+\item IEEE compliant?
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% DOCUMENT APPENDICES %
+%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\appendices
+
+
+
+% use section* for acknowledgement
+\ifCLASSOPTIONcompsoc
+  \section*{Acknowledgments}
+\else
+  \section*{Acknowledgment}
+\fi
+
+
+The authors would like to thank...
+
+
+% Can use something like this to put references on a page
+% by themselves when using endfloat and the captionsoff option.
+\ifCLASSOPTIONcaptionsoff
+  \newpage
+\fi
+
+
+% \bibliographystyle{IEEEtran}
+% \bibliography{../../Library/library}
+
+
+\end{document}
+
+
