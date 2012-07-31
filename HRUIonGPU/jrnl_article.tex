@@ -604,7 +604,7 @@ In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation an
 where $N_L = M-L+1$, $N_K = 2K + 1$ is the number of subarrays, and $\vec{x}_l^{\Delta}$ is the $l^\text{th}$ subarray $[x_l^{\Delta}[n], \dotso, x_{l+L-1}^{\Delta}[n]]$. The dimension of the covariance matrix will after this smoothing be $L \times L$. Hence, the size of $\vec{w}[n]$ and $\vec{a}$ in (\ref{eq:w}) has to be $L \times 1$ when the covariance matrix in (\ref{eq:R}) is used.
 Finally, the covariance matrix is loaded with a diagonal factor $\epsilon$ to ensure numerical stability, 
 \begin{align}\label{eq:diag}
-\mat{\hat{R}} = \mat{\breve{R}} + \epsilon\mat{I}.
+\mat{\hat{R}} =  f(\vec{x}^{\Delta}[n]) = \mat{\breve{R}} + \epsilon\mat{I}.
 \end{align}
 A weighting proportional to the output power is often used to reduce the need of parameter adjustments, and the trace of $\mat{\breve{R}}$, 
 \begin{align}\label{eq:diag_adapt}
@@ -616,8 +616,17 @@ introduced by Synnev\aa{}g et al. \cite{Synnevag2007} has been applied in much o
 The beamformer output is in the end calculated by combining all $N_L$ subarrays weighted with the same set of adaptive weights.
 \begin{align}
 z[n] &= \frac{1}{N_L}\vec{w}[n]^H \sum_{l=0}^{N_L-1} \vec{x}_l^{\Delta}[n] \label{eq:z_mv}\\
-&= (\vec{w}[n]^H \ast{} \vec{1}_{N_L}/N_L)\vec{x}^{\Delta}[n] \label{eq:z_mv2}.
+&= 1/N_L \text{CONV}_m(\vec{w}[n], \vec{1}_{N_L})^H\vec{x}^{\Delta}[n] \label{eq:z_mv2},
 \end{align}
+%where (this matrix is wrong)
+%\begin{align}
+%\mat{C} = \left(
+%\begin{matrix}
+%\vec{1}_1 & \vec{1}_2 & \cdots & \vec{1}_{N_L} & \vec{0}_1 & \cdots & \vec{0}_{N_L-1} & \vec{0}_{N_L}\\
+%\vec{0}_{N_L-1} & \vec{0}_{N_L-2} & \cdots & \vec{0}_{0} & \vec{1}_{N_L-1} & \cdots & \vec{1}_{2} & \vec{1}_{1}\\
+%\end{matrix}
+%\right)^T
+%\end{align}
 Note how we can either select to sum all subarrays first in (\ref{eq:z_mv}), or accumulate the right weighting per element in (\ref{eq:z_mv2}).
 
 % Få med at vi processerer hele bildet på en gang. Forklar forskjellen med å prosessere en beam av gangen. Hva med MLA?
@@ -719,7 +728,7 @@ Diagonal loading as a constant value can be added with marginal cost, but the ad
 \subsection{Solving Multiple Small Linear Systems}
 In the literature, when it comes to solving systems of linear equations on the GPU the focus has mostly been on large systems, and GPU libraries usually lack a comprehensive collection of batched solvers. The reason for this is two-fold, first the GPU needs to solve thousand of small systems in order to beat the low memory latency of the CPU, second there is a range of system dimensions that does not fit well with the GPU architecture, where only a small amount of near-core memory and registers are available. Because of this, it has been proven hard to optimize a manageable set of solvers that provides speedups compared with the CPU in every cases.
 
-For the results presented in this paper, we have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$, where $\vec{b} = \mat{\hat{R}}^{-1}\vec{1}_L$. For smaller systems, $L < 10$, a direct solver using one thread per system is preferable. For this purpose we have implemented Cramer's rule for $2 \times 2$, $3 \times 3$ and $4 \times 4$ matrices. This has been benchmarked against the latest MKL libraries.
+For the results presented in this paper, we have used an unreleased GPU implementation of Gauss Jordan (GJ) elimination (by NVIDIA) to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$, where $\vec{b} = \mat{\hat{R}}^{-1}\vec{1}_L$. For smaller systems, $L < 10$, a direct solver using one thread per system is preferable. For this purpose we have implemented Cramer's rule for $2 \times 2$, $3 \times 3$ and $4 \times 4$ matrices. All solvers have been benchmarked against the latest MKL libraries.
 
 %However we will go through an implementation of an $\mat{U}^H\mat{D}\mat{U}$-decomposition-based solver to point out challenges when implementing batched solving of small linear systems on the GPU. ... (Unsure if this should be included).
 
@@ -733,7 +742,7 @@ For the results presented in this paper, we have used an unreleased GPU implemen
 \subsection{Compute Beamformer Output}
 To calculate the beamformer output we have implement the formula in (\ref{eq:z_mv}) with one thread per element-weight ($L$ threads per weight vector). After the solution vector $\vec{b}$ has been placed in shared memory, one of the $L$ threads finds the sum of $\vec{b}$. Another option is to let several threads cooperate to form the sum using a binary reduction sum. However, in the following benchmarks the first approach has been used. Each of the $L$ threads then read one element of $\vec{b}$, scale it with the inverse sum just found to get the weight vector $\vec{w}[n]$. 
 
-The final output, as shown in (\ref{eq:z_mv}) and (\ref{eq:z_mv2}), can be formed by either reducing the data down to length $L$, or increase the weight vector to length $M$. Since we have decided to have $L$ threads per output, the data is reduced to length $L$ by calculating 
+The final output, as shown in (\ref{eq:z_mv}) and (\ref{eq:z_mv2}), can be formed by either reducing the data down to length $L$, or increase the weight vector to length $M$. Since we have decided to have $L$ threads per output, the data is reduced to length $L$ by letting thread $r$ calculate 
 \begin{align}
 \breve{x}_{r}^{\Delta} = \sum_{k=r}^{r+N_L-1}x_{k}^{\Delta} \text{ for } r \in [0, L-1].
 \end{align}
@@ -748,7 +757,7 @@ Nilsen et al. \cite{Nilsen2009} have proposed to apply beamspace processing to f
 \end{align} 
 The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like a cardiac ultrasound scanner, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et. al concluded that as little as three beams around broadside where adequate to produce results comparable to applying Capon beamforming in element space. 
 
-The beamspace version of Capon is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{\hat{R}}_{BS} = f(\vec{x}_{BS}\vec{x}_{BS}^H)$, where $\mat{B} \in \mathbb{C}^{N_b,M}$, and $N_b$ is the number of selected beams. Note that when subarray averaging is applied, the transformation must be done per subarray, yielding subarrays that no longer overlap in space. Hence, the amount of data is change from $M$ to $N_LN_b$ per sample.
+The beamspace version of Capon is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{\hat{R}}_{BS} = f(\vec{x}_{BS})$, where $\mat{B} \in \mathbb{C}^{N_b,M}$, and $N_b$ is the number of selected beams. Note that when subarray averaging is applied, the transformation must be done per subarray, yielding subarrays that no longer overlap in space. Hence, the amount of data is change from $M$ to $N_LN_b$ per sample.
 
 (Go in detail about the implementation using sliding DFT).
 
