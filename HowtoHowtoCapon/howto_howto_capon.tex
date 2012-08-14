@@ -482,17 +482,21 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % 
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
-Data adaptive methods has been reported to improve image quality in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been shown to produce images with improved constrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{}, and passive sonar . Only recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+Data adaptive methods has been reported to improve image quality in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been shown to produce images with improved constrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{}, and passive sonar . Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 However, despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and will suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while conventional beamformers are at O($M$).
 
-We target the complexity issue by investigating the feasibility of accelerating the MVDR method using the massively parallel Graphics Processing Unit (GPU) technology. Furthermore, we discuss ways to reduce the computational complexity of the MVDR, and show that implementing the robustification techniques actually help in this respect. Our implementation handles complex basebanded data, and supports several common robustification techniques, such as temporal and spatial averaging, and regularisation.
+We target the complexity issue by investigating the feasibility of accelerating the MVDR method using the massively parallel Graphics Processing Unit (GPU) technology. GPUs have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize FLOPS while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return there are up to thousands of them. 
 
-Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. Such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached.
+Furthermore, we discuss ways to reduce the computational complexity of the MVDR, and show that implementing the robustification techniques actually help in this respect. Our implementation handles complex basebanded data, and supports several common robustification techniques, such as temporal and spatial averaging, and regularisation.
+
+Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. \todo{improve}
 
 This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details on our MVDR method. Then we,  as a general concept, and describe the 
 
- Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
+%  Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
+
+% These devices have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
 
 % Yay or nay? $\Rightarrow$ GPU ultrasound (\cite{So2011,Chen2011}). Complex data, all robustification techniques.
 
@@ -512,10 +516,10 @@ In conventional beamforming the array sensors are assigned a static set of weigh
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
-\caption{Beamforming}\label{beamforming}
+\caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - prior to summation - a suitable set of delays and weights are applied to focus on a pixel of interest.}\label{beamforming}
 \end{figure}
 
-Consider an $M$ element phased array. Let the sample recorded by the $m$'th channel at time instant $n$ be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$ (Fig. \ref{beamforming}). To simplify the upcoming notation, let sample $x_m[n]$ delayed by $\Delta_m[n]$ be written as:
+Consider an $M$ element phased array recording a narrow-band wavefield, and assume that the signal signature has been removed by a matched filter. Let $n$'th sample of the $m$'th channel be represented as $x_m[n]$, and the accompanying weights be  $w_m[n]$ and $\Delta_m[n]$ (Fig. \ref{beamforming}). To simplify the upcoming notation, let sample $x_m[n]$ delayed by $\Delta_m[n]$ be written as:
 \begin{align}
 x^\Delta_m[n] = x_m[n-\Delta_m[n]].
 \end{align}
@@ -523,13 +527,15 @@ The beamformer output $z[n]$ is then defined as the weighted sum of all the dela
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x^\Delta_0[n]\\x^\Delta_1[n]\\\vdots\\x^\Delta_{M-1}[n]}.\label{z}
 \end{align}
-If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. The \gls{MVDR} beamformer, however, finds the set of weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
-\begin{gather}
-\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
-\end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to ensure a numerically well conditioned $\eR$~\cite{Synnevag2009a}.
+If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. Here weight sets that trail off towards the array edges can be used to trade resolution for improved noise suppression, but one always end up with a compromise between the two \cite{Harris1978}.
 
-\emph{Spatial averaging} is achieved by grouping the array channels into $M-L+1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
+The \gls{MVDR} beamformer, however, finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
+\begin{gather}
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1} \in\mathbb C^M,\label{weights}
+\end{gather}
+where $\1\in\mathbb C^M$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to ensure a numerically well conditioned $\eR$~\cite{Synnevag2009a}.
+
+\emph{Spatial averaging} is achieved by grouping the array channels into $M-L+1$ subarrays of length $L$, where all but one element overlap. Then each subarray is processed with the MVDR method and the  If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
 \x_l[n] = \bmat{x^\Delta_l[n] & x^\Delta_{l+1}[n] & \dots & x^\Delta_{l+L-1}[n]}\T,
 \end{gather}
@@ -542,80 +548,82 @@ then the ``subarray averaged'' sample covariance matrix, $\eR_\text{s}$, is give
 \begin{gather}
 \eR_\text{t,s}[n] = \frac{1}{2N_\text{avg}+1} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \eR_\text{s}[n'].
 \end{gather}
-Finally, to ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007}:
+To ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal\cite{Synnevag2007}:
 \begin{align}
 \eR[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
 \end{align}
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ represents the matrix trace operation.
+
+Note that the weight set obtained in (\ref{weights}) when substituting $\R \rightarrow \eR$ is only $\mathbb{R}$ finally applied to all subarrays prior to 
 \begin{align}
-z[n] = \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
+w[n] = \sumb{l=0}{M-L+1}   \eR_\text{t,s}[n] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[n]\},\label{finalR}
 \end{align}
 
-\section{Arithmetic optimizations}
+
+\subsection{Computational Complexity}
+
+As illustrated in Fig. \ref{implementation} the MVDR method is applied to each pixel independently, by
+
+\begin{enumerate}
+\item computing the sample covariance matrix $\eR$ (in \ref{finalR}),
+\item solving the linear equation $\eRi\1$ (in \ref{weights}), and
+\item computing the beamformer output $z$ (in \ref{weights}).
+\end{enumerate}
+
+The first thing note is the difference in complexity, and how this complexity changes depending on the parameters chosen.  Estimating a covariance matrix has a complexity of O(M$^2$), solving a linear equation O($L^3$)\todo{explain why}, and computing the beamformer output is at O($M$). How can we speed this process up?
+
+
+\subsection{GPU Computing Model}
+
+Two main parallelisation strategies competes when a modern processor is made. One is to make each thread run as fast as possible, by running independent instructions in parallel. The other is to support the parallel execution of as many threads as possible. This is typically realized in two levels. On a top level a few fully functional processor cores can run threads that executes different pieces of code. These cores may in turn be able to execute the same instruction on multiple data (SIMD). While CPUs represent a balanced compromise, GPUs are all out on the SIMD design.
+ 
+The nVidia GeForce GTX 680 is a good example of such a design. Using nVidias own terminology, it is comprised of 8 ``streaming'' multiprocessors (SMX) each having 192 CUDA\todo{introduce} cores. This is a SIMD design where all the CUDA cores within an SMX share the same instruction unit, and a common pool of register and cache memory.
+
+. Hence, granted that all threads run the exact same function (called a kernel), and does not  The threads also have to share a pool of register and cache memory available on each SMX. 
+
+follow collective access patterns to memory.
+
+GPUs fine  grained parallelism 
+
+But there are several challenges faced when desigining for such systems. 
+The challenge is to utilize all of these cores efficiently. 
+
+
+General purpose programming models for GPUs are hrough frameworks such as the open standard OpenCL, or nVidias Compute Unified Computer Architecture (CUDA). We have selected nVidia.
+
+Instead of having a few complex core that can boost massive single thread performance, designers chose to create hundreds of lightweight cores that each is much powerful than a single CPU core, but combined boasts a massive artithmetical performance.
+
+
+\section{Implementation}
+
+- Split program into equally sized portions - load balancing
+- Some portions depend on other potions already being carried outer - sequential dependencies
+- Effort timed in order to finish at the same time - synchronization
+
+- task level parallelism - compute images independent of each other
+- data level parallelism - compute pixels independent of each other
+
+
+\subsection{Challenges}
 
 
 \begin{itemize}
-\item Arrange order of summations to reduce data dimensions as early as possible.
-\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
-\item Compute R sub for each time sample, and average these. Rsub is symmetric.
-\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
-\item 
+\item Lots of cores, little memory for each.
+\item Few data transfers, lots of computations.
+\item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
+\item Memory latency hidden as long as it takes longer to compute than to move data around.
+\item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
 \end{itemize}
 
+Vast amount of processing power, which are easily accessible but hard to fully harness. This is because in the pursuit of an ever increasing amount of arithmetical computing cores, the 
+
+Unlike a CPU, a GPU 
+
+If we compare a GPU with a CPU, 
+
+When implementing an algorithm on a GPU, it is important to be aware
 
 
-Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
-
-These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
-\begin{align*}
-r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
-\end{align*}
-which can be easily rewritten in a sliding window fashion
-\begin{align*}
-r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
-                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
-\end{align*}
-Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
-\begin{figure}[H]
-% \begin{narrow}{-3.5cm}{-3.5cm}
-\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
-\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
-% \end{narrow}
-\end{figure}
-The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
-{\renewcommand*{\arraystretch}{1.8}
-\begin{align*}
-\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
-&= \left[\;
-\begin{matrix}
-\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-\end{matrix}
-\;\right]
-\end{align*}}%
-Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
-
-\begin{itemize}
-\item Switching summations. Sum of covariance coefficients in two dimensions.
-\begin{itemize}
-\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
-\item Job queue (how does this work)
-\end{itemize}
-\item Register pressure and shared memory. Thread context must fit in local memories.
-\item Warp computational intensity should be high to make up for the memory cost.
-\end{itemize}
-
-
-\section{GPU challenges}
-
-These devices have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
-
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/implementation.eps}
-\caption{GPU Implementation}
-\label{implementation}
-\end{figure}
 
 People friendly:
 \begin{itemize}
@@ -675,6 +683,86 @@ This suggests that the algorithm should be decomposed into as many lightweight t
 In the upcoming results, we have beamformed pre-delayed data. This is a large dataset, and the latency experienced when copying it from the \gls{CPU} side to the \gls{GPU} was significant. However, in a practical system only the channel data should be transferred as the delaying of data can effortlessly be performed by the \gls{GPU}. The remaining latency can be hidden as long as the \gls{GPU} is kept busy, hence the data transfer times will not be reported in the upcoming results.
 
 In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVidia's \gls{CUDA} framework~\cite{NvidiaCuda}.
+
+
+
+\subsection{Estimating the spatial covariance matrix, $\hat R$}
+
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/implementation.eps}
+\caption{GPU Implementation}
+\label{implementation}
+\end{figure}
+
+To understand how 
+
+\begin{itemize}
+\item Arrange order of summations to reduce data dimensions as early as possible.
+\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
+\item Compute R sub for each time sample, and average these. Rsub is symmetric.
+\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
+\end{itemize}
+
+Let us first consider the \emph{computation of $\hat{\mat R}$}. Notice that when implementing the formula directly a lot of summations and multiplications will be repeated unnecessary. To illustrate this, consider for instance a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. Let us further assume that we need to average over 7 time samples, i.e. that $N_{\text{avg}} = 3$. 
+
+These procedures are commutative, so the order in which we perform them does not matter. But for the sake of this example let us start by performing the time averaging. Assuming that $\vec x_i$ and $\vec x_j$ have a zero mean, a time averaged covariance coefficient $r_{ij}$ in $\hat{\mat R}$ may be obtained by (omitting the normalisation):
+\begin{align*}
+r_{ij}[n] &= \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_i[n']\,x_j[n'],
+\end{align*}
+which can be easily rewritten in a sliding window fashion
+\begin{align*}
+r_{ij}[n] &= r_{ij}[n-1] - x_i[n\text{-}N_\text{avg}\text{-}1]\,x_j[n\text{-}N_\text{avg}\text{-}1]
+                         + x_i[n\text{+}N_\text{avg}]\,x_j[n\text{+}N_\text{avg}].
+\end{align*}
+Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
+\begin{figure}[H]
+% \begin{narrow}{-3.5cm}{-3.5cm}
+\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+\caption{Building $\hat{\mat R}$: Symmetry and element coverage}\label{buildingRfull}
+% \end{narrow}
+\end{figure}
+The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
+{\renewcommand*{\arraystretch}{1.8}
+\begin{align*}
+\hat{\mat R}_\text{sub} &= {\color{Blue}\mat R_{\text{sub},1} + \mat R_{\text{sub},2} + \mat R_{\text{sub},3} + \mat R_{\text{sub},4}} \\
+&= \left[\;
+\begin{matrix}
+\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+\end{matrix}
+\;\right]
+\end{align*}}%
+Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
+
+\begin{itemize}
+\item Switching summations. Sum of covariance coefficients in two dimensions.
+\begin{itemize}
+\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+\item Job queue (how does this work)
+\end{itemize}
+\item Register pressure and shared memory. Thread context must fit in local memories.
+\item Warp computational intensity should be high to make up for the memory cost.
+\end{itemize}
+
+
+
+% increasing performance hit several walls:
+% \begin{itemize}
+% \item memory couldnt keep track - remedy cache.
+% \item instruction parallelism - complex to identity
+% \item power consumption cubic with frequency
+% GPUs:
+% \begin{itemize}
+% \item lower frequency, less power
+% \item no instruction parallelism
+% \item massive amounts of lightweight cores
+% \end{itemize}\end{itemize}
+
+\cite{Owens2007} \cite{Lee2010}
+
+
+
 
 \begin{figure}[!t]
 \centering
