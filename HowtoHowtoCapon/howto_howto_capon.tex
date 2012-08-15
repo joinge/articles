@@ -570,93 +570,96 @@ As illustrated in Fig. \ref{implementation} the MVDR method is applied to each p
 \item computing the beamformer output $z$ (in \ref{weights}).
 \end{enumerate}
 
-The first thing note is the difference in complexity, and how this complexity changes depending on the parameters chosen.  Estimating a covariance matrix has a complexity of O(M$^2$), solving a linear equation O($L^3$)\todo{explain why}, and computing the beamformer output is at O($M$). How can we speed this process up?
+The first thing note is the difference in complexity, and how this complexity changes depending on the parameters chosen.  Estimating a covariance matrix has a complexity of O(M$^2$), solving a linear equation O($L^3$)\todo{explain why with a figure}, and computing the beamformer output is at O($M$). How can we speed this process up?
 
 
 \subsection{GPU Computing Model}
 
-Two main parallelisation strategies competes when a modern processor is made. One is to make each thread run as fast as possible, by running independent instructions in parallel. The other is to support the parallel execution of as many threads as possible. This is typically realized in two levels. On a top level a few fully functional processor cores can run threads that executes different pieces of code. These cores may in turn be able to execute the same instruction on multiple data (SIMD). While CPUs represent a balanced compromise, GPUs are all out on the SIMD design.
+Two main parallelisation strategies competes when a modern processor is made. One is to make each thread run as fast as possible, by running independent instructions in parallel\todo{get complexity in there}. The other is to support the parallel execution of as many threads as possible. This is typically realized in two levels. On a top level a few fully functional processor cores can run threads that executes different pieces of code. These cores may in turn be able to execute the same instruction on multiple data (SIMD). While CPUs represent a balanced compromise, GPUs are all out on the SIMD design.
  
-The nVidia GeForce GTX 680 is a good example of such a design. Using nVidias own terminology, it is comprised of 8 ``streaming'' multiprocessors (SMX) each having 192 CUDA\todo{introduce} cores. This is a SIMD design where all the CUDA cores within an SMX share the same instruction unit, and a common pool of register and cache memory.
+The nVidia GeForce GTX 680 is a good example of such a design. Using nVidias own terminology, it is comprised of 8 ``streaming'' multiprocessors (SMX) each having 192 CUDA\todo{make sure CUDA is introduced} cores. This is a SIMD design where all the CUDA cores within an SMX share the same instruction unit and a pool of 128kB cache and 256kB register memory. This translates to a very small amount of fast memory for each computing core. GDDR5 ``global'' memory is available but access to it is slow.
 
-. Hence, granted that all threads run the exact same function (called a kernel), and does not  The threads also have to share a pool of register and cache memory available on each SMX. 
-
-follow collective access patterns to memory.
-
-GPUs fine  grained parallelism 
-
-But there are several challenges faced when desigining for such systems. 
-The challenge is to utilize all of these cores efficiently. 
-
-
-General purpose programming models for GPUs are hrough frameworks such as the open standard OpenCL, or nVidias Compute Unified Computer Architecture (CUDA). We have selected nVidia.
-
-Instead of having a few complex core that can boost massive single thread performance, designers chose to create hundreds of lightweight cores that each is much powerful than a single CPU core, but combined boasts a massive artithmetical performance.
-
-
-\section{Implementation}
-
-- Split program into equally sized portions - load balancing
-- Some portions depend on other potions already being carried outer - sequential dependencies
-- Effort timed in order to finish at the same time - synchronization
-
-- task level parallelism - compute images independent of each other
-- data level parallelism - compute pixels independent of each other
-
-
-\subsection{Challenges}
-
-
-\begin{itemize}
-\item Lots of cores, little memory for each.
-\item Few data transfers, lots of computations.
-\item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
-\item Memory latency hidden as long as it takes longer to compute than to move data around.
-\item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
-\end{itemize}
-
-Vast amount of processing power, which are easily accessible but hard to fully harness. This is because in the pursuit of an ever increasing amount of arithmetical computing cores, the 
-
-Unlike a CPU, a GPU 
-
-If we compare a GPU with a CPU, 
-
-When implementing an algorithm on a GPU, it is important to be aware
-
-
-
-People friendly:
-\begin{itemize}
-\item More and more compute units, but less memory for each.
-\item Need to keep each compute unit busy.
-\item Few data transfers, lots of computations.
-\item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
-\item Memory latency hidden as long as it takes longer to compute than to move data around.
-\item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
-\end{itemize}
-
-The ``fast'' memory of the GPU is the registers and cache. All threads executed 
-
-
-
-
-\begin{itemize}
-\item Hiding memory access.
-\begin{itemize}
-\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
-\item Job queue (how does this work)
-\end{itemize}
-\item Register pressure and shared memory. Thread context must fit in local memories.
-\item Warp computational intensity should be high to make up for the memory cost.
-\item Optimized for small L, high M, hardly any time averaging. A typical sonar scenario.
-\end{itemize}
-
-
+% \begin{itemize}
+% \i
+% \end{itemize}
+% 
+% pool of register and cache memory available on each SMX. 
+% 
+% follow collective access patterns to memory.
+% 
+% GPUs fine  grained parallelism 
+% 
+% But there are several challenges faced when desigining for such systems. 
+% The challenge is to utilize all of these cores efficiently. 
+% 
+% 
+% General purpose programming models for GPUs are hrough frameworks such as the open standard OpenCL, or nVidias Compute Unified Computer Architecture (CUDA). We have selected nVidia.
+% 
+% Instead of having a few complex core that can boost massive single thread performance, designers chose to create hundreds of lightweight cores that each is much powerful than a single CPU core, but combined boasts a massive artithmetical performance.
+% 
+% \begin{itemize}
+% \item Lots of cores, little memory for each.
+% \item Few data transfers, lots of computations.
+% \item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
+% \item Memory latency hidden as long as it takes longer to compute than to move data around.
+% \item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
+% \end{itemize}
+% 
+% Vast amount of processing power, which are easily accessible but hard to fully harness. This is because in the pursuit of an ever increasing amount of arithmetical computing cores, the 
+% 
+% Unlike a CPU, a GPU 
+% 
+% If we compare a GPU with a CPU, 
+% 
+% When implementing an algorithm on a GPU, it is important to be aware
+% 
+% 
+% 
+% People friendly:
+% \begin{itemize}
+% \item More and more compute units, but less memory for each.
+% \item Need to keep each compute unit busy.
+% \item Few data transfers, lots of computations.
+% \item Data transfers are moved around by hardware that can operate asynchronously from the compute units.
+% \item Memory latency hidden as long as it takes longer to compute than to move data around.
+% \item Tasks can be queued on SM (blocks) and on CPU to hide internal and external memory latencies.
+% \end{itemize}
+% 
+% The ``fast'' memory of the GPU is the registers and cache. All threads executed 
+% 
+% 
+% 
+% 
+% \begin{itemize}
+% \item Hiding memory access.
+% \begin{itemize}
+% \item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+% \item Job queue (how does this work)
+% \end{itemize}
+% \item Register pressure and shared memory. Thread context must fit in local memories.
+% \item Warp computational intensity should be high to make up for the memory cost.
+% \item Optimized for small L, high M, hardly any time averaging. A typical sonar scenario.
+% \end{itemize}
 
 
 \section{Implementation}
 
-- Compute bound vs. bandwidth bound
+At first glance, it might seem like a good idea to compute one pixel per CUDA core. The processing steps in are the same, which adhere to the SIMD model, and the pixels can be computed separately without any exchange of data. However, this approach is unfeasible due to the limited cache and register memory available to each thread. One could resolve to using the slower GDDR5 memory, but this would largely mitigate the performance gain and defeat the purpose of using a GPU in the first place.
+
+This is why we aimed to find ways to decompose the three computing steps in the MVDR method into lighter threads. \ref{implementation}
+
+
+% - Split program into equally sized portions - load balancing
+% - Some portions depend on other potions already being carried outer - sequential dependencies
+% - Effort timed in order to finish at the same time - synchronization
+% 
+% - task level parallelism - compute images independent of each other
+% - data level parallelism - compute pixels independent of each other
+
+% - Compute bound vs. bandwidth bound
+
+
+\subsection{Estimating the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
 
 - Order of summations - memory vs. computations
 - Order of summations - beamspace capable
@@ -665,13 +668,12 @@ The ``fast'' memory of the GPU is the registers and cache. All threads executed
 
 \begin{itemize}
 \item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
-\end{itemize}ss
+\end{itemize}
 
-For each matrix we need to store 
-
-Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. A technology of particular interest here are \glspl{GPU}~\cite{Nilsen2009}, which are tailored for image processing, available off-the-shelf at reasonable prices, and are found in most desktop computers already. The \gls{GPU} is a hardware architecture comprised of several hundred computing cores, each running a thread that executes a copy of a common function called a kernel.  However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
+Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
 
 This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
+
 \begin{enumerate}
 \item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
 %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
@@ -789,11 +791,11 @@ Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to supp
 
 As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the \gls{GPU} implementation, respectively.
 
-\newpage
 Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the \gls{GPU} implementation.
 
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
+MVDR inherits a structure that promotes parallelisation on a pixel level, and partially on a sub-pixel level. Problem with load balancing and memory access. Saving insttructions breaks parallelism, and is noe as promising.
 
 - Sidescan: 40kHz 
 
@@ -802,6 +804,8 @@ To illustrate what this performance might be used for, consider a moving platfor
 If the sonar system is Maximum range 
 There is a limit to the along-track sampli
 To avoid along track undersampling, the 
+
+
 
 % HUGIN: 1.8m/s - range 250m \\
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
