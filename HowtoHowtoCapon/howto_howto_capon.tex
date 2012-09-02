@@ -559,25 +559,149 @@ Note how subarray averaging led to a reduction of $\eR$ from $\mathbb{C}^{L,L}$ 
 \begin{align}
 z[\p] = \w\H[\p] \sumb{l=0}{M-L} \x_l[\p].\label{finaleR}
 \end{align}
-
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/algorithm_structure.eps}
 \caption{MVDR beamforming. First a spatial covariance matrix is estimated from the delayed data (\ref{spatialR}-\ref{finalR}), then the weights are computed (\ref{weights}) and finally applied to the delayed channel data (\ref{z}).}
 \label{implementation}
 \end{figure}
+To summarize, the MVDR method is applied to each pixel independently, by
+\begin{enumerate}
+\item computing the sample covariance matrix $\eR$ (in \ref{finalR}),
+\item computing $\eRi\1$ (in \ref{weights}), and
+\item computing the beamformer output $z$ (in \ref{finaleR}).
+\end{enumerate}
+This is illustrated in Fig. \ref{implementation}.
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/buildR-complex_data-average.eps}
+\caption{.}\label{complexity}
+\end{figure}
 
 \subsection{Computational Complexity}
 
-As illustrated in Fig. \ref{implementation}, the MVDR method is applied to each pixel independently, by
+Which of these steps are mainly responsible for the MVDR beamformers complexity? This may not be immediately apparent. In the first step, computing a simple covariance matrix has a computational complexity of O($M^2$), but this is largely affected by the values of $L$ and $K$. Step 2 is also largely affected by the size of $L$, since $\eR$ is a quadratic matrix of size $L$ and inverting will be of O($L^3$). But these are approximate figures, and does not account for e.g. the fact that the underlying data is complex.
+
+To assess the this aspect, complexity curves were computed for the entire range of possible subarray sizes from 1 to $M$. Temporal averaging was set to $K=\{0,1,2\}$, which should cover the range of values used in most applications. Data were assumed to be complex with a rectangular representation, with complex addition corresponding to 2 real additions, and a complex multiplication corresponding to 4 multiplications and 2 additions. The result is shown Fig. \ref{complexity} \todo{move to results}. 
+
+We notice that for small subarray sizes $L$ building the covariance matrix dominates. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
+
+
+\subsection{Optimize Estimation the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
+
+To get a better idea of the process of forming the convariance matrix, and how we can improve it,  consider a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. %(\ref{spatialR}-\ref{finalR})
+The spatial covariance matrix for all $M$ channels at time instant $n$ is then given as:
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+\end{figure}
+where $r_{ij} = x_i[\p]x_j^*[\p]$, and $\eR_{l}$ is the covariance matrix for the $l$'th subarray. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
+{\renewcommand*{\arraystretch}{1.8}
+\begin{align*}
+\hat{\mat R}_\text{s} &= \color{Blue}\eR_1 + \eR_2 + \eR_3 + \eR_4 \\
+&= \left[\;
+\begin{matrix}
+\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
+                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
+                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
+\end{matrix}
+\;\right]
+\end{align*}}%
+Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.
+
+Let us further assume that we need to average over 3 time samples, i.e. that $N_{\text{avg}} = 1$:
+\begin{align*}
+\eR_\text{s,t}[n] &= \eR_\text{s}[n] + \eR_\text{s}[n] + \eR_\text{s}[n+1]
+\end{align*}%
+
+
+Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. 
+
+
+
+
+
+- Order of summations - memory vs. computations
+- Order of summations - beamspace capable
+
+- Size of L vs size of M:
+
+\begin{itemize}
+\item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
+\end{itemize}
+
+Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
+
+This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 
 \begin{enumerate}
-\item computing the sample covariance matrix $\eR$ (in \ref{finalR}),
-\item solving the linear equation $\eRi\1$ (in \ref{weights}), and
-\item computing the beamformer output $z$ (in \ref{finaleR}).
+\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
+%Finished threads can also wrap around and start on diagonals on the lower half triangular. 
+% In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
+\item \emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
 \end{enumerate}
 
-The first thing note is the difference in complexity, and how this complexity changes depending on the parameters chosen.  Estimating a covariance matrix has a complexity of O(M$^2$), solving a linear equation O($L^3$)\todo{explain why with a figure}, and computing the beamformer output is at O($M$). How can we speed this process up?
+In the upcoming results, we have beamformed pre-delayed data. This is a large dataset, and the latency experienced when copying it from the \gls{CPU} side to the \gls{GPU} was significant. However, in a practical system only the channel data should be transferred as the delaying of data can effortlessly be performed by the \gls{GPU}. The remaining latency can be hidden as long as the \gls{GPU} is kept busy, hence the data transfer times will not be reported in the upcoming results.
 
+In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVidia's \gls{CUDA} framework~\cite{NvidiaCuda}.
+
+
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/implementation.eps}
+\caption{GPU Implementation}
+\label{implementation}
+\end{figure}
+
+To understand how 
+
+\begin{itemize}
+\item Arrange order of summations to reduce data dimensions as early as possible.
+\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
+\item Compute R sub for each time sample, and average these. Rsub is symmetric.
+\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
+\end{itemize}
+
+
+
+\begin{itemize}
+\item Switching summations. Sum of covariance coefficients in two dimensions.
+\begin{itemize}
+\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
+\item Job queue (how does this work)
+\end{itemize}
+\item Register pressure and shared memory. Thread context must fit in local memories.
+\item Warp computational intensity should be high to make up for the memory cost.
+\end{itemize}
+
+
+
+% increasing performance hit several walls:
+% \begin{itemize}
+% \item memory couldnt keep track - remedy cache.
+% \item instruction parallelism - complex to identity
+% \item power consumption cubic with frequency
+% GPUs:
+% \begin{itemize}
+% \item lower frequency, less power
+% \item no instruction parallelism
+% \item massive amounts of lightweight cores
+% \end{itemize}\end{itemize}
+
+\cite{Owens2007} \cite{Lee2010}
+
+
+
+
+\subsection{Solving Ria}
+
+Using a Gauss Jordan solver with partial pivoting,
+Creating a covariance matrix exhibits hermitian positive-semidefinite matrix.
+
+\emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{gfx/img_holmengraa.ps}
+\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
+\end{figure}
 
 \section{GPU Implementation}
 
@@ -677,8 +801,6 @@ This leads to a few challenges that be overcome, which may be apparent at first 
 % \end{itemize}
 
 
-
-
 At first glance, it might seem like a good idea to compute one pixel per CUDA core. Each pixel is computed using the same instructions, and without any exchange of data. However, this approach is unfeasible due to the limited cache and register memory available to each thread. One could resolve to using the slower GDDR5 memory, but this would largely mitigate the performance gain and defeat the purpose of using a GPU in the first place.
 
 This is why we aimed to find ways to decompose the three computing steps in the MVDR method into lighter threads. \ref{implementation}
@@ -693,121 +815,6 @@ This is why we aimed to find ways to decompose the three computing steps in the 
 
 % - Compute bound vs. bandwidth bound
 
-
-\subsection{Estimating the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
-
-Let us start by visualising how $\eR$ could be built (\ref{spatialR}-\ref{finalR}) in a system with only a few channels. Consider a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. The spatial covariance matrix for all $M$ channels at time instant $n$ is then given as:
-\begin{figure}[H]
-\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
-\end{figure}
-where $r_{ij} = x_i[\p]x_j^*[\p]$, and $\eR_{l}$ is the covariance matrix for the $l$'th subarray.
-
-$\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
-{\renewcommand*{\arraystretch}{1.8}
-\begin{align*}
-\hat{\mat R}_\text{s} &= \color{Blue}\eR_1 + \eR_2 + \eR_3 + \eR_4 \\
-&= \left[\;
-\begin{matrix}
-\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-\end{matrix}
-\;\right]
-\end{align*}}%
-Let us further assume that we need to average over 3 time samples, i.e. that $N_{\text{avg}} = 1$. 
-\begin{align*}
-\eR_\text{s,t}[n] &= \eR_\text{s}[n-1] + \eR_\text{s}[n] + \eR_\text{s}[n+1]
-\end{align*}%
-
-
-Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption. The next thing to realise is that not all $r_{ij}[n]$ need to be computed. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only compute an upper triangular band of R (marked \Green{green})
-
-The final step is to average all the subarray matrices to form $\hat{\mat R}$ by 
-
-Note that consecutive elements along the diagonals overlap on all but one covariance coefficient, hence a sliding window may also be used here. The subarray size $L$ is usually quite a bit larger than the time averaging window, so there is more to gain from implementing the sliding window here.\\\\
-
-
-
-- Order of summations - memory vs. computations
-- Order of summations - beamspace capable
-
-- Size of L vs size of M:
-
-\begin{itemize}
-\item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
-\end{itemize}
-
-Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
-
-This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
-
-\begin{enumerate}
-\item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
-%Finished threads can also wrap around and start on diagonals on the lower half triangular. 
-% In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
-\item \emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
-\item \emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
-\end{enumerate}
-
-In the upcoming results, we have beamformed pre-delayed data. This is a large dataset, and the latency experienced when copying it from the \gls{CPU} side to the \gls{GPU} was significant. However, in a practical system only the channel data should be transferred as the delaying of data can effortlessly be performed by the \gls{GPU}. The remaining latency can be hidden as long as the \gls{GPU} is kept busy, hence the data transfer times will not be reported in the upcoming results.
-
-In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVidia's \gls{CUDA} framework~\cite{NvidiaCuda}.
-
-
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/implementation.eps}
-\caption{GPU Implementation}
-\label{implementation}
-\end{figure}
-
-To understand how 
-
-\begin{itemize}
-\item Arrange order of summations to reduce data dimensions as early as possible.
-\item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
-\item Compute R sub for each time sample, and average these. Rsub is symmetric.
-\item Sliding window in time/space to reduce instructions at the cost of extra memory consumption. Only pays off to do this over subarrays.
-\end{itemize}
-
-
-
-\begin{itemize}
-\item Switching summations. Sum of covariance coefficients in two dimensions.
-\begin{itemize}
-\item Between GPU and CPU: Several concurrent blocks (contexts) per SM.
-\item Job queue (how does this work)
-\end{itemize}
-\item Register pressure and shared memory. Thread context must fit in local memories.
-\item Warp computational intensity should be high to make up for the memory cost.
-\end{itemize}
-
-
-
-% increasing performance hit several walls:
-% \begin{itemize}
-% \item memory couldnt keep track - remedy cache.
-% \item instruction parallelism - complex to identity
-% \item power consumption cubic with frequency
-% GPUs:
-% \begin{itemize}
-% \item lower frequency, less power
-% \item no instruction parallelism
-% \item massive amounts of lightweight cores
-% \end{itemize}\end{itemize}
-
-\cite{Owens2007} \cite{Lee2010}
-
-
-\subsection{Solving Ria}
-
-Creating a covariance matrix exhibits hermitian positive-semidefinite matrix.
-
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{gfx/img_holmengraa.ps}
-\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
-\end{figure}
 
 
 \section{Results}
