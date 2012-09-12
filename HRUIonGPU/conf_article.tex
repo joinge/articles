@@ -417,9 +417,9 @@ Sverre Holm\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}
 
 \begin{abstract}
 \boldmath
-Recent results \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012} suggest that the Capon beamformer can provide increased lateral resolution to a medical ultrasound image. In this paper, the high computational complexity of the Capon beamformer is targeted with the use of Graphics Processing Units (GPUs), and we show in-vivio results with Capon beamforming applied on a full cardiac cycle in addition to simulations. With GPUs we are able to process a 70 degree sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing.
+Recent results \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012} suggest that the Capon beamformer can provide increased lateral resolution when applied in medical ultrasound imaging. In this paper, the high computational complexity of the Capon beamformer is targeted with the use of Graphics Processing Units (GPUs). We also present in-vivio results with Capon beamforming applied on a full cardiac cycle in addition to simulations. With GPUs we are able to process a 70 degrees sector cardiac image from a 64 element phased array at interactive frame rates using both spatial and temporal smoothing.
 
-For a typical cardiac ultrasound image of $80\times400$ pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, M=64 element phased array, we obtain 10fps (subarray length L=M/2, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the frame rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector ($40\times400$ pixels), hence with the same parameters the frame rate increases to 87fps. The bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16 (M = 64), real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
+For a typical cardiac ultrasound image of $80\times400$ pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, M=64 element phased array, we obtain 10fps (subarray length L=M/2, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the frame rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector ($40\times400$ pixels), hence with the same parameters the frame rate increases to 87fps. After optimization the bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16 (M = 64), real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -447,7 +447,7 @@ For a typical cardiac ultrasound image of $80\times400$ pixels (70 degree sector
 
 
 \section{Introduction}
-Capon adaptive beamforming \cite{Capon1969} applied to medical ultrasound imaging has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. For instance it has been introduced some interesting trade-offs in addition to just improved resolution, like maintaining image resolution in combination with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}. Despite these benefits, widespread use has been limited by the immense computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied in a typical cardiac ultrasound imaging setting. To accomplish this task we make use of the massive, and easily accessed, parallel processing power found in modern Graphics Processing Units (GPUs), combined with novel methods to reduce the computational complexity as the problem size grows. 
+Capon adaptive beamforming \cite{Capon1969} applied to medical ultrasound imaging has recently shown promising results in several studies \cite{Synnevag2007, Austeng2008, Vignon2008, Viola, Mehdizadeh2012}. For instance it has been introduced some interesting trade-offs in addition to just improved resolution, like maintaining image resolution in combination with higher framerates, smaller probes, or deeper penetration \cite{Synnevag2009}. Despite these benefits, widespread use has been limited by the immense computational complexity associated with the method \cite{So2011}.  In this paper we introduce the first implementation of the Capon beamformer exhibiting real-time performance when applied in a typical cardiac ultrasound imaging setting. To accomplish this task we make use of the massive, and easily accessed, parallel processing power found in modern Graphics Processing Units (GPUs). 
 
 Previous work on implementing a parallel Capon beamformer have mainly been focused around radar and passive sonar systems using custom made systolic array processors \cite{McWhirter1989, Sinha2002}. For medical ultrasound, Chen et al. \cite{Chen2011a, Chen2011} have implemented a Capon beamformer on the GPU that produced real apodization weights based on real data. Under this constraint the Capon beamformer is not allowed to shift the main lobe, and therefore its full potential is not reached. Shifting the main lobe is an important property of the Capon beamformer in order for it to improve edge definitions and contrast throughout an ultrasound image. Another aspect of using complex data is that even though the number of aritmetic operations per sample is increased we can now sample at the system bandwidth, keeping the number of samples for a full cardiac imaging sector at a minimum. All results in this paper is reported with the use of baseband data.
 
@@ -480,11 +480,11 @@ As shown in Figure \ref{fig:mvbf}, the basic idea of an adaptive beamformer is t
 \label{fig:mvbf}
 \end{figure}
 
-To calculate the Capon beamformer output we need three equations. First the sample covariance matrix has to be estimated,
+To calculate the Capon beamformer output we need three equations. First the sample covariance matrix has to be calculated,
 \begin{align}
 \mat{\breve{R}}[n] = \frac{1}{N_LN_K}\sum_{n'=n-K}^{n+K} \sum_{l=0}^{N_L-1} \vec{x}_l^{\Delta}[n']\vec{x}_l^{\Delta}[n']^H,\label{eq:R}
 \end{align}
-where  $N_K = 2K + 1$ is the number of samples included in time, $N_L = M-L+1$ is the number of subarrays, and $\vec{x}_l^{\Delta}$ is the $l^\text{th}$ subarray $[x_l^{\Delta}[n], \dotso, x_{l+L-1}^{\Delta}[n]]$. Note that the dimension of the covariance matrix is $L \times L$. The covariance matrix is also loaded with a diagonal factor $\epsilon$ to ensure numerical stability, 
+where  $N_K = 2K + 1$ is the number of samples included in time, $N_L = M-L+1$ is the number of subarrays, and $\vec{x}_l^{\Delta}$ is the $l^\text{th}$ subarray $[x_l^{\Delta}[n], \dotso, x_{l+L-1}^{\Delta}[n]]$. Note that the dimension of the covariance matrix is $L \times L$. The covariance matrix is usually loaded with a diagonal factor $\epsilon$ to ensure numerical stability, 
 \begin{align}\label{eq:diag}
 \mat{\hat{R}} = \mat{\breve{R}} + \epsilon\mat{I}.
 \end{align}
@@ -560,56 +560,66 @@ If we analyze the beamformer in (\ref{eq:z_mv}) in combination with (\ref{eq:w})
 The computational complexity of these three steps is $O(L^3)$, $O(L^3)$, and $O(L)$ respectively.
 
 \subsection{Calculating Multiple Sample Covariance Matrices}
-The straightforward sum in (\ref{eq:R}) has complexity $O(L^2N_LN_K) = O(L^3)$ since $N_L$, the number of subarrays, is a function of $L$. This is actually the same as for inverting an $L \times L$ matrix. However little attention has been devoted to this step in the literature before. Note that for a typical array configuration we do more spacial smoothing than temporal smoothing. Hence, $N_K$ is usually small compared to $N_L$. For short subarrays the construction of $\mat{\hat{R}}$ is dominated by the number of elements $M$ ($N_L = M - L + 1$), but since $L$  in most cases is selected to be between $M/4$ and $M/2$, many array elements implies large subarrays.
+The straightforward sum in (\ref{eq:R}) has complexity $O(L^2N_LN_K)$. Note that for a typical array configuration ($M \in [32, 128]$) we do more spacial smoothing than temporal smoothing. Hence, $N_K$ is usually small compared to the number of subarrays ($N_L$). If we let $L = M/\alpha$, $L^2N_L$ becomes $(\alpha - 1)L^3 + L^2$, $\alpha \in [1, M]$. A common choice for $\alpha$ in medical ultrasound imaging is between two and four. In this interval, calculating the sample covariance matrix is cubic with $L$. This is actually the same as for inverting an $L \times L$ matrix. However little attention has been devoted to this step in the literature.
 
-From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all the other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on the subarray length, $L_{max}=32$, since we want to avoid block-to-block synchronization.
+From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all the other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$ \cite{Chen2011}. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on the subarray length, $L_{max}=32$, since we want to avoid block-to-block synchronization.
 
-The quadratic complexity with $L$ and linear complexity with $N_K$ can be reduced by realizing that the calculation in (\ref{eq:R}) overlap both across subarrays and in time. Element $(i,j)$ of $\mat{\hat{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ as
+The cubic complexity with $L$ and linear complexity with $N_K$ can be reduced by realizing that the calculation in (\ref{eq:R}) overlap both across subarrays and in time. Element $(i,j)$ of $\mat{\hat{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ as
 \begin{align}
 \mat{\breve{R}}_{i,j}[n] &=  \mat{\breve{R}}_{i-1,j-1}[n]  + \sum_{n'=n-K}^{n+K} (x_{i+N_L-1}^{\Delta}[n']x_{j+N_L-1}^{\Delta}[n']^* \nonumber \\
  &- x_{i-1}^{\Delta}[n']x_{j-1}^{\Delta}[n']^H) \label{eq:sliding}
 \end{align}
-The same is true in time where
-\begin{align}
-\mat{\breve{R}}[n] &= \mat{\breve{R}}[n-1] + \sum_{l=0}^{N_L-1} (\vec{x}^{\Delta}_l[n+K]\vec{x}^{\Delta}_l[n+K]^H \nonumber \\
-&- \vec{x}^{\Delta}[n-K-1]\vec{x}^{\Delta}[n-K-1]^H).
-\end{align}
+%The same is true in time where
+%\begin{align}
+%\mat{\breve{R}}[n] &= \mat{\breve{R}}[n-1] + \sum_{l=0}^{N_L-1} (\vec{x}^{\Delta}_l[n+K]\vec{x}^{\Delta}_l[n+K]^H \nonumber \\
+%&- \vec{x}^{\Delta}[n-K-1]\vec{x}^{\Delta}[n-K-1]^H).
+%\end{align}
 %- \mat{\breve{R}}[n-K-1] + \mat{\breve{R}}[n-K].
-Both sliding across subarrays and in time can be realized simultaneously if we hold a $N_K$-average in time of the outer products $\vec{x}^{\Delta}[n]\vec{x}^{\Delta}[n]^H$ in memory and calculate $\mat{\hat{R}}$ averaged over subarrays from this buffer. However, since $N_K$ typically is small, and we have a limited amount of memory per thread on the GPU, we have chosen to focus on sliding across subarrays only (\ref{eq:sliding}). In that case, the complexity of calculating $\mat{\hat{R}}$ is reduced to $O(L^2)$. Important to notice is that sliding will break independence in the sliding dimension. With our choice of calculating $\mat{\hat{R}}$, calculations are still independent across time, but not along diagonals in $\mat{\hat{R}}$. We therefore have selected to use one thread per diagonal in the upper triangle of $\mat{\hat{R}}$, and for small $L$s several covariance matrices are calculated per thread block (Figure \ref{fig:gpulayout}). Maximum supported $L$ is with this approach increased to 512, however for small $L$ high $M$ configurations, memory consumption per thread will be to high to achieve full occupancy of the GPU.
+Both sliding across subarrays and in time can be realized simultaneously if we hold a $N_K$-average in time of the outer products $\vec{x}^{\Delta}[n]\vec{x}^{\Delta}[n]^H$ in memory and calculate $\mat{\hat{R}}$ averaged over subarrays from this buffer. However, since $N_K$ typically is small, and we have a limited amount of memory per thread on the GPU, we have chosen to focus on sliding across subarrays only (\ref{eq:sliding}). In that case, the complexity of calculating $\mat{\hat{R}}$ is reduced to $O(L^2)$. Important to notice is that sliding will break independence in the sliding dimension. With our choice of calculating $\mat{\hat{R}}$, calculations are still independent across time, but not along diagonals in $\mat{\hat{R}}$. We have therefore selected to use one thread per diagonal in the upper triangle of $\mat{\hat{R}}$. And for small subarrays, several covariance matrices are calculated per thread block (Figure \ref{fig:gpulayout}). Maximum supported $L$ is with this approach increased to 512, however for small $L$ high $M$ configurations, memory consumption per thread will be to high to achieve full occupancy of the GPU.
 
-Taking symmetry into account, only the upper half of $\mat{\hat{R}}$ needs to be calculated. However, the way we have decided to organize the GPU compute threads per $\mat{\hat{R}}$, the lower triangle can be calculated with little overhead on the GPU. This also means that we do not relay on a upper triangular solver to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$, even if that could have saved some instructions.
+Taking symmetry into account, only the upper half of $\mat{\hat{R}}$ needs to be calculated. However, the way we have decided to organize the GPU compute threads per $\mat{\hat{R}}$, the lower triangle can be calculated with little overhead on the GPU. This also means that we do not rely on a upper triangular solver to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$, even if that could have saved some instructions.
 
 Diagonal loading as a constant value can be added with marginal cost. For the adaptive diagonal loading factor in (\ref{eq:diag}), the trace of $\mat{\hat{R}}$ has to be known before diagonal elements are written back to global memory. Since one row for all covariance matrices is written to global memory per kernel iteration, the diagonal elements need to be held in a local memory until the trace is accumulated. When it is found, scattered writes of the diagonal elements to global memory has to be performed. 
 
 \subsection{Solving Multiple Small Linear Systems}
-In the literature, when it comes to solving systems of linear equations on the GPU the focus has mostly been on large systems. GPU libraries therefore often lack a comprehensive collection of batched solvers. The reason for this is two-fold, first the GPU needs to solve thousands of small systems in order to beat the low memory latency of the CPU, second there is a range of system dimensions that does not fit well with the GPU architecture, where only a small amount of near-core memory and registers are available. Because of this, it has been proven hard to optimize a manageable set of solvers that provides speedups compared with the CPU in every cases. It is therefore not given that solving on the GPU is faster than solving on the CPU in general. However, there is two arguments for doing solving on the GPU. First the CPU, which might already runs a lot of algorithms, is offloaded. Second the transfer of several thousand covariance matrices from CPU-side to GPU-side is spared.
+In the literature, when it comes to solving systems of linear equations on the GPU, focus has mainly been on large systems. GPU libraries therefore often lack a comprehensive collection of batched solvers. The reason for this is two-fold, first the GPU needs to solve thousands of small systems in order to beat the low memory latency of the CPU, second there is a range of system dimensions that does not fit well with the GPU architecture, where only a small amount of near-core memory and registers are available. Because of this, it has been proven hard to optimize a manageable set of solvers that provides speedups compared with the CPU in every cases. It is therefore not given that solving on the GPU is faster than solving on the CPU in general. However, there is two arguments for doing solving on the GPU. First the CPU, which might already runs a lot of algorithms, is offloaded. Second the transfer of several thousand covariance matrices from CPU-side to GPU-side is spared.
 
-For the results presented in this paper, we have used an unreleased GPU implementation of Gauss-Jordan (GJ) elimination (by Nvidia) to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$.
+For the results presented in this paper, we have used an unreleased GPU implementation of batched Gauss-Jordan (GJ) elimination (by Nvidia) to solve $\mat{\hat{R}}\vec{b} = \vec{1}_L$.
 
 \subsection{Compute Beamformer Output}
-To calculate the beamformer output we have implement the formula in (\ref{eq:z_mv}) with one thread per element-weight ($L$ threads per weight vector). After the solution vector $\vec{b}$ has been placed in shared memory, one of the $L$ threads finds the sum of $\vec{b}$. Another option is to let several threads cooperate to form the sum using a binary reduction sum. However, in the following benchmarks the first approach has been used. Each of the $L$ threads then read one element of $\vec{b}$, scale it with the inverse sum just found to get the weight vector $\vec{w}[n]$. 
+The formula in (\ref{eq:z_mv}) has been implemented with one thread per element-weight ($L$ threads per weight vector). After the solution vector $\vec{b}$ has been placed in shared memory, one of the $L$ threads finds the sum of $\vec{b}$. Each of the $L$ threads then read one element of $\vec{b}$, scale it with the inverse sum just found to get the weight vector $\vec{w}[n]$. 
 
 The final output can be formed by either reducing the data down to length $L$ (as shown in (\ref{eq:z_mv})), or by increasing the weight vector to length $M$. Since we have decided to have $L$ threads per output, the data is reduced to length $L$ by letting thread $r$ calculate 
 \begin{align}
 \breve{x}_{r}^{\Delta} = \sum_{k=r}^{r+N_L-1}x_{k}^{\Delta} \text{ for } r \in [0, L-1].
 \end{align}
-Each thread now computes $z_r = w_r^*x_r$, and finally one thread computes and outputs $z = \sum_{r=0}^{L-1} z_r$ to global memory. The last sum can also be performed using a binary reduction sum across several threads for increased speed.
+Each thread now computes $z_r = w_r^*x_r$, and finally one thread computes and outputs $z = \sum_{r=0}^{L-1} z_r$ to global memory.
 
 \begin{figure*}[!t]
 \centerline{\subfloat[]{\includegraphics[width=3.9in]{gfx/benchmark_us_32_lr.png} \label{fig:benchUS32}}
 \hfil
 \subfloat[]{\includegraphics[width=3.9in]{gfx/benchmark_us_64_lr.png}%
 \label{fig:benchUS64}}}
-\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $K \in [0, 1, 2]$. (a) A 32 element array. (b) A 64 element array.}
+\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L \in [1, M/2]$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $K \in [0, 1, 2]$. (a) A 32 element array. (b) A 64 element array.}
 \label{fig:bench}
 \end{figure*}
 
 \section{Benchmarks and Videos}
 Figure \ref{fig:bench} shows the results from benchmarking the described implementation on a Nvidia Quadro 6000 graphics card (14 SMs, and 1 TFlops single precision, 6 GB global memory, and 144 GB/s memory bandwidth). The problem sizes are calculated based on a 32 and 64 elements array with center frequency 2.5 MHz. By assuming a system bandwidth of 80\% we need a sampling frequency of 2 MHz. If we image down to a depth of 15 cm we get approximately 400 samples per range line. To correctly sample a 70 degrees sector with a 64 and 32 elements array ($\lambda/2$ pitch) we need at least 80 and 40 beams respectively. The presented execution times does not include transferring of data from CPU-side to the GPU. What is included is all calculations, memory transfers from global to near-core GPU memory, and near core memory accessing. 
 
-In the attached videos you will find a cardiac loop (add ref to video), and a simulated phantom (add ref to videos) processed with different types of settings given to the Capon beamformer.
+In the attached videos you will find a cardiac loop (add ref to video), and a simulated phantom (add ref to videos) processed with different types of settings given to the Capon beamformer. Cardiac data was acquired using a 64 elements and 3.5 MHz phased array. Simulations was done using a 64 elements and 2.5 MHz phased array. 
 
 \section{Discussion}
+From Figure \ref{fig:benchUS64} we see that for $L = M/2 = 32$ and $K=1$, total execution time is 100 ms (10 fps). Taking into account that we use complex data, but less samples per image, this is similar to the performance reported by Chen et al. \cite{Chen2011}. For the 32 element array in Figure (\ref{fig:benchUS32}), execution time is reduced to 11.5 ms (87 fps) using the same settings ($L=M/2, K = 1$). Doubling this number can be interpreted as pre-beamforming a 64 elements array down to 32. The frame rate for a 64 elements array is then increased from 10 to 44 fps.
+
+A major part of the total running time comes from solving systems of linear equations. Further research should therefore focus on making this contribution smaller. Either by implementing faster solvers, or reducing the sample covariance matrix size in a novel way (cite BS and other low complexity methods?). When doing such a reduction, including the pre-beamforming described above, one should investigate the loss of contrast and resolution compared with full Capon beamforming.
+
+As for now, we have shown that the Capon beamformer can be implemented in a GPU framework. And if we as in \cite{Chen2011} define real-time as 10 fps, all execution times  in Figure (\ref{fig:bench}) are real time. If we on the other hand define real-time as the time it takes to acquire the image. The image formed using a 32 elements array, has a real time requirement of 125 fps. For the 64 elements array real time is 62.5 fps. There is some distance to cover before that goal is reached.
+
+%Do we need more beams? 
+
+% cite field II
+
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
@@ -705,7 +715,7 @@ In the attached videos you will find a cardiac loop (add ref to video), and a si
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-The authors would like to thank Tore Bj\aa{}stad at GE Vingmed Ultrasound for providing cardiac data, and Nvidia for the batched solver written in CUDA. 
+The authors would like to thank Tore Bj\aa{}stad at GE Vingmed Ultrasound for providing cardiac data, and Nvidia for their batched solver written in CUDA. 
 
 
 
