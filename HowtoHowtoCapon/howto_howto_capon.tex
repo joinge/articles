@@ -530,11 +530,11 @@ z[\p] = \w\H[\p]\x[\p] = \bmat{w_0[\p]\\w_1[\p]\\\vdots\\w_{M-1}[\p]}^H \bmat{x_
 \end{align}
 If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. This a conventional beamformer where a weight set that trail off towards the array edges can be used to trade resolution for improved noise suppression, but one always end up with a compromise between the two \cite{Harris1978}.
 
-The \gls{MVDR} beamformer, however, attempts to go beyond the limits of conventional beamforming. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
+In an attempt to go beyond this limit of conventional beamforming, the beamformer may be altered to produce a weightset that is tuned to the impinging wavefield at any time instant $n$. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
 \begin{gather}
 \vec w[\p] = \frac{\Ri[\p]\1}{\1\T\Ri[\p]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[\p]\x\H[\p]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[\p]\x\H[\p]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics\todo{dette gjelder vel først og fremst for US?}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
 
 If we let $x_l[\p]$ represent the datavector from subarray $l$,
 \begin{gather}
@@ -542,21 +542,17 @@ If we let $x_l[\p]$ represent the datavector from subarray $l$,
 \end{gather}
 then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as:
 \begin{gather}
-\eR_\text{s,te}[\p] =  \frac{1}{N_K N_L} \sumb{n'=n-K}{n+K}\sumb{l=0}{M-L} \x_l[\p]\x_l\H[\p] \in\mathbb{C}^{L,L}.\label{spatialR}
+\eR_\text{s,t}[\p] =  \frac{1}{N_K N_L} \sumb{n'=n-K}{n+K}\sumb{l=0}{M-L} \x_l[\p]\x_l\H[\p] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
-where $N_K = 2K+1$ is the number of samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
+where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
 
-\emph{Temporal averaging} can now be introduced by taking the average of $2N_\text{avg}+1$ temporal samples of $\eR_\text{s}[\p]$. Let the result be called $\eR_\text{t,s}[\p]$,
-\begin{gather}
-\eR_\text{t,s}[\p] = \frac{1}{} \sumb{n'=n-N_\text{avg}}{n+N_\text{avg}} \eR_\text{s}[\p'].
-\end{gather}
 To ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[\p]$ to its diagonal~\cite{Synnevag2007}:
 \begin{align}
 \eR[\p] = \eR_\text{t,s}[\p] + \I \cdot \frac{d}{L} \cdot \tr\{\eR_\text{t,s}[\p]\},\label{finalR}
 \end{align}
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ represents the matrix trace operation.
 
-Note how subarray averaging led to a reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This is solved by applying the same weightset on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
+Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This can be solved by applying the same weightset on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
 \begin{align}
 z[\p] = \w\H[\p] \sumb{l=0}{M-L} \x_l[\p].\label{finalZ}
 \end{align}
@@ -574,9 +570,9 @@ z[\p] = \w\H[\p] \sumb{l=0}{M-L} \x_l[\p].\label{finalZ}
 % \end{figure}
 As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each pixel independently, by
 \begin{enumerate}
-\item computing the sample covariance matrix $\eR$ (in \ref{finalR}),
-\item computing $\eRi\1$ (in \ref{weights}), and
-\item computing the beamformer output $z$ (in \ref{finalZ}).
+\item computing the sample covariance matrix $\eR$ in (\ref{finalR}),
+\item computing $\eRi\1$ in (\ref{weights}), and
+\item computing the beamformer output $z$ in (\ref{finalZ}).
 \end{enumerate}
 % This is illustrated in .
 % \begin{figure}[!t]\centering
@@ -586,14 +582,20 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 \subsection{Computational Complexity}
 
-Which of these steps are mainly responsible for the MVDR beamformers complexity? This may not be immediately apparent. From the litterature we may find that computing a simple covariance matrix has a computational complexity of O($M^2$), but in our case this will largely be affected by i.e. the values of $L$ and $K$. Step 2 is also largely affected by the size of $L$, since $\eR$ is a quadratic matrix of size $L$ and inverting will be of O($L^3$). But these are approximate figures, and does not take into account the fact that the underlying data is complex, not whether the algorithms are suited for implementation on paralell hardware.
+When assessing the MVDR beamformer's complexity and mappability to parallel hardware, step 1 and 2 can be easily identified as the most computationally intense. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. What does it all amount to in the end?
+
+To investigate this aspect we have derived exact complexity formulas for each step. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, and with the temporal averaging set to either $K=\{0,1,2\}$ (\ref{mvdr_complexity}). From this it may seem that building $\eR$ should be our main area of We note from this that the inversion step does not seem critical at lower subarray sizes, but should be taken. 
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
 \caption{Per-pixel computational complexity of the steps in MVDR beamforming with no optimizations.}\label{mvdr_complexity}
 \end{figure}
 
-To assess the this aspect, complexity curves were computed for the entire range of possible subarray sizes from $L=1\dots M$. Temporal averaging was set to $K=\{0,1,2\}$, which should cover the range of values used in most applications. Data were assumed to be complex with a rectangular representation, with complex addition corresponding to 2 real additions, and a complex multiplication corresponding to 4 multiplications and 2 additions. The result is shown Fig. \ref{mvdr_complexity} \todo{move to results}. 
+
+, which should cover the range of values used in most applications. Data were assumed to be complex with a rectangular representation, with complex addition corresponding to 2 real additions, and a complex multiplication corresponding to 4 multiplications and 2 additions. The result is shown Fig. \ref{mvdr_complexity} \todo{move to results}.
+
+
+To assess the this aspect,  
 
 We notice that for small subarray sizes, $L$, building the covariance matrix dominates, and the trend is seen even for higher $L$'s. This can partly be attributed to the fact that solving linear equations are light on complex multiplications, while building $\eR$ is not. Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
 
@@ -603,6 +605,7 @@ But these are approximate figures, and does not account for e.g. the fact that t
 
 \section{GPU Implementation}
 
+In light of the compuational challenges just discussed,
 % \begin{itemize}
 % \item Keep delay step on CPU, as this is a common step in all beamforming
 % \item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
