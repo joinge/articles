@@ -584,18 +584,12 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 When assessing the MVDR beamformer's complexity and mappability to parallel hardware, step 1 and 2 can be easily identified as the most computationally intense. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
-To investigate this aspect we derived exact complexity formulas for each step in the MVDR process. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, with temporal averaging assessed with values $K=\{0,1,2\}$ and the number of channels set to $M=\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher.
+To investigate this aspect we derived exact complexity formulas for each step in the MVDR process. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, with temporal averaging assessed with values $K=\{0,1,2\}$ and the number of channels set to $M=\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher. There is also a very notable penalty in performing temporal averaging, but this can be a
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
 \caption{Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic  complexity.}\label{mvdr_complexity}
 \end{figure}
-
-
-, which should cover the range of values used in most applications. Data were assumed to be complex with a rectangular representation, with complex addition corresponding to 2 real additions, and a complex multiplication corresponding to 4 multiplications and 2 additions. The result is shown Fig. \ref{mvdr_complexity} \todo{move to results}.
-
-
-To assess the this aspect,  
 
 We notice that for small subarray sizes, $L$, building the covariance matrix dominates, and the trend is seen even for higher $L$'s. This can partly be attributed to the fact that solving linear equations are light on complex multiplications, while building $\eR$ is not. Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
 
@@ -609,6 +603,10 @@ But these are approximate figures, and does not account for e.g. the fact that t
 % \item Keep delay step on CPU, as this is a common step in all beamforming
 % \item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
 % \end{itemize}
+
+An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently. Considering that sonar images often size up in the order of Mpixels, this makes a compelling case for investigating technologies that support massive data parallelism. Perhaps the prominent technology in this application domain is the Graphics Processing Unit (GPU). These are chips 
+
+A GPU fundamentally differs from 
 
 In order to create an efficient implementation suited for the GPU, we first need to understand its inherent potential and limitations. Our implementation was targeted towards the nVidia GeForce GTX 480, so we will use this chip as an example. Using nVidias own terminology, it is comprised of 15 ``streaming'' multiprocessors (SMs), each having having 32 CUDA\todo{make sure CUDA is introduced} cores that execute a common program called a kernel. This adds to a total of 480 CUDA cores, which compared to CPU cores are simple and with modest computing capabilities, but combined offers vast floating point performance. That is, if we can keep them all busy most of the time. %This is referred to as a single-program, multiple-data (SPMD) architecture\todo{malplaced}.
 
