@@ -1,0 +1,92 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{Documentation FFI Sonar Simulator}
+\author{Jo Inge Buskenes and Jon Petter \AA{}sen}
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\maketitle
+
+\section{Loading 3D Models}
+
+Describe how models should be loaded. Framework and formate etc.
+
+\section{Calculation by Rasterization}
+\subsection{From 3D Models to Rasterized Points}\label{sec:modelsToPoints}
+The 3D models and sea floor has to be rasterized on to a view plane in order to calculate output intensity using CUDA.
+
+We plan to use openGL to construct depth and reflection coefficient buffers at each along-track position. For this we need to set up a camera in a scene that mimic the sonar array imaging objects on a sea floor. The output from this step is a depth and a reflection coefficient buffer for each along-track position. Investigation has to be done to see if information is redundant along the track. We might also need to calculate per-pixel normals for use in the next step.
+
+\subsection{Calculating Intensity}\label{sec:calcIntensity}
+For each pixel, load normal, range, and reflection coefficient. Calculating the contribution from this location is then done by calculating the reciprocal doubled range, and weight it with the reflection coefficient and the normal component towards the along-track position. Saving these calculations to a buffer, we can now find the slant-range pixel by summing all values closer than half the sampling distance for the given slant-range value.
+
+\subsection{Parallel Design Pattern for the GPU}
+It is natural that we loop over along-track positions. At each position we generate the listed buffers in Section \ref{sec:modelsToPoints} and holds them in GPU memory. The buffers is then fed to a custom CUDA kernel that calculates the reflected intensity per buffer location. All buffers should be placed in texture memory so that resolution can be adjusted at any step. If we render each buffer listed in Section \ref{sec:modelsToPoints} at resolution $M \times N$, the step in Section \ref{sec:calcIntensity} can easily be rendered at $2M \times 2N$ by interpolation. Finally we arrive to what is believed to be the less parallel part of this approach, the sum operation. A kernel has to be launched that for each slant-range accumulates the total contribution in the given intensity buffer. We might want to use a library kernel for this if it exist. If we are going to code this step, one idea could be as follow: Assign a region to a block of treads, find min and max, and let one thread search for one ore more slant-range values\footnote{Need to do some more thinking here}.
+
+\subsection{Concluding Remarks}
+Uses a lot of memory, many calculations. Flexible. Will support point-based objects and sea floor out of the box. 
+
+\section{Geometric Calculation of Output Intensity}
+Inspired by the Field II ultrasound simulator, where array responses are found by considering geometry, the same concept can be used for reflection off object geometry. Geometry in our case can be viewed as arrays, where the emitted energy is reflected energy from a point source at the along-track position.
+
+Given a list of triangle patches, were the three corners of each triangle has a corresponding reflection coefficient, normal and position/depth, the reflection intensity can be found by simple geometric considerations. First we should sort triangles in depth, so that GPU-threads in a block, process vertices that are close to each other in range. This to maximize throughput of writing to global memory. One thread loads a triangle and iterates from min to max depth using the slant-range sampling distance as step length. For each step the thread calculates the intersection between the triangle and a sphere with radius given by the current depth. The intersection length is weighted with both the reciprocal depth, the reflection coefficient and the triangle normal \footnote{We should only use triangles with equal normals in each corner. Hence they are all equal to the average triangle normal. Might not be compliant.}.
+
+\subsection{Concluding Remarks}
+Uses little memory, few calculations. Will not support point-based objects and sea floor out of the box. 
+
+
+\end{document}
