@@ -584,18 +584,19 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 When assessing the MVDR beamformer's complexity and mappability to parallel hardware, step 1 and 2 can be easily identified as the most computationally intense. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
-To investigate this aspect we derived exact complexity formulas for each step in the MVDR process. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, with temporal averaging assessed with values $K=\{0,1,2\}$ and the number of channels set to $M=\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher. There is also a very notable penalty in performing temporal averaging, but this can be a
+To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, with temporal averaging assessed with values $K=\{0,1,2\}$ and the number of channels set to $M=\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}.
+
+Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher. Also notice how temporal averaging comes with a high computational penalty. This can partly be attributed to the fact that building $\eR$ is is heavy on complex multiplications, and a lot of these are repeated unneccessary.
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
 \caption{Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic  complexity.}\label{mvdr_complexity}
 \end{figure}
 
-We notice that for small subarray sizes, $L$, building the covariance matrix dominates, and the trend is seen even for higher $L$'s. This can partly be attributed to the fact that solving linear equations are light on complex multiplications, while building $\eR$ is not. Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
 
-and does not take into that does not  feasibility parallel decomposition  memory consumption.
+Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
 
-But these are approximate figures, and does not account for e.g. the fact that the underlying data is complex.
+% and does not take into that does not  feasibility parallel decomposition  memory consumption.
 
 \section{GPU Implementation}
 
