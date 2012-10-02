@@ -540,7 +540,7 @@ If we let $x_l[\p]$ represent the datavector from subarray $l$,
 \begin{gather}
 \x_l[\p] = \bmat{x_l[\p] & x_{l+1}[\p] & \dots & x_{l+L-1}[\p]}\T,
 \end{gather}
-then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as:
+then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as\todo{this is not working. need to have n as variable}:
 \begin{gather}
 \eR_\text{s,t}[\p] =  \frac{1}{N_K N_L} \sumb{n'=n-K}{n+K}\sumb{l=0}{M-L} \x_l[\p]\x_l\H[\p] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
@@ -584,55 +584,53 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 When assessing the MVDR beamformer's complexity and mappability to parallel hardware, step 1 and 2 can be easily identified as the most computationally intense. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
-To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L=1\dots M$, with temporal averaging assessed with values $K=\{0,1,2\}$ and the number of channels set to $M=\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}.
+To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}.
 
 Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher. Also notice how temporal averaging comes with a high computational penalty. This can partly be attributed to the fact that building $\eR$ is is heavy on complex multiplications, and a lot of these are repeated unneccessary.
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
-\caption{Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic  complexity.}\label{mvdr_complexity}
+\caption{Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic complexity, especially with temporal averaging.}\label{mvdr_complexity}
 \end{figure}
 
+% Not corrected for fused multiply accumulate
 
-Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
+% Also, the need for partial pivoting has been ignored, as we ensure a numerically well conditioned $\eR$ by applying diagonal loading. Since this is the most common scenario, we will have a thorough look at how it can be optimized.
 
 % and does not take into that does not  feasibility parallel decomposition  memory consumption.
 
-\section{GPU Implementation}
+\section{Mapping the MVDR to a GPU}
 
 % \begin{itemize}
 % \item Keep delay step on CPU, as this is a common step in all beamforming
 % \item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
 % \end{itemize}
 
-An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently. Considering that sonar images often size up in the order of Mpixels, this makes a compelling case for investigating technologies that support massive data parallelism. Perhaps the prominent technology in this application domain is the Graphics Processing Unit (GPU). These are chips 
+An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Considering that sonar images often end up having millions of pixels, this makes a compelling case for investigating technologies that support massive data level parallelism. The technology that does this best is perhaps Graphics Processing Units (GPUs). These chips contain up to thousands of small computation cores, which combined deliver superior peak floating point performance compared multi-core systems such as CPUs.
 
-A GPU fundamentally differs from 
+Due to the simple reason of availability we have targeted the nVidia GeForce GTX 480 in our study. This is by now a three generation old high-end Compute Unified Device Architecture (CUDA) enabled device from nVidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using nVidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. Instead we aim to investigate how to efficiently map the MVDR beamformer to the GeForce GTX 480.
 
-In order to create an efficient implementation suited for the GPU, we first need to understand its inherent potential and limitations. Our implementation was targeted towards the nVidia GeForce GTX 480, so we will use this chip as an example. Using nVidias own terminology, it is comprised of 15 ``streaming'' multiprocessors (SMs), each having having 32 CUDA\todo{make sure CUDA is introduced} cores that execute a common program called a kernel. This adds to a total of 480 CUDA cores, which compared to CPU cores are simple and with modest computing capabilities, but combined offers vast floating point performance. That is, if we can keep them all busy most of the time. %This is referred to as a single-program, multiple-data (SPMD) architecture\todo{malplaced}.
+Using nVidias own terminology, the GeForce GTX 480 is comprised of 15 ``streaming'' multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. That make for a total of 480 CUDA cores which we need to keep busy if we want to harness the full potential. This is achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. The best way to do this is completely different for each step in the MVDR process, so we will launch a different kernel and configuration for each of them. 
 
-Whether we are successful in keeping all cores busy depends on a few critial factors. First, a sufficient level of data parallelism is required to ustbe inherent in the algorithm to balance the load evenly on all computing cores, whether sufficiently fast memory can be used to avoid waiting for memory transfers, and whether  and as whether the algorithm can be decomposed into smaller subtasks of similar computational burden that can be evenly distributed onto the different cores.  
-In attempting to keep all cores busy, we will be facing a few challenges. In general, we need to expose a sufficient level of parallelism For one, the algorithm must be The first is to properly 
-To make sure all cores stay busy, we first aim to decompose the MVDR algorithm into equally heavy subtasks that 
+% To effectively harness the computing potential of a GPU we need to make sure all computing cores stays busy most of the time. 
 
-Keeping such a large number of computing cores busy can prove a challenge, and 
+% Memory latency can be hidden in two ways. One is to keep a lot of threads queued up on each SM at all times, such that when some threads perform memory operations other threads can be scheduled to run instead. This is referred to as data level parallelism (DLP). Alternatively, or preferrably in addition, the designer may promote instruction level parallelism (ILP) by letting subsequent instructions in a thread be independent. While ILP can be very effective when done correctly, DLP is generally simpler to design for.
+% 
+% In the CUDA framework, the threads on an SM is managed through a software abstraction call a compute block. The block is a 3 dimensional grid where each element correspond to a thread that is scheduled to be executed on the SM at some point.
 
-To be able to keep all cores busy, and hence harness the full potential of the GPU, we must be aware of a few constraining factors. First, the algorithm must be decomposed into tasks
-The apparent challenge, however, is to effectively harness the computing potential of all these cores. First, a sufficient level of parallelism must be exposed in the
+% load balancing
+% - distribute load - optimize symmetry
+% - avoid branching
+% 
+% memory latency hiding
+% - make threads use high bandwidth memory
+% - hide latency with dlp, ilp, or both
+% 
+% thread sync hiding
+% - queue blocks up on an sm
 
-The first thing to note about designing for an architecture with this fine level of parallelism, is that 
+%This is referred to as a single-program, multiple-data (SPMD) architecture\todo{malplaced}.
 
-So when can we benefit from using GPUs? When we are able to keep most of the computing cores busy at all times. This involves finding a way of balancing the computational load evenly over all cores, and to find ways to hide memory latency. % keep synchronization threads at a minimum, and 
-
-Memory latency can be hidden in two ways. One is to keep a lot of threads queued up on each SM at all times, such that when some threads perform memory operations other threads can be scheduled to run instead. This is referred to as data level parallelism (DLP). Alternatively, or preferrably in addition, the designer may promote instruction level parallelism (ILP) by letting subsequent instructions in a thread be independent. While ILP can be very effective when done correctly, DLP is generally simpler to design for.
-
-In the CUDA framework, the threads on an SM is managed through a software abstraction call a compute block. The block is a 3 dimensional grid where each element correspond to a thread that is scheduled to be executed on the SM at some point.
-
-Expose as much parallelism as possible and map this to the hardware architecture in an efficient manner. 
-
-Balance load
-Make sure cores stay busy by hiding memory latency and thread synchronization blocks. 
-Use fast memories to avoid 
  %An SM is a single-program multiple-data (SPMD) processor, meaning that all the CUDA cores on an instruction unit, L1 cache and registers is shared by all the CUDA cores on that SM.  %
 % GPUs, on the other hand, does not attempt to do ILP, but use all available transistors to support massive DLP. This leads to designs such as the nNvidia GeForce GTX 580. 
 % each with 48kB of L1 cache (shared memory) and 128kB of register memory.
@@ -640,30 +638,37 @@ Use fast memories to avoid
 % -bank conflicts when L > 32. not treated.
 
 
-\subsection{Optimize Estimation the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
+\subsection{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
 
-To get a better idea of the process of forming the convariance matrix, and how we can improve it,  consider a case with $M=6$ sensors that are grouped into subarrays of length $L=3$ where all but one element overlap. %(\ref{spatialR}-\ref{finalR})
-The spatial covariance matrix for all $M$ channels at time instant $n$ is then given as:
-\begin{figure}[H]
-\includegraphics[width=\linewidth]{gfx/capon_build_R_full.eps}
+% As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
+
+As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is very compuationally complex. Furtunately, we can dramatically improve matters by performing arithmetic optimizations. As illustrated illustrated in Fig. \ref{mvdr_build_R}, we do not 
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
+\caption{Step 1: Building $\eR$. This is an example of how we would build $\eR$ in a case with $M=5$ sensors, with subarray size $L=3$ and temporal averaging set to $K=1$. $\eR_{l}$ is the sample covariance matrix for the $l$'th subarray, and $\eR_s$ is the average of all these.}\label{mvdr_build_R}
 \end{figure}
+
+
+
+% However, an advantage with this approach is that the summations can be carried out in any order, and hence this form exhibits great deal of parallelism. Can we optimize the algorithm without sacrificing parallelism?
+
+Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. These two memory types have the sufficient bandwidth to promote maximum utilisatin of all CUDA cores. Unfortunately, they are a sparse resource. The GTX 480 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}, the equivalent of 12k and 32k complex numbers stored with single precision, respectively. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. Divide the SM memory on these, and each thread can store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} complex numbers in shared memory.
+
+Let us start with the order of summations. Is it better to perform temporal averaging and then spatial averaging, or the other way around? 
+
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
-\caption{Per-pixel computational complexity of the steps in MVDR beamforming with no optimizations.}
+\caption{Per-pixel computational complexity of the steps in MVDR beamforming with no optimizations.} 
 \label{implementation}
 \end{figure}
-where $r_{ij} = x_i[\p]x_j^*[\p]$, and $\eR_{l}$ is the covariance matrix for the $l$'th subarray. Since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only need to compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
+
+Avoid keeping data in memory.
+
+
+
+ Furthermore, since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only need to compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
 {\renewcommand*{\arraystretch}{1.8}
-\begin{align*}
-\hat{\mat R}_\text{s} &= \color{Blue}\eR_1 + \eR_2 + \eR_3 + \eR_4 \\
-&= \left[\;
-\begin{matrix}
-\color{Green}r_{00}+r_{11}+r_{22} & \color{Red}r_{01}+r_{12}+r_{23} & r_{02}+r_{13}+r_{24} \\
-                                       & \color{Green}r_{11}+r_{22}+r_{33} & \color{Red}r_{12}+r_{23}+r_{34} \\
-                                       &                                        & \color{Green}r_{22}+r_{33}+r_{44}
-\end{matrix}
-\;\right]
-\end{align*}}%
+
 Note that consecutive elements along the diagonals overlap on all but one covariance coefficient. Hence, if $L$ is small compared to $M$, many arithmetical operations may be saved by implementing a sliding window here. Do note, however, that this introduces data dependencies in the diagonal sums, and is only a feasible approach if we launch computing threads along those diagonals. The final step, temporal averaging, is simply carried out in a straight forward fashion:
 \begin{align*}
 \eR_\text{s,t}[n] &= \eR_\text{s}[n-1] + \eR_\text{s}[n] + \eR_\text{s}[n+1]
@@ -671,13 +676,14 @@ Note that consecutive elements along the diagonals overlap on all but one covari
 Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption.
 
 
+
+
+
+
+
+
 % - Order of summations - beamspace capable
 
-
-
-
-% Because each pixel in the image can be processed independently, the \gls{MVDR} beamformer is well suited for parallel acceleration. However, there are some inherent drawbacks with such a design: Each core is left with a rather limited amount of local memory, and distributing data to the computing cores and collecting the result is a process with some inherent latency.
-% 
 % This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 % 
 % \begin{enumerate}
@@ -688,11 +694,7 @@ Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less in
 % 
 % In this paper we have targeted an nVidia \gls{GPU} using the C interface to nVidia's \gls{CUDA} framework~\cite{NvidiaCuda}.
 % 
-% 
-% 
-% 
-% To understand how 
-% 
+
 % \begin{itemize}
 % \item Arrange order of summations to reduce data dimensions as early as possible.
 % \item Compute R full with time averaging, then subarray averaging. Rfull is banded symmetric.
@@ -701,6 +703,7 @@ Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less in
 % \end{itemize}
 % 
 % 
+% However, not all algorithms map well to this fine level of parallelism, so how about the MVDR beamformer?
 % 
 % \begin{itemize}
 % \item Switching summations. Sum of covariance coefficients in two dimensions.
