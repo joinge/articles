@@ -110,7 +110,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
    \addtolength\marginparwidthsmall{-7pt}
    \newcommand\todo[1]{%
       \addtocounter{todoidx}{1}%
-      {\color{Red}\fbox{\bf\thetodoidx{}}}%
+      {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
       \marginpar{%
          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
          \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\scriptsize #1}}}}
@@ -304,10 +304,10 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 \begin{document}
 
-\title{Optimal GPU Implementation of the MVDR beamformer for Active Sonar Imaing}
+\title{An Optimal GPU Implementation of the MVDR beamformer for Active Sonar Imaing}
 
 \author{Jo~Inge~Buskenes, %
-        Jon~Petter~Aasen, %
+        Jon~Petter~$\overset{\tiny_{\boldsymbol{\circ}}}{\text{A}}$sen, % The Norwegian letter Å was not recognized by latex
         Carl-Inge~Colombo~Nilsen, %
         Andreas~Austeng%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
@@ -331,7 +331,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
+% Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
 
 The Minimum Variance (MV) adaptive beamformer has recently been introduced in active sonar imaging. While displaying great potential for creating high quality images, it is computationally intensive and relies on robustification. These are important reasons why the MV beamformer is not in widespread use today.
 
@@ -482,17 +482,17 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % 
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
-Data adaptive methods has been reported to improve image quality in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been shown to produce images with improved constrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{}, and passive sonar . Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+Data adaptive methods have been reported to improve image quality in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been shown to produce images with improved constrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{}, and passive sonar . Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 However, despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and will suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while conventional beamformers are at O($M$).
 
-We target the complexity issue by investigating the feasibility of accelerating the MVDR method using Graphics Processing Units (GPUs). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize FLOPS while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return there are up to thousands of them. 
+The robustness issue may be solved through means such as temporal and spatial averaging, and regularisation. We will show that by exploiting symmetry and avoiding unnecessary computations, the mentioned techniques will aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}. 
 
-Furthermore, we discuss ways to reduce the computational complexity of the MVDR, and show that implementing the robustification techniques actually help in this respect. Our implementation handles complex basebanded data, and supports several common robustification techniques, such as temporal and spatial averaging, and regularisation.
+Furthermore, we investigate the feasibility of accelerating the MVDR method using Graphics Processing Units (GPUs). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize FLOPS while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them. 
 
 Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. \todo{improve}
 
-This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details on our MVDR method. Then we,  as a general concept, and describe the 
+This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{...}
 
 %  Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
 
@@ -510,7 +510,6 @@ This article is outlined as follows. First, we will introduce the concept of ada
 
 Consider a sonar imaging scenario where an encoded signal is transmitted to highlight a surface of interest, and the reflected wavefield is sampled using a receiver array. An image is then formed in the post-processing by coherently combining the receiver outputs to focus at one pixel at the time. The principle of adjusting the arrays focus is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
-In conventional beamforming the array sensors are assigned a static set of weights. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two. Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield. In other words, we exploit the a priori knowledge in the data to improve image quality.
 
 \subsection{Beamforming}
 
@@ -519,42 +518,41 @@ In conventional beamforming the array sensors are assigned a static set of weigh
 \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - prior to summation - a suitable set of delays and weights are applied to focus on a pixel of interest.}\label{beamforming}
 \end{figure}
 
-
-Consider an $M$ element phased array recording a narrow-band wavefield, and assume that the signal signature has been removed by a matched filter. Let $n$'th sample of the $m$'th channel be represented as $y_m[n]$, and the accompanying weights and delays be  $w_m[\p]$ and $\Delta_m[\p]$ for pixel $\p$ (Fig. \ref{beamforming}). Further let $x_m[\p]$ describe sample $y_m[n]$ delayed by $\Delta_m[\p]$:
+Consider an $M$ element phased array recording a narrow-band wavefield, and assume that the signal signature has been removed by a matched filter. Let the $n$'th sample of the $m$'th channel be represented as $y_m[n]$, and the accompanying weights and delays be $w_m[n]$ and $\Delta_m[n]$ for pixel $\p=[\theta,n]$ (Fig. \ref{beamforming}). $w_n$ and $\Delta_m$ also depend on the on the azimuth angle $\theta$, but this dependence is made implicit to simplify the upcoming notation. Further let $x_m[n]$ describe sample $y_m[n]$ delayed by $\Delta_m[n]$:
 \begin{align}
-x_m[\p] = y_m[n-\Delta_m[\p]].
+x_m[n] = y_m[n-\Delta_m[n]].
 \end{align}
-The beamformer output $z[\p]$ is then defined as the weighted sum of all the delayed data samples:
+The beamformer output $z[n]$ is then defined as the weighted sum of all the delayed data samples:
 \begin{align}
-z[\p] = \w\H[\p]\x[\p] = \bmat{w_0[\p]\\w_1[\p]\\\vdots\\w_{M-1}[\p]}^H \bmat{x_0[\p]\\x_1[\p]\\\vdots\\x_{M-1}[\p]}.\label{z}
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.\label{z}
 \end{align}
-If the weights in (\ref{z}) were static, this would be referred to as the \gls{DAS} beamformer. This a conventional beamformer where a weight set that trail off towards the array edges can be used to trade resolution for improved noise suppression, but one always end up with a compromise between the two \cite{Harris1978}.
+If the weights in (\ref{z}) were static, this would be referred to as the conventional delay-and-dum (DAS) beamformer. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
-In an attempt to go beyond this limit of conventional beamforming, the beamformer may be altered to produce a weightset that is tuned to the impinging wavefield at any time instant $n$. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
+Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data could be exploited to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
 \begin{gather}
-\vec w[\p] = \frac{\Ri[\p]\1}{\1\T\Ri[\p]\1},\label{weights}
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[\p]\x\H[\p]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics\todo{dette gjelder vel først og fremst for US?}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to obtain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
 
-If we let $x_l[\p]$ represent the datavector from subarray $l$,
+If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
-\x_l[\p] = \bmat{x_l[\p] & x_{l+1}[\p] & \dots & x_{l+L-1}[\p]}\T,
+\x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
 \end{gather}
 then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as\todo{this is not working. need to have n as variable}:
 \begin{gather}
-\eR_\text{s,t}[\p] =  \frac{1}{N_K N_L} \sumb{n'=n-K}{n+K}\sumb{l=0}{M-L} \x_l[\p]\x_l\H[\p] \in\mathbb{C}^{L,L},\label{spatialR}
+\eR_\text{s,t}[n] =  \frac{1}{N_K N_L} \sumb{n'=n-K}{n+K}\sumb{l=0}{M-L} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
 
-To ensure a well conditioned sample covariance matrix, we add a fraction $d$ of the total power of $\eR_\text{t,s}[\p]$ to its diagonal~\cite{Synnevag2007}:
+To further improve robustness, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal~\cite{Synnevag2007}:
 \begin{align}
-\eR[\p] = \eR_\text{t,s}[\p] + \I \frac{d}{L} \tr\{\eR_\text{t,s}[\p]\},\label{finalR}
+\eR[n] = \eR_\text{t,s}[n] + \I \frac{d}{L} \tr\{\eR_\text{t,s}[n]\},\label{finalR}
 \end{align}
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ represents the matrix trace operation.
 
-Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This is solved by applying the same weightset on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
-\begin{align}
-z[\p] = \w\H[\p] \sumb{l=0}{M-L} \x_l[\p].\label{finalZ}
+Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This weightset is then applied to on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
+\begin{align}s
+z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/implementation.eps}
@@ -584,9 +582,9 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 When assessing the MVDR beamformer's complexity and mappability to parallel hardware, step 1 and 2 can be easily identified as the most computationally intense. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
-To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$. The results are shown in Fig. \ref{mvdr_complexity}.
+To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$.
 
-Note how the computation of $\eR$ completely dominates at smaller subarray sizes, and that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher. Also notice how temporal averaging comes with a high computational penalty. This can partly be attributed to the fact that building $\eR$ is is heavy on complex multiplications, and a lot of these are repeated unneccessary.
+The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of $\eR$ completely dominates at smaller subarray sizes, that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher, and that the computation of $z$ has a neglible impact. Also notice how temporal averaging comes with a high computational penalty. This can partly be attributed to the fact that building $\eR$ is is heavy on complex multiplications, and a lot of these are repeated unneccessary.
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
@@ -599,6 +597,8 @@ Note how the computation of $\eR$ completely dominates at smaller subarray sizes
 
 % and does not take into that does not  feasibility parallel decomposition  memory consumption.
 
+
+
 \section{Mapping the MVDR to a GPU}
 
 % \begin{itemize}
@@ -608,9 +608,20 @@ Note how the computation of $\eR$ completely dominates at smaller subarray sizes
 
 An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Considering that sonar images often end up having millions of pixels, this makes a compelling case for investigating technologies that support massive data level parallelism. The technology that does this best is perhaps Graphics Processing Units (GPUs). These chips contain up to thousands of small computation cores, which combined deliver superior peak floating point performance compared multi-core systems such as CPUs.
 
-Due to the simple reason of availability we have targeted the nVidia GeForce GTX 480 in our study. This is by now a three generation old high-end Compute Unified Device Architecture (CUDA) enabled device from nVidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using nVidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. Instead we aim to investigate how to efficiently map the MVDR beamformer to the GeForce GTX 480.
+Due to the simple reason of availability we have targeted the Nvidia GeForce Quadro 6000 in our study. This is by now a three generation old\todo{check this} high-end Compute Unified Device Architecture (CUDA) enabled device from Nvidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using Nvidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. Instead we aim to investigate how to efficiently map the MVDR beamformer to the GeForce GTX 480.
 
-Using nVidias own terminology, the GeForce GTX 480 is comprised of 15 ``streaming'' multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. That make for a total of 480 CUDA cores which we need to keep busy if we want to harness the full potential. This is achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. The best way to do this is completely different for each step in the MVDR process, so we will launch a different kernel and configuration for each of them. 
+Using Nvidias own terminology, the Quadro 6000 is comprised of 14 ``streaming'' multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. This is achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. The best way to do this is completely different for each step in the MVDR process, so we will launch a different kernel and configuration for each of them. 
+
+\todo{Another shitty GPU transition}
+Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. Only these two memory types have a high enough bandwidth to promote sustained maximum utilisation of all CUDA cores. Unfortunately, they are a sparse resource. The Quadro 6000 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. This leaves us with the constraint that each thread should store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers.
+
+This makes it apparent that computing one pixel per thread is not a feasible solution. \todo{...}
+
+% follow collective access patterns to memory.
+
+% At first glance, it might seem like a good idea to compute one pixel per CUDA core. Each pixel is computed using the same instructions, and without any exchange of data. However, this approach is unfeasible due to the limited cache and register memory available to each thread. One could resolve to using the slower GDDR5 memory, but this would largely mitigate the performance gain and defeat the purpose of using a GPU in the first place.
+
+%Bandwidth becomes crucial, as getting data in to the cores and out again must happen i a frantic pace. %the feeding all these cores with data and harvesting the result
 
 % To effectively harness the computing potential of a GPU we need to make sure all computing cores stays busy most of the time. 
 
@@ -636,13 +647,41 @@ Using nVidias own terminology, the GeForce GTX 480 is comprised of 15 ``streamin
 % each with 48kB of L1 cache (shared memory) and 128kB of register memory.
 
 % -bank conflicts when L > 32. not treated.
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
+\caption{Step 1: Building $\eR$. This is a visualization of how $\eR$ could be built in a case with $M=5$ sensors, with subarray size $L=3$ and temporal averaging set to $K=1$. Here $\eR_{l}$ is the sample covariance matrix for the $l$'th subarray, and $\eR_s$ is the average of all these. Note that instead of performing the temporal sum last as here, one could take more temporal samples into consideration in the computation of each $r_{ij}$.}\label{mvdr_build_R}
+\end{figure}
 
 
 \subsection{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
 
 % As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
 
-As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is very compuationally complex. Furtunately, we can dramatically improve matters by performing arithmetic optimizations. As illustrated illustrated in Fig. \ref{mvdr_build_R}, we can exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it, we can avoid unneccessary multiplications, and the spatial sum can be implemented in a sliding window fashion. The order of summations will also play a role here.
+
+As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is very computationally complex. Furtunately, we can dramatically improve matters by performing arithmetic optimizations. As illustrated illustrated in Fig. \ref{mvdr_build_R},
+we can exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it, we can avoid unnecessary multiplications, and the spatial sum can be implemented in a sliding window fashion (iterative summing). Moreover, the order of the temporal or spatial sum also play a role here.
+
+Which solution is best\todo{introduce them}? We assessed this by comparing each solutions individual complexity\todo{per pixel} to the reference implementation in Fig. \ref{mvdr_complexity} and (\ref{spatialR}). The result is shown in Fig. \ref{mvdr_build_R}\todo{figure is cropped}. Note\todo{overused} how the optimizations truly makes a difference, especially at lower subarray sizes and when using temporal averaging. As expected, the recursive solution proved an overall winner \todo{don't just say it, let it be evident}. 
+
+What about the GPU implementation? This one was tricky. Balance load, avoid inter-thread dependencies when performing iterative summations, keep thread memory consumption at a minimum, and promote collective access patterns (coalesced reads/writes) to global memory.
+
+Have a look at Fig. \ref{mvdr_implementation} to get an idea of what we did. Basically, we compute one row in in $\eR$ at a time, where each thread is assigned to each their diagonal. On the top row a full computation is carried out, then that entire row is saved back to global memory. Then this is repeated for each of the remaining elements on the diagonals, except now the computations are based on iterative summing\todo{mention multiplications}. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Due to the symmetry conditions the initial value is obtained by simply performing a complex conjugate copy of the relevant value in the first row.
+
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
+\caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity (higher is better). The reference is at 1(TODO: show it!) } 
+\label{implementation}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{gfx/mvdr_implementation.eps}
+\caption{MVDR implementation.}\label{mvdr_implementation}
+\end{figure}
+
+% Avoid keeping data in memory.
+
+
 
 % Furthermore, since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only need to compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
 % {\renewcommand*{\arraystretch}{1.8}
@@ -653,24 +692,13 @@ As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spati
 % \end{align*}%
 % Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption.
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
-\caption{Step 1: Building $\eR$. This is an example of how we would build $\eR$ in a case with $M=5$ sensors, with subarray size $L=3$ and temporal averaging set to $K=1$. $\eR_{l}$ is the sample covariance matrix for the $l$'th subarray, and $\eR_s$ is the average of all these.}\label{mvdr_build_R}
-\end{figure}
+
 
 % However, an advantage with this approach is that the summations can be carried out in any order, and hence this form exhibits great deal of parallelism. Can we optimize the algorithm without sacrificing parallelism?
 
-Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. These two memory types have the sufficient bandwidth to promote maximum utilisatin of all CUDA cores. Unfortunately, they are a sparse resource. The GTX 480 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}, the equivalent of 12k and 32k complex numbers stored with single precision, respectively. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. Divide the SM memory on these, and each thread can store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}.
 
-This makes it apparent that computing one pixel per thread is not a feasible solution. More pixels need to cooperate in building $\eR$. An idea of how this can  We need to decompose the steps illustrated in Fig. \ref{mvdr_build_R} into independent tasks that can be computed by 
 
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
-\caption{Per-pixel computational complexity of the steps in MVDR beamforming with no optimizations.} 
-\label{implementation}
-\end{figure}
 
-Avoid keeping data in memory.
 
 
 
@@ -678,9 +706,6 @@ Avoid keeping data in memory.
 
 % This suggests that the algorithm should be decomposed into as many lightweight threads as possible, which are both computationally intensive and light on the memory access and consumption. However, for a typical array configuration, using a single thread per pixel is not lightweight enough. Therefore, the methods presented section \ref{methods} had to be decomposed further. In particular, the solutions we came up with for the different steps in the algorithm, listed in their natural order of execution, was:
 % 
-% \begin{enumerate}
-% \item \emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
-% \end{enumerate}
 % 
 % In the upcoming results, we have beamformed pre-delayed data. This is a large dataset, and the latency experienced when copying it from the \gls{CPU} side to the \gls{GPU} was significant. However, in a practical system only the channel data should be transferred as the delaying of data can effortlessly be performed by the \gls{GPU}. The remaining latency can be hidden as long as the \gls{GPU} is kept busy, hence the data transfer times will not be reported in the upcoming results.
 % 
@@ -724,54 +749,35 @@ Avoid keeping data in memory.
 \cite{Owens2007} \cite{Lee2010}
 
 
-
-
 \subsection{Solving $\hat{\boldsymbol{R}}$$\,\!^{-1}$$\mathbf{1}$}
 
-There are essentially two ways to solve the linear equation $\eRi\1$. One is to first invert the matrix $\eR$, then perform the inner product with $\1$. The other is to solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, in which case we arrive at the solution $\boldsymbol{b}  = \eRi\1$ directly. Other than that, both operations are cubic with the size of $\eR$, O($L^3$), and 
+There are essentially two ways to solve the linear equation $\eRi\1$. One is to first invert the matrix $\eR$, then perform the inner product with $\1$. The other is to solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, in which case we arrive at the solution $\boldsymbol{b} = \eRi\1$ directly. In short, both operations are cubic with the size of $\eR$, O($L^3$), but solving the linear equation is slightly less computationally complex\todo{elaborate?}.  
+
+Because of this, we went searching for a decent linear equation solver. However, our problem is slightly different from the problem most existing solver libraries deal with. While these are generally concerned with solving a few large linear algebra systems, we needed to solve a large number of very small ones.
+
+Fortunately, Nvidia has recently released a Gauss Jordan solver that can take a batch of small linear systems as input and process these in one go. The solver is complete with support for partial pivoting and complex numbers. The only downside to using it in our application is that it does not exploit the symmetry properties of our sample covariance matrix. A better choice would be a Cholesky solver, which is designed for Hermitian positive semi-definite matrices and is expected to offer roughly a factor 2 speedup over the Gauss Jordan one.
+
+% \emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
 
 
-Using a Gauss Jordan solver with partial pivoting,
-Creating a covariance matrix exhibits hermitian positive-semidefinite matrix.
+\subsection{Computing $z$}
 
-\emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
+=== THIS SECTION IS RUBBISH ===
 
+\emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
 
-
-
-\subsection{Computing $\hat{\boldsymbol{R}}$}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{gfx/mvdr_implementation.eps}
-\caption{MVDR implementation.}\label{mvdr_implementation}
-\end{figure}
-
-The GTX 580 supports having up to 1536 threads queued up per SM. 
 
 % \item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
 % %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
 % % In this way we process one row of $\eR$ per kernel iteration, and manage to keep the numbers of both data reads and writes at a minimum.
-
-% Decomposing an algorithm with the intent to accelerate it using parallel hardware, this may happen at either 
 
 % There are essentially two ways to accelerate an algorithm on parallel hardware. One is to identify independent instructions for each thread, and run these in in parallel, and the other is to support the parallel execution of as many threads as possible. This is referred to as instruction level parallelism (ILP) and data level parallelism (DLP), respectively. Most general purpose processors, such as a CPUs, support both DLP by featuring multiple cores with single-data multiple-data (SIMD) capabilities, and ILP by through means such as branch prediction and out-of-order execution.
 
 % GPUs, on the other hand, does not attempt to do ILP, but use all available transistors to support massive DLP. This leads to designs such as the nNvidia GeForce GTX 580. Using their own terminology, it is comprised of 16 ``streaming'' multiprocessors (SMs), each having having 32 CUDA\todo{make sure CUDA is introduced} cores that execute a common program called a kernel. %An SM is a single-program multiple-data (SPMD) processor, meaning that all the CUDA cores on an instruction unit, L1 cache and registers is shared by all the CUDA cores on that SM.  %
 % each with 48kB of L1 cache (shared memory) and 128kB of register memory.
 
-% However, while GPUs display impressive floating point  processing capabilities, 
-% This leads to a few challenges that be overcome, which may be apparent at first eyesight. Basically, 
 
-\begin{itemize}
-\item \emph{Memory bandwidth}. To keep each computing core as busy as possible, only the fastest performing memory should be used. This means ideally only using registers, or L1 cache (shared memory).
-\item \emph{Load balancing}. Try to make each thread equally computationally heavy.
-\end{itemize}
-
-
-% Lots of cores with modest computing abilities, but in return there are hundreds of them. Little memory for each core. Bandwidth becomes crucial, as getting data in to the cores and out again must happen i a frantic pace. %the feeding all these cores with data and harvesting the result
-
-% This translates to a very small amount of fast memory for each computing core. GDDR5 ``global'' memory is available but access to it is slow.
+% Lots of cores with modest computing abilities, but in return there are hundreds of them. Little memory for each core. 
 
 % In short, designing for a GPU involves finding the optimal balance between hiding memory latency (high occupancy) and resource utilization.
 % 
@@ -780,7 +786,7 @@ The GTX 580 supports having up to 1536 threads queued up per SM.
 % threads in block - min 64. 128-256 better starting point.
 
 % 
-% follow collective access patterns to memory.
+% 
 % 
 % GPUs fine  grained parallelism 
 % 
@@ -833,10 +839,6 @@ The GTX 580 supports having up to 1536 threads queued up per SM.
 % \end{itemize}
 
 
-At first glance, it might seem like a good idea to compute one pixel per CUDA core. Each pixel is computed using the same instructions, and without any exchange of data. However, this approach is unfeasible due to the limited cache and register memory available to each thread. One could resolve to using the slower GDDR5 memory, but this would largely mitigate the performance gain and defeat the purpose of using a GPU in the first place.
-
-This is why we aimed to find ways to decompose the three computing steps in the MVDR method into lighter threads. \ref{implementation}
-
 
 % - Split program into equally sized portions - load balancing
 % - Some portions depend on other potions already being carried outer - sequential dependencies
@@ -849,45 +851,41 @@ This is why we aimed to find ways to decompose the three computing steps in the 
 
 
 
-\section{Results}
+\section{Benchmarks}
 
-In a practical system it should be moved to the GPU as well. Therefore, in the upcoming benchmarks, CPU computation time and data transfer to the GPU is neglected.
+% In a practical system it should be moved to the GPU as well. Therefore, in the upcoming benchmarks, CPU computation time and data transfer to the GPU is neglected.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{gfx/img_holmengraa.ps}
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
 \end{figure}
 
-We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two different experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and one one of the datasets used in sidescan mode to image the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{gfx/benchmark.ps}
-\caption{\protect\gls{MVDR} benchmarks. Forming a 55\,kpixel image from a $M=32$ channel array.}\label{benchmarks}
-\end{figure}
+We have tested our \gls{GPU} implementation of the \gls{MVDR} beamformer on two different experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar~\cite{Hansen2009}. The sonar was attached to the HUGIN \gls{AUV}, and was in one of the datasets used in sidescan mode to image the 1500 dwt oil tanker wreck Holmengraa (\Fig{holmengraa}). Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The \gls{MVDR} image was created with the parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
 
 The other dataset was a 55\,kpixel sectorscan test image. We used it to benchmark our \gls{MVDR} implementation, and compared the result with the runtimes of an optimized single-thread C and Matlab implementation (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card. This is a \gls{GPU} with 448 \gls{CUDA} cores and 6Gb of onboard \gls{RAM}, capable of performing roughly 1Tflops.
 
 \section{Discussion}
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{gfx/benchmark_tagged.eps}
-\caption{Realtime requirement for sectorscan imaging.}\label{realtime_sectorscan}
-\end{figure}
+Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation\todo{never mentioned matlab vefore} of MVDR beamformer needed minutes.
 
-Figure \ref{holmengraa} demonstrates the \gls{MVDR} beamformer's ability to suppress interference and achieve better detail resolution. Compared the \gls{DAS} beamformer, the ship's edges come out as sharper, and the shadows are less noisy. But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation of \gls{MVDR} beamformer needed minutes.
-
-As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and $2N_\text{avg}+1=5$ pixels of temporal averaging, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the \gls{GPU} implementation, respectively.
+As Figure \ref{benchmarks} illustrates, using a \gls{GPU} improves matters. If we look at the total runtimes for a subarray size of $L=16$ and temporal averaging at $K=2$, the \gls{GPU} implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the \gls{GPU} implementation, respectively.
 
 Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the \gls{GPU} implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the \gls{GPU} implementation.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{gfx/benchmark.ps}
+\caption{\protect\gls{MVDR} benchmarks. Forming a 55\,kpixel image from a $M=32$ channel array.}\label{benchmarks}
+\end{figure}
+
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We further assume a critical complex sampling frequency equal to the HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for realtime processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our \gls{GPU} implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
-Problem with load balancing and memory access. Saving insttructions breaks parallelism, and is noe as promising.
 
-- Sidescan: 40kHz 
+
+
+
+% - Sidescan: 40kHz 
 
 What may this performance be used for? Let us assume that the 32 element, 1.2\,m long HISAS1030 array is mounted on a platform moving at 1.8\,m/s. Then the pulse repetition frequency (PRF) could be set to 3\,Hz to ensure critical along-track sampling, 
 To illustrate what this performance might be used for, consider a moving platform travelling at 1.8\,m/s. 
@@ -916,6 +914,11 @@ To avoid along track undersampling, the
 
 The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \gls{GPU}. This is because the computations involved are independent on a pixel level, and partially also within each pixel. We were able to achieve speedup factors of 2-3 orders of magnitude by implementing our active sonar capable \gls{MVDR} implementation on a high-end \gls{GPU}. This performance is sufficient for computing critically sampled full-coverage sectorsscan images from the HISAS1030 sonar in realtime. Furthermore, even if such processing speeds are not required, it might be advantageous to relieve the \gls{CPU} from some of its workload. After all, these chips were designed to cooperate.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{gfx/benchmark_tagged.eps}
+\caption{Realtime requirement for sectorscan imaging.}\label{realtime_sectorscan}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % DOCUMENT APPENDICES %
@@ -934,9 +937,6 @@ The \gls{MVDR} beamformer is an algorithm well suited for implementation on a \g
 % \renewcommand\section[1]{{\Large\bf\MakeUppercase #1}}
 % \renewcommand\section*[1]{{\Large\bf\MakeUppercase #1}}
 
-\section*{Acknowledgments}
-
-The authors would like to thank nVidia for providing them their unofficial linear equation batch solver, and Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data.
 % 
 % 
 % 
@@ -1023,13 +1023,6 @@ The authors would like to thank nVidia for providing them their unofficial linea
 
 
 \newpage
-Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
-\begin{gather*}
-r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-\end{gather*}
-where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
-
-
 
 {\bf Method complexity (instructions):}\\
 \begin{tabular}{l l}
@@ -1037,6 +1030,11 @@ No optimizations            & $2M^2\,(2\Navg+1)$ \\
 Banded symmetric            & $L(2M-L+1)\,(2\Navg+1)$ \\
 Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 \end{tabular}\\\\
+
+{\bf Number of complex numbers needed per SM when building R:}\\
+\begin{align*}
+\left\lfloor\frac{T_b}{L}\right\rfloor(M+L)+2MN
+\end{align*}
 
 
 % 
@@ -1237,7 +1235,7 @@ Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 \fi
 
 
-The authors would like to thank...
+The authors would like to thank Nvidia\todo{drop this now that the batch solver is official?} for providing them their unofficial linear equation batch solver, and Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data.
 
 
 % Can use something like this to put references on a page
