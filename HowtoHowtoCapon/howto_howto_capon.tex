@@ -642,19 +642,27 @@ Using nVidias own terminology, the GeForce GTX 480 is comprised of 15 ``streamin
 
 % As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
 
-As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is very compuationally complex. Furtunately, we can dramatically improve matters by performing arithmetic optimizations. As illustrated illustrated in Fig. \ref{mvdr_build_R}, we do not 
+As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is very compuationally complex. Furtunately, we can dramatically improve matters by performing arithmetic optimizations. As illustrated illustrated in Fig. \ref{mvdr_build_R}, we can exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it, we can avoid unneccessary multiplications, and the spatial sum can be implemented in a sliding window fashion. The order of summations will also play a role here.
+
+% Furthermore, since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only need to compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
+% {\renewcommand*{\arraystretch}{1.8}
+% 
+% Note that consecutive elements along the diagonals overlap on all but one covariance coefficient. Hence, if $L$ is small compared to $M$, many arithmetical operations may be saved by implementing a sliding window here. Do note, however, that this introduces data dependencies in the diagonal sums, and is only a feasible approach if we launch computing threads along those diagonals. The final step, temporal averaging, is simply carried out in a straight forward fashion:
+% \begin{align*}
+% \eR_\text{s,t}[n] &= \eR_\text{s}[n-1] + \eR_\text{s}[n] + \eR_\text{s}[n+1]
+% \end{align*}%
+% Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption.
+
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
 \caption{Step 1: Building $\eR$. This is an example of how we would build $\eR$ in a case with $M=5$ sensors, with subarray size $L=3$ and temporal averaging set to $K=1$. $\eR_{l}$ is the sample covariance matrix for the $l$'th subarray, and $\eR_s$ is the average of all these.}\label{mvdr_build_R}
 \end{figure}
 
-
-
 % However, an advantage with this approach is that the summations can be carried out in any order, and hence this form exhibits great deal of parallelism. Can we optimize the algorithm without sacrificing parallelism?
 
-Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. These two memory types have the sufficient bandwidth to promote maximum utilisatin of all CUDA cores. Unfortunately, they are a sparse resource. The GTX 480 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}, the equivalent of 12k and 32k complex numbers stored with single precision, respectively. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. Divide the SM memory on these, and each thread can store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} complex numbers in shared memory.
+Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. These two memory types have the sufficient bandwidth to promote maximum utilisatin of all CUDA cores. Unfortunately, they are a sparse resource. The GTX 480 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}, the equivalent of 12k and 32k complex numbers stored with single precision, respectively. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. Divide the SM memory on these, and each thread can store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}.
 
-Let us start with the order of summations. Is it better to perform temporal averaging and then spatial averaging, or the other way around? 
+This makes it apparent that computing one pixel per thread is not a feasible solution. More pixels need to cooperate in building $\eR$. An idea of how this can  We need to decompose the steps illustrated in Fig. \ref{mvdr_build_R} into independent tasks that can be computed by 
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
@@ -663,22 +671,6 @@ Let us start with the order of summations. Is it better to perform temporal aver
 \end{figure}
 
 Avoid keeping data in memory.
-
-
-
- Furthermore, since $r_{ji} = r^*_{ij}$, and the subarrays only span $L$ elements, we only need to compute an upper triangular band of R (marked \Green{green}). $\R_s$ can then be found as the mean of all $\eR_l$ (\ref{spatialR}):
-{\renewcommand*{\arraystretch}{1.8}
-
-Note that consecutive elements along the diagonals overlap on all but one covariance coefficient. Hence, if $L$ is small compared to $M$, many arithmetical operations may be saved by implementing a sliding window here. Do note, however, that this introduces data dependencies in the diagonal sums, and is only a feasible approach if we launch computing threads along those diagonals. The final step, temporal averaging, is simply carried out in a straight forward fashion:
-\begin{align*}
-\eR_\text{s,t}[n] &= \eR_\text{s}[n-1] + \eR_\text{s}[n] + \eR_\text{s}[n+1]
-\end{align*}%
-Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption.
-
-
-
-
-
 
 
 
