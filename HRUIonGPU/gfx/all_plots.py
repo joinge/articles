@@ -102,13 +102,13 @@ def barBenchmarkGPU(filename, M, Nx, Ny):
    
    fig = figure()
    ax = fig.add_subplot(1,1,1)
-   cax1 = ax.bar(x_range, yavg1[:,0], width, color='0.25')
-   cax4 = ax.bar(x_range, yavg1[:,1], width, bottom=yavg1[:,0], color='0.5')
-   cax5 = ax.bar(x_range, yavg1[:,2], width, bottom=(yavg1[:,0] + yavg1[:,1]), color='0.75')
+   cax5 = ax.bar(x_range, yavg1[:,2], width, color='0.25')
+   cax4 = ax.bar(x_range, yavg1[:,1], width, bottom=yavg1[:,2], color='0.5')
+   cax1 = ax.bar(x_range, yavg1[:,0], width, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75')
    
-   cax2 = ax.bar(x_range + 1/3.0, yavg2[:,0], width/3.0, color='0.25', hatch='//')
-   cax3 = ax.bar(x_range + 2/3.0, yavg3[:,0], width/3.0, color='0.25', hatch='\\')
-   
+   cax2 = ax.bar(x_range + 1/3.0, yavg2[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='/')
+   cax3 = ax.bar(x_range + 2/3.0, yavg3[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='o')
+
    #cax = ax.plot([0,0.001],[0,0], 'k')
    #cax = ax.plot([0,0.001],[0,0], ':k')
    #cax = ax.plot([0,0.001],[0,0], '--k')
@@ -127,7 +127,7 @@ def barBenchmarkGPU(filename, M, Nx, Ny):
    #cax = ax.plot(range(min_L,max_L+1), yavg3_sum, '--k')
 
    if M > 32:
-      x_range = arange(min_L, max_L, 2)
+      x_range = arange(min_L, max_L+1, 2)
    
    ax.set_title('M=%d, %d beams, %d samples in range'%(M,Nx,Ny), fontsize='large')
    xlabel('L')
