@@ -1076,6 +1076,13 @@ case: compute a*b+c, 2 flops, 12 bytes in, 4 bytes out = 8 bytes per flop
 at peak 1.3Tflop/s we need 10.4Tflops/s!!! shared is only at 1.3TB/s, registers are atleast x6 as fast on fermi
 a factor 6 can be gained by using ilp instead of dlp
 
+need to compute op/float ratios
+non-optimized: M=32,L=16, 300kops/px / 40k floats/px = 8 ops/float. op bound if shared is used
+optimized: 50kops/px / 40k floats/px = 1 ops/float. memm bound even if shared is used. some ilp advantageous
+
+
+global: 30:1
+shared: 3:1
 
 % 
 % \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
