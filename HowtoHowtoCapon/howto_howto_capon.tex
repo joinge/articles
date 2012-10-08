@@ -608,9 +608,9 @@ The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of
 
 An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Considering that sonar images often end up having millions of pixels, this makes a compelling case for investigating technologies that support massive data level parallelism. The technology that does this best is perhaps Graphics Processing Units (GPUs). These chips contain up to thousands of small computation cores, which combined deliver superior peak floating point performance compared multi-core systems such as CPUs.
 
-Due to the simple reason of availability we have targeted the Nvidia GeForce Quadro 6000 in our study. This is by now a three generation old\todo{check this} high-end Compute Unified Device Architecture (CUDA) enabled device from Nvidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using Nvidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. Instead we aim to investigate how to efficiently map the MVDR beamformer to the GeForce GTX 480.
+Due to the simple reason of availability we have targeted the Nvidia GeForce Quadro 6000 in our study. This is by now a one generation old high-end Compute Unified Device Architecture (CUDA) enabled device from Nvidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using Nvidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. However, while adapting Nvidias terminology, we aim to provide a general view of how the MVDR maps to a GPU.
 
-Using Nvidias own terminology, the Quadro 6000 is comprised of 14 ``streaming'' multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. This is achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. The best way to do this is completely different for each step in the MVDR process, so we will launch a different kernel and configuration for each of them. 
+Using Nvidias own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. This is achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. The best way to do this is completely different for each step in the MVDR process, so we will launch a different kernel and configuration for each of them. 
 
 \todo{Another shitty GPU transition}
 Before proceeding we should make a quick note on the GPU memory. Note that to obtain the best possible performance, we need to make sure that CUDA threads find the data they need in cache or registers most of the time. Only these two memory types have a high enough bandwidth to promote sustained maximum utilisation of all CUDA cores. Unfortunately, they are a sparse resource. The Quadro 6000 CUDA architecture is of compute capability 2.0, which translates to a maximum of 48kB L1 cache and 128kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads currently residing on that SM. To completely hide latency in even worst case scenarios this number should be no less than 768 (on compute capability 2.0)~\cite{Nvidia2012a}. This leaves us with the constraint that each thread should store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers.
@@ -666,6 +666,8 @@ Which solution is best\todo{introduce them}? We assessed this by comparing each 
 What about the GPU implementation? This one was tricky. Balance load, avoid inter-thread dependencies when performing iterative summations, keep thread memory consumption at a minimum, and promote collective access patterns (coalesced reads/writes) to global memory.
 
 Have a look at Fig. \ref{mvdr_implementation} to get an idea of what we did. Basically, we compute one row in in $\eR$ at a time, where each thread is assigned to each their diagonal. On the top row a full computation is carried out, then that entire row is saved back to global memory. Then this is repeated for each of the remaining elements on the diagonals, except now the computations are based on iterative summing\todo{mention multiplications}. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Due to the symmetry conditions the initial value is obtained by simply performing a complex conjugate copy of the relevant value in the first row.
+
+
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
@@ -848,6 +850,15 @@ Fortunately, Nvidia has recently released a Gauss Jordan solver that can take a 
 % - data level parallelism - compute pixels independent of each other
 
 % - Compute bound vs. bandwidth bound
+
+
+% Shared memory:
+% - Inter-thread communication within a block
+% - Cacke data to reduce redundant access to global memory
+% - User-managed cache (reduce global memory access patterns)
+%
+% 32 banks, each bank 4-byte wide
+
 
 
 
@@ -1036,6 +1047,11 @@ Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 \left\lfloor\frac{T_b}{L}\right\rfloor(M+L)+2MN
 \end{align*}
 
+Is the method compute bound, memory throughput bound, or memory latency bound?
+
+Take as example the case in Fig \ref{mvdr_complexity} in case where $M=32$, $L=16$ and $K=1$. The figure shows a that 300k floating point operations need to be performed per pixel. Furthermore, the total size of global reads is $(M+L)*8$bytes$ = 384 $bytes per px, and the total number of writes is $L^2*8$bytes = 2048 bytes, leading to a total of 2432 bytes. This means less than 1 bytes need to be read from or written to global per every 1000 floating point instructions. 
+
+If an algorithm is neither bandwidth bound or computationally bound, it might be bound by latency. 
 
 % 
 % \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
