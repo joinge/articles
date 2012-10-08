@@ -1049,9 +1049,33 @@ Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
 
 Is the method compute bound, memory throughput bound, or memory latency bound?
 
-Take as example the case in Fig \ref{mvdr_complexity} in case where $M=32$, $L=16$ and $K=1$. The figure shows a that 300k floating point operations need to be performed per pixel. Furthermore, the total size of global reads is $(M+L)*8$bytes$ = 384 $bytes per px, and the total number of writes is $L^2*8$bytes = 2048 bytes, leading to a total of 2432 bytes. This means less than 1 bytes need to be read from or written to global per every 1000 floating point instructions. 
+Take as example the case in Fig \ref{mvdr_complexity} in case where $M=32$, $L=16$ and $K=1$. The figure shows a that 300k floating point operations need to be performed per pixel. Furthermore, the total size of global reads is $(M+L)*8$bytes$ = 96$floats per px, and the total number of writes is $L^2*2$floats = 512 floats, leading to a total of 608 floats. This means that roughly 1000 arithmetic instructions are carried for every 0.6 float transferred from or to global memory.
 
 If an algorithm is neither bandwidth bound or computationally bound, it might be bound by latency. 
+
+
+1Tflops (ops/cycle?)
+144GB/s global
+1TB/s shared
+x6 regs
+
+latency - arithmethic (20 cycles) and memory (400+ cycles)
+
+Little's law - needed parallelism = latency * throughput
+arithmetic: 23 cycles * 32ops/SM/cycle = 576 ops/SM parallelism
+memory: <800 cycles * <144GB/s=125B/cycle = <100kB in the flight
+
+On GF104: must have some ILP to get >0.66 of peak:
+- 48cores/SM, one instruction is broadcast across 16 cores
+- need 3 instructions per cycle
+- but only have 2 warp schedulers
+- instead, can issue 2 instructions per warp in the same cycle
+
+determine bandwidth:
+case: compute a*b+c, 2 flops, 12 bytes in, 4 bytes out = 8 bytes per flop
+at peak 1.3Tflop/s we need 10.4Tflops/s!!! shared is only at 1.3TB/s, registers are atleast x6 as fast on fermi
+a factor 6 can be gained by using ilp instead of dlp
+
 
 % 
 % \subsubsection{Computing $\text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\,\!^{-1}\vec a$}
