@@ -3,11 +3,11 @@ BIBFILE = jrnl_article
 PDF_READER = okular
 
 all:
-	latex $(FILE).tex
+	pdflatex $(FILE).tex
 	bibtex $(BIBFILE)
-	latex $(FILE).tex
-	latex $(FILE).tex
-	dvipdf $(FILE).dvi
+	pdflatex $(FILE).tex
+	pdflatex $(FILE).tex
+# 	dvipdf $(FILE).dvi
 
 read: all
 	$(PDF_READER) $(FILE).pdf
