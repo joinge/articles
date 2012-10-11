@@ -340,7 +340,8 @@ The Minimum Variance (MV) adaptive beamformer has recently been introduced in ac
 We propose means for adapting the MV beamformer and its robustification techniques to fit a modern Graphics Processing Unit (GPU) architecture. These devices have in recent years
 emerged as a flexible and highly potent parallel technology well suited for many DSP tasks, and are available off-the-shelf at reasonable prices.
 
-We benchmarked optimized implementations of the MV beamformer in Matlab and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a mid-range nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. We found that the GPU rendered more than 1Mpixels/s, representing a speedup of more than two orders of magnitude over C, and three orders of magnitude over Matlab. If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in realtime would be possible with this performance. The CPU would then be free to take on the rest of the beamforming as well.
+We benchmarked optimized implementations of the MV beamformer in Matlab and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a mid-range nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. We found that the GPU rendered more than 1Mpixels/s, representing a speedup of more than two orders of magnitude over C, and three orders of magnitude over Matlab. If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in realtime would be possible with this performance.
+%The CPU would then be free to take on the rest of the beamforming as well.
 \end{abstract}
 
 % Keywords (normally not used for peer reviews)
@@ -519,16 +520,13 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
 \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - prior to summation - a suitable set of delays and weights are applied to focus on a pixel of interest.}\label{beamforming}
 \end{figure}
+Consider a backscattered wavefield being recorded by an $M$ element uniform linear arraa, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{beamforming}). Further assume that the channels are digitally delayed to create focus at azimuth angle $\theta$ and range $n$, and let the delayed data from the $m$'th channel be $x_m[\theta,n]$. To simplify notation, the dependence on $\theta$ will be made implicit from now on.
 
-Consider an $M$ element phased array recording a narrow-band wavefield, and assume that the signal signature has been removed by a matched filter. Let the $n$'th sample of the $m$'th channel be represented as $y_m[n]$, and the accompanying weights and delays be $w_m[n]$ and $\Delta_m[n]$ for pixel $\p=[\theta,n]$ (Fig. \ref{beamforming}). $w_n$ and $\Delta_m$ also depend on the on the azimuth angle $\theta$, but this dependence is made implicit to simplify the upcoming notation. Further let $x_m[n]$ describe sample $y_m[n]$ delayed by $\Delta_m[n]$:
-\begin{align}
-x_m[n] = y_m[n-\Delta_m[n]].
-\end{align}
-The beamformer output $z[n]$ is then defined as the weighted sum of all the delayed data samples:
+The beamformer output $z[n]$ is defined as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.\label{z}
 \end{align}
-If the weights in (\ref{z}) were static, this would be referred to as the conventional delay-and-dum (DAS) beamformer. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+where $w_m$ is the weight factor assigned to channel $m$. If these weights static, this would be referred to as the conventional delay-and-dum (DAS) beamformer. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
 Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data could be exploited to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
 \begin{gather}
