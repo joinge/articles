@@ -139,6 +139,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % MACROS %       
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% \DeclareMathOperator*{\argmin}{\text{arg}\,\text{min}}
+
 \newcommand\Eq[1]{Equation (\ref{#1})}
 \newcommand\Fig[1]{Figure \ref{#1}}
 
@@ -168,7 +170,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\adj{\text{adj}}
 
 % \newcommand\max{\text{max}}
-\newcommand\argmin{\text{argmin}}
+\newcommand\argmin[1]{\text{arg}\,\underset{#1}{\text{min}}}
 
 \newcommand\qqquad{\quad\qquad}
 \newcommand\qqqquad{\qquad\qquad}
@@ -489,11 +491,11 @@ Data adaptive methods have been reported to improve image quality in various ima
 
 However, despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and will suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while conventional beamformers are at O($M$).
 
-The robustness issue may be solved through means such as temporal and spatial averaging, and regularisation. We will show that by exploiting symmetry and avoiding unnecessary computations, the mentioned techniques will aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}. 
+The robustness issue may be solved through means such as temporal and spatial averaging, and regularisation. We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. This is because for Unlike other work, which focus modifying or transforming We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}. 
 
 Furthermore, we investigate the feasibility of accelerating the MVDR method using Graphics Processing Units (GPUs). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize FLOPS while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them. 
 
-Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. \todo{improve}
+Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
 
 This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{...}
 
@@ -520,25 +522,25 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
 \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - prior to summation - a suitable set of delays and weights are applied to focus on a pixel of interest.}\label{beamforming}
 \end{figure}
-Consider a backscattered wavefield being recorded by an $M$ element uniform linear arraa, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{beamforming}). Further assume that the channels are digitally delayed to create focus at azimuth angle $\theta$ and range $n$, and let the delayed data from the $m$'th channel be $x_m[\theta,n]$. To simplify notation, the dependence on $\theta$ will be made implicit from now on.
+Consider a backscattered wavefield being recorded by an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{beamforming}). Further assume that the array channels are digitally delayed to create focus at a pixel at azimuth angle $\theta$ and range sample $n$, and let the delayed data from the $m$'th channel be $x_m[\theta,n]$. To simplify notation, the dependence on $\theta$ will be made implicit from now on.
 
 The beamformer output $z[n]$ is defined as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. If these weights static, this would be referred to as the conventional delay-and-dum (DAS) beamformer. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Depending on the weighting pattern, lateral resolution to be traded for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
-Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data could be exploited to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the output power, $\min E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
+Adaptive beamformers target this limitation by allowing the weights to change to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data could be exploited to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, $\argmin{\w} E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to obtain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$.
 
 If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
 \x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
 \end{gather}
-then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as\todo{this is not working. need to have n as variable}:
+then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as:
 \begin{gather}
 \eR_\text{s,t}[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
@@ -551,7 +553,7 @@ To further improve robustness, we add a fraction $d$ of the total power of $\eR_
 where $\I$ is an identity matrix and $\tr\{\cdot\}$ represents the matrix trace operation.
 
 Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This weightset is then applied to on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
-\begin{align}s
+\begin{align}
 z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
 \begin{figure}[!t]\centering
