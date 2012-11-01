@@ -308,12 +308,12 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 \begin{document}
 
-\title{An Optimal GPU Implementation of the MVDR beamformer for Active Sonar Imaing}
+\title{An Optimal GPU Implementation of the MVDR beamformer for Active Sonar Imaging}
 
 \newcommand\Aa{$\overset{\tiny_{\boldsymbol{\circ}}}{\text{A}}$} % The Norwegian letter Å was not recognized by latex
 
 \author{Jo~Inge~Buskenes, %
-        Jon~Petter~\Aa sen,
+        Jon~Petter~\Aa sen, %
         Carl-Inge~Colombo~Nilsen, %
         Andreas~Austeng%
 \thanks{J.I.Buskenes, C.-I.C.Nilsen and A.Austeng are with the Department of Informatics, University of Oslo, Norway.}%
@@ -602,9 +602,9 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 \subsection{Computational Complexity}
 
-When assessing the MVDR beamformer's complexity and mappability to parallel hardware, computing and inverting $\eR$ is by far the most computationally intense task. If we neglect spatial and temoral averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
+When assessing the MVDR beamformer's complexity and mapability to parallel hardware, computing and inverting $\eR$ is by far the most computationally intensive task. If we neglect spatial and temporal averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
-To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except patial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$.
+To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except partial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$.
 
 The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of $\eR$ completely dominates at smaller subarray sizes, that solving $\eRi\1$ only plays a notable role when the element number and subarray sizes are higher, and that the computation of $z$ has a neglible impact. Also notice how temporal averaging comes with a high computational penalty. This can partly be attributed to the fact that building $\eR$ is is heavy on complex multiplications, and a lot of these are repeated unneccessary.
 
@@ -628,11 +628,13 @@ The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of
 % \item Increasing matrix size reduces the number of threads per block, since the entire matrix must be in shared memory. 1 matrix 72x72 complex (8 bytes) max per block - 72 threads. same as 207 5x5 matrixes, 5*207=1036 threads. max threads in block 512.
 % \end{itemize}
 
-An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Considering that sonar images often end up having millions of pixels, this makes a compelling case for investigating technologies that support massive data level parallelism. The technology that does this best is perhaps Graphics Processing Units (GPUs). These chips contain up to thousands of small computation cores, which combined deliver superior peak floating point performance compared multi-core systems such as CPUs.
+% An important feature of MVDR beamforming, and with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Considering that sonar images often end up having millions of pixels, this makes a compelling case for investigating technologies that support massive data level parallelism. The technology that does this best is perhaps Graphics Processing Units (GPUs). These chips contain up to thousands of small computation cores, which combined deliver superior peak floating point performance compared multi-core systems such as CPUs.
 
-Due to the simple reason of availability we have targeted the Nvidia GeForce Quadro 6000 in our study. This is by now\todo{rephrase} a one generation old high-end Compute Unified Device Architecture (CUDA) enabled device from Nvidia, which we instructed to carry out the general purpose tasks in the MVDR beamformer using Nvidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and portable framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study. However, while adapting Nvidias terminology og technology, the general concepts we discuss should not be limited to this vendor.
+An important feature of MVDR beamforming, as with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Furthermore, a typical sonar image may contain millions of pixels. This represents a level of data parallelism that appears very well suited for a massively parallel architecture such as the GPU.
 
-Using Nvidias own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. Combined these cores are able to perform more than 1\,Tflop/s (\ref{flops}), but only if the implementation is computation bound. This can be achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. As the best way to do this is completely different for each step in the MVDR process, we will design a different kernel and configuration for each of them. Particular attention will be put on building $\eR$, since the potential for gaining overall speedups are greatest here.
+We have chosen to investigate the feasibility of using GPUs we have we have chosen the Nvidia GeForce Quadro 6000. This is a high-end Compute Unified Device Architecture (CUDA) enabled device based on Nvidia's Fermi architecture, which we targeted using Nvidia's ``C for CUDA'' framework. We believe that a GPU from AMD would have been equally attractive, and that GPUs from either vendors might as well be targeted through the open and cross-platform framework OpenCL from the Khronos group, but comparing these alternatives are beyond the scope of this study.
+
+Using Nvidias own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. Combined these cores are able to deliver more than 1\,Tflop/s (\ref{flops}), but only if the implementation is computation bound. This can be achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. As the best way to do this is completely different for each step in the MVDR process, we will design a different kernel and configuration for each of them. Particular attention will be paid to building $\eR$, since the potential for gaining overall speedups are greatest here.
 
 %  this assumes that the implementation is solely bound by arithmethic throughput.  r bound by memory bandwidth, arithmethic latency or arithmethic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
 
@@ -685,13 +687,19 @@ Using Nvidias own terminology, the Quadro 6000 is comprised of 14 streaming mult
 
 % As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
 
-As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is a computational burden. We target this issue by first performing \emph{arithmetic optimizations}, then focus on \emph{optimizing arithmetic throughput} in the GPU implementation.
+As observed in Fig. \ref{mvdr_complexity} a direct implementation of (\ref{spatialR}) and (\ref{finalR}) is a computational burden. We target this issue by first performing \emph{arithmetic reductions}, then aim to get as close to the peak \emph{arithmetic throughput} on the GPU as possible.
 
-\subsubsection{Arithmetic Optimizations}
+\subsubsection{Arithmetic Reductions}
 
-Several ways to perform \emph{arithmetic optimizations} are illustrated in Fig. \ref{mvdr_build_R}. We can exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it, we can avoid unnecessary multiplications, and the spatial sum can be implemented in a sliding window fashion (iterative summing). Of implementational interest is also to take note of whether temporal or spatial sum is carried out first.\todo{bah, sounds banal}.
-
-To compare the mentioned optimization strategies, we derived complexity curves for the plain implementation with swapped sums, a couple that take symmetry into account, and a couple of implementations that implement the iterative sum along the diagonals of $\eR$. Then these curves were normalized to the complexity curve of the reference implementation in Fig. \ref{mvdr_complexity} and (\ref{spatialR}). The result is shown in Fig. \ref{mvdr_build_R}. Note\todo{overused} how the optimizations truly makes a difference. Taking symmetry into account and implementing iterative summing both lead to considerably reduced arithmethic complexity, especially at lower subarray sizes and when using temporal averaging. \todo{jump}In the end we chose the iterative solution based on its overall excellent performance, and because it can be altered to consume very little memory when computing $\eR$, which is very important.
+In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity of building $\eR$ in a system with $M=5$ sensors, a subarray size of $L=3$ and temporal averaging is set to $K=1$. Here the spatial sum is carried out before the temporal sum. To reduce arithmetic operations we may
+%
+\begin{enumerate}
+\item exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it,
+\item avoid redundant multiplications, and
+\item implement the spatial sum iteratively by sliding along the diagonals of $\eR$.
+\end{enumerate}
+%
+To study the effect of these optimization strategies we derived complexity curves for the plain implementation with and without swapped sums, a couple that take symmetry into account, and a couple that implement the iterative sum along the diagonals of $\eR$. Then these curves were normalized to the complexity curve of the reference implementation in Fig. \ref{mvdr_complexity}. The results are shown in Fig. \ref{mvdr_build_R}. They show that taking symmetry into account and implementing iterative summing both lead to considerably reduced arithmethic complexity, especially at lower subarray sizes and when using temporal averaging. \todo{jump}In the end we chose the iterative solution based on its overall excellent performance, and because it can be altered to consume very little memory when computing $\eR$, which is very important.
 
 \begin{table}[b]\centering%\normalsize
 \begin{tabular}[c]{l r@{:}  l}\hline
@@ -711,9 +719,15 @@ Registers & $>$3 & 2~\cite{Vasilyy}
 
 \subsubsection{Arithmetic Throughput}
 
-When we compute $\eR$, we very rarely perform more than 1-3 floating point operations for every float read or written to memory. Unfortunately, the GPU prefers kernels to be more computationally intensive than this. This can be inferred from Table \ref{tabbandwidth}, where the bandwidth of the three types of GPU memory are compared to the arithmetic throughput. The global memory\todo{if there's space somewhere, introduce memory layout}, in which all data must reside at some point\todo{rephrase}, has a 30 times lower bandwidth than the arithmetical throughput of the GPU (see appendix \ref{throughput}). However, the shared memory is only 4 times slower than the arithmetical throughput, so if we manage to keep our data in shared memory most of the time it certainly helps. Further alleviation is  possible by exposing instruction level parallelism within a thread, as this promotes the use of registers which operates at a bandwidth atleast 6 higher than that of shared memory~\cite{Vasilyy}.
+When we compute $\eR$, we very rarely perform more than 1-3 floating point operations for every float read or written to memory. Unfortunately, the GPU prefers kernels to be more computationally intensive than this. This can be inferred from Table \ref{tabbandwidth}, where the peak bandwidth of the three types of GPU memory are compared to the peak arithmetic throughput (for derivations see appendix \ref{throughput}). The global memory\todo{if there's space somewhere, introduce memory layout}, in which all data must reside at some point\todo{rephrase}, is at best only able to move one float for every 30 floats processed by the CUDA cores. However, peak shared memory performance is only 4 times slower than the arithmetical throughput so we really need to use it. This means that
+\begin{enumerate}
+\item most of the data needed to compute a pixel should be kept in shared memory, and
+\item we need to 
+\end{enumerate}
 
-Another concern is hiding latency. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB L1 cache and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads currently residing on that SM. completely hide latency in even worst case scenarios this number should be no less than 768 (Little's law)~\cite{Nvidia2012a}. This leaves us with the constraint that each thread should store no more than 8\todo{$\frac{2^{15}+2^{14}}{8*768}$} single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers.
+ so if we manage to keep our data in shared memory and use it effciently the performance penalty should not be too severe. %Further alleviation is also possible by exposing instruction level parallelism within a thread, as this promotes the use of registers with a bandwidth at least 6 times higher than that of shared memory~\cite{Vasilyy}\todo{so why don't we? rephrase}.
+
+These challenges are very closely linked. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB L1 cache and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads currently residing on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This is to expose a sufficient level of level parallelism to ensure that  memory latency is completely hidden (Little's law). By dividing the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers.
 
 % What about the GPU implementation? This one was tricky. Balance load, avoid inter-thread dependencies when performing iterative summations, keep thread memory consumption at a minimum, and promote collective access patterns (coalesced reads/writes) to global memory.
 
@@ -799,31 +813,19 @@ Have a look at Fig. \ref{mvdr_implementation} to get an idea of what we did. Bas
 
 \subsection{Solving $\hat{\boldsymbol{R}}$$\,\!^{-1}$$\mathbf{1}$}
 
-As intuition might suggest that the matrix product $\eRi\1$ can be carried out by first inverting the matrix $\eR$, then performing the inner product with $\1$. However, one can also solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, where $\boldsymbol{b} = \eRi\1$. 
+As intuition might suggest that the matrix product $\eRi\1$ can be carried out by first inverting the matrix $\eR$, then performing the inner product with $\1$. However, one can also solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, where $\boldsymbol{b} = \eRi\1$. In terms of arithmetic count, and when comparing direct implementations, a direct the latter appears to be the preferred option.
 
-
- directly and thus come out as slightly less computationally complex.
-
-
-
-
-
-By direct implementation either method is of same order of complexity, although 
-In short, both operations are cubic with the size of $\eR$, O($L^3$), but solving the linear equation is slightly less computationally complex\todo{elaborate?}.  
-
-Because of this, we went searching for a decent linear equation solver. However, our problem is slightly different from the problem most existing solver libraries deal with. While these are generally concerned with solving a few large linear algebra systems, we needed to solve a large number of very small ones.
-
-Fortunately, Nvidia has recently released a Gauss Jordan solver that can take a batch of small linear systems as input and process these in one go. The solver is complete with support for partial pivoting and complex numbers. The only downside to using it in our application is that it does not exploit the symmetry properties of our sample covariance matrix. A better choice would be a Cholesky solver, which is designed for Hermitian positive semi-definite matrices and is expected to offer roughly a factor 2 speedup over the Gauss Jordan one.
+An important thing to note, however, is that unlike most problems out there we do not attempt so solve large linear equations or invert large matrices; our matrices are small, but we have a very large number of them. Fortunately Nvidia recently released a highly optimized batched linear equation solver aimed for this particular purpose. It is a Gauss Jordan based and supports partial pivoting and complex numbers. The only downside to using it in our application is that it does not exploit the symmetry properties of our sample covariance matrix. A better choice would be a Cholesky solver, which is designed for Hermitian positive semi-definite matrices and is expected to offer roughly a factor 2 speedup over the Gauss Jordan one.
 
 % \emph{Computing} $\eRi[n]\1$ (from (\ref{weights})). While intuition may suggest that this step is carried out by inverting $\eR$, it is better to solve the linear equation $\R\beta = \1$ for $\beta$ instead, which gives us $\beta = \eRi\1$ directly. We have tested various solvers for this task, both in-house and proprietary implementations, and achieved the best performance by using an unofficial batch solver from nVidia. Inverting $\eR$ is by far the most computationally intensive task, and a key area of focus for further improvements.
 
 
 \subsection{Computing $z$}
 
-=== THIS SECTION IS RUBBISH ===
+The beamformer output $z$ was finally computed on a per-pixel basis by computing the MVDR 
 
-\emph{Computing the beamformer output} $z[n]$ by substituting $\beta = \eRi[n]\1$ into (\ref{weights}), and (\ref{weights}) into (\ref{z}). A group of $L$ threads per pixel was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
-
+first computing the sum in (\ref{finalZ}). For this a group of $L$ threads were assigned to respective elements of $x_l$, and summed for all $N_L$ subarrays. Then the MVDR weight to sum these up for all $L$ was used to reduce local memory pressure and to obtain coalesced reads and a minimum of writes. When applying weights, there are two approaches from an implementation point of view. The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
+git 
 
 % \item \emph{Computing the spatial covariance matrix} $\eR[n]$ (\ref{spatialR}-\ref{finalR}). A group of threads are created that slide along the diagonals of $\eR$. In this way we exploited the fact that entries on the diagonals overlap across subarrays and time, and keep the numbers of both data reads and writes at a minimum.
 % %Finished threads can also wrap around and start on diagonals on the lower half triangular. 
@@ -924,7 +926,7 @@ Fortunately, Nvidia has recently released a Gauss Jordan solver that can take a 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{gfx/img_holmengraa.ps}
+\includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}
 \end{figure}
 
