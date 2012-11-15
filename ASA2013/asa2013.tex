@@ -35,17 +35,18 @@
 \thispagestyle{empty}
 \pagenumbering{arabic} %Normal numbers
 
-\title{Adapting the MVDR to a GPU for active sonar systems of different sizes.}
+
+{\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
 
 \begin{abstract}
 The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping MVDR to a GPU, and suggest three different solutions depending on the system size.
 
 For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable. This promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
 
-For even larger systems we suggest employing the LCA beamformer. It does not compute a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU. 
+For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU. 
 
 \ \\
-Total: 215 words (200 max)
+Total: 192 words (200 max)
 
 \ \\
 Noen tanker jeg har selv nå:
