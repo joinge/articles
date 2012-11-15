@@ -35,8 +35,10 @@
 \thispagestyle{empty}
 \pagenumbering{arabic} %Normal numbers
 
+\title{Adapting the MVDR to a GPU for active sonar systems of different sizes.}
+
 \begin{abstract}
-The MVDR adaptive beamformer has been shown to improve image quality in active sonar systems, but at a major computational expense. This is because the estimation and inversion of a spatial covariance matrix is required for each image pixel. We target this problem by altering and mapping the MVDR algorithm to a GPU, and suggest three different solutions depending on the system size.
+The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping MVDR to a GPU, and suggest three different solutions depending on the system size.
 
 For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable. This promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
 
