@@ -788,6 +788,23 @@ By this approach we go from solving $\mat{\hat{R}}\vec{b} = \vec{1}_L$, which is
 
 In our implementation we have tried to minimize the number of adjustments that had to be done in order to integrate beamspace processing into the GPU-Capon processing pipeline. The beamspace-results presented in this paper is therefore produced by transforming covariance matrices to beamspace, and after solving, transforming the result back to element space.
 
+Derivation of sliding beamspace transformation. Given a $M$ long data vector divided into $N_L$ subarrays, the beamspace transformation of the $l^{th}$ subarray is given as:
+\begin{align}
+x_{BS,l,k} = \frac{1}{\sqrt{L}}\sum_{p=i}^{l+L-1}x_p e^{-j2\pi k(p-l)/L} , k \in [0, N_b-1].
+\end{align}
+Manipulating this expression we find that
+\begin{align}
+x_{BS,l,k} &= \frac{1}{\sqrt{L}}((x_{BS,l-1,k} - x_{l-1})e^{-j2\pi k/L} \\ &+ x_{i+L-1}e^{-j2\pi k(L-1)/L}) \\
+&= \frac{1}{\sqrt{L}}(x_{BS,l-1,k} - x_{l-1} + x_{i+L-1})e^{-j2\pi k/L}
+\end{align}
+For $l=0$ a full computation has to be performed.
+Instructions can be saved if we utilize the overlap across subarrays. However, since the number of beams usually is small we will end up with a large memory per thread ratio ($M > N_b$). Using one GPU-thread per beam is therefore not feasible for small $N_b$ large $M$ configurations. The solution is to combine sliding with full computations. A number of thread groups target different sets of subarrays which they transform using the sliding beamspace algorithm. In that way, number of threads per sample is increased and thus the memory per thread ratio is decreased. Notice how subarrays no longer overlap after the beamspace transformation. The amount of data is increased from $M$ to $N_LN_b$ per sample. This means that we no longer can exploit spatial overlap when calculating the sample covariance matrix, but since $N_b$ is small we can now use one thread per element.    
+
+How do we calculate the number of possible subarrays $N_L$ with overlap $L-s$ in a data vector of length $M$.
+\begin{align}
+N_L = floor(\frac{M}{s}) - floor(\frac{L-1}{s})
+\end{align}
+
 %(Go in detail about the implementation using sliding DFT).
 
 %(Go in detail about what kind of modifications we need to do to each of the three steps)
