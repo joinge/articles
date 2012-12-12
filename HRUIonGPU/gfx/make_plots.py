@@ -9,3 +9,4 @@ bar('timer_values_64_80_400.txt', 64, 80, 400, 2, 32)
 bar('timer_values_32_40_400.txt', 32, 40, 400, 2, 16)
 
 barBS('timer_values_M=64_Nx=80_Ny=400_L=2-32_Nb=3_slidingBS.txt', 64, 3, 80, 400, 3, 32)
+barBS('timer_values_M=96_Nx=120_Ny=400_L=3-48_Nb=3_slidingBS.txt', 96, 3, 120, 400, 3, 48)

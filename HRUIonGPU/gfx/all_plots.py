@@ -106,11 +106,22 @@ def barBenchmarkGPU(filename, M, Nx, Ny, fromL, toL):
    
    cax2 = ax.bar(x_range + 1/3.0, yavg2[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='/')
    cax3 = ax.bar(x_range + 2/3.0, yavg3[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='o')
+   
+   # calc acquisition rate for the given number of beams if depth equals 15.4cm.
+   acq_speed = 0.2*Nx
+   cax6 = ax.plot([0, max_L+1], [acq_speed, acq_speed], '-', color='0.2')
 
    #cax = ax.plot([0,0.001],[0,0], 'k')
    #cax = ax.plot([0,0.001],[0,0], ':k')
    #cax = ax.plot([0,0.001],[0,0], '--k')
-   legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0]),('Calculate covariance matrices (K=0)', 'Calculate covariance matrices (K=1)', 'Calculate covariance matrices (K=2)', 'Nvidia solver','Calculate beamformer output'), loc='upper left')
+   legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0], cax6[0]),
+          ('Calculate covariance matrices (K=0)', 
+           'Calculate covariance matrices (K=1)', 
+           'Calculate covariance matrices (K=2)', 
+           'Nvidia solver',
+           'Calculate beamformer output',
+           'Real time requirement'), 
+          loc='upper left')
    #legend(('Calc covariance matrices','Nvidia solver','Calc beamformer output','Total', 'K = 0','K = 1','K = 2'), loc='upper left')
 #   gca().add_artist(l1)
    
@@ -160,12 +171,19 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
    width = 1
    x_range = arange(min_L,max_L+1)
    
+   K = 2
+   yavg = yavg3
+   
    fig = figure()
    ax = fig.add_subplot(1,1,1)
-   cax4 = ax.bar(x_range, yavg1[:,3], width, color='0.25')
-   cax3 = ax.bar(x_range, yavg1[:,2], width, bottom=yavg1[:,3], color='0.5')
-   cax2 = ax.bar(x_range, yavg1[:,1], width, bottom=(yavg1[:,3] + yavg1[:,2]), color='0.75')
-   cax1 = ax.bar(x_range, yavg1[:,0], width, bottom=(yavg1[:,3] + yavg1[:,2] + yavg1[:,1]), color='0.75',  hatch='o')
+   cax4 = ax.bar(x_range, yavg[:,3], width, color='0.25')
+   cax3 = ax.bar(x_range, yavg[:,2], width, bottom=yavg[:,3], color='0.5')
+   cax2 = ax.bar(x_range, yavg[:,1], width, bottom=(yavg[:,3] + yavg[:,2]), color='0.75')
+   cax1 = ax.bar(x_range, yavg[:,0], width, bottom=(yavg[:,3] + yavg[:,2] + yavg[:,1]), color='0.75',  hatch='o')
+   
+   # calc acquisition rate for the given number of beams if depth equals 15.4cm.
+   acq_speed = 0.2*Nx
+   cax5 = ax.plot([0, max_L+1], [acq_speed, acq_speed], '-', color='0.2')
    
    #cax2 = ax.bar(x_range + 1/3.0, yavg2[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='/')
    #cax3 = ax.bar(x_range + 2/3.0, yavg3[:,0], width/3.0, bottom=(yavg1[:,1] + yavg1[:,2]), color='0.75', hatch='o')
@@ -173,7 +191,7 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
    #cax = ax.plot([0,0.001],[0,0], 'k')
    #cax = ax.plot([0,0.001],[0,0], ':k')
    #cax = ax.plot([0,0.001],[0,0], '--k')
-   legend((cax1[0], cax2[0], cax3[0], cax4[0]),('Beamspace transform', 'Calculate covariance matrices', 'Nvidia solver','Calculate beamformer output'), loc='lower left')
+   legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0]),('Beamspace transform', 'Calculate covariance matrices', 'Nvidia solver','Calculate beamformer output', 'Real time requirement'), loc='lower left')
    #legend(('Calc covariance matrices','Nvidia solver','Calc beamformer output','Total', 'K = 0','K = 1','K = 2'), loc='upper left')
 #   gca().add_artist(l1)
    
@@ -189,11 +207,17 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
 
    if M > 32:
       x_range = arange(min_L, max_L+1, 2)
+   if M > 64:
+      x_range = arange(min_L, max_L+1, 3)
    
-   ax.set_title('M=%d, K=0, Nb=%d, %d angles, %d samples in range'%(M,Nb,Nx,Ny), fontsize='large')
+   ax.set_title('M=%d, K=%d, Nb=%d, %d angles, %d samples in range'%(M,K,Nb,Nx,Ny), fontsize='large')
    xlabel('L')
    ylabel('Execution time [ms]')
    xlim((min_L, max_L+1))
    xticks(x_range+width/2.0, x_range )
+   if acq_speed > yavg.max():
+      ylim((0, acq_speed+1))
+   else:
+      ylim((0, yavg.max()+1))
    
    savefig('./benchmark_bar_bs_M=%d_Nx=%d_Ny=%d_Nb=%d'%(M,Nx,Ny,Nb))

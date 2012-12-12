@@ -395,6 +395,7 @@
 %%% My commands
 \newcommand{\mat}[1]{\mathbf{#1}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\degree}{\ensuremath{^\circ}}
 
 
 \begin{document}
@@ -531,7 +532,7 @@ Previous work on parallel implementations of the Capon beamformer have mainly be
 %Using real data will results in symmetric windows, and even if the number of samples they managed to process per second was high, both the number of floating point operations per sample and the imaging region is reduced using real data compared with use of complex data. It is crucial to use complex data within the Capon beamformer framework, both for reducing the amount of data per image, and to allow for asymmetric windows. All results in this paper is reported with use of critically sampled complex data, both laterally and in range.  (ikke helt kritisk samplet, ikke si det, bare at det er i baseband).
 
 % denne må utelates i IUS-artikkelen
-In recent work \cite{asen2012}(cite JOE or ECUA?) we have applied a GPU-based Capon beamformer in both an active sonar system and for cardiac ultrasound imaging. For sonar the real-time requirement is much lower than for medical ultrasound imaging, which means that most common array configurations can be handled using the GPU without taking any additional measures. For medical ultrasound imaging, and especially cardiac ultrasound imaging, frame rate requirements increase to a level where even a high-end GPU can not do the processing required for a standard implementation of Capon beamforming. Since the execution time for a Capon beamformer depends highly on the number of elements in the given array, it is important to find ways of reducing the computational complexity for high-channel-count systems. Different approaches to low-complexity Capon beamforming have therefore recently been proposed \cite{Synnevag2011, Asl2012, Jensen2012, Kim}. In this paper we have selected to implement the beamspace transformation described by Nilsen and Hafizovic \cite{Nilsen2009} on the GPU to maintain high framerates as the channel count increases. The beamspace transformation matches well with the focused beams used in cardiac ultrasound imaging. 
+In recent work \cite{asen2012}(cite JOE or ECUA?) we have applied a GPU-based Capon beamformer in both an active sonar system and for cardiac ultrasound imaging. For sonar the real-time requirement is much lower than for medical ultrasound imaging, which means that most common array configurations can be handled using the GPU without taking any additional measures. For medical ultrasound imaging, and especially cardiac ultrasound imaging, frame rate requirements increase to a level where even a high-end GPU can not do the processing required for a standard implementation of the Capon beamformer. Since the execution time highly depends on the number of elements in the given array, it is important to find ways of reducing computational complexity for high-channel-count systems. Different approaches to low-complexity Capon beamforming have therefore recently been proposed \cite{Synnevag2011, Asl2012, Jensen2012, Kim}. In this paper we have selected to implement the beamspace transformation, described by Nilsen and Hafizovic \cite{Nilsen2009}, on the GPU to maintain high framerates as the channel count increases. The beamspace transformation matches well with the focused transmit beams used in cardiac ultrasound imaging. 
 %(Referer til JOE-artikkelen, få med beskrivelse av hva som blir anerledes for ultralyd.)
 
 In the next section we present background information about the Capon beamformer and the GPU computing model. In Section \ref{sec:meth} we go in detail about the parallel implementation of the Capon beamformer, before in Section \ref{sec:bs} we introduce the beamspace method and how it has been implemented on the GPU. Benchmark results and resulting images are presented in Section \ref{sec:res}, and finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
@@ -592,7 +593,7 @@ Second, a linear system of equations has to be solved
 \begin{align}\label{eq:b}
 \vec{b}[n] = \mat{\hat{R}}[n]^{-1}\vec{a},
 \end{align}
-where the steering vector $\vec{a} = \vec{1}_L = [1_0, 1_1, ..., 1_{L-1}]^T$ since $\vec{x}^\Delta$ is pre-delayed. Finally the Capon weight vector is formed based on (\ref{eq:b}) as
+where the steering vector $\vec{a} = \vec{1}_L = [1_0, 1_1, ..., 1_{L-1}]^T$ since $\vec{x}^\Delta$ is pre-delayed. Finally the Capon weight vector is formed from (\ref{eq:b}) as
 \begin{align}\label{eq:w}
 \vec{w}[n] = \frac{\vec{b}[n]}{\vec{1}^H\vec{b}[n]},
 \end{align}
@@ -613,9 +614,9 @@ z[n] &= \frac{1}{N_L}\vec{w}[n]^H \sum_{l=0}^{N_L-1} \vec{x}_l^{\Delta}[n] \labe
 where $\text{CONV}_m$ is a non-truncated convolution across elements.
 Note how we can choose to first sum all subarrays (\ref{eq:z_mv}), or accumulate the right weighting per element (\ref{eq:z_mv2}).
 
-In passive systems, assuming stationary statistics, the sample covariance matrix is typically averaged over a long sequence of samples\cite{Krima}. For an active, pulsed system like medical ultrasound imaging, the available data from which $\mat{\hat{R}}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favors weights that cancel out the signal \cite{Reddy1987}. In this way, the beamformer output can be too low at broadside, even when there is signal present and the distortionless-response criterion is applied. 
+In passive systems, assuming stationary statistics, the sample covariance matrix in (\ref{eq:R}) is typically averaged over a long sequence of samples\cite{Krima}. For an active, pulsed system like medical ultrasound imaging, the available data from which $\mat{\hat{R}}$ can be estimated is quite limited. The resulting sample covariance matrix might therefore be both inaccurate, and poorly conditioned. Another challenge with applying Capon to active systems is the effect of signal cancellation, where high correlation between signal and interference favors weights that cancel out the signal \cite{Reddy1987}. In this way, the beamformer output can be too low at broadside, even when there is signal present and the distortionless-response criterion is applied. 
 
-In order to get a well-conditioned $\mat{\hat{R}}$, avoid signal cancellation, and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N_K \sim T_p/T_s$ time samples \cite{Synnevag2007, Synnevag2007a}. Where, $T_p$ is the pulse length in seconds and $T_s$ is the sampling period.
+In order to get a well-conditioned $\mat{\hat{R}}$, avoid signal cancellation, and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N_K \sim T_p/T_s$ time samples \cite{Synnevag2007, Synnevag2007a}. Where, $T_p$ is the pulse length in seconds and $T_s$ is the sampling period. For baseband data, one pulse length ($1.5\lambda$) is around 3 samples ($K=1$).
 
 % Få med at vi processerer hele bildet på en gang. Forklar forskjellen med å prosessere en beam av gangen. Hva med MLA?
 % Illustrer tråder og tider for hvordan processeringen går.
@@ -640,7 +641,7 @@ In this section we briefly discuss the principle behind GPU computing, laying th
 
 The CUDA compute model is based on execution of a kernel function across a large set of threads, where the kernel function describe the work to be done in each thread. As depicted in Fig. \ref{fig:gpulayout}, threads are organized in a grid of thread-blocks, with maximal size of 1024 threads per block. Threads inside a block supports low-cost synchronized if needed. From a CUDA perspective the GPU consist of one or more stream multi processors (SMs), where each SM is capable of 32 or more, depending on the architecture, concurrent multiplications and/or additions. A group of blocks is scheduled to each SM until all blocks have been processed. 
 
-A SM has available a limited amount of near-core memory and registers. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. It is also important that the problem can be divided into enough threads to hide instruction latency. Global reads and writes on the GPU, in addition to CPU-GPU transfers, have high penalty, and should be minimized as much as possible. All of these constraints combined pose a real challenge as the target problem has to map on to the parallel framework both on a grid, block, thread and memory consumption level in order to benefits from parallel acceleration. In the next section, we will describe how this mapping should be done for Capon beamforming of cardiac ultrasound data.    
+An SM has available a limited amount of near-core memory and registers. Each thread therefore has to be as light on memory as possible and has to perform enough instructions per used byte in order to hide memory latency. It is also important that the problem can be divided into enough threads to hide instruction latency. Global reads and writes on the GPU, in addition to CPU-GPU transfers, have high penalty, and should be minimized as much as possible. All of these constraints combined pose a real challenge as the target problem has to map on to the parallel framework both on a grid, block, thread and memory consumption level in order to benefits from parallel acceleration. In the next section, we will describe how this mapping should be done for Capon beamforming of cardiac ultrasound data.    
 
 \begin{figure}
 \centerline{\includegraphics[width=3in]{gfx/gpu_layout_vertical_lr.png}}
@@ -660,7 +661,7 @@ A SM has available a limited amount of near-core memory and registers. Each thre
 %\IEEEpubidadjcol
 
 \section{Parallel Capon}\label{sec:meth}
-If we analyze the beamformer in (\ref{eq:z_mv}) in combination with (\ref{eq:b}) and (\ref{eq:R}), we see that each calculation of a set of Capon weights is independent across the outputs $z[n]$. As shown in Fig. \ref{fig:gpulayout}, a first level of granularity is therefore to divide the image into a grid, where the output in each cell can be calculated independently of all others. Further, based on memory dependencies and to hold memory consumption per thread at a minimum, one should recognise that a group of threads should process one output in the final image. Continuing with the calculation of one weight vector, the algorithm can be broken down into three main steps that, to some extent, can be further divided into a small set of parallel processes. That is, for each data vector $\vec{x}^\Delta$ in the image:
+If we analyze the beamformer in (\ref{eq:z_mv}) in combination with (\ref{eq:b}) and (\ref{eq:R}), we see that each calculation of a set of Capon weights is independent across the outputs $z[n]$. As shown in Fig. \ref{fig:gpulayout}, a first level of granularity is therefore to divide the image into a grid, where the output in each cell can be calculated independently of all others. Further, based on memory dependencies and to hold memory consumption per thread at a minimum, one should recognise that a group of threads should process one output in the final image. Continuing with the calculation of one weight vector, the algorithm can be broken down into three main steps that, to some extent, can be divided further into a set of parallel processes. That is, for each data vector $\vec{x}^\Delta$ in the image:
 \begin{align*}
 %\begin{array}{l}
 \text{1) } &\text{Calculate the sample covariance matrix } \mat{\hat{R}} \text{ as in } \text{(\ref{eq:diag})}\\
@@ -691,13 +692,13 @@ The computational complexity of these three steps is $O(L^3)$, $O(L^3)$, and $O(
 
 %The straightforward sum in (\ref{eq:R}) has complexity $O(L^2N_LN_K) = O(L^3)$ since $N_L$, the number of subarrays, is a function of $L$. This is actually the same as for inverting an $L \times L$ matrix. However little attention has been devoted to this step in the literature before. Note that for a typical array configuration we do more spacial smoothing than temporal smoothing. Hence, $N_K$ is usually small compared to $N_L$. The construction of $\mat{\hat{R}}$ is dominated by the number of elements $M$ ($N_L = M - L + 1$) for short subarrays, but since $L$ is selected in most cases to be between $M/2$ and $M/4$ a large $M$ implies a large $L$.
 
-From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all the other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$ as in \cite{Chen2011}. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on the subarray length, $L_{max}=32$, since we want to avoid block-to-block synchronization.
+From (\ref{eq:R}) it is obvious that calculation of one element in $\mat{\hat{R}}$ is independent of all other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$ as done by \cite{Chen2011}. This will minimize global reads and writes needed per thread, but unfortunately the maximum number of threads per block puts an upper limit on the subarray length, $L_{max}=32$, since we want to avoid block-to-block synchronization.
 
 The cubic complexity with $L$ and linear complexity with $N_K$ can be reduced by realizing that the calculation in (\ref{eq:R}) overlap both across subarrays and in time. Element $(i,j)$ of $\mat{\breve{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ as
 \begin{align}
 \mat{\breve{R}}_{i,j}[n] &=  \mat{\breve{R}}_{i-1,j-1}[n]  \nonumber \\
 &+ \sum_{n'=n-K}^{n+K} (x_{i+N_L-1}^{\Delta}[n']x_{j+N_L-1}^{\Delta}[n']^* \nonumber \\
-&- x_{i-1}^{\Delta}[n']x_{j-1}^{\Delta}[n']^H) \label{eq:sliding}
+&- x_{i-1}^{\Delta}[n']x_{j-1}^{\Delta}[n']^H). \label{eq:sliding}
 \end{align}
 The same is true in time where
 \begin{align}
@@ -758,7 +759,7 @@ The steering vectors in $\mat{B}$, the so-called Butler matrix, determine each b
 
 For a focused system like cardiac ultrasound imaging, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all the energy. Nilsen et al. concluded that as little as three beams around broadside were adequate to produce results comparable to applying Capon beamforming in element space. Hence, the inversion steps is found to be constant with respect to the number of array elements.
 
-The beamspace version of the Capon beamformer is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{\hat{R}}_{BS} = f(\vec{x}_{BS}) = f(\mat{B}\vec{x})$, where $\mat{B} \in \mathbb{C}^{N_b,L}$, and $N_b$ is the number of selected beams. The transformation must be done per subarray, yielding subarrays that no longer overlap in space. If the transformation is applied before the covariance matrix is constructing, the amount of input data is change from $M$ to $N_LN_b$ elements per sample, however all remaining steps will get lower complexity.
+The beamspace version of the Capon beamformer is derived by replacing the covariance matrix in (\ref{eq:w}) with the beamspace covariance matrix $\mat{\hat{R}}_{BS} = f(\vec{x}_{BS}) = f(\mat{B}\vec{x})$, where $\mat{B} \in \mathbb{C}^{N_b,L}$, and $N_b$ is the number of selected beams. The transformation must be done per subarray, yielding subarrays that no longer overlap in space. If the transformation is applied before the covariance matrix is constructed, the amount of input data is change from $M$ to $N_LN_b$ elements per sample, however all remaining steps will get lower complexity if $N_b < L$.
 
 Another choice is to transform the element space covariance matrix to beamspace. 
 \begin{align}
@@ -785,7 +786,7 @@ x_{BS,l,k} &= \frac{1}{\sqrt{L}}((x_{BS,l-1,k} - x_{l-1})e^{-j2\pi k/L} \nonumbe
 \end{align}
 We call this the sliding beamspace transformation (SBS), and it is equal to a normalized sliding DFT. For $l=0$ a full computation has to be performed using (\ref{eq:bs_formula}).
 
-From (\ref{eq:sliding_bs}) it is obvious that instructions can be saved if we utilize the overlap across subarrays, with an increase in task parallel granularity (As discussed in Section \ref{sec:calcR}). With SBS we can therefore select to have one thread per beam (index $k$) that calculates this beam for all subarrays. However, since the number of beams usually is small we will end up with a large memory per thread ratio ($M \gg N_b$). Using one thread per beam is therefore not feasible for small $N_b$ large $M$ configurations. The solution is to combine SBS with full computations. As shown in Fig. (???), a number of thread groups target different sets of subarrays which they transform using the SBS algorithm. In that way, the number of threads per sample is increased and thus the memory per thread ratio is decreased. 
+From (\ref{eq:sliding_bs}) it is obvious that instructions can be saved if we utilize the overlap across subarrays, with an increase in task parallel granularity (As discussed in Section \ref{sec:calcR}). With SBS we can therefore select to have one thread per beam (index $k$) that calculates this beam for all subarrays. However, since the number of beams usually is small ($N_b \ll M$) we will end up with a large memory per thread ratio. Using one thread per beam is therefore not feasible for small $N_b$ large $M$ configurations. The solution is to combine SBS with full computations. As shown in Fig. (???), a number of thread groups target different sets of subarrays which they transform using the SBS algorithm. In that way, the number of threads per sample is increased and thus the memory per thread ratio is decreased. 
 
 As mentioned the amount of data is increased from $M$ to $N_LN_b$ per sample in beamspace. This means that we no longer can exploit spatial overlap when calculating the sample covariance matrix, but since $N_b$ is small we can now allow to have one thread per element in $\mat{\hat{R}}_{BS}$. A kernel similar to the one described by Chen et al. \cite{Chen2011}, has therefore been implemented. For small $N_b$ values, several covariance matrices are calculated per thread block to achieve high occupancy of the SMs.
 
@@ -800,7 +801,7 @@ and applied to the beamspace data summed across subarrays.
 %N_L = floor(\frac{M}{s}) - floor(\frac{L-1}{s})
 %\end{align}
 
-As presented in (\ref{eq:diag}), adaptive diagonal loading is performed by loading the sample covariance matrix with the average energy per element, hence $trace\{\mat{\hat{R}}\}/L$. If adaptive diagonal loading is applied after data has been transformed into beamspace, a high percentage of the total energy is mapped to a small subset of beams. Thus the average energy per beam is higher than the average energy per element, if the system uses focused transmit beams. This means that less diagonal loading has to be applied in beamspace than in element space ($d_{BS} \ll d_{element}$).
+As presented in (\ref{eq:diag}), adaptive diagonal loading is performed by loading the sample covariance matrix with the average energy per element, hence $trace\{\mat{\hat{R}}\}/L$. If adaptive diagonal loading is applied after data has been transformed into beamspace, a high percentage of the total energy is mapped to a small subset of beams. Thus the average energy per beam is higher than the average energy per element, if the system uses focused transmit beams. This means that less diagonal loading (smaller $d$) has to be applied in beamspace than in element space.
 
 %(Go in detail about the implementation using sliding DFT).
 
@@ -815,6 +816,7 @@ As presented in (\ref{eq:diag}), adaptive diagonal loading is performed by loadi
  
 
 \section{Results}\label{sec:res}
+
 Describe the computer system (CPU, GPU...). Describe the data that are processed (field II, Channel data from GE Vingmed).
 % stolpediagram, med de ulike metodenes kjøretid oppehverandre.
 
@@ -823,38 +825,46 @@ Describe the computer system (CPU, GPU...). Describe the data that are processed
 \hfil
 \subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_64_80_400.png}%
 \label{fig:benchUS64}}}
-\caption{(Change into bar plot?) Benchmark of GPU Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) A 32 element array. (b) A 64 element array.}
+\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a $70\degree$ wide $15.4$cm deep sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices with three different choices of temporal averaging, solver, and the final beamformer sum. For larger arrays, more transmit beams have to be emitted for sufficient lateral sampling. (a) Shows the benchmark for a 32 element array. (b) Shows the benchmark for a 64 element array.}
 \label{fig:bench}
 \end{figure*}
 
 \begin{figure*}[!t]
 \centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=400_Nb=3.png} \label{fig:benchBS3}}
 \hfil
-\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=400_Nb=3.png}%
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=400_Nb=3.png}%
 \label{fig:benchBS5}}}
-\caption{(TODO: Add the right figure. Change it into a bar plot?) Benchmark of GPU Beamspace Capon beamforming for a cardiac image covering a 70 degrees sector. Execution time is plotted as a function of number of elements $M$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices in red, solver in green, and the final beamformer sum in blue. For each step, there is one line for three different choices of temporal averaging, $N_{avg} \in [0, 1, 2]$. (a) 3 beams. (b) 5 beams.}
+\caption{Benchmark of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15.4$cm deep sector. Execution time is plotted as a function of subarray length $L$. (a) Shows the benchmark for a 64 elements array. (b) Shows the benchmark for a 96 elements array.}
 \label{fig:benchBS}
 \end{figure*}
 
 \begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=2in]{gfx/mv_phantom.png} \label{fig:phantomDAS}}
+\centerline{\subfloat[]{\includegraphics[width=2in]{gfx/das.png} \label{fig:phantomDAS}}
 \hfil
-\subfloat[]{\includegraphics[width=2in]{gfx/mv_phantom.png} \label{fig:phantomMV}}
+\subfloat[]{\includegraphics[width=2in]{gfx/capon.png} \label{fig:phantomMV}}
 \hfil
-\subfloat[]{\includegraphics[width=2in]{gfx/mv_phantom.png} \label{fig:phantomBS}}}
-\caption{(TODO: Add the right figures) Have graph showing cyst contrast as a function of different parameters instead? Cyst and point targets phantom a) Delay-and-sum, uniform weights. b) Capon ($M=?, L=?, N=?$) c) Beamspace Capon ($M=?, L=?, N=?, N_b=?$).}
-\label{fig:bench}
+\subfloat[]{\includegraphics[width=2in]{gfx/capon_bs.png} \label{fig:phantomBS}}}
+\caption{Simulated phantom containing one bright and one dark "cyst" and two point targets in speckle. The simulation was done using Field II with a 2.5MHz, $\lambda/2$ and 64 elements array. a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
+\label{fig:phantom}
 \end{figure*}
 
 \begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=2in]{gfx/us_image.png} \label{fig:phantomDAS}}
+\centerline{\subfloat[]{\includegraphics[width=2in]{gfx/das_invivo.png} \label{fig:invivoDAS}}
 \hfil
-\subfloat[]{\includegraphics[width=2in]{gfx/us_image.png} \label{fig:phantomMV}}
+\subfloat[]{\includegraphics[width=2in]{gfx/capon_invivo.png} \label{fig:invivoMV}}
 \hfil
-\subfloat[]{\includegraphics[width=2in]{gfx/us_image.png} \label{fig:phantomBS}}}
-\caption{(TODO: Add the right figures) Have graph showing cavity-wall contrast as a function of parameters instead? In-vivo cardiac ultrasound image a) Delay-and-sum, uniform weights. b) Capon ($M=?, L=?, N=?$) c) Beamspace Capon ($M=?, L=?, N=?, N_b=?$).}
-\label{fig:bench}
+\subfloat[]{\includegraphics[width=2in]{gfx/capon_bs_invivo.png} \label{fig:invivoBS}}}
+\caption{\textit{In-vivo} harmonic cardiac ultrasound image acquired using a 3.5MHz, 64 elements phased array.  a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
+\label{fig:invivo}
 \end{figure*}
+
+Fig. \ref{fig:bench} shows the results from benchmarking the implementation described in Section \ref{sec:meth} on an Nvidia Quadro 6000 graphics card (14 SMs, 1 TFlops single precision, 6 GB global memory, and 144 GB/s memory bandwidth). The problem sizes are calculated based on 32 and 64 element arrays with center frequency 2.5 MHz. By assuming a system bandwidth of 80\% we need a complex sampling frequency of 2 MHz. If we image down to a depth of 15 cm we get approximately 400 samples per range line. To correctly sample a $70\degree$ sector with 64 and 32 element arrays ($\lambda/2$ pitch), we need at least 80 and 40 beams, respectively. The presented execution times do not include transfer of data from CPU-side to the GPU. What is included are all calculations, memory transfers from global to near-core GPU memory, and near core memory access. 
+
+There are two videos attached to this paper. One cardiac loop, 
+%(add ref to video)
+and one simulation, both 
+%(add ref to videos) 
+processed with the following Capon beamformer settings: $L = 32$, $K = 2$, $d=0.01$. These settings have previously been shown to provide high resolution while maintaining DAS-like speckle \cite{Synnevag2007a} in ultrasound images. Cardiac data was acquired using a 64 element and 3.5 MHz phased array. Simulations were done using a 64 element 2.5 MHz phased array. For the simulation, 16x lateral over-sampling has been used, in order to avoid under sampling of the two bright point scatterers. The cardiac recording only has $30\%$ lateral over sampling.
 
 Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing executing times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
 
@@ -872,6 +882,13 @@ Add a comparison between beamspace and full capon using small L.
 
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
+
+From Fig. \ref{fig:benchUS64} we see that for $L = M/2 = 32$ and $K=1$, total execution time is 100 ms (10 fps). Taking into account that we use complex data, but less samples per image, this is similar to the performance reported by Chen et al. \cite{Chen2011}. For the 32 element array in Fig. (\ref{fig:benchUS32}), execution time is reduced to 11.5 ms (87 fps) using the same settings ($L=M/2, K = 1$). Doubling this number can be interpreted as pre-beamforming a 64 element array down to 32. The frame rate for a 64 element array is then increased from 10 to 44 fps. Note that lateral oversampling will increase the total execution time with a factor equal the amount of oversampling.  
+
+A major part of the total execution time comes from solving systems of linear equations. Further research should therefore focus on making this contribution smaller. This can be done either by implementing faster solvers, or reducing the sample covariance matrix size in a novel way \cite{Nilsen2009}. %When doing such a reduction, including the pre-beamforming described above, one should investigate the loss of contrast and resolution compared with full Capon beamforming.
+As for now, we have shown that the Capon beamformer can be implemented in a GPU framework. And if we as in \cite{Chen2011} define real-time as 10 fps, all execution times  in Fig. (\ref{fig:bench}) are real time. If we on the other hand define real-time as the time it takes to acquire a given image, the image formed using a 32 and 64 element array has a real time requirement of 125 fps and 62.5 fps respectively. There is some distance to cover before that goal is reached for all values of $L \le M/2$. However we see that real time, by the last definition, is possible for $M=64, L < 16$, and for $M = 32, L < 13$. Another option to reach real-time execution is to use several GPUs simultaneously. Note that multi-line acquisition will increase the frame rate requirement accordingly.
+ 
+In the attached video of a simulated phantom one can see that Capon beamforming highly resolves moving point targets. The beamformer is shift invariant as long as the lateral sampling is increased. No major improvement in contrast is observed. In the cardiac recording, structures are thinner when the Capon beamformer is applied, however we observe a loss in contrast due to signal cancellation. Future work should focus on solving this issue.
 
 We expect that a large speedup had the Capon beamformer been implemented on the CPU using threads and SIMD (single instruction multiple data) instructions. 
 
