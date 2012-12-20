@@ -786,7 +786,7 @@ Manipulating this expression we find that for $l \in [1, L-1]$
 x_{BS,l,k} &= \frac{1}{\sqrt{L}}((x_{BS,l-1,k} - x_{l-1})e^{-j2\pi k/L} \nonumber \\ &+ x_{i+L-1}e^{-j2\pi k(L-1)/L}) \nonumber \\
 &= \frac{1}{\sqrt{L}}(x_{BS,l-1,k} - x_{l-1} + x_{i+L-1})e^{-j2\pi k/L}.
 \end{align}
-We call this the sliding beamspace transformation (SBS), and it is equal to a normalized sliding DFT. For $l=0$ a full computation has to be performed using (\ref{eq:bs_formula}).
+We call this the sliding beamspace transformation (SBS), and it is equal to a normalized sliding DFT \cite{Lyons2003}. For $l=0$ a full computation has to be performed using (\ref{eq:bs_formula}).
 
 From (\ref{eq:sliding_bs}) it is obvious that instructions can be saved if we utilize the overlap across subarrays, with an increase in task parallel granularity (As discussed in Section \ref{sec:calcR}). With SBS we can therefore select to have one thread per beam (index $k$) that calculates this beam for all subarrays. However, since the number of beams usually is small ($N_b \ll M$) we will end up with a large memory per thread ratio. Using one thread per beam is therefore not feasible for small $N_b$ large $M$ configurations. The solution is to combine SBS with full computations. As shown in Fig. (???), a number of thread groups target different sets of subarrays which they transform using the SBS algorithm. In that way, the number of threads per sample is increased and thus the memory per thread ratio is decreased. 
 
@@ -838,9 +838,17 @@ To summarize, by transforming data to beamspace we reduce the complexity of all 
 \hfil
 \subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=400_Nb=3.png}%
 \label{fig:benchBS5}}}
-\caption{(Move BS trans below calcR) Benchmark of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$cm deep sector. Execution time is plotted as a function of subarray length $L$. (a) Shows the benchmark for a 64 elements array. (b) Shows the benchmark for a 96 elements array.}
+\caption{Benchmark of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$cm deep sector. Execution time is plotted as a function of subarray length $L$. (a) Shows the benchmark for a 64 elements array. (b) Shows the benchmark for a 96 elements array.}
 \label{fig:benchBS}
 \end{figure*}
+
+Fig. \ref{fig:bench} shows the results from benchmarking the implementation described in Section \ref{sec:meth} on an Nvidia Quadro 6000 graphics card (14 SMs, 1 TFlops theoretical single precision, 6 GB global memory, and 144 GB/s memory bandwidth). The problem sizes are calculated based on 32 and 64 element phased arrays with center frequency 2.5 MHz. By assuming a system bandwidth of 80\% we need a complex sampling frequency of 2 MHz. If we image down to a depth of 15 cm we get approximately 400 samples per range line. To correctly sample a $70\degree$ sector with 64 and 32 element arrays ($\lambda/2$ pitch), we need at least 80 and 40 beams, respectively. The presented execution times do not include transfer of data from CPU-side to the GPU, since data are assumed to be pre-delayed and available in GPU memory. What is included are all calculations, memory transfers from global to near-core GPU memory, and near core memory access. For $M=64$, $L=32$ and $K=2$ (Fig. \ref{fig:benchUS64}), a typical setup for high quality imaging, processing throughput is 10 frames per second. 
+
+In Fig. \ref{fig:benchBS} we present similar benchmarks for the beamspace version of the Capon beamformer. Benchmarks are based on a 64 and 96 elements phased array respectively. For the latter, number of transmit beams is increased to 120. The figure only present results with use of temporal averaging ($K=2$). For $M=96$, $L=48$, $K=2$ and $N_b=3$, processing throughput is 100 frames per second. 
+
+For all benchmarks there is a line indicating the time it takes to acquire the underlying image using single line acquisition. Hence, below this line we are capable of real time processing.
+
+\section{Simulated phantom and cardiac data}
 
 \begin{figure*}[!t]
 \centerline{\subfloat[]{\includegraphics[width=2.3in]{gfx/das.png} \label{fig:phantomDAS}}
@@ -848,7 +856,7 @@ To summarize, by transforming data to beamspace we reduce the complexity of all 
 \subfloat[]{\includegraphics[width=2.3in]{gfx/capon.png} \label{fig:phantomMV}}
 \hfil
 \subfloat[]{\includegraphics[width=2.3in]{gfx/capon_bs.png} \label{fig:phantomBS}}}
-\caption{Simulated phantom containing one bright and one dark "cyst" and two point targets in speckle. The simulation was done using Field II with a 2.5MHz, $\lambda/2$ and 64 elements phased array. Dynamic range is -30dB to 30dB with mean value represented as 0dB. a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
+\caption{Simulated phantom containing one bright (24 dB) and one dark (-30 dB) circular area and two point targets (40 dB) in speckle. The simulation was done using Field II with a 2.5 MHz, $\lambda/2$ and 64 elements phased array. Dynamic range is -30 dB to 30 dB with mean value represented as 0 dB. a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
 \label{fig:phantom}
 \end{figure*}
 
@@ -858,35 +866,41 @@ To summarize, by transforming data to beamspace we reduce the complexity of all 
 \subfloat[]{\includegraphics[width=2.3in]{gfx/capon_invivo.png} \label{fig:invivoMV}}
 \hfil
 \subfloat[]{\includegraphics[width=2.3in]{gfx/capon_bs_invivo.png} \label{fig:invivoBS}}}
-\caption{\textit{In-vivo} harmonic cardiac ultrasound image acquired using a 3.5MHz, 64 elements phased array. Number of receive beams for the $70\degree$ sector is 98. Dynamic range is -20dB to 20dB with mean value represented as 0dB. a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
+\caption{\textit{In-vivo} harmonic cardiac ultrasound image acquired using a 3.5 MHz, 64 elements phased array. Number of receive beams for the $70\degree$ sector is 98, and number of samples in range is 610. Dynamic range is -20 dB to 20 dB with mean value represented as 0 dB. a) Delay-and-sum with uniform weights. b) Capon ($L=32, K=2, d=0.1$) c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$).}
 \label{fig:invivo}
 \end{figure*}
 
-Fig. \ref{fig:bench} shows the results from benchmarking the implementation described in Section \ref{sec:meth} on an Nvidia Quadro 6000 graphics card (14 SMs, 1 TFlops theoretical single precision, 6 GB global memory, and 144 GB/s memory bandwidth). The problem sizes are calculated based on 32 and 64 element arrays with center frequency 2.5 MHz. By assuming a system bandwidth of 80\% we need a complex sampling frequency of 2 MHz. If we image down to a depth of 15 cm we get approximately 400 samples per range line. To correctly sample a $70\degree$ sector with 64 and 32 element arrays ($\lambda/2$ pitch), we need at least 80 and 40 beams, respectively. The presented execution times do not include transfer of data from CPU-side to the GPU, since data are assumed to be pre-delayed and available in GPU memory. What is included are all calculations, memory transfers from global to near-core GPU memory, and near core memory access. 
+\begin{figure*}[!t]
+\centerline{
+\subfloat[]{\includegraphics[width=3in]{gfx/simulation_slice.png} \label{fig:simulationSlice}}
+\hfil
+\subfloat[]{\includegraphics[width=3in]{gfx/invivo_slice.png} \label{fig:invivoSlice}}
+}
+\caption{Lateral slices taken from the images in Fig. \ref{fig:phantom} and Fig. \ref{fig:invivo}. a) From Fig. \ref{fig:phantom} at 93 mm range. Straight through the two bright point scatterers. b) From Fig. \ref{fig:invivo} at 96 mm range, going through the tip of the mitral valve.}
+\label{fig:slices}
+\end{figure*}
 
-In Fig. \ref{fig:benchBS} we present similar benchmarks for the beamspace version of the Capon beamformer, but now for a 64 and 96 elements probe. For the latter, number of transmit beams is increased to 120. For all benchmarks there is a line indicating the time it takes to acquire the underlying image. Hence, below this line we are capable of real time processing.
+Fig. \ref{fig:phantom} presents a phantom simulated using Field II \cite{Jensen1992}. The simulation was performed using a 2.5 MHz, $\lambda/2$ pitch, 10 $\mu$m kerf, 50\% bandwidth and 10 mm high phased array. The transducer was exited with a $3\lambda$ long pulse and the transmit focus is at 80 mm. The phantom contains two circular areas, one bright at 24 dB and one dark at -30 dB, and two point targets at 40 dB. Speckle level is at 0 dB. The resulting image has been processed both using DAS with uniform weights, Capon and BS Capon. The presented image is the first frame in a series of images where motion is imposed on both circles, point targets and the probe. This simulation is presented in an attached video.
 
-\section{Simulated phantom}
-Present images, both simulated and in-vivo, processed using beamspace Capon. Comment on the differences between the two and on how much they deviates from the full method. 
+Fig. \ref{fig:invivo} shows an \textit{in-vivo} image of the left ventricle. The image was acquired using a experimental scanner at MI-Lab in Trondheim using a 3.5 MHz phased array in harmonic mode. The image is extracted from a cardiac cycle, that can be viewed in its entirety in the attached videos. 
 
-Present images before and after Capon weights has been applied. Comment on the effect of selecting different parameters. Present graph showing executing times for Cython-Capon v.s. CUDA-Capon for different choices of parameters. Comment on different choices of parameters change the running times. Temporal averaging for instance, lowers the efficiency since $2Y_{avg}$ more operations has to be performed per $\mat{\hat{R}}$    
+Both data sets have been processed with the following Capon beamformer settings: $L = 32$, $K = 2$, $d=0.1$. These settings have previously been shown to provide high resolution while maintaining DAS-like speckle \cite{Synnevag2007a} in ultrasound images. For the beamspace processing the following parameters have been used: $L=32$, $K=2$, $d=0.01$, $N_b=3$.
 
-\section{\textit{Ion-vivo} cardiac data}
-How has the data been acquired?
-
-There are two videos attached to this paper. One cardiac loop, 
-%(add ref to video)
-and one simulation, both 
-%(add ref to videos) 
-processed with the following Capon beamformer settings: $L = 32$, $K = 2$, $d=0.01$. These settings have previously been shown to provide high resolution while maintaining DAS-like speckle \cite{Synnevag2007a} in ultrasound images. Cardiac data was acquired using a 64 element and 3.5 MHz phased array. Simulations were done using a 64 element 2.5 MHz phased array. For the simulation, 16x lateral over-sampling has been used, in order to avoid under sampling of the two bright point scatterers. The cardiac recording only has $30\%$ lateral over sampling.
+For the simulation, 16x lateral over-sampling has been used, in order to avoid under sampling of the two bright point scatterers. The cardiac recording only has $30\%$ lateral over sampling.
 
 \section{Trading resolution for speed}
-Add a comparison between beamspace and full capon using small L.
+Add a comparison between beamspace and full capon using small L. Plot system resolution vs $L$ and $N_b$ for the two methods. ???
+Fig \ref{fig:speed_res_trade}.
+
+\begin{figure}
+\centering
+\includegraphics[width=3in]{gfx/speed_res_trade.png}
+\caption{Trade-off between resolution and speed by reducing subarray size or reducing beamspace.}
+\label{fig:speed_res_trade}
+\end{figure}
 
 \section{Discussion}\label{sec:dis}
-Discuss results presented in Section \ref{sec:res}.
-
-From Fig. \ref{fig:benchUS64} we see that for $L = M/2 = 32$ and $K=1$, total execution time is 100 ms (10 fps). Taking into account that we use complex data, but less samples per image, this is similar to the performance reported by Chen et al. \cite{Chen2011}. For the 32 element array in Fig. (\ref{fig:benchUS32}), execution time is reduced to 11.5 ms (87 fps) using the same settings ($L=M/2, K = 1$). Doubling this number can be interpreted as pre-beamforming a 64 element array down to 32. The frame rate for a 64 element array is then increased from 10 to 44 fps. Note that lateral oversampling will increase the total execution time with a factor equal the amount of oversampling.  
+From Fig. \ref{fig:benchUS64} we see that for $L = M/2 = 32$ and $K=1$, the total execution time is 100 ms (10 fps). Taking into account that we use complex data, but less samples per image, this is similar to the performance reported by Chen et al. \cite{Chen2011}. For the 32 element array in Fig. (\ref{fig:benchUS32}), execution time is reduced to 11.5 ms (87 fps) using the same settings ($L=M/2, K = 1$). Doubling this number can be interpreted as pre-beamforming a 64 element array down to 32. The frame rate for a 64 element array is then increased from 10 to 44 fps. Note that lateral oversampling will increase the total execution time with a factor equal the amount of oversampling.  
 
 A major part of the total execution time comes from solving systems of linear equations. Further research should therefore focus on making this contribution smaller. This can be done either by implementing faster solvers, or reducing the sample covariance matrix size in a novel way \cite{Nilsen2009}. %When doing such a reduction, including the pre-beamforming described above, one should investigate the loss of contrast and resolution compared with full Capon beamforming.
 As for now, we have shown that the Capon beamformer can be implemented in a GPU framework. And if we as in \cite{Chen2011} define real-time as 10 fps, all execution times  in Fig. (\ref{fig:bench}) are real time. If we on the other hand define real-time as the time it takes to acquire a given image, the image formed using a 32 and 64 element array has a real time requirement of 125 fps and 62.5 fps respectively. There is some distance to cover before that goal is reached for all values of $L \le M/2$. However we see that real time, by the last definition, is possible for $M=64, L < 16$, and for $M = 32, L < 13$. Another option to reach real-time execution is to use several GPUs simultaneously. Note that multi-line acquisition will increase the frame rate requirement accordingly.
@@ -907,6 +921,8 @@ How does beamspace perform when using plane wave imaging...?
 \section{Conclusion}\label{sec:con}
 ...
 
+\section{Future work}
+Plane waves...
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
