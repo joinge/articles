@@ -1109,7 +1109,7 @@ The MVDR maps well to the GPU since the computations involved are independent on
 
 In the context of determining whether an implementation is computationally bound or memory bound, one should first compare the target platform's sustained computational throughput to sustained memory throughput. Let us start with the former.
 
-The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\,148\,MHz and being able to perform 2 floating point operations (flop) per clock cycle. Theoretical peak arithmethic throughput is then given as:
+The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\,148\,MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmethic throughput is then given as:
 \begin{align}
 \text{BW}_\text{arithmethic} &= 2\cdot1\,148\,\text{flop/s/core}\cdot 32\,\text{cores/SM}\cdot 14\,\text{SMs}\nn
 &= 1.03\,\text{Tflop/s}.\label{flops}
