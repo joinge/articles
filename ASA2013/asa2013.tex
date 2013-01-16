@@ -4,25 +4,19 @@
 %===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
  
 \documentclass[
-   article                                      % Document type (non-standard)
- , 12pt                                         % Text size
-%  , draft
-%  , final                                        % Quality
- , xelatex                                      % Use the XeLaTeX compiler
-%  , biblatex                                     % Use 'biblatex' for references (best by far)
- , bibtex                                       % Use 'bibtex' for references (oldschool :)
-%  , movie
-%  , notodos                                      % Disable todos
- , layout
-%  , defaultformat                                % Attempt to use default formatting options
-%  , glossary                                     % Use a glossary
-]{common/mytemplate}
+a4paper,10pt
+]{common/ica2013_2}
 
+\usepackage[utf8x]{inputenc}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+% \bibliography{../../Library/library}
 % \bibliography{references}
-\hypersetup{
-   bookmarksopen=true
- , bookmarksopenlevel=2
-}
+% \hypersetup{
+%    bookmarksopen=true
+%  , bookmarksopenlevel=2
+% }
 % Load the references.bib file
 % \bibliography{references}
 
@@ -58,7 +52,7 @@ Noen tanker jeg har selv nå:
 
 
 \ \\
-Questions they wanted answered:
+Questions they wanted answered:\cite{Kailath1985}
 \begin{itemize}
 \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
 \item If algorithm is slow - What technology will help me?
@@ -70,6 +64,8 @@ Questions they wanted answered:
 \end{itemize}
 \end{abstract}
 
+\bibliographystyle{common/jasanum}
+\bibliography{../../Library/library}
 
 % \section{Introduction}
 
