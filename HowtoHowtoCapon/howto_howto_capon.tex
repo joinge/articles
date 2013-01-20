@@ -554,7 +554,7 @@ z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}.
 
-Adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data could be exploited to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, $\argmin{\w}\,E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution:
+Adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data may be used to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, $\argmin{\w}\,E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
@@ -1109,7 +1109,7 @@ The MVDR maps well to the GPU since the computations involved are independent on
 
 In the context of determining whether an implementation is computationally bound or memory bound, one should first compare the target platform's sustained computational throughput to sustained memory throughput. Let us start with the former.
 
-The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\,148\,MHz and being able to perform 2 floating point operations (flop) per clock cycle. Theoretical peak arithmethic throughput is then given as:
+The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\,148\,MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmethic throughput is then given as:
 \begin{align}
 \text{BW}_\text{arithmethic} &= 2\cdot1\,148\,\text{flop/s/core}\cdot 32\,\text{cores/SM}\cdot 14\,\text{SMs}\nn
 &= 1.03\,\text{Tflop/s}.\label{flops}
