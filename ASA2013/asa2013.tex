@@ -179,11 +179,35 @@ a4paper,10pt
 {\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
 
 \begin{abstract}
-The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping MVDR to a GPU, and suggest three different solutions depending on the system size.
+The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping the MVDR beamformer to a GPU, and suggest three different solutions depending on the system size.
 
-For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable. This promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
+For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
 
-For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU. 
+For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
+
+\ \\
+Total: 195 words (200 max)
+
+\ \\
+Noen tanker jeg har selv naa:
+\begin{itemize}
+\item Det mangler noe om bruksomraader.
+\item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
+\item 200 ord er ingenting. :)
+\end{itemize}
+
+
+\ \\
+Questions they wanted answered:
+\begin{itemize}
+\item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
+\item If algorithm is slow - What technology will help me?
+\item What skills are needed?
+\item What tools are available and what's the cost?
+\item What acceleration factor are we looking at?
+\item How can I get started?
+\item What we did. Which tools? Was it hard? Speedup?
+\end{itemize}
 \end{abstract}
 
 \section{Introduction}
@@ -280,10 +304,10 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 % Total: 192 words (200 max)
 % 
 % \ \\
-% Noen tanker jeg har selv nå:
+% Noen tanker jeg har selv naa:
 % \begin{itemize}
-% \item Det mangler noe om bruksområder.
-% \item Må passe på å ikke selge LCA så bra at MVDR ser helt håpløs ut(?)
+% \item Det mangler noe om bruksomraader.
+% \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haapløs ut(?)
 % \item 200 ord er ingenting. :)
 % \end{itemize}
 % 
