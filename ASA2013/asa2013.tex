@@ -7,7 +7,7 @@
  
 \documentclass[
 a4paper,10pt
-]{common/ica2013_2}
+]{ica2013_2}
 
 \usepackage[utf8x]{inputenc}
 \usepackage[table,dvipsnames,svgnames]{xcolor}
@@ -167,6 +167,8 @@ a4paper,10pt
   \immediate\write18{./bin/laFigure #2 #1}%
   \input{result}}%
 
+\definecolor{tabBlue}{HTML}{AACCFF}
+
 
 \newenvironment{outline}
 {\begin{itemize}}
@@ -222,7 +224,7 @@ This may seem perfectly suited for image reconstruction algorithms, because usua
 
 << PREVIOUS WORK >>
 
-<< OUTLINE >>
+This article is outlined as follows: In section \ref{methods} we will present the theoretical background on MVDR operated in time and frequency domain, as well as relating this to the LCA beamformer.  As we move along we aim to mention complexity issues and suggest means to overcome them, but implementational aspect will first be presented in \ref{implementation}.
 
 % MVDR - two parts - estimating R and solving
 % less 32: 
@@ -246,7 +248,7 @@ This may seem perfectly suited for image reconstruction algorithms, because usua
 % The potential that adaptive beamformers to improve active sonar image quality is  ers is that theimprove image quality by utilising the apriori knowledge present in the backscattered wavefield.  has for improving active sonar image quality has been demonstrated in e.g. []. are known for the potential to improve image quality in to When using adaptive beamformers to improbe
 
 
-\section{Methods}
+\section{Methods}\label{methods}
 
 Suppose that a backscattered wavefield is recorded by an $M$ element uniform linear array, that a suitable set of delays are applied to the channels for the pixel of interest, and let the delayed output from the $m$'th channel be given as $x_m$. By definition a beamformer's output $z[n]$ at time instant $n$ is a weighted sum all the delayed data outputs:
 \begin{align}
@@ -254,7 +256,7 @@ z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}.
 
-\subsection{MVDR beamformer}
+\subsection{MVDR beamforming in time domain}
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=0.7\linewidth]{gfx/implementation.svg}%
@@ -284,6 +286,17 @@ then a sample covariance matrix formed with temporal and spatial averaging, $\eR
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
 
+\subsection{MVDR beamspace}
+
+The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
+\begin{gather}
+\argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
+% \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+\end{gather}
+Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion. 
+
+<< AVERAGING >>
+
 \subsection{LCA beamformer}
 
 The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
@@ -296,7 +309,22 @@ Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion
 << AVERAGING >>
 
 
-\section{Implementation}
+\section{Implementation}\label{implementation}
+
+% Most of the challenges we faced when porting the MVDR to a GPU are caused by a single troublesome fact: GPU prefers threads that computationally intensive but very light on memory consumption. 
+
+Throughout our work with porting the MVDR beamformer to a GPU, one issue has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point numbers that the GPU is able to execute. Now, if we consider the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible. Using shared memory (L1 cache) and registers is a big step in the right direction, but this e
+\begin{table}[b]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{:}  l}\hline
+\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
+Shared memory & & 257 Gfloats/s & 1 & 4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
+\end{tabular}
+\caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 TB/s.}\label{tabbandwidth}
+\end{table}
+
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=0.7\linewidth]{gfx/mvdr_implementation.svg}%
@@ -307,11 +335,17 @@ Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion
 
 \section{Results}
 
-
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
+\caption{Holmengraa.}\label{mvdr_implementation}
+\end{figure}
 
 
 
 \section{Discussion}
+
+
+MVDR for systems with less than 32 channels. After that MVDR in beamspace. 
 
 
 % 
@@ -377,8 +411,9 @@ Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion
 % \end{itemize}
 % \end{abstract}
 
-\bibliographystyle{common/jasanum}
-\bibliography{../../Library/library}
+\bibliographystyle{jasanum}
+% \bibliography{../../Library/library}
+\bibliography{library}
 
 % \section{Introduction}
 
