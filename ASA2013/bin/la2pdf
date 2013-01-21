@@ -31,12 +31,12 @@ fi
 
 # Running latex twice:
 echo ':) Starting xelatex..'
-xelatex -synctex=1 -interaction=nonstopmode ${1}.tex
+xelatex -shell-escape -synctex=1 -interaction=nonstopmode ${1}.tex
 if [ $? -ne 0 ]; then
   echo ':( FAILED: latex'
   exit 1
 fi
-xelatex -synctex=1 -interaction=nonstopmode ${1}.tex
+xelatex -shell-escape -synctex=1 -interaction=nonstopmode ${1}.tex
 if [ $? -ne 0 ]; then
    echo ':(  FAILED: xelatex'
    exit 1

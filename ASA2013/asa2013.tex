@@ -163,6 +163,11 @@ a4paper,10pt
 \usepackage{amsmath,amssymb}
 \usepackage{glossaries}
 
+\newcommand\graphicsAI[2][]{%
+  \immediate\write18{./bin/laFigure #2 #1}%
+  \input{result}}%
+
+
 \newenvironment{outline}
 {\begin{itemize}}
 {\end{itemize}}
@@ -184,49 +189,66 @@ The MVDR beamformer has been shown to improve active sonar image quality compare
 For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
 
 For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
-
-\ \\
-Total: 195 words (200 max)
-
-\ \\
-Noen tanker jeg har selv naa:
-\begin{itemize}
-\item Det mangler noe om bruksomraader.
-\item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
-\item 200 ord er ingenting. :)
-\end{itemize}
-
-
-\ \\
-Questions they wanted answered:
-\begin{itemize}
-\item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
-\item If algorithm is slow - What technology will help me?
-\item What skills are needed?
-\item What tools are available and what's the cost?
-\item What acceleration factor are we looking at?
-\item How can I get started?
-\item What we did. Which tools? Was it hard? Speedup?
-\end{itemize}
 \end{abstract}
+% \ \\
+% Total: 195 words (200 max)
+% 
+% \ \\
+% Noen tanker jeg har selv naa:
+% \begin{itemize}
+% \item Det mangler noe om bruksomraader.
+% \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
+% \end{itemize}
+% 
+% 
+% \ \\
+% Questions they wanted answered:
+% \begin{itemize}
+% \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
+% \item If algorithm is slow - What technology will help me?
+% \item What skills are needed?
+% \item What tools are available and what's the cost?
+% \item What acceleration factor are we looking at?
+% \item How can I get started?
+% \item What we did. Which tools? Was it hard? Speedup?
+% \end{itemize}
+
 
 \section{Introduction}
 
-To improve the image quality active sonar imaging several data adaptive techniques have 
+Graphics Processing Units (GPUs) is a technology tailored to perform image processing at incredible speeds. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed in . Unlike a CPU, which employ clever means to make a few threads run as fast as possible, a GPU does little to optimize the execution speed of a single thread, but in return allow thousands of them to run simultaneously.
 
-Most modern active sonar imaging systems operate by combining data from sensor arrays to , from which data is combined 
+This may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this might be true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle. Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The end design is more than 2 orders of magnitude faster than a C implementation we started off with, it took considerable effort to get there.
 
-The Minimum Variance Distortionless Response (MVDR) beamformer is known for its potential to improve sonar image quality. 
+<< PREVIOUS WORK >>
 
-Most active sonar systems today employ phased arrays to record and 
+<< OUTLINE >>
 
-Adaptive beamforming have in recent years been applied to active sonar imaging by several authors. 
+% MVDR - two parts - estimating R and solving
+% less 32: 
+% 
 
-The potential that adaptive beamformers to improve active sonar image quality is  ers is that theimprove image quality by utilising the apriori knowledge present in the backscattered wavefield.  has for improving active sonar image quality has been demonstrated in e.g. []. are known for the potential to improve image quality in to When using adaptive beamformers to improbe
+% However, to a problem that is commonly met is not that the peak arithmetic performance is insufficient, but that it is difficult move data around fast enough to keep all the computing cores busy. We say that the algorithm is memory bound, as opposed to compute bound.
+
+% 
+% One of the hottest topics in high performance computing today is how Graphics Processing Units (GPUs) can be used to  are one of the hottest candidates for accelerating  . Their appeal in the gaming community makes them relatively cheap, readily available off-the-shelf, and most computers today already have one installed. 
+% 
+% To improve the image quality active sonar imaging several data adaptive techniques have 
+% 
+% Most modern active sonar imaging systems operate by combining data from sensor arrays to , from which data is combined 
+% 
+% The Minimum Variance Distortionless Response (MVDR) beamformer is known for its potential to improve sonar image quality. 
+% 
+% Most active sonar systems today employ phased arrays to record and 
+% 
+% Adaptive beamforming have in recent years been applied to active sonar imaging by several authors. 
+% 
+% The potential that adaptive beamformers to improve active sonar image quality is  ers is that theimprove image quality by utilising the apriori knowledge present in the backscattered wavefield.  has for improving active sonar image quality has been demonstrated in e.g. []. are known for the potential to improve image quality in to When using adaptive beamformers to improbe
+
 
 \section{Methods}
 
-Suppose that a backscattered wavefield is recorded by an $M$ element uniform linear array, and let the output from the $m$'th channel be given as $x_m$. By definition a beamformer's output $z$ is a weighted sum $z$ of all these data outputs:
+Suppose that a backscattered wavefield is recorded by an $M$ element uniform linear array, that a suitable set of delays are applied to the channels for the pixel of interest, and let the delayed output from the $m$'th channel be given as $x_m$. By definition a beamformer's output $z[n]$ at time instant $n$ is a weighted sum all the delayed data outputs:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
@@ -234,68 +256,98 @@ where $w_m$ is the weight factor assigned to channel $m$. With static weights th
 
 \subsection{MVDR beamformer}
 
-Adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, $\argmin{\w}\,E\{|z[n]|^2\}$, while ensuring unity gain in the look direction~\cite{Capon1969}. The solution to this optimization problem is given as:
-\begin{gather}
-\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
-\end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$\todo{should we mention variance reduction?}.
-
-If we let $x_l[n]$ represent the datavector from subarray $l$,
-\begin{gather}
-\x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
-\end{gather}
-then a sample covariance matrix formed with temporal and spatial averaging, $\eR_\text{s,t}$, is given as:
-\begin{gather}
-\eR_\text{s,t}[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
-\end{gather}
-where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
-
-To further improve robustness, we add a fraction $d$ of the total power of $\eR_\text{t,s}[n]$ to its diagonal~\cite{Synnevag2007}:
-\begin{align}
-\eR[n] = \eR_\text{t,s}[n] + \I \frac{d}{L} \tr\{\eR_\text{t,s}[n]\},\label{finalR}
-\end{align}
-where $\I$ is an identity matrix, $\tr\{\cdot\}$ represents the matrix trace operation, and $\tr\{\eR_\text{t,s}[n]\}$ is an estimate of the energy received by this pixel.
-
-\subsection{LCA beamformer}
-
-
-
-
-Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{L,L}$ to $\mathbb{C}^{M,M}$, and hence will produce an $L$-element weightset when substituted into (\ref{z}). This weightset is then applied to on all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weightset to the sum of all the subarrays:
-\begin{align}
-z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
-\end{align}
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/implementation.eps}
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=0.7\linewidth]{gfx/implementation.svg}%
 \caption{MVDR beamforming. For one of the total number of pixels in range and azimuth, $N_y$ and $N_x$,\newline
 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
 2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
-3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
+3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). }\label{mvdr_beamforming}
 \end{figure}
-% \begin{figure}[!t]\centering
-% \includegraphics[width=\linewidth]{gfx/algorithm_structure.eps}
-% \caption{MVDR beamforming. First a spatial covariance matrix is estimated from the delayed data (\ref{spatialR}-\ref{finalR}), then the weights are computed (\ref{weights}) and finally applied to the delayed channel data (\ref{z}).}
-% \label{implementation}
-% \end{figure}
-As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each pixel independently, by
-\begin{enumerate}
-\item computing the sample covariance matrix $\eR$ in (\ref{finalR}),
-\item computing $\eRi\1$ in (\ref{weights}), and
-\item computing the beamformer output $z$ in (\ref{finalZ}).
-\end{enumerate}
+Adaptive beamformers target this limitation by computing a set of weights for each pixel that to better fit the dynamic nature of the incoming wavefield. The MVDR beamformer is one such method. It computes a set of weights that minimizes the noise and signal power accumulated by the array, but with a constraint of unity gain in the desired direction. When the data is delayed this is formulated as follows:
+\begin{gather}
+\argmin{\w}\ E\Big\{\big|\w\H[n]\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w\H[n]\1 = 1. \label{mvdr_def}
+% \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+\end{gather}
+This is a convex optimization problem with the solution:
+\begin{gather}
+\vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+\end{gather}
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these techniques will also ensure a numerically well conditioned $\eR$.
 
+If we let $x_l[n]$ represent the datavector from subarray $l$\todo{replace with with a drawing?},
+\begin{gather}
+\x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
+\end{gather}
+then a sample covariance matrix formed with temporal and spatial averaging, $\eR$, is given as:
+\begin{gather}
+\eR[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
+\end{gather}
+where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
+
+\subsection{LCA beamformer}
+
+The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
+\begin{gather}
+\argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
+% \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+\end{gather}
+Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion. 
+
+<< AVERAGING >>
+
+
+\section{Implementation}
+
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=0.7\linewidth]{gfx/mvdr_implementation.svg}%
+\caption{MVDR implementation.}\label{mvdr_implementation}
+\end{figure}
 
 
 
 \section{Results}
 
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/implementation.eps}
-\caption{MVDR beamforming. For one of the total number of pixels in range and azimuth, $N_y$ and $N_x$,\newline
-1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
-2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
-3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
-\end{figure}
+
+
+
+
+\section{Discussion}
+
+
+% 
+% $\underset{p}{\argmin}$
+% 
+% \begin{gather}
+% \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+% \end{gather}
+
+
+
+
+% \begin{figure}[!t]\centering
+% \includegraphics[width=\linewidth]{gfx/algorithm_structure.eps}
+% \caption{MVDR beamforming. First a spatial covariance matrix is estimated from the delayed data (\ref{spatialR}-\ref{finalR}), then the weights are computed (\ref{weights}) and finally applied to the delayed channel data (\ref{z}).}
+% \label{implementation}
+% \end{figure}
+% As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each pixel independently, by
+% \begin{enumerate}
+% \item computing the sample covariance matrix $\eR$ in (\ref{finalR}),
+% \item computing $\eRi\1$ in (\ref{weights}), and
+% \item computing the beamformer output $z$ in (\ref{finalZ}).
+% \end{enumerate}
+
+
+
+% 
+% \section{Results}
+% 
+% \begin{figure}[t]\centering
+% \graphicsAI[width=\linewidth]{gfx/implementation.svg}
+% \caption{MVDR beamforming. For one of the total number of pixels in range and azimuth, $N_y$ and $N_x$,\newline
+% 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
+% 2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
+% 3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
+% \end{figure}
 
 
 
