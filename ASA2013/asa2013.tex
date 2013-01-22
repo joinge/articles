@@ -315,7 +315,7 @@ Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion
 
 Throughout our work with porting the MVDR beamformer to a GPU, one issue has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible.
 
-The apparent solution is make sure that each thread primarily access the shared memory (L1 cache) and registers, but these are scarce resources. 
+The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
 \begin{table}[b]\centering%\normalsize
 \begin{tabular}[c]{l r r r@{:}  l}\hline
 \rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
