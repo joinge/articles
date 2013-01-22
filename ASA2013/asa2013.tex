@@ -146,6 +146,7 @@ a4paper,10pt
 \newcommand*\X{\mat X}
 \newcommand*\Xd{\X_{\!\Delta}}
 \newcommand*\Y{\mat Y}
+\renewcommand*\B{\mat B}
 
 \renewcommand*\L{\mat \Lambda}
 \newcommand*\U{\mat U}
@@ -294,18 +295,15 @@ then a sample covariance matrix formed with temporal and spatial averaging, $\eR
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
 
-O($N_K N_L L^2$) and the inversion of O($L^3$)
+Complexity: O($N_K N_L L^2$) and the inversion of O($L^3$)
 
 \subsection{MVDR beamforming in the frequency domain}
 
-The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
 \begin{gather}
-\argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1\label{lca_def}. 
-% \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
+\x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
 \end{gather}
-Note that (\ref{mvdr_ref}) and (\ref{lca_ref}) is essentially the same criterion. 
 
-<< AVERAGING >>
+Complexity: To frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$). Inversion: O($N_b^3$).
 
 \subsection{LCA beamformer}
 
@@ -316,8 +314,6 @@ The Low Complexity Adaptive (LCA) beamformer is another take on the optimization
 Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, once the LCA have 10-20 well designed windows to choose from the its ability to create high quality images quickly approaches the quality level of the MVDR beamformer.
 
 Although LCA promotes good image quality, its two most attractive traits is perhaps its simplicity and low computational complexity. The LCA is essentially a delay-and-sum (DAS) beamformer where the delay step is carried out as usual, but where the weighting and summing is repeated for each of the $P$ windows. In its basic form its computational complexity is then of O($M\,P$).
-
-<< AVERAGING >>
 
 
 \section{Implementation}\label{implementation}
