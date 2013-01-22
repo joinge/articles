@@ -221,39 +221,20 @@ For even larger systems we suggest employing the LCA beamformer. It does not cal
 
 Graphics Processing Units (GPUs) is a technology tailored to perform image processing as fast as possible. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying a speed increase of an order of magnitude compared to similar CPU designs. Initially, GPUs may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this is true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
 
-Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR technique displays a notable potential for improving image quality over simple conventional methods, but is far more computationally complex. This is because a spatial covariance matrix must be estimated and inverted for each image pixel. These steps take turn in being the most complex depending on system size. With less than 20-30 channels the algorithm spends most of its time with the estimation step, while at larger system sizes the inversion step completely dominates. For large systems one should try to bypass the estimation/inversion step altogether. 
+Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR technique is known for its notable potential for improving image quality over simple conventional methods, but it is also far more computationally complex. This is because a spatial covariance matrix must be estimated and inverted for each image pixel, the former dominating for systems with less than 20-30 channels, and the latter otherwise. 
 
-Therefore we suggest two different approaches for     dominates the computation time, while for larger system sizes the the inversion step   %Unlike other studies, w While most studies tend to focus on reducing the dimensionality of the convariance matrix to 
+We propose three different solutions to the complexity issue depending on system size. For smaller systems we use the standard time-domain MVDR method, arithmetically optimize the estimation step, and show that image creation rates of more than 1\,Mpx/s can be achieved when this algorithm is run on a GPU. For medium sized systems we suggest applying the MVDR in the frequency domain (beamspace) instead, which allows for comparable processing rates at a negligible reduction in image quality. Finally, for large systems the estimation and inversion step can be avoided completely by utilising the Low Complexity Adaptive (LCA) beamformer.
+% 
+% 
+% The end design is more than 2 orders of magnitude faster than a C implementation we started off with, it took considerable effort to get there.
+% \\
+% << MOTIVATION >>
+% \\
 
-
-The end design is more than 2 orders of magnitude faster than a C implementation we started off with, it took considerable effort to get there.
-\\
-<< MOTIVATION >>
-\\
 Comparable work can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
-\\
-This article is outlined as follows: In section \ref{methods} we will present the background on the MVDR method operated in time and frequency domain, and on the LCA beamformer. For each method we start with the mathematical formulation, then evaluate complexity issues, and finally give our thoughts on some implementational aspects. The results are collected in \ref{implementation}. Finally, we conclude in \ref{discssion}.
+% \\
 
-% MVDR - two parts - estimating R and solving
-% less 32: 
-% 
-
-% However, to a problem that is commonly met is not that the peak arithmetic performance is insufficient, but that it is difficult move data around fast enough to keep all the computing cores busy. We say that the algorithm is memory bound, as opposed to compute bound.
-
-% 
-% One of the hottest topics in high performance computing today is how Graphics Processing Units (GPUs) can be used to  are one of the hottest candidates for accelerating  . Their appeal in the gaming community makes them relatively cheap, readily available off-the-shelf, and most computers today already have one installed. 
-% 
-% To improve the image quality active sonar imaging several data adaptive techniques have 
-% 
-% Most modern active sonar imaging systems operate by combining data from sensor arrays to , from which data is combined 
-% 
-% The Minimum Variance Distortionless Response (MVDR) beamformer is known for its potential to improve sonar image quality. 
-% 
-% Most active sonar systems today employ phased arrays to record and 
-% 
-% Adaptive beamforming have in recent years been applied to active sonar imaging by several authors. 
-% 
-% The potential that adaptive beamformers to improve active sonar image quality is  ers is that theimprove image quality by utilising the apriori knowledge present in the backscattered wavefield.  has for improving active sonar image quality has been demonstrated in e.g. []. are known for the potential to improve image quality in to When using adaptive beamformers to improbe
+This article is outlined as follows: In section \ref{methods} we will present background material on the MVDR method operated in time and frequency domain, and on the LCA beamformer. For each method we start with the mathematical formulation, then evaluate complexity issues, and finally give our thoughts on some implementation aspects. The results are collected in \ref{implementation}. Finally, we conclude in \ref{discssion}.
 
 
 \section{Methods}\label{methods}
