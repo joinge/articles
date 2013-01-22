@@ -218,7 +218,7 @@ For even larger systems we suggest employing the LCA beamformer. It does not cal
 
 \section{Introduction}
 
-Graphics Processing Units (GPUs) is a technology tailored to perform image processing at incredible speeds. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed in . Unlike a CPU, which employ clever means to make a few threads run as fast as possible, a GPU does little to optimize the execution speed of a single thread, but in return allow thousands of them to run simultaneously.
+Graphics Processing Units (GPUs) is a technology tailored to perform image processing at incredible speeds. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed through . Unlike a CPU, which employ clever means to make a few threads run as fast as possible, a GPU does little to optimize the execution speed of a single thread, but in return allow thousands of them to run simultaneously.
 
 This may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this might be true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle. Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The end design is more than 2 orders of magnitude faster than a C implementation we started off with, it took considerable effort to get there.
 
@@ -256,7 +256,7 @@ z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}.
 
-\subsection{MVDR beamforming in time domain}
+\subsection{MVDR beamforming in the time domain}
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=0.7\linewidth]{gfx/implementation.svg}%
@@ -286,7 +286,7 @@ then a sample covariance matrix formed with temporal and spatial averaging, $\eR
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
 
-\subsection{MVDR beamspace}
+\subsection{MVDR beamforming in the frequency domain}
 
 The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
 \begin{gather}
@@ -303,7 +303,9 @@ The Low Complexity Adaptive (LCA) beamformer is another take on the optimization
 \begin{gather}
 \argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
 \end{gather}
-Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, once the LCA have 10-20 well designed windows to choose from its performance quickly converge towards the MVDR beamformer's performance. The difference in computational complexity, however, is 
+Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, once the LCA have 10-20 well designed windows to choose from the its ability to create high quality images quickly approaches the quality level of the MVDR beamformer.
+
+Although LCA promotes good image quality, its two most attractive traits is perhaps its simplicity and low computational complexity. The LCA is essentially a delay-and-sum (DAS) beamformer where the delay step is carried out as usual, but where the weighting and summing is repeated for each of the $P$ windows. In its basic form its computational complexity is then of O($M\,P$).
 
 << AVERAGING >>
 
@@ -312,7 +314,7 @@ Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MV
 
 % Most of the challenges we faced when porting the MVDR to a GPU are caused by a single troublesome fact: GPU prefers threads that computationally intensive but very light on memory consumption. 
 
-Throughout our work with porting the MVDR beamformer to a GPU, one issue has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible.
+Throughout our work with porting the MVDR beamformer to a GPU, one challenge has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible.
 
 The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
 \begin{table}[b]\centering%\normalsize
