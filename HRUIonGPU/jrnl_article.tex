@@ -63,7 +63,22 @@
 % should be used if it is desired that the figures are to be displayed in
 % draft mode.
 %
-\documentclass[journal]{IEEEtran}
+%\documentclass[journal]{IEEEtran}
+
+% Single column review mode:
+\documentclass[12pt,journal,onecolumn]{IEEEtran}
+\newcommand\CLASSINPUTbaselinestretch{2}
+\RequirePackage{calc}
+\RequirePackage{fp} 
+
+% Left margin = 1 inch + hoffset + oddsidemargin (or evensidemargin)
+% Adding the 2cm gutter width to the odd/even side margins:
+\setlength\hoffset{0pt}
+\setlength\oddsidemargin{4cm}       % 4cm margins on the left side
+\addtolength\oddsidemargin{-1in}    % Subtract the initial 1 inch
+
+\setlength\textwidth{21cm-8cm}    % A4 width (21cm) minus margins on either side
+
 %
 % If IEEEtran.cls has not been installed into the LaTeX system files,
 % manually specify the path to it like:
