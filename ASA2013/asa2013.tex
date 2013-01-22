@@ -263,7 +263,7 @@ Suppose that a backscattered wavefield is recorded by an $M$ element uniform lin
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}. Adaptive beamformers target this limitation by computing a set of weights for each pixel that to better fit the dynamic nature of the incoming wavefield.
+where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}. 
 
 \subsection{MVDR beamforming in the time domain}
 
@@ -274,7 +274,7 @@ where $w_m$ is the weight factor assigned to channel $m$. With static weights th
 2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
 3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). }\label{mvdr_beamforming}
 \end{figure}
-The MVDR beamformer is one such method. It computes a set of weights that minimizes the noise and signal power accumulated by the array, but with a constraint of unity gain in the desired direction. When the data is delayed this is formulated as follows:
+The MVDR beamformer target this limitation by computing a set of weights for each pixel that to better fit the dynamic nature of the incoming wavefield. It computes the set of weights that minimizes the noise and signal power accumulated by the array, but with the constraint of unity gain for signal coming from the pixel of interest. When the data is delayed this is formulated as follows:
 \begin{gather}
 \argmin{\w}\ E\Big\{\big|\w\H[n]\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w\H[n]\1 = 1. \label{mvdr_def}
 % \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
@@ -283,9 +283,10 @@ This is a convex optimization problem with the solution:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these techniques will also ensure a numerically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these techniques will also ensure a numerically well conditioned $\eR$. 
 
-If we let $x_l[n]$ represent the datavector from subarray $l$\todo{replace with with a drawing?},
+In terms of computational complexity the two important  of the MVDR method the 
+Before If we let $x_l[n]$ represent the datavector from subarray $l$\todo{replace with with a drawing?},
 \begin{gather}
 \x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
 \end{gather}
