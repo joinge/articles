@@ -281,23 +281,24 @@ To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image w
 
 \subsubsection{Complexity and implementation}
 
-If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison, performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ the estimation step will dominate. This tend to be true in active systems because we often want to set set $L<M/2$ and $N_K\ge>3$ for the MVDR to be robust enough to yield the expected results.
+If (\ref{spatialR}) were to be implemented directly, we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison, performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ the estimation step will dominate. This tends to be true in active systems because we often want to set $L<M/2$ and $N_K\ge>3$ for the MVDR to be robust enough to yield the expected results.
 
-First, we target this limitation arithmetic optimizations and parallel computing power. In particular, we may infer from (\ref{spatialR}) that:
+A few properties let us improve these matters notably. First, we may infer from (\ref{spatialR}) that:
 \begin{itemize}
 \item The subarray covariance matrices $R_l[n] = \x_l[n]\x_l\H[n]$ are Hermitian semi-definite, which means that we can get away with computing only one triagonal in them.
 \item When summing $R_l[n]$ most of the multiplications can be computed only once, and most sums need only be updated iteratively.
 \end{itemize}
-
+Second, each of the diagonals of $R_l[n]\ \forall\ l$ can be computed independently, which is good news for our GPU design.
 
 \subsection{MVDR beamforming in the frequency domain}
 
-As we increase system size the inversion step will become the main bottleneck. Although the dimensionality of the covariance matrix was reduced to $L$ due to subarray averaging, we can reduce it further by moving to the frequency domain. For narrowband  relation between the frequency conent and angles of arrival in the spatial domain; the zero-frequency component will correspond to broadside, and larger frequency components will correspond to increasing .   component corresponding to broadside and increasing frequencies  This is usually handled by reducing the dimensionality of the covariance matrix to 
+As we increase system size the inversion step will become more of a bottleneck. Although the dimensionality of the covariance matrix is reduced to $L$ due to subarray averaging, we can reduce it further by performing MVDR beamforming. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array angles of arrival in the spatial domain; the zero-frequency correspond to broadside, and increasing frequencies map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, why would we want to process angles where there are hardly any information?
 
+Beamspace MVDR very closely resembles time domain MVDR. The main difference is the need to Fourier transform the data:
 \begin{gather}
-\x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
+\x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N_b,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
 \end{gather}
-
+$\B$ is usually referred to as 
 Complexity: To frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$). Inversion: O($N_b^3$).
 
 \subsection{LCA beamformer}
