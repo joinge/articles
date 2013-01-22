@@ -218,17 +218,19 @@ For even larger systems we suggest employing the LCA beamformer. It does not cal
 
 \section{Introduction}
 
-Graphics Processing Units (GPUs) is a technology tailored to perform image processing at incredible speeds. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying an order of magnitude speedups compared to comparable designs running on a CPU. Initially, GPUs seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this might be true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
+Graphics Processing Units (GPUs) is a technology tailored to perform image processing at incredible speeds. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying an order of magnitude speedups compared to comparable designs running on a CPU. Initially, GPU may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this is true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
 
 %Unlike a CPU, which employ clever means to make a few threads run as fast as possible, a GPU does little to optimize the execution speed of a single thread, but in return allow thousands of them to run simultaneously.
 
-Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR technique display a potent potential for improving image quality over simple conventional methods, but is far more computationally complex since a spatial covariance matrix must be estimated (of O($L$)) and inverted for each image pixel. While most studies tend to focus on reducing the dimensionality of the convariance matrix to 
+Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR is a technique that displays a great potential for improving image quality over simple conventional methods, but is far more computationally complex. This is because a spatial covariance matrix must be estimated (of O($M$) and inverted for each image pixel.    For systems with less than 20-30 channels, the estimation step dominates,   %Unlike other studies, w While most studies tend to focus on reducing the dimensionality of the convariance matrix to 
+
+ .
 
 The end design is more than 2 orders of magnitude faster than a C implementation we started off with, it took considerable effort to get there.
 \\
 << MOTIVATION >>
 \\
-Comparable can be found in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a,}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approximate the 
+Comparable can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a,}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
 \\
 This article is outlined as follows: In section \ref{methods} we will present the theoretical background on MVDR operated in time and frequency domain, as well as relating this to the LCA beamformer.  As we move along we aim to mention complexity issues and suggest means to overcome them, but implementational aspect will first be presented in \ref{implementation}.
 
@@ -291,6 +293,8 @@ then a sample covariance matrix formed with temporal and spatial averaging, $\eR
 \eR[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
+
+O($N_K N_L L^2$) and the inversion of O($L^3$)
 
 \subsection{MVDR beamforming in the frequency domain}
 
