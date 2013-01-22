@@ -276,15 +276,18 @@ then the sample covariance matrix formed with temporal and spatial averaging, $\
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. In the actual design a fraction of the total power of $\eR[n]$ is finally added to its diagonal~\cite{Synnevag2007}, but this step will be ignored here due to its negligible contribution to runtime.
 
+To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image we estimate $\eR$ (\ref{spatialR}), solve the linear equation $\eRi\1$ (\ref{weights}), the finally substitute some to get the beamformer output (\ref{mvdr_def}-\ref{weights}).
+
 
 \subsubsection{Complexity and implementation}
 
-If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ then the estimation step will dominate. This tend to be true in active systems because it is usually required to set $L<M/2$ and $N_K\ge>3$ to MVDR yield the expected results.
+If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison, performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ the estimation step will dominate. This tend to be true in active systems because we often want to set set $L<M/2$ and $N_K\ge>3$ for the MVDR to be robust enough to yield the expected results.
 
-\begin{figure}[t]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/mvdr_implementation.svg}%
-\caption{MVDR implementation.}\label{mvdr_implementation}
-\end{figure}
+The good news is that this step can greatly benefit from both arithmetic optimizations and parallel computing power. By carefully evaluating (\ref{spatialR}) we can see that:
+\begin{itemize}
+\item 
+\end{itemize}
+
 
 
 \subsection{MVDR beamforming in the frequency domain}
@@ -310,21 +313,23 @@ Although LCA promotes good image quality, its two most attractive traits is perh
 
 \section{Implementation}\label{implementation}
 
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/mvdr_implementation.svg}%
+\caption{MVDR implementation.}\label{mvdr_implementation}
+\end{figure}
+
+Some key aspects of our time domain MVDR implementation is illustrated in Figure \ref{mvdr_implementation}. 
+
+First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without the need for reading additional channel data.
+
+Second we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximize global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Combined these steps balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less memory. 
+
+
+
+These challenges are very closely linked. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB of shared memory (L1 cache) and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This will expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (Little's law). By dividing the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
+
 % Most of the challenges we faced when porting the MVDR to a GPU are caused by a single troublesome fact: GPU prefers threads that computationally intensive but very light on memory consumption. 
 
-Throughout our work with porting the MVDR beamformer to a GPU, one challenge has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible.
-
-The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
-\begin{table}[b]\centering%\normalsize
-\begin{tabular}[c]{l r r r@{:}  l}\hline
-\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
-Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
-Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
-Shared memory & & 257 Gfloats/s & 1 & 4 \\
-Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
-\end{tabular}
-\caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
-\end{table}
 
 
 
@@ -341,6 +346,21 @@ Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
 
 
 \section{Discussion}
+
+
+Throughout our work with porting the MVDR beamformer to a GPU, one challenge has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible.
+
+The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
+\begin{table}[b]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{:}  l}\hline
+\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
+Shared memory & & 257 Gfloats/s & 1 & 4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
+\end{tabular}
+\caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
+\end{table}
 
 
 MVDR for systems with less than 32 channels. After that MVDR in beamspace. 
