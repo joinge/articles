@@ -299,6 +299,8 @@ Complexity: O($N_K N_L L^2$) and the inversion of O($L^3$)
 
 \subsection{MVDR beamforming in the frequency domain}
 
+For larger systems the inversion step will completely dominate the computation time. Although the dimensionality of the coveriance matrix was reduced to $L$ due to subarray averaging, we can reduce it further by moving to the frequency domain. If the data is narrowband enough there is a very close relation between the frequency conent and angles of arrival in the spatial domain; the zero-frequency component will correspond to broadside, and    component corresponding to broadside and increasing frequencies  This is usually handled by reducing the dimensionality of the covariance matrix to 
+
 \begin{gather}
 \x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
 \end{gather}
@@ -344,7 +346,7 @@ Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
 
 \section{Results}
 
-\begin{figure}[h]\centering%
+\begin{figure}[!h]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
 \caption{Holmengraa.}\label{mvdr_implementation}
 \end{figure}
