@@ -223,7 +223,7 @@ Graphics Processing Units (GPUs) is a technology tailored to perform image proce
 
 %Unlike a CPU, which employ clever means to make a few threads run as fast as possible, a GPU does little to optimize the execution speed of a single thread, but in return allow thousands of them to run simultaneously.
 
-Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR is a technique that displays a great potential for improving image quality over simple conventional methods, but is far more computationally complex. This is because a spatial covariance matrix must be estimated (of O($M$) and inverted for each image pixel.  For systems with less than 20-30 channels, the estimation step dominates,   %Unlike other studies, w While most studies tend to focus on reducing the dimensionality of the convariance matrix to 
+Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR is a technique that displays a great potential for improving image quality over simple conventional methods, but is far more computationally complex. This is because a spatial covariance matrix must be estimated and inverted for each image pixel.  For systems with less than 20-30 channels, the estimation step dominates,   %Unlike other studies, w While most studies tend to focus on reducing the dimensionality of the convariance matrix to 
 
  .
 
@@ -233,7 +233,7 @@ The end design is more than 2 orders of magnitude faster than a C implementation
 \\
 Comparable can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a,}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
 \\
-This article is outlined as follows: In section \ref{methods} we will present the theoretical background on MVDR operated in time and frequency domain, as well as relating this to the LCA beamformer.  As we move along we aim to mention complexity issues and suggest means to overcome them, but implementational aspect will first be presented in \ref{implementation}.
+This article is outlined as follows: In section \ref{methods} we will present the background on the MVDR method operated in time and frequency domain, and on the LCA beamformer. For each method we start with the mathematical formulation, then evaluate complexity issues, and finally give our thoughts on some implementational aspects. The results are collected in \ref{implementation}. Finally, we conclude in \ref{discssion}.
 
 % MVDR - two parts - estimating R and solving
 % less 32: 
@@ -263,7 +263,7 @@ Suppose that a backscattered wavefield is recorded by an $M$ element uniform lin
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}.
+where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}. Adaptive beamformers target this limitation by computing a set of weights for each pixel that to better fit the dynamic nature of the incoming wavefield.
 
 \subsection{MVDR beamforming in the time domain}
 
@@ -274,7 +274,7 @@ where $w_m$ is the weight factor assigned to channel $m$. With static weights th
 2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
 3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). }\label{mvdr_beamforming}
 \end{figure}
-Adaptive beamformers target this limitation by computing a set of weights for each pixel that to better fit the dynamic nature of the incoming wavefield. The MVDR beamformer is one such method. It computes a set of weights that minimizes the noise and signal power accumulated by the array, but with a constraint of unity gain in the desired direction. When the data is delayed this is formulated as follows:
+The MVDR beamformer is one such method. It computes a set of weights that minimizes the noise and signal power accumulated by the array, but with a constraint of unity gain in the desired direction. When the data is delayed this is formulated as follows:
 \begin{gather}
 \argmin{\w}\ E\Big\{\big|\w\H[n]\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w\H[n]\1 = 1. \label{mvdr_def}
 % \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
