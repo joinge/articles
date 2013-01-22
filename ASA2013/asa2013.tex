@@ -283,16 +283,16 @@ To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image w
 
 If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison, performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ the estimation step will dominate. This tend to be true in active systems because we often want to set set $L<M/2$ and $N_K\ge>3$ for the MVDR to be robust enough to yield the expected results.
 
-The good news is that this step can greatly benefit from both arithmetic optimizations and parallel computing power. By carefully evaluating (\ref{spatialR}) we can see that:
+First, we target this limitation arithmetic optimizations and parallel computing power. In particular, we may infer from (\ref{spatialR}) that:
 \begin{itemize}
-\item 
+\item The subarray covariance matrices $R_l[n] = \x_l[n]\x_l\H[n]$ are Hermitian semi-definite, which means that we can get away with computing only one triagonal in them.
+\item When summing $R_l[n]$ most of the multiplications can be computed only once, and most sums need only be updated iteratively.
 \end{itemize}
-
 
 
 \subsection{MVDR beamforming in the frequency domain}
 
-For larger systems the inversion step will completely dominate the computation time. Although the dimensionality of the coveriance matrix was reduced to $L$ due to subarray averaging, we can reduce it further by moving to the frequency domain. If the data is narrowband enough there is a very close relation between the frequency conent and angles of arrival in the spatial domain; the zero-frequency component will correspond to broadside, and    component corresponding to broadside and increasing frequencies  This is usually handled by reducing the dimensionality of the covariance matrix to 
+As we increase system size the inversion step will become the main bottleneck. Although the dimensionality of the covariance matrix was reduced to $L$ due to subarray averaging, we can reduce it further by moving to the frequency domain. For narrowband  relation between the frequency conent and angles of arrival in the spatial domain; the zero-frequency component will correspond to broadside, and larger frequency components will correspond to increasing .   component corresponding to broadside and increasing frequencies  This is usually handled by reducing the dimensionality of the covariance matrix to 
 
 \begin{gather}
 \x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
@@ -306,7 +306,7 @@ The Low Complexity Adaptive (LCA) beamformer is another take on the optimization
 \begin{gather}
 \argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
 \end{gather}
-Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, once the LCA have 10-20 well designed windows to choose from the its ability to create high quality images quickly approaches the quality level of the MVDR beamformer.
+Note the similarity between (\ref{mvdr_def}) and (\ref{lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, we have found that once the LCA has 10-20 well designed windows available the quality of the images it produces quickly approaches that of the MVDR beamformer.
 
 Although LCA promotes good image quality, its two most attractive traits is perhaps its simplicity and low computational complexity. The LCA is essentially a delay-and-sum (DAS) beamformer where the delay step is carried out as usual, but where the weighting and summing is repeated for each of the $P$ windows. In its basic form its computational complexity is then of O($M\,P$).
 
@@ -318,13 +318,11 @@ Although LCA promotes good image quality, its two most attractive traits is perh
 \caption{MVDR implementation.}\label{mvdr_implementation}
 \end{figure}
 
-Some key aspects of our time domain MVDR implementation is illustrated in Figure \ref{mvdr_implementation}. 
+Some key aspects of our time domain MVDR implementation is illustrated in Figure \ref{mvdr_implementation}.
 
 First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without the need for reading additional channel data.
 
-Second we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximize global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Combined these steps balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less memory. 
-
-
+Second we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Combined these steps balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less memory. 
 
 These challenges are very closely linked. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB of shared memory (L1 cache) and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This will expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (Little's law). By dividing the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
 
