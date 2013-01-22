@@ -266,19 +266,26 @@ This is a convex optimization problem with the solution:
 \end{gather}
 where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these techniques will also ensure a numerically well conditioned $\eR$. 
 
-To arrive at a formulation of how $\eR$ is estimated, we first split the array into subarrays of length $L$ that overlap on all but one sensor. Let $x_l[n]$ represent the datavector from subarray $l$,
+To arrive at a formulation of how $\eR$ can be estimated, we first split the array into subarrays of length $L$ that overlap on all but one sensor. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}
 \x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T.
 \end{gather}
-Now the sample covariance matrix formed with temporal and spatial averaging, $\eR$, is given as:
+then the sample covariance matrix formed with temporal and spatial averaging, $\eR$, is given as:
 \begin{gather}
 \eR[n] =  \frac{1}{N_K N_L} \sumb{l=0}{N_L-1}\sumb{n'=n-K}{n+K} \x_l[n]\x_l\H[n] \in\mathbb{C}^{L,L},\label{spatialR}
 \end{gather}
 where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. In the actual design a fraction of the total power of $\eR[n]$ is finally added to its diagonal~\cite{Synnevag2007}, but this step will be ignored here due to its negligible contribution to runtime.
 
+
 \subsubsection{Complexity and implementation}
 
-If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step has a complexity of O($N_K N_L L^2$). By comparison the inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L > L$ then the estimation step will dominate. Note that this inequality will increase as we increase the number of subarrays or temporal samples to perform averaging over.
+If (\ref{spatialR}) were to be implemented directly, then we note that the estimation step would have a complexity of O($N_K N_L L^2$). By comparison performing a Gauss Jordan inversion is generally of O($L^3$), which implies that whenever $N_K\,N_L = N_K(M-L+1) \gg L$ then the estimation step will dominate. This tend to be true in active systems because it is usually required to set $L<M/2$ and $N_K\ge>3$ to MVDR yield the expected results.
+
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/mvdr_implementation.svg}%
+\caption{MVDR implementation.}\label{mvdr_implementation}
+\end{figure}
+
 
 \subsection{MVDR beamforming in the frequency domain}
 
@@ -320,10 +327,7 @@ Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
 \end{table}
 
 
-\begin{figure}[t]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/mvdr_implementation.svg}%
-\caption{MVDR implementation.}\label{mvdr_implementation}
-\end{figure}
+
 
 
 
