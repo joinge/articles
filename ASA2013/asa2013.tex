@@ -297,10 +297,11 @@ As we increase system size the inversion step will become more of a bottleneck. 
 
 The beamspace MVDR formulation very closely resembles that of time domain MVDR. The main difference is the initial need to Fourier transform the data:
 \begin{gather}
-\x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N_b,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
+\x_{\text{BS},l}[n] = \B\x_l[n], \qquad \B\in \mathbb{C}^{N_b,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
 \end{gather}
-The number of angles to compute is here defined by $N_b$, $\B$, usually referred to as a Butler matrix
-Complexity: To frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$), Inversion: O($N_b^3$).
+Here $\B$ is referred to as the Butler matrix, $l$ is the subarray index, and $N_b$ is the number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{spatialR}), $\w_\text{BS}$ as in (\ref{weights}), and $z$ as in (\ref{z}).
+
+By reducing the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional O[$N_b  Complexity: To\,L$) computations required  frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$), Inversion: O($N_b^3$).
 
 \subsection{LCA beamformer}
 
