@@ -817,7 +817,7 @@ and applied to the beamspace data summed across subarrays.
 %N_L = floor(\frac{M}{s}) - floor(\frac{L-1}{s})
 %\end{align}
 
-As presented in (\ref{eq:diag}), adaptive diagonal loading is performed by loading the sample covariance matrix with the average energy per element, hence $trace\{\mat{\hat{R}}\}/L$. If adaptive diagonal loading is applied after data have been transformed into beamspace, a high percentage of the total energy is mapped to a small subset of beams. Thus the average energy per beam is higher than the average energy was per element, if the system uses focused transmit beams. This means that less diagonal loading (smaller $d$) has to be applied in beamspace than in element space.
+As presented in (\ref{eq:diag}), adaptive diagonal loading is performed by loading the sample covariance matrix with the average energy per element, hence $trace\{\mat{\hat{R}}\}/L$. If adaptive diagonal loading is applied after data have been transformed into beamspace, a high percentage of the total energy is mapped to a small subset of beams. Thus the average energy per beam is higher than the average energy was per element, when beams containing little energy are removed. This means that less diagonal loading (smaller $d$) has to be applied in beamspace than in element space when $N_b < L$.
 
 To summarize, by transforming data to beamspace we reduce the complexity of all the subsequent steps. Calculating the covariance matrix is now $O(N_KN_LN_b^2)$, the inversion step is $O(N_b^3)$, and calculating weights and the beamformer output are both $O(N_b)$. The added complexity of SBS is $O(N_bL)$.
 
@@ -852,7 +852,7 @@ To summarize, by transforming data to beamspace we reduce the complexity of all 
 \hfil
 \subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=400_Nb=3.png}%
 \label{fig:benchBS5}}}
-\caption{Benchmark of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$cm deep sector. Execution time is plotted as a function of subarray length $L$. (a) Shows the benchmark for a 64 elements array. (b) Shows the benchmark for a 96 elements array. (TODO: Change this to be a function of $N_b$)}
+\caption{Benchmark of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$cm deep sector. Execution time is plotted as a function of subarray length $L$.  If $L$ is kept constant on $M/2$ and execution time is plotted against $N_b$, the plot would be similar to the two in Fig. \ref{fig:bench}. (a) Shows the benchmark for a 64 elements array. (b) Shows the benchmark for a 96 elements array.}
 \label{fig:benchBS}
 \end{figure*}
 
