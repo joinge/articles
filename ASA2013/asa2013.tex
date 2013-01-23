@@ -163,6 +163,7 @@ a4paper,10pt
 \usetikzlibrary{shapes,snakes}
 \usepackage{amsmath,amssymb}
 \usepackage{glossaries}
+\usepackage{common/slashbox}
 
 \newcommand\graphicsAI[2][]{%
   \immediate\write18{./bin/laFigure #2 #1}%
@@ -292,14 +293,14 @@ Second, each of the diagonals of $R_l[n]\ \forall\ l$ can be computed independen
 
 \subsection{MVDR beamforming in the frequency domain}
 
-As we increase system size the inversion step will become more of a bottleneck. Although the dimensionality of the covariance matrix is reduced to $L$ due to subarray averaging, we can reduce it further by performing MVDR beamforming. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array angles of arrival in the spatial domain; the zero-frequency correspond to broadside, and increasing frequencies map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, why would we want to process angles where there are hardly any information?
+As we increase system size the inversion step will become more of a bottleneck. Although the dimensionality of the covariance matrix is reduced to $L$ due to subarray averaging, we can reduce it further by performing MVDR beamforming. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array angles of arrival in the spatial domain; the zero-frequency correspond to broadside, and increasing frequencies map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, this method allow us to only process the angles where the signal came from.
 
-Beamspace MVDR very closely resembles time domain MVDR. The main difference is the need to Fourier transform the data:
+The beamspace MVDR formulation very closely resembles that of time domain MVDR. The main difference is the initial need to Fourier transform the data:
 \begin{gather}
 \x_\text{BS}[n] = \B\x[n], \qquad \B\in \mathbb{C}^{N_b,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
 \end{gather}
-$\B$ is usually referred to as 
-Complexity: To frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$). Inversion: O($N_b^3$).
+$\B$ here is usually referred to as a Butler matrix. 
+Complexity: To frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$), Inversion: O($N_b^3$).
 
 \subsection{LCA beamformer}
 
@@ -342,16 +343,18 @@ These challenges are very closely linked. The Quadro 6000 architecture is of com
 \caption{Holmengraa.}\label{mvdr_implementation}
 \end{figure}
 
-\begin{table}[b]\centering%\normalsize
-\begin{tabular}[c]{l r r r@{:}  l}\hline
-\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
-Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
-Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
-Shared memory & & 257 Gfloats/s & 1 & 4 \\
-Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
-\end{tabular}
-\caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
-\end{table}
+\begin{figure}[!h]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/benchmark_tagged.svg}%
+\caption{Holmengraa.}\label{mvdr_implementation}
+\end{figure}
+
+% \begin{table}[h]\centering%\normalsize
+% \begin{tabular}[c]{l r r r@{:}  l}\hline
+% \rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+%  & & & & \\
+% \end{tabular}
+% \caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
+% \end{table}
 
 
 \section{Discussion}
