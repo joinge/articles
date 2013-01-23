@@ -1,5 +1,5 @@
 
-\newif\ifTODO\TODOtrue                        % Use todo notes?
+\newif\ifTODO\TODOfalse                        % Use todo notes?
 
 %===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % DOCUMENTCLASS %                                See full option description in "mytemplate.cls"
@@ -178,50 +178,50 @@ a4paper,10pt
 
 
 \begin{document}
-% \setlength{\headrulewidth}{0.0pt}
-
-%~~ TitlePage ~~%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\thispagestyle{empty}
-\pagenumbering{arabic} %Normal numbers
-
-{\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
-
-\begin{abstract}
-The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping the MVDR beamformer to a GPU, and suggest three different solutions depending on the system size.
-
-For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
-
-For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
-\end{abstract}
-\vspace{2cm}
-(Forsiden genereres av ASA.)
-% \ \\
-% Total: 195 words (200 max)
+% % \setlength{\headrulewidth}{0.0pt}
 % 
-% \ \\
-% Noen tanker jeg har selv naa:
-% \begin{itemize}
-% \item Det mangler noe om bruksomraader.
-% \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
-% \end{itemize}
+% %~~ TitlePage ~~%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% \thispagestyle{empty}
+% \pagenumbering{arabic} %Normal numbers
 % 
+% {\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
 % 
-% \ \\
-% Questions they wanted answered:
-% \begin{itemize}
-% \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
-% \item If algorithm is slow - What technology will help me?
-% \item What skills are needed?
-% \item What tools are available and what's the cost?
-% \item What acceleration factor are we looking at?
-% \item How can I get started?
-% \item What we did. Which tools? Was it hard? Speedup?
-% \end{itemize}
-
-\newpage
+% \begin{abstract}
+% The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping the MVDR beamformer to a GPU, and suggest three different solutions depending on the system size.
+% 
+% For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
+% 
+% For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
+% \end{abstract}
+% \vspace{2cm}
+% (Forsiden genereres av ASA.)
+% % \ \\
+% % Total: 195 words (200 max)
+% % 
+% % \ \\
+% % Noen tanker jeg har selv naa:
+% % \begin{itemize}
+% % \item Det mangler noe om bruksomraader.
+% % \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
+% % \end{itemize}
+% % 
+% % 
+% % \ \\
+% % Questions they wanted answered:
+% % \begin{itemize}
+% % \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
+% % \item If algorithm is slow - What technology will help me?
+% % \item What skills are needed?
+% % \item What tools are available and what's the cost?
+% % \item What acceleration factor are we looking at?
+% % \item How can I get started?
+% % \item What we did. Which tools? Was it hard? Speedup?
+% % \end{itemize}
+% 
+% \newpage
 \section{Introduction}
 
-Graphics Processing Units (GPUs) is a technology tailored to perform image processing as fast as possible. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying a speed increase of an order of magnitude compared to similar CPU designs. Initially, GPUs may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this is true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
+Graphics Processing Units (GPUs) is a technology tailored to perform image processing as fast as possible. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying speed increases of an order of magnitude compared to similar CPU designs. Initially, GPUs may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this is true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
 
 Through a case study of on such technique, the Minimum Variance Distortionless Response (MVDR) beamformer, we identify these challenges and explain how they were overcome. The MVDR technique is known for its notable potential for improving image quality over simple conventional methods, but it is also far more computationally complex. This is because a spatial covariance matrix must be estimated and inverted for each image pixel, the former dominating for systems with less than 20-30 channels, and the latter otherwise. 
 
@@ -305,7 +305,7 @@ By reducing the covariance size from $L$ to $N_b$ we also reduce the estimation 
 
 \subsection{LCA beamformer}
 
-The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as:
+The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as~\cite{Synnevag2008}:
 \begin{gather}
 \argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
 \end{gather}
@@ -325,7 +325,7 @@ Our GPU implementation consists of three main kernels relating to the computing 
 
 When computing $\eR$ we we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. This procedure balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes very little memory.
 
-Frequency domain MVDR beamforming 
+The implementation of beamspace MVDR is very similar, but the data access pattern is different. In the time domain subsequent subarrays overlap on all but one element in memory, but once Fourier transformed the data does not overlap at all. Such a seemingly innocent detail can make all the difference in a GPU design, because efficient memory accessing is key to obtaining good performance.
 
 
 
@@ -338,26 +338,16 @@ Frequency domain MVDR beamforming
 % The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
 
 
-
-
-
-
-
 \section{Results}
 
 
-To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar being attached to the HUGIN AUV~\cite{Hansen2009}. The studied object is the 1500 dwt oil tanker wreck Holmengraa, lying at 77\,m depth outside of Horten, Norway. HISAS1030 is a synthetic apterture sonar, but was operated in sidescan mode here. Holmengraa is roughly 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth. The image was processed with MVDR parameters $L=16$, $N_\text{avg}=3$, and $d=1\%$, which proved to be a reasonable selection for this scenario.
+To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar mounted on the HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\,m and operating frequency of 100\,kHz, and it was operated in sidescan mode here. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\,m long and 9\,m wide, and lies at a slanted seabed at 77\,m depth outside of Horten, Norway. The results are shown in Figure \ref{holmengraa}. The MVDR images were processed with parameters $L$=16, $K$=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was designed with a window database consisting of 5 Kaiser windows, each with different window-parameters from the range $\beta\in[0,10]$, and each steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from.
 
-The computational performance of our GPU implementation is displayed in (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. A single-thread C and Matlab implementation is added as reference, although only moderate optimization work was carried out on these. The test system was a quad-core Intel Xeon E5620, with 64Gb of RAM, and an nVidia Quadro 6000 card.
+A few benchmarks of these methods are presented in Figure \ref{benchmark}. On our test system, a quad-core Intel Xeon E5620 with 64Gb of RAM and an nVidia Quadro 6000 card, the MVDR methods managed to create images at rates just over 1\,Mpx/s. A single-thread C implementation that was added as reference was outperformed by around 2 orders of magnitude. However, do not consider this comparison fair because while the GPU design is make efficient use of the L1 cache, similar optimisation work was not carried out on the CPU design.
 
 \begin{figure}[!t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
-\caption{Holmengraa.}\label{holmengraa}
-\end{figure}
-
-\begin{figure}[!h]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/benchmark_tagged.svg}%
-\caption{Holmengraa.}\label{benchmark}
+\caption{The 68$\times$9\,m oil tanker Holmengraa lying at a depth of 77\,m. The MVDR images were processed with L=16, K=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was set up with a window database consisting of 5 Kaiser windows with the window-parameter set in the range $\beta\in[0,10]$, and then each of these were steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from..}\label{holmengraa}
 \end{figure}
 
 % \begin{table}[h]\centering%\normalsize
@@ -368,27 +358,33 @@ The computational performance of our GPU implementation is displayed in (\Fig{be
 % \caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
 % \end{table}
 
+\begin{figure}[!h]\centering%
+\graphicsAI[drawing,width=.8\linewidth]{gfx/benchmark1_tagged.pdf}%
+\caption{Benchmarks for the our time-domain and frequency-domain MVDR method running on a GPU. The grey line marks the realtime requirement for the HUGIN AUV to perform full-coverage sectorscan images with a ping rate of 3 pings/s.}\label{benchmark}
+\end{figure}
+
 
 \section{Discussion}
 
-\begin{table}[b]\centering%\normalsize
-\begin{tabular}[c]{l r r r@{:}  l}\hline
-\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
-Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
-Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
-Shared memory & & 257 Gfloats/s & 1 & 4 \\
-Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
-\end{tabular}
-\caption{Nvidia Quadro 6000: Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
-\end{table}
-
-One thing seems clear to us after we have learned from this work is that it is very hard to reach the peak performance of a GPU, and more often 
-
-. In our this learned from this process is how that each GPU thread have very small amounts of A thing we took home from this work 
-But no matter how Throughout our work with porting the MVDR beamformer to a GPU, one challenge has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible. 
+% \begin{table}[b]\centering%\normalsize
+% \begin{tabular}[c]{l r r r@{:}  l}\hline
+% \rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+% Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
+% Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
+% Shared memory & & 257 Gfloats/s & 1 & 4 \\
+% Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
+% \end{tabular}
+% \caption{Nvidia Quadro 6000: Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
+% \end{table}
 
 
-MVDR for systems with less than 32 channels. After that MVDR in beamspace. 
+The MVDR beamformer is a technique that is able to improve image quality over conventional methods. This can be seen in Figure \ref{holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge detection. Contrary to common belief, it can also be made to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
+
+If this performance is insufficient, we suggest looking at the LCA method. It is based on the same optimisation criterion as the MVDR method, but avoids the estimation and inversion step altogether by limiting the weight's solution space to only a few predefined windows. As seen the Figure \ref{holmengraa}, it produces images with a quality comparable to the MVDR method, but computing the images takes only a fraction of the time.
+
+
+
+% Finally, throughout our work with porting the MVDR beamformer to a GPU, one challenge has been particularly difficult to solve: The GPU will only perform efficiently when each computing thread is very computationally intense. This should be apparent by studying Table \ref{tabbandwidth}. It compares theoretical peak values for the memory bandwidth and arithmetic throughput for an Nvidia Quadro 6000 GPU. Looking at global memory, we note that it is only able to move 1 float for every 30 floating point operation that the GPU is able to execute. Now, consider the simple equation we the simple equation $C=A+B$, where the ratio is 3 floats read/written for every 1 floating point operation, we realise that global memory should be avoided whenever possible. 
 
 
 % 
