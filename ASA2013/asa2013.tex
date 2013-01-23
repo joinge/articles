@@ -178,47 +178,47 @@ a4paper,10pt
 
 
 \begin{document}
-% % \setlength{\headrulewidth}{0.0pt}
+% \setlength{\headrulewidth}{0.0pt}
+
+%~~ TitlePage ~~%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\thispagestyle{empty}
+\pagenumbering{arabic} %Normal numbers
+
+{\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
+
+\begin{abstract}
+The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping the MVDR beamformer to a GPU, and suggest three different solutions depending on the system size.
+
+For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
+
+For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
+\end{abstract}
+\vspace{2cm}
+(Forsiden genereres av ASA.)
+% \ \\
+% Total: 195 words (200 max)
 % 
-% %~~ TitlePage ~~%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-% \thispagestyle{empty}
-% \pagenumbering{arabic} %Normal numbers
+% \ \\
+% Noen tanker jeg har selv naa:
+% \begin{itemize}
+% \item Det mangler noe om bruksomraader.
+% \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
+% \end{itemize}
 % 
-% {\Large\bf Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems.}
 % 
-% \begin{abstract}
-% The MVDR beamformer has been shown to improve active sonar image quality compared to conventional methods. Unfortunately, it is also significantly more computationally expensive because a spatial covariance matrix must be estimated and inverted for each image pixel. We target this challenge by altering and mapping the MVDR beamformer to a GPU, and suggest three different solutions depending on the system size.
-% 
-% For systems with relatively few channels, we suggest arithmetic optimizations for the estimation step, and show how a GPU can be used to yield image creation rates of more than 1\,Mpx/s. For larger systems we show that frequency domain processing is preferable, as this promotes high processing rates at a negligible reduction in image quality. These GPU implementations consistently reduced the runtime by 2-3 orders of magnitude compared to our reference C and Matlab implementations.
-% 
-% For even larger systems we suggest employing the LCA beamformer. It does not calculate a weightset, but merely computes the beamformer output for each of a predefined set of weights, and selects the one that best fulfils the MVDR criterion. The LCA creates images with a quality comparable to MVDR, and it is perfectly suited for a GPU.
-% \end{abstract}
-% \vspace{2cm}
-% (Forsiden genereres av ASA.)
-% % \ \\
-% % Total: 195 words (200 max)
-% % 
-% % \ \\
-% % Noen tanker jeg har selv naa:
-% % \begin{itemize}
-% % \item Det mangler noe om bruksomraader.
-% % \item Maa passe paa aa ikke selge LCA saa bra at MVDR ser helt haaplos ut(?)
-% % \end{itemize}
-% % 
-% % 
-% % \ \\
-% % Questions they wanted answered:
-% % \begin{itemize}
-% % \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
-% % \item If algorithm is slow - What technology will help me?
-% % \item What skills are needed?
-% % \item What tools are available and what's the cost?
-% % \item What acceleration factor are we looking at?
-% % \item How can I get started?
-% % \item What we did. Which tools? Was it hard? Speedup?
-% % \end{itemize}
-% 
-% \newpage
+% \ \\
+% Questions they wanted answered:
+% \begin{itemize}
+% \item This session will feature work on adapting computationally demanding modeling and signal processing tasks to take advantage of various parallel architectures, such as cloud computing, computing clusters, multicore CPUs, multi-core graphic processing units (GPUs), DSP chips, and FPGAs.
+% \item If algorithm is slow - What technology will help me?
+% \item What skills are needed?
+% \item What tools are available and what's the cost?
+% \item What acceleration factor are we looking at?
+% \item How can I get started?
+% \item What we did. Which tools? Was it hard? Speedup?
+% \end{itemize}
+
+\newpage
 \section{Introduction}
 
 Graphics Processing Units (GPUs) is a technology tailored to perform image processing as fast as possible. They are available off-the-shelf at reasonable prices, are very power efficient, and can be programmed to carry out a wide range of computational tasks, often displaying speed increases of an order of magnitude compared to similar CPU designs. Initially, GPUs may seem perfectly suited for image reconstruction algorithms, because usually each pixel can be computed independently and concurrently of one another. While this is true for simple techniques such as conventional beamformers, the more complex per-pixel computations present in adaptive techniques are harder for the GPU to handle.
@@ -293,19 +293,19 @@ Second, each of the diagonals of $R_l[n]\ \forall\ l$ can be computed independen
 
 \subsection{MVDR beamforming in the frequency domain}
 
-As we increase system size the inversion step will take over as the main bottleneck. We can, however, reduce the dimensionality further than the subarray size of $L$ by performing MVDR beamforming the frequency domain. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array and angles of arrival in the spatial domain; the zero-frequency will correspond to broadside, and increasing frequencies will map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, this method allow us to only process the angles where our signals are coming from~\cite{Nilsen2009a,VanTrees2002}. The method is named beamspace MVDR.
+As we increase system size the inversion step will take over as the main bottleneck. We can, however, reduce the dimensionality further than subarray averaging already has by performing MVDR beamforming in the frequency domain. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array and angles of arrival in the spatial domain; the zero-frequency will correspond to broadside, and increasing frequencies will map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, this method allows us to only process the angles where our signals are coming from~\cite{Nilsen2009a,VanTrees2002}. The method is called beamspace MVDR.
 
-The beamspace MVDR formulation very closely resembles that of time domain MVDR. The main difference is the initial need to Fourier transform the data:
+The beamspace MVDR formulation very closely resembles that of the time domain MVDR. The main difference is the initial need to Fourier transform the data:
 \begin{gather}
-\x_{\text{BS},l}[n] = \B\x_l[n], \qquad \B\in \mathbb{C}^{N_b,M}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{M}} e^{-j2\pi\,p\,q/M}.\label{beamspace}
+\x_{\text{BS},l}[n] = \B\x_l[n], \qquad \B\in \mathbb{C}^{N_b,L}, \qquad \text{where} \qquad [\B]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}.\label{beamspace}
 \end{gather}
 Here $\B$ is referred to as the Butler matrix, $l$ is the subarray index, and $N_b$ is the number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{spatialR}), $\w_\text{BS}$ as in (\ref{weights}), and $z$ as in (\ref{z}).
 
-By reducing the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). Although the additional computations required by the frequency transform must be taken into consideration, the effect of adjusting far outweighs it for larger systems.
+When we reduce the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
 
 \subsection{LCA beamformer}
 
-The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a collection of such, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as~\cite{Synnevag2008}:
+The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{mvdr_def}). Instead of calculating the weights like in (\ref{weights}), it simply computes the beamformer output for each window in a larger set of windows, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as~\cite{Synnevag2008}:
 \begin{gather}
 \argmin{p}\ E\Big\{\big|\w_p\H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p\H\1 = 1. \label{lca_def}
 \end{gather}
@@ -321,11 +321,11 @@ Although LCA promotes good image quality, its two most attractive traits is perh
 \caption{MVDR implementation.}\label{mvdr_implementation}
 \end{figure}
 
-Our GPU implementation consists of three main kernels relating to the computing steps illustrated in Figure \ref{mvdr_implementation}. In the first step we estimate $\eR$, in the second we solve the linear equation $\eRi\1$, and finally we perform some substitutions to obtain the beamformer output, $z$. All pixels are processed by one step before we move on to the next step. Our efforts here were mainly focused on estimating $\eR$, because an official batch linear equation solver is already available from Nvidia, and computing the beamformer output is a rather simple task.
+Our GPU implementation consists of three main kernels, one for each of the computing steps illustrated in Figure \ref{mvdr_implementation}. In the first step we estimate $\eR$, in the second we solve the linear equation $\eRi\1$, and finally we perform some substitutions to obtain the beamformer output, $z$. All pixels are processed by one step before we move on to the next step. Our efforts here were mainly focused on estimating $\eR$, because a highly optimised batch linear equation solver is already available from Nvidia, and computing the beamformer output is a rather simple task.
 
 When computing $\eR$ we we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. This procedure balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes very little memory.
 
-The implementation of beamspace MVDR is very similar, but the data access pattern is different. In the time domain subsequent subarrays overlap on all but one element in memory, but once Fourier transformed the data does not overlap at all. Such a seemingly innocent detail can make all the difference in a GPU design, because efficient memory accessing is key to obtaining good performance.
+The implementation of beamspace MVDR is very similar, but the data access pattern is different. In the time domain subsequent subarrays overlap on all but one element in memory, but the Fourier transformed data does not overlap at all. Such a seemingly innocent detail can make all the difference in a GPU design, because designing to make efficient use of memory is key to obtaining good performance.
 
 
 
@@ -341,9 +341,9 @@ The implementation of beamspace MVDR is very similar, but the data access patter
 \section{Results}
 
 
-To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar mounted on the HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\,m and operating frequency of 100\,kHz, and it was operated in sidescan mode here. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\,m long and 9\,m wide, and lies at a slanted seabed at 77\,m depth outside of Horten, Norway. The results are shown in Figure \ref{holmengraa}. The MVDR images were processed with parameters $L$=16, $K$=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was designed with a window database consisting of 5 Kaiser windows, each with different window-parameters from the range $\beta\in[0,10]$, and each steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from.
+To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar mounted on the HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\,m and operating frequency of 100\,kHz, and it was operated in sidescan mode here. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\,m long and 9\,m wide, and lies at a slanted seabed at 77\,m depth outside of Horten, Norway. The results are shown in Figure \ref{holmengraa}. The MVDR images were processed with parameters $L$=16, $K$=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was designed with a window database consisting of 5 Kaiser windows, each with different window-parameters from the range $\beta\in[0,10]$, and each steered in 5 distinct directions leaving a total of 25 windows for the LCA to select from.
 
-A few benchmarks of these methods are presented in Figure \ref{benchmark}. On our test system, a quad-core Intel Xeon E5620 with 64Gb of RAM and an nVidia Quadro 6000 card, the MVDR methods managed to create images at rates just over 1\,Mpx/s. A single-thread C implementation that was added as reference was outperformed by around 2 orders of magnitude. However, do not consider this comparison fair because while the GPU design is make efficient use of the L1 cache, similar optimisation work was not carried out on the CPU design.
+A few benchmarks of these methods are presented in Figure \ref{benchmark}. On our test system with a quad-core Intel Xeon E5620, 64Gb of RAM and an nVidia Quadro 6000 card, the MVDR methods managed to create images at rates just over 1\,Mpx/s. A single-thread C implementation that was added as reference was outperformed by around 2 orders of magnitude. However, do not consider this comparison fair because while the GPU design is make efficient use of the L1 cache, similar optimisation work was not carried out on the CPU design.
 
 \begin{figure}[!t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
@@ -364,6 +364,7 @@ A few benchmarks of these methods are presented in Figure \ref{benchmark}. On ou
 \end{figure}
 
 
+\newpage
 \section{Discussion}
 
 % \begin{table}[b]\centering%\normalsize
@@ -378,7 +379,7 @@ A few benchmarks of these methods are presented in Figure \ref{benchmark}. On ou
 % \end{table}
 
 
-The MVDR beamformer is a technique that is able to improve image quality over conventional methods. This can be seen in Figure \ref{holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge detection. Contrary to common belief, it can also be made to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
+The MVDR beamformer is a technique that is capable of improving image quality over conventional methods. This can be seen in Figure \ref{holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge definitions. Contrary to common belief, it is also possible to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
 
 If this performance is insufficient, we suggest looking at the LCA method. It is based on the same optimisation criterion as the MVDR method, but avoids the estimation and inversion step altogether by limiting the weight's solution space to only a few predefined windows. As seen the Figure \ref{holmengraa}, it produces images with a quality comparable to the MVDR method, but computing the images takes only a fraction of the time.
 
