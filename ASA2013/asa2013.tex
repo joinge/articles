@@ -236,7 +236,7 @@ We propose three different solutions to the complexity issue depending on system
 Comparable work can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
 % \\
 
-This article is outlined as follows: First we will present\todo{denne formuleringstypen begynner aa bli oppbrukt...} background material on the MVDR method operated in time and frequency domain, and on the LCA beamformer. For each method we start with the mathematical formulation, then evaluate complexity issues, and finally give our thoughts on some implementation aspects. The results are collected in \ref{implementation}. Finally, we conclude in section \ref{discssion}.
+This article is outlined as follows: First we will present the mathematical formulation and evaluate complexity aspects of the MVDR method operated in time or frequency domain, and on the LCA beamformer. Then we mention some of our experiences with implementing the MVDR on a GPU, before concluding with some results and final thoughts.
 
 
 \section{Methods}\label{methods}
@@ -287,7 +287,7 @@ If (\ref{spatialR}) were to be implemented directly, we note that the estimation
 A few properties let us improve these matters notably. First, we may infer from (\ref{spatialR}) that:
 \begin{itemize}
 \item The subarray covariance matrices $R_l[n] = \x_l[n]\x_l\H[n]$ are Hermitian semi-definite, which means that we can get away with computing only one triagonal in them.
-\item When summing $R_l[n]$ most of the multiplications can be computed only once, and most sums need only be updated iteratively.
+\item When summing $R_l[n]$ most of the multiplications need only be computed only once, and most sums can be updated iteratively.
 \end{itemize}
 Second, each of the diagonals of $R_l[n]\ \forall\ l$ can be computed independently, which is good news for our GPU design.
 
@@ -301,7 +301,7 @@ The beamspace MVDR formulation very closely resembles that of time domain MVDR. 
 \end{gather}
 Here $\B$ is referred to as the Butler matrix, $l$ is the subarray index, and $N_b$ is the number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{spatialR}), $\w_\text{BS}$ as in (\ref{weights}), and $z$ as in (\ref{z}).
 
-By reducing the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional O[$N_b  Complexity: To\,L$) computations required  frequency domain: O($N_b\,L$). Build $R_\text{BS}$, O($N_b^2\,N_L\,N_K$), Inversion: O($N_b^3$).
+By reducing the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). Although the additional computations required by the frequency transform must be taken into consideration, the effect of adjusting far outweighs it for larger systems.
 
 \subsection{LCA beamformer}
 
@@ -325,7 +325,7 @@ Our GPU implementation consists of three main kernels relating to the computing 
 
 When computing $\eR$ we we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. This procedure balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes very little memory.
 
-
+Frequency domain MVDR beamforming 
 
 
 
