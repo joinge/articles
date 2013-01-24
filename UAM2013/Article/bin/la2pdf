@@ -289,33 +289,33 @@ fi
 #   exit 1
 # fi
 
-# cp $COMPILEDDIR/*.aux ./
-# cp $COMPILEDDIR/${1}-blx.bib ./
-IS_BIBTEX=false
-IS_BIBLATEX=false
 
-grep "bibtex" "$TMPDIR/$SETTINGSFILE"
-if [ "$?" = "0" ]; then
-  IS_BIBTEX=true
-fi
-grep "biblatex" "$TMPDIR/$SETTINGSFILE"
-if [ "$?" = "0" ]; then
-  IS_BIBLATEX=true
-fi
 
-if [ $IS_BIBTEX ]; then
-  echo ''
-  echo ':) Building bibliography..'
-  bibtex ${1}.aux
-
-  if [ $? -ne 0 ]; then
-    cat $TMPDIR/$GLOSSLOG
-    echo ':( FAILED: bibtex'
-    exit 1
-  fi
-    cat $TMPDIR/$GLOSSLOG
-    echo ':) SUCCESS: bibtex'
-fi
+# IS_BIBTEX=false
+# IS_BIBLATEX=false
+# 
+# grep "bibtex" "$TMPDIR/$SETTINGSFILE"
+# if [ "$?" = "0" ]; then
+#   IS_BIBTEX=true
+# fi
+# grep "biblatex" "$TMPDIR/$SETTINGSFILE"
+# if [ "$?" = "0" ]; then
+#   IS_BIBLATEX=true
+# fi
+# IS_BIBTEX=false
+# if [ $IS_BIBTEX ]; then
+#   echo ''
+#   echo ':) Building bibliography..'
+#   bibtex ${1}.aux
+# 
+#   if [ $? -ne 0 ]; then
+#     cat $TMPDIR/$GLOSSLOG
+#     echo ':( FAILED: bibtex'
+#     exit 1
+#   fi
+#     cat $TMPDIR/$GLOSSLOG
+#     echo ':) SUCCESS: bibtex'
+# fi
 
 
 # xelatex -interaction=nonstopmode -shell-escape -src-specials ${1}.tex > $TMPDIR/$PDFLALOG 2>> $TMPDIR/$PDFLALOG
