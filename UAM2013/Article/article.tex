@@ -67,17 +67,20 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 \end{contact}%
 %
 \begin{abstract}
-In active sonar imaging one is typically concerned with extracting intensity and phase information from a backscattered acoustic wavefield. Usually an image that 
+A typical active sonar image contains intensity and phase information of the wavefield backscattered off an imaged scene.  Usually an image that 
 
 These images can be created by performing receive beamforming on data from a sensor array to digitally focus on one pixel at a time in the image. Image resolution and contrast is then determined by the beamformer's ability to enhance the signal from the the pixel of interest while suppressing noise and interference from other directions
 
 % s When no prior information is available, this is fully determined by the array's geometrical properties, signal characteristic
 
-In a common active sonar scenario one employ phased arrays to record the
+In active imaging systems based on phased arrays the choice of sensor weights are known to greatly influence image quality. The best results are obtained when the weights are allowed to change to accomodate the dynamic nature of the impinging wavefield.
 
-In active sonar imaging one is typically concerned with creating images containing intensity and phase information of the imaged scene. To improve the resolution and contrast it has been shown that adaptive beamforming methods can be 
+The Low Complexity Adaptive (LCA) beamformer takes a an ad-hoc approach to this. Instead of computing the weights based on the current wavefield, it iterates through a list of predefined weight sets, applies each in turn, and finally selects the one yielding the most desirable response. This is done locally for each pixel in the image.
 
-We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+The weight pattern determine the resolution and contrast of the system, but can While a static set of weights allow resolution to be traded for contrast. , but this limitation can be overcome by adjusting the weights dynamically to better fit the changing nature of the incoming wavefield.
+
+This is what the The Low Complexity Adaptive (LCA) beamformer does. It adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
 
 We have studied what happens if we take several images created by an adaptive beamformer 
 
