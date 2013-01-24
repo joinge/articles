@@ -52,7 +52,7 @@
 
 
 
-\title{A Low Complexity Adaptive Beamformer\\for Active Sonar Imaging}%
+\title{Some title}%
 %
 \author{J.I.Buskenes\firstAddress, A.Austeng\firstAddress, C.-I.C.Nilsen\firstAddress}%
 %
@@ -67,74 +67,76 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 \end{contact}%
 %
 \begin{abstract}
-A typical active sonar image contains intensity and phase information of the wavefield backscattered off an imaged scene.  Usually an image that 
-
-These images can be created by performing receive beamforming on data from a sensor array to digitally focus on one pixel at a time in the image. Image resolution and contrast is then determined by the beamformer's ability to enhance the signal from the the pixel of interest while suppressing noise and interference from other directions
+% A typical active sonar image contains intensity and phase information of the wavefield backscattered off an imaged scene.  Usually an image that 
+% 
+% These images can be created by performing receive beamforming on data from a sensor array to digitally focus on one pixel at a time in the image. Image resolution and contrast is then determined by the beamformer's ability to enhance the signal from the the pixel of interest while suppressing noise and interference from other directions
 
 % s When no prior information is available, this is fully determined by the array's geometrical properties, signal characteristic
 
 In active imaging systems based on phased arrays the choice of sensor weights are known to greatly influence image quality. The best results are obtained when the weights are allowed to change to accomodate the dynamic nature of the impinging wavefield.
 
-The Low Complexity Adaptive (LCA) beamformer takes a an ad-hoc approach to this. Instead of computing the weights based on the current wavefield, it iterates through a list of predefined weight sets, applies each in turn, and finally selects the one yielding the most desirable response. This is done locally for each pixel in the image.
+The Low Complexity Adaptive (LCA) beamformer address this task in an ad-hoc manner. Instead of computing the weights based on the current wavefield, it iterates through a list of predefined weight sets, applies each in turn, and finally selects the one yielding the most desirable response. This is done locally for each pixel in the image.
 
-The weight pattern determine the resolution and contrast of the system, but can While a static set of weights allow resolution to be traded for contrast. , but this limitation can be overcome by adjusting the weights dynamically to better fit the changing nature of the incoming wavefield.
+When set up with a diverse set of responses to choose from, the LCA produces images like other adaptive techniques. But we limited the responses to enhance other features in the image, such as edges, shadows or highlighted regions. Then, based on the statistics we got when combining all these images, we were able to determine speckle regions, 
 
-This is what the The Low Complexity Adaptive (LCA) beamformer does. It adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-
-
-We have studied what happens if we take several images created by an adaptive beamformer 
-
-
-Adaptive beamformers constantly evaluates the data 
-
-from oo\ To obtain these values from a single pixel, along with phase information regarding distance to target. echoes an intensity map of the backscattered wavefield is sought, with  intensity map of the seafloor or some object of interest. Sometimes phase information is also sought to allow for interferometric imaging. But estimating the amplitude and phase for each pixel im the image is just one of many features we may extract from the echoes.
-
-- lots of other images also known ofc.
-- resolution constrast, adaptive beamformers, 
-- take raw data, extract a few features, ship result as image
-- have more images? more features?
-
-Adaptivity: 
-- improves resolution / contrast in many cases
-- in cases where in some cases LCA performs better than MVDR since 
-- puts higher demands on processing hardware
-
-Feature extractor:
-- Works on channel data, more information available than e.g. what is present in the final image
-- Some distinct features
-
-Verification
-- Tested in simulations. Can be used for detecting sidelobes, speckle.
-
-
-Andreas:
-- orthogonal windows. speckle not the same. mu/sigma = 1.91
-
-- stor variance - speckle.
-- ikke - ikke
-- amplitude til verdiene, fasen til verdiene sier noe om egenskapen til bildene. kanter, punkter, skygger
-
-middelverdi/amplitude, fase random = spekkel, fase lik = punkt (samme med MV).
-
-lca
-- windows - helt ortoganilitet, 
-- middelverdi / amplitude, fase -> informasjon om kanter, skygger, 
-
-ser på statistikken over hvilke vinduer som er valgt (høyresidig/venstresidig)
-
-punkt = gir fast fase
-
-amplitude mot korrelasjon.
-
-The Low Complexity Adaptive (LCA) beamformer is a simple alternative to the fully adaptive Minimum Variance Distortionless Response (MVDR) beamformer. It 
-
-The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
-
-While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
-
-We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-
-An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
+% The weight pattern determine the resolution and contrast of the system, but can While a static set of weights allow resolution to be traded for contrast. , but this limitation can be overcome by adjusting the weights dynamically to better fit the changing nature of the incoming wavefield.
+% 
+% This is what the The Low Complexity Adaptive (LCA) beamformer does. It adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+% 
+% 
+% We have studied what happens if we take several images created by an adaptive beamformer 
+% 
+% 
+% Adaptive beamformers constantly evaluates the data 
+% 
+% from oo\ To obtain these values from a single pixel, along with phase information regarding distance to target. echoes an intensity map of the backscattered wavefield is sought, with  intensity map of the seafloor or some object of interest. Sometimes phase information is also sought to allow for interferometric imaging. But estimating the amplitude and phase for each pixel im the image is just one of many features we may extract from the echoes.
+% 
+% - lots of other images also known ofc.
+% - resolution constrast, adaptive beamformers, 
+% - take raw data, extract a few features, ship result as image
+% - have more images? more features?
+% 
+% Adaptivity: 
+% - improves resolution / contrast in many cases
+% - in cases where in some cases LCA performs better than MVDR since 
+% - puts higher demands on processing hardware
+% 
+% Feature extractor:
+% - Works on channel data, more information available than e.g. what is present in the final image
+% - Some distinct features
+% 
+% Verification
+% - Tested in simulations. Can be used for detecting sidelobes, speckle.
+% 
+% 
+% Andreas:
+% - orthogonal windows. speckle not the same. mu/sigma = 1.91
+% 
+% - stor variance - speckle.
+% - ikke - ikke
+% - amplitude til verdiene, fasen til verdiene sier noe om egenskapen til bildene. kanter, punkter, skygger
+% 
+% middelverdi/amplitude, fase random = spekkel, fase lik = punkt (samme med MV).
+% 
+% lca
+% - windows - helt ortoganilitet, 
+% - middelverdi / amplitude, fase -> informasjon om kanter, skygger, 
+% 
+% ser på statistikken over hvilke vinduer som er valgt (høyresidig/venstresidig)
+% 
+% punkt = gir fast fase
+% 
+% amplitude mot korrelasjon.
+% 
+% The Low Complexity Adaptive (LCA) beamformer is a simple alternative to the fully adaptive Minimum Variance Distortionless Response (MVDR) beamformer. It 
+% 
+% The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
+% 
+% While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
+% 
+% We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+% 
+% An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 \end{abstract}%
 %
 \keywords{Beamforming, Capon, Minimum variance, Low Complexity, Sonar}
