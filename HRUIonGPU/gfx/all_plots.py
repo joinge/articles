@@ -88,9 +88,9 @@ def barBenchmarkGPU(filename, M, Nx, Ny, fromL, toL):
    min_L = fromL
    max_L = toL
 
-   yavg1 = timings[0::3,:]
-   yavg2 = timings[1::3,:]
-   yavg3 = timings[2::3,:]
+   yavg1 = timings[0::3,[2, 6, 8]]
+   yavg2 = timings[1::3,[2, 6, 8]]
+   yavg3 = timings[2::3,[2, 6, 8]]
    yavg1_sum = yavg1.sum(1)
    yavg2_sum = yavg2.sum(1)
    yavg3_sum = yavg3.sum(1)
@@ -157,22 +157,25 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
    min_L = fromL
    max_L = toL
 
-   yavg1 = timings[0::3,[1, 2, 6, 8]]
-   yavg2 = timings[1::3,[1, 2, 6, 8]]
-   yavg3 = timings[2::3,[1, 2, 6, 8]]
-   yavg1_sum = yavg1.sum(1)
-   yavg2_sum = yavg2.sum(1)
-   yavg3_sum = yavg3.sum(1)
+   #yavg1 = timings[0::3,[1, 2, 6, 8]]
+   #yavg2 = timings[1::3,[1, 2, 6, 8]]
+   #yavg3 = timings[2::3,[1, 2, 6, 8]]
+   #yavg1_sum = yavg1.sum(1)
+   #yavg2_sum = yavg2.sum(1)
+   #yavg3_sum = yavg3.sum(1)
 
-   print 'Yavg1 ', yavg1.shape
-   print 'Yavg2 ', yavg2.shape
-   print 'Yavg3 ', yavg3.shape
+   #print 'Yavg1 ', yavg1.shape
+   #print 'Yavg2 ', yavg2.shape
+   #print 'Yavg3 ', yavg3.shape
 
    width = 1
    x_range = arange(min_L,max_L+1)
+   print 'x_range ', x_range.shape
    
    K = 2
-   yavg = yavg3
+   yavg = timings[:,[1,2,6,8]]#yavg1#yavg3
+   
+   print 'Yavg ', yavg.shape
    
    fig = figure()
    ax = fig.add_subplot(1,1,1)
@@ -221,3 +224,55 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
       ylim((0, yavg.max()+1))
    
    savefig('./benchmark_bar_bs_M=%d_Nx=%d_Ny=%d_Nb=%d'%(M,Nx,Ny,Nb))
+   
+   
+def barBeamspaceBenchmarkGPU2(filename, M, L, Nx, Ny, fromNb, toNb, legendOn=True):
+   
+   print "Reading ", filename
+   
+   timings = np.loadtxt(filename)
+
+   print 'Timings ', timings.shape
+   
+   min_Nb = fromNb
+   max_Nb = toNb
+
+   width = 1
+   x_range = arange(min_Nb,max_Nb+1)
+   print 'x_range ', x_range.shape
+   
+   K = 2
+   yavg = timings[:,[1,2,6,8]]
+   
+   print 'Yavg ', yavg.shape
+   
+   fig = figure()
+   ax = fig.add_subplot(1,1,1)
+   cax4 = ax.bar(x_range, yavg[:,3], width, color='0.25')
+   cax3 = ax.bar(x_range, yavg[:,2], width, bottom=yavg[:,3], color='0.5')
+   cax2 = ax.bar(x_range, yavg[:,1], width, bottom=(yavg[:,3] + yavg[:,2]), color='0.75')
+   cax1 = ax.bar(x_range, yavg[:,0], width, bottom=(yavg[:,3] + yavg[:,2] + yavg[:,1]), color='0.75',  hatch='o')
+   
+   # calc acquisition rate for the given number of beams if depth equals 15.4cm.
+   acq_speed = 0.2*Nx
+   cax5 = ax.plot([0, max_Nb+1], [acq_speed, acq_speed], '-', color='0.2')
+   
+   if legendOn:
+      legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0]),('Beamspace transform', 'Calculate covariance matrices', 'Nvidia solver','Calculate beamformer output', 'Real time requirement'), loc='lower right')
+
+   #if M > 32:
+   #   x_range = arange(min_Nb, max_Nb+1, 2)
+   #if M > 64:
+   #   x_range = arange(min_Nb, max_Nb+1, 3)
+   
+   ax.set_title('M=%d, K=%d, L=%d, %d angles, %d samples in range'%(M,K,L,Nx,Ny), fontsize='large')
+   xlabel('$N_b$')
+   ylabel('Execution time [ms]')
+   xlim((min_Nb, max_Nb+1))
+   xticks(x_range+width/2.0, x_range )
+   if acq_speed > yavg.max():
+      ylim((0, acq_speed+1))
+   else:
+      ylim((0, yavg.max()+1))
+   
+   savefig('./benchmark_bar_bs_M=%d_Nx=%d_Ny=%d_L=%d'%(M,Nx,Ny,L))

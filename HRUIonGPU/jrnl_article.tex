@@ -848,21 +848,22 @@ To summarize, by transforming data to beamspace the complexity of all subsequent
 %Describe the computer system (CPU, GPU...). Describe the data that are processed (field II, Channel data from GE Vingmed).
 % stolpediagram, med de ulike metodenes kjøretid oppehverandre.
 
-\begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_32_40_400.png} \label{fig:benchUS32}}
-\hfil
-\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_64_80_400.png}%
-\label{fig:benchUS64}}}
-\caption{Benchmarks of GPU Capon beamforming for a cardiac image covering a $70\degree$ wide $15$ cm deep sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices with three different choices of temporal averaging, solver, and the final beamformer sum. For larger arrays, more transmit beams have to be emitted for sufficient lateral sampling. (a)  32 element array. (b)  64 element array.}
+\begin{figure}
+%\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_32_40_400.png} \label{fig:benchUS32}}
+%\hfil
+%\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_64_80_606.png}%
+%\label{fig:benchUS64}}}
+\centerline{\includegraphics[width=3.5in]{gfx/benchmark_bar_64_80_606.png}}
+\caption{Benchmark of GPU Capon beamforming for a cardiac image covering a $70\degree$ wide $15$ cm deep sector. Execution time is plotted as a function of subarray length $L$. The plot shows execution times for the three steps listed in Section \ref{sec:meth}. Calculating covariance matrices with three different choices of temporal averaging, solver, and the final beamformer sum.}
 \label{fig:bench}
-\end{figure*}
+\end{figure}
 
 \begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=400_Nb=3.png} \label{fig:benchBS64}}
+\centerline{\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=606_Nb=3.png} \label{fig:benchBS64}}
 \hfil
-\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=400_Nb=3.png}%
+\subfloat[]{\includegraphics[width=3.5in]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=606_Nb=3.png}%
 \label{fig:benchBS96}}}
-\caption{Benchmarks of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$ cm deep sector. Execution time is plotted as a function of subarray length $L$.  If $L$ had been kept constant on $M/2$ and execution time was plotted against $N_b$, the plot would be similar to the two in Fig. \ref{fig:bench}. (a) 64 elements array. (b) 96 elements array.}
+\caption{Benchmarks of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15$ cm deep sector. Execution time is plotted as a function of subarray length $L$.  If $L$ had been kept constant on $M/2$ and execution time was plotted against $N_b$, the plot would be similar to the one in Fig. \ref{fig:bench}. The variation in execution time is caused by adaptive kernel launch configurations.}
 \label{fig:benchBS}
 \end{figure*}
 In this section we present benchmarks of the implementations presented in Sections \ref{sec:meth} and \ref{sec:bs} performed on a Nvidia Quadro 6000 graphics card (14 SMs, 1 TFlops theoretical single precision, 6 GB global memory, and 144 GB/s memory bandwidth). Problem sizes are calculated based on 32, 64, and 96 element phased arrays with a 2.5 MHz center frequency. Assuming a system bandwidth of 80\% we need a complex sampling frequency of 2 MHz, and when imaging down to a depth of 15 cm we have approximately 400 samples per range line. To correctly sample a $70\degree$ sector with 32, 64 and 96 element arrays ($\lambda/2$ pitch), we need at least 40, 80 and 120 beams respectively. The presented execution times do not include transfer of data from CPU- to the GPU-side, since data are assumed to be pre-delayed and available in GPU memory. What is included are all calculations, memory transfers from global to near-core GPU memory, and near core memory access. 
@@ -912,7 +913,9 @@ To get a better impression of the improved lateral resolution obtained with Capo
 Both data sets have been processed with the following Capon beamformer settings: $L = 32$, $K = 2$, and $d=0.1$. These settings have previously been shown to provide high resolution while maintaining DAS-like speckle\cite{Synnevag2007a}. For the beamspace processing the following parameters have been used: $L=32$, $K=2$, $d=0.01$, and $N_b=3$. For the simulated phantom, 16x lateral oversampling on transmit has been used, in order to avoid under sampling of the two bright point scatterers as they move. The cardiac recording only has $30\%$ lateral oversampling on receive.
 
 \section{Trading resolution for speed}\label{sec:trade}
-As seen from Fig. \ref{fig:bench} and \ref{fig:benchBS}, execution time is reduced when either $L$ or $N_b$ is reduced. So to gain an  increase in processing throughput we can reduce $L$ or $N_b$. The question is then, how does this impact image quality? In Fig. \ref{fig:speed_res_trade}, the minimum distance between the two point targets in Fig. \ref{fig:phantom} (while preserving a 6 dB saddle point in between the two) is plotted against $L$ (when processed with Capon) and $N_b$ (when processed with BS Capon). For high values the two methods are equal, but for lower values, BS Capon provides higher resolution than what is possible with small subarrays. For this result, $d=0.01$ has been used on both methods. Why resolution decreases for BS Capon for small $N_b$s is partially explained by reduced information of interference at higher angles, and an automatically increase in diagonal loading (See end of Section \ref{sec:bs}). In element space, resolution decays rapidly as a result of a reduced effective adaptive aperture. For $N_b=3$, BS Capon provides approximately 1 mm improved resolution over DAS. However, note that resolution for the Capon beamformer highly depends on image SNR and the choice of parameters. Thus, different SNR scenarios and choices of parameters will give different results. It is also worth noting that Capon beamforming in this example performs worse than DAS for small subarrays.
+As seen from Fig. \ref{fig:bench} and \ref{fig:benchBS}, execution time is reduced when either $L$ or $N_b$ is reduced. So to gain an  increase in processing throughput we can reduce $L$ or $N_b$. The question is then, how does this impact image quality? In Fig. \ref{fig:speed_res_trade}, the minimum distance between the two point targets in Fig. \ref{fig:phantom} (while preserving a 6 dB saddle point in between the two) is plotted against $L$ (when processed with Capon) and $N_b$ (when processed with BS Capon). For the result in Fig. \ref{fig:speed_res_trade}, $d=0.01$ has been used on both methods.
+
+For high $L$ and $N_b$ values the two methods are equal. However, for lower values, BS Capon provides higher resolution than what is possible with small subarrays. We see that the resolution for BS Capon gradually decreases due to an automatically increase in diagonal loading (See end of Section \ref{sec:bs}). If this is compensated for, BS Capon will provide resolution almost equal to Capon for all values except $N_b=1$ \cite{Nilsen2009}. For $N_b=1$ the resolution is worse than for DAS because of a triangular apodization caused by subarray averaging. In element space, resolution decays rapidly as a result of a reduced effective adaptive aperture. For $N_b=3$, BS Capon still provides approximately 1 mm improved resolution over DAS. However, note that resolution for the Capon beamformer highly depends on image SNR and the choice of parameters. Thus, different SNR scenarios and choices of parameters will give different results. It is also worth noting that Capon beamforming in this example performs worse than DAS for small subarrays. For small values of $L$, there are not enough degrees of freedom in order steer zeros at each point target.
 
 \begin{figure}
 \centering
