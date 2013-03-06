@@ -73,11 +73,11 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 
 % s When no prior information is available, this is fully determined by the array's geometrical properties, signal characteristic
 
-In active sonar imaging systems the choice of sensor weights will greatly influence image quality. The best results are obtained when the weights are allowed to change to accommodate the dynamic nature of the impinging wavefield. The Minimum Variance Distortionless Response (MVDR) beamformer achieves this by computing the set of weights that minimises the effects of noise and interference in the output image. 
+In active sonar imaging systems the choice of sensor weights will greatly influence image quality. The best results are obtained when the weights are allowed to change to accommodate the dynamic nature of the impinging wavefield. The Minimum Variance Distortionless Response (MVDR) beamformer achieves this by computing the set of weights that minimises the effects of noise and interference on the output image. 
 
-Another technique, the Low Complexity Adaptive (LCA) beamformer, addresses this task in an ad-hoc manner. Instead of computing the weights based on the current wavefield, it iterates through a list of predefined weight sets, applies each in turn, and finally selects the one yielding the most desirable response in a minimum variance sense. This is done locally for each pixel in the image. With a diverse set of responses to choose from, the LCA produces images similar to the MVDR, but is much less computationally expensive.
+Another technique, the Low Complexity Adaptive (LCA) beamformer, addresses the task in an ad-hoc manner. Instead of computing the weights based on the current wavefield, it iterates through a list of predefined weight sets, applies each in turn, and finally selects the one yielding the most desirable response in a minimum variance sense. This is done locally for each pixel in the image. With a diverse set of responses to choose from, LCA produces images similar to MVDR, but is much less computationally expensive.
 
-In this work we extend the LCA beamformer to not only produce MVDR-like images, but also to enhance other features in the image, such as edges, shadows or highlighted regions. From the statistics found when comparing these images, we are able to make qualified guesses of whether a pixel belongs to a speckle region, the object under study, or something else. This can be achieved with hardly any additional computational cost.
+In this work we extend LCA beamformer to not only produce MVDR-like images, but also to enhance other features in the image, such as edges, shadows or highlighted regions. From the statistics found when comparing these images, we are able to make qualified guesses of whether a pixel belongs to a speckle region, the object under study, or something else. This can be achieved with hardly any additional computational cost.
 
 % The weight pattern determine the resolution and contrast of the system, but can While a static set of weights allow resolution to be traded for contrast. , but this limitation can be overcome by adjusting the weights dynamically to better fit the changing nature of the incoming wavefield.
 % 
@@ -139,7 +139,7 @@ In this work we extend the LCA beamformer to not only produce MVDR-like images, 
 % An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 \end{abstract}%
 %
-\keywords{Beamforming, Capon, Minimum variance, Low Complexity, Sonar}
+\keywords{Adaptive beamforming, minimum variance, MVDR, LCA, complexity, sonar}
 
 % \titlepage
 
