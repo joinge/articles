@@ -338,7 +338,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \begin{abstract}
 % Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
 
-The Minimum Variance Distortionless Response (MVDR) adaptive beamformer can improve active sonar image quality compared to conventional methods\todo{argh!!}. Unfortunately, it is also very computationally complex because a spatial covariance matrix must be estimated and inverted for each of each image pixel. Furthermore, several parameters need to be tuned to obtain sufficient estimation accuracy.\todo{henger i lufta...}
+The Minimum Variance Distortionless Response (MVDR) adaptive beamformer can improve active sonar image quality compared to conventional methods\todo{argh!!}. Unfortunately, it is also very computationally complex because a spatial covariance matrix must be estimated and inverted for each image pixel. Furthermore, to a few several parameters need to be tuned to obtain sufficient estimation accuracy.\todo{henger i lufta...}
 
 We show that for active sonar systems up to 32 channels, the computation time can be significantly reduced by performing arithmetic optimizations, and by implementing the MVDR on a Graphics Processing Unit (GPU). On a quad-core Intel Xeon system with a high-end Nvidia GPU, we found that the GPU rendered more than 1\;Mpixels/s. This represents a speedup of more than two orders of magnitude over our intial implementation in C. We envision this performance used for real-time processing of sonar data, and for making the MVDR a viable alternative to conventional methods in practical systems. 
 % If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in real-time would be possible with this performance.
@@ -463,8 +463,10 @@ Adaptive beamforming, MVDR, Capon, sonar, active sonar, complexity.
 % 
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
-Data driven methods have been reported to improve image quality in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been 
-shown to produce images with improved constrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{\cite{Synnevag2007}}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+The Minimum Variance Distortionless Response (MVDR) beamformer is a data driven method 
+
+Data driven methods have been reported to improve image quality in various imaging fields over the years. One such method, the , has been 
+shown to produce images with improved contrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 % \the\linewidth
 
