@@ -146,7 +146,7 @@ def barBenchmarkGPU(filename, M, Nx, Ny, fromL, toL):
    
    savefig('./benchmark_bar_%d_%d_%d'%(M,Nx,Ny))
 
-def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
+def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL, legendOn=True):
    
    print "Reading ", filename
    
@@ -194,7 +194,8 @@ def barBeamspaceBenchmarkGPU(filename, M, Nb, Nx, Ny, fromL, toL):
    #cax = ax.plot([0,0.001],[0,0], 'k')
    #cax = ax.plot([0,0.001],[0,0], ':k')
    #cax = ax.plot([0,0.001],[0,0], '--k')
-   legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0]),('Beamspace transform', 'Calculate covariance matrices', 'Nvidia solver','Calculate beamformer output', 'Real time requirement'), loc='lower left')
+   if legendOn:
+      legend((cax1[0], cax2[0], cax3[0], cax4[0], cax5[0]),('Beamspace transform', 'Calculate covariance matrices', 'Nvidia solver','Calculate beamformer output', 'Real time requirement'), loc='lower left')
    #legend(('Calc covariance matrices','Nvidia solver','Calc beamformer output','Total', 'K = 0','K = 1','K = 2'), loc='upper left')
 #   gca().add_artist(l1)
    
