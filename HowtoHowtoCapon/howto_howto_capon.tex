@@ -465,7 +465,7 @@ Adaptive beamforming, MVDR, Capon, sonar, active sonar, complexity.
 
 
 
-Data driven methods has been introduced in various imaging fields over the years in attempts to improve image quality. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been reported to produce images with improved contrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+In attempts to improve image quality, data driven methods has been introduced in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been reported to produce images with improved contrast and resolution compared to conventional non-adaptive methods, e.g. in radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 % \the\linewidth
 
@@ -476,11 +476,12 @@ Despite its inherent potential, the MVDR beamformer has yet to see widespread ad
 % R estimate accuracy vs. dynamic trackability: (1) Trade observation time for bandwidth (2) Partial adaptiveness (less degrees of freedom than channels) (3) Quadratic constraint on sensor weights to limit the norm to some preset value.
 % -  
 
-Previous work have shown that the robustness issue may be solved through means such as temporal and spatial averaging~\cite{Kailath1985}, and regularisation. Reducing complexity has been achieved in a variety of ways, often by enforcing a Toeplitz-structure on the covariance matrix to simplify its inversion, or by employing iterative solvers. Some low complexity approximations to the MVDR beamformer is also available, such as the Low Complexity Adaptive (LCA) beamformer, 
+Previous work have shown that the robustness issue can be solved by means such as temporal and spatial averaging~\cite{Kailath1985}, and regularisation. To reduce computational complexity, some studies have demonstrated the feasibility of enforcing a Toeplitz-structure on the covariance matrix to simplify its inversion, or performing MVDR beamforming in beamspace (frequency domain)~\cite{Nilsen2009}. Some low complexity approximations to the MVDR beamformer is also available, such as the Low Complexity Adaptive (LCA) beamformer, 
 
-In this work, we will show that a proper implementation of a textbook MVDR version on a graphics processing unit (GPU)
+In this work, we show that the computation time can be reduced by 1-2 orders of magnitude when implemented wisely on a Graphics Processing Unit (GPU). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize the number of floating point operations per second (Flop/s) while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them\todo{misplaced?}. 
 
-We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
+
+% We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
 
 % Other work (keywords: mvdr, capon, computation, efficient, complexity):
 % - Partially adaptive beamforming. DAS on non-overlapping subarrays, then MVDR \cite{Swingler1999a}.
@@ -498,9 +499,9 @@ We will show that by exploiting symmetry and avoiding unnecessary computations, 
 % (Made partially adaptive by employing subarray averaging to reduce degrees of freedom to L.)
 
 
-Furthermore, we investigate the feasibility of accelerating the MVDR method using Graphics Processing Units (GPUs). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize Flop/s while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them\todo{misplaced?}. 
+% Furthermore, 
 
-Comparable work may be found in e.g. ultrasound, where Chen \emph{et. al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
+Comparable work may be found, e.g. in ultrasound, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
 
 This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{too much overlap here}
 
@@ -905,7 +906,7 @@ transfer.
 
 As Fig. \ref{benchmarks} demonstrates, performing arithmetic reductions and designing for using GPUs can significantly improve upon the problem with  the processing speed. If we look at the total runtimes for a subarray size of $L=16$ and temporal averaging at $K=2$, the GPU implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the GPU implementation, respectively.
 
-Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the GPU implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the GPU implementation.
+Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the GPU implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating, e.g. a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the GPU implementation.
 
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We could further assume a complex sampling frequency of 40\,kHz to accomodate the  HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for real-time processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our GPU implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
