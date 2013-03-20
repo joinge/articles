@@ -338,7 +338,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \begin{abstract}
 % Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
 
-The Minimum Variance Distortionless Response (MVDR) adaptive beamformer can improve active sonar image quality compared to conventional methods\todo{argh!!}. Unfortunately, it is also very computationally complex because a spatial covariance matrix must be estimated and inverted for each image pixel. Furthermore, to a few several parameters need to be tuned to obtain sufficient estimation accuracy.\todo{henger i lufta...}
+The Minimum Variance Distortionless Response (MVDR) adaptive beamformer can improve active sonar image quality compared to conventional methods\todo{argh!!}. Unfortunately, it is also very computationally complex because a spatial covariance matrix must be estimated and inverted for each image pixel. %Furthermore, to a few several parameters need to be tuned to obtain sufficient estimation accuracy.\todo{henger i lufta...}
 
 We show that for active sonar systems up to 32 channels, the computation time can be significantly reduced by performing arithmetic optimizations, and by implementing the MVDR on a Graphics Processing Unit (GPU). On a quad-core Intel Xeon system with a high-end Nvidia GPU, we found that the GPU rendered more than 1\;Mpixels/s. This represents a speedup of more than two orders of magnitude over our intial implementation in C. We envision this performance used for real-time processing of sonar data, and for making the MVDR a viable alternative to conventional methods in practical systems. 
 % If the HISAS1030 was attached to a platform traveling at 1.8m/s, creating full-coverage sectorscan images in real-time would be possible with this performance.
@@ -463,24 +463,27 @@ Adaptive beamforming, MVDR, Capon, sonar, active sonar, complexity.
 % 
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
-The Minimum Variance Distortionless Response (MVDR) beamformer is a data driven method 
 
-Data driven methods have been reported to improve image quality in various imaging fields over the years. One such method, the , has been 
-shown to produce images with improved contrast and resolution compared to conventional non-adaptive methods, in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+
+In attempts to improve image quality, data driven methods has been introduced in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been reported to produce images with improved contrast and resolution compared to conventional non-adaptive methods, e.g. in radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 % \the\linewidth
 
-Despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and will suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O(M$^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
+Despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and will suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O($M^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
 
-% Previous:
 
 % Robustification:
 % R estimate accuracy vs. dynamic trackability: (1) Trade observation time for bandwidth (2) Partial adaptiveness (less degrees of freedom than channels) (3) Quadratic constraint on sensor weights to limit the norm to some preset value.
 % -  
 
-Previous work have shown that the robustness issue may be solved through means such as temporal and spatial averaging~\cite{Kailath1985}, and regularisation. Reducing complexity has been achieved in a variety of ways, often by enforcing a Toeplitz-structure on the covariance matrix to simplify its inversion, or by employing iterative solvers.
+Previous work have shown that the robustness issue can be solved by means such as temporal and spatial averaging~\cite{Kailath1985}, and regularisation. To reduce computational complexity, some studies have demonstrated the feasibility of enforcing a Toeplitz-structure on the covariance matrix to simplify its inversion~\cite{Asl2012a,Jakobsson2000m}, or performing MVDR beamforming in beamspace (frequency domain)~\cite{Nilsen2009}.
 
-We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
+% Some low complexity approximations to the MVDR beamformer is also available, such as the Low Complexity Adaptive (LCA) beamformer, 
+
+In this work, we show that the computation time can be reduced by 1-2 orders of magnitude when implemented wisely on a Graphics Processing Unit (GPU). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize the number of floating point operations per second (Flop/s) while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them\todo{misplaced?}. 
+
+
+% We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
 
 % Other work (keywords: mvdr, capon, computation, efficient, complexity):
 % - Partially adaptive beamforming. DAS on non-overlapping subarrays, then MVDR \cite{Swingler1999a}.
@@ -498,9 +501,9 @@ We will show that by exploiting symmetry and avoiding unnecessary computations, 
 % (Made partially adaptive by employing subarray averaging to reduce degrees of freedom to L.)
 
 
-Furthermore, we investigate the feasibility of accelerating the MVDR method using Graphics Processing Units (GPUs). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize Flop/s while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them\todo{misplaced?}. 
+% Furthermore, 
 
-Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
+Comparable work may be found, e.g. in ultrasound, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
 
 This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{too much overlap here}
 
@@ -905,7 +908,7 @@ transfer.
 
 As Fig. \ref{benchmarks} demonstrates, performing arithmetic reductions and designing for using GPUs can significantly improve upon the problem with  the processing speed. If we look at the total runtimes for a subarray size of $L=16$ and temporal averaging at $K=2$, the GPU implementation is able to process the test image in roughly 40\,ms. This translates to a processing throughput of 1.4\,Mpixels/s. For the same scenario the C implementation clocked in at roughly 3\,s and Matlab at 17\,s, which is 75 and 435 times slower than the GPU implementation, respectively.
 
-Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the GPU implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating e.g.\ a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the GPU implementation.
+Interesting to note is also that solving $\eRi\1$ remains the main bottleneck in the GPU implementation, and it gets even worse for larger $L$'s. However, this is a general Gauss Jordan solver which does not exploit symmetry properties of $\eR$, so creating, e.g. a batch based Cholesky solver should improve the runtimes further. Both the C and Matlab implementation in this benchmark take this symmetry into account, which partially explains why the complexity curves of these implementations are different from that of the GPU implementation.
 
 If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\,m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\,Hz. We could further assume a complex sampling frequency of 40\,kHz to accomodate the  HISAS1030's bandwidth of 30\,kHz, and beamform $M=32$ lateral beams. The throughput required for real-time processing of these images would then be 1\,Mpixels/s. As we have seen, this is something our GPU implementation can handle if $L$ is not too large.%, leaving the \gls{CPU} free to take on other assignments.
 
@@ -1668,7 +1671,8 @@ The bandwidths are compared in Tab. \ref{tabbandwidth}. Note that even when usin
 % 
 % In Fig. \ref{mvdr_implementation} we illustrate how we got around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without the need for reading additional channel data.
 % 
-% Second we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximize global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Combined these steps balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less memory.
+% Second we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that entire row is saved back to global memory following a collective access pattern that maximize global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Combined these steps balances the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less 
+memory.
 %  
 % 
 % 
@@ -2372,21 +2376,21 @@ The authors would like to thank Kongsberg Maritime and the Norwegian Defence Res
 % your own custom macro containing the \includegraphics command to make things
 % simpler here.)
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jo_inge.eps}}]{Jo Inge Buskenes}
-received the B.S. degree in electrical engineering from Gj\o{}vik College University, Norway, in 2007, and the M.S. degree in instrumentation for particle physics from the University of Oslo, Norway, in 2010. He is currently pursuing the Ph.D. degree in image reconstruction and technology at the University of Oslo.
+received the B.Sc. degree in electrical engineering from Gj\o{}vik College University, Norway, in 2007, and the M.Sc. degree in instrumentation for particle physics from the University of Oslo, Norway, in 2010. He is currently pursuing the Ph.D. degree in image reconstruction and technology at the University of Oslo.
 
-His industry experience includes the European Organization for Nuclear Research (CERN), Geneva, Switzerland (2007-2008), and the Norwegian Defence Research Establishment, Kjeller, Norway (2009). He has lectured in digital signal processing at the Gj\o{}vik College University (2009), and at the University of Oslo (2010-2012). His research interests include adaptive beamforming, digital image reconstruction, high performance computing, intelligent detector design and embedded Linux platforms.
+His industry experience includes the European Organization for Nuclear Research (CERN), Geneva, Switzerland (2007-2008), and the Norwegian Defence Research Establishment, Kjeller, Norway (2009). He has lectured in digital signal processing at the Gj\o{}vik College University (2009), and at the University of Oslo (2010-2012). His research interests include adaptive beamforming, digital image reconstruction, high performance computing, intelligent detector design and open source software.
 \end{IEEEbiography}
 
-\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jon_petter.eps}}]{Jon Petter {}sen}
-(S'12) was born in Porsgrunn, Norway in 1986. He received the M.S degree in computer science from the University of Oslo, Norway, in 2010. He is currently pursuing his Ph.D degree in medical ultrasound technology at the Norwegian University of Science and Technology (NTNU) Medical Imaging Lab (MI-Lab), Trondheim, Norway. His research interests include adaptive ultrasound processing techniques and acceleration of ultrasound algorithms using Graphics processing units (GPUs). 
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jon_petter.eps}}]{Jon Petter \AA{}sen}
+(S'12) was born in Porsgrunn, Norway in 1986. He received the B.Sc. and M.Sc. degree in computer science from the University of Oslo, Norway, in 2010. He is currently pursuing his Ph.D. degree in medical ultrasound technology at the Norwegian University of Science and Technology (NTNU) Medical Imaging Lab (MI-Lab), Trondheim, Norway. His research interests include adaptive ultrasound processing techniques and acceleration of ultrasound algorithms using Graphics Processing Units (GPUs). 
 \end{IEEEbiography}
 
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/carl-inge.eps}}]{Carl-Inge Colombo Nilsen}
-(S'06-M'10) received the M.sc. and Ph.d. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustic applications.
+(S'06-M'10) received the M.Sc. and Ph.d. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustic applications.
 \end{IEEEbiography}
 
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/andreas.eps}}]{Andreas Austeng}
-was born in Oslo, Norway, in 1970. He received the M.S. degree in physics in 1996 and the Ph.D. degree in computer science in 2001, both from the University of Oslo. since 2001, he has been working at the department of Informatics, University of Oslo, first as a postdoctoral research fellow and currently as an associate Professor. His research interests include signal processing for acoustical imaging.
+was born in Oslo, Norway, in 1970. He received the M.Sc. degree in physics in 1996 and the Ph.D. degree in computer science in 2001, both from the University of Oslo. Since 2001, he has been working at the Department of Informatics, University of Oslo, first as a postdoctoral research fellow and currently as an associate professor. His research interests include signal and array processing for acoustical imaging.
 \end{IEEEbiography}
 
 
