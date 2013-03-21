@@ -310,14 +310,14 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \begin{document}
 
 
-\title{An Optimal GPU Implementation of the MVDR beamformer for Active Sonar Imaging}
+\title{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
 
 \author{Jo~Inge~Buskenes, %
         Jon~Petter~\AA{}sen, %
         Carl-Inge~Colombo~Nilsen, %
         Andreas~Austeng%
-\thanks{J.I.Buskenes, C.-I.C.Nilsen and A.Austeng are with the Department of Informatics, University of Oslo, Norway.}%
-\thanks{J.P.\AA{}sen is with MI-Lab, Norwegian University of Science and Technology, Trondheim, Norway.}% <-this % stops a space
+\thanks{J. I. Buskenes, C.-I. C. Nilsen and A. Austeng are with the Department of Informatics, University of Oslo, Norway.}%
+\thanks{J. P. \AA{}sen is with MI-Lab, Norwegian University of Science and Technology, Trondheim, Norway.}% <-this % stops a space
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
 
@@ -464,8 +464,7 @@ Adaptive beamforming, MVDR, Capon, sonar, active sonar, GPU, graphics processing
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
 
-
-In attempts to improve image quality, data driven methods has been introduced in various imaging fields over the years. One such method, the Minimum Variance Distortionless Response (MVDR) beamformer, has been reported to produce images with improved contrast and resolution compared to conventional non-adaptive methods, e.g. in radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and passive sonar. Recently has its feasibility in active sonar also been demonstrated~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
+In attempts to improve image quality, data driven methods has been introduced in various imaging fields over the years. One such method is the Minimum Variance Distortionless Response (MVDR) beamformer. Its use has led to reports of improved image contrast and resolution compared to conventional non-adaptive methods, e.g. in radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and active sonar~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 % \the\linewidth
 
@@ -476,11 +475,16 @@ Despite its inherent potential, the MVDR beamformer has yet to see widespread ad
 % R estimate accuracy vs. dynamic trackability: (1) Trade observation time for bandwidth (2) Partial adaptiveness (less degrees of freedom than channels) (3) Quadratic constraint on sensor weights to limit the norm to some preset value.
 % -  
 
-Previous work have shown that the robustness issue can be solved by means such as temporal and spatial averaging~\cite{Kailath1985}, and regularisation. To reduce computational complexity, some studies have demonstrated the feasibility of enforcing a Toeplitz-structure on the covariance matrix to simplify its inversion~\cite{Asl2012a,Jakobsson2000m}, or performing MVDR beamforming in beamspace (frequency domain)~\cite{Nilsen2009}.
+It has been shown that the robustness issue can be solved by means such as temporal and spatial averaging, and regularisation, in e.g. \cite{VanTrees2002,Kailath1985}. To reduce computational complexity, one possibility is to assume data stationarity which allows the formation of a Toeplitz-structured covariance matrix that are simpler to invert~\cite{Asl2012a,Jakobsson2000}. Another possibility is to perform MVDR beamforming in beamspace (the frequency domain)~\cite{VanTrees2002,Nilsen2009}.
 
 % Some low complexity approximations to the MVDR beamformer is also available, such as the Low Complexity Adaptive (LCA) beamformer, 
 
-In this work, we show that the computation time can be reduced by 1-2 orders of magnitude when implemented wisely on a Graphics Processing Unit (GPU). These chips have in recent years emerged as a flexible and highly potent parallel technology well suited for many DSP tasks. Driven by the gaming industry, these devices are engineered to maximize the number of floating point operations per second (Flop/s) while keeping cost and power consumption at a minimum. Compared to many-core CPUs, a GPU core offer modest computational capabilities, but in return provide up to thousands of them\todo{misplaced?}. 
+In this work, we show that such approximations may not be necessary since the computation time can be reduced by 1-2 orders of magnitude when implemented wisely on a Graphics Processing Unit (GPU). This can in part be attributed to the GPU itself, which is designed up of a large number of computing cores that combined to achieve a maximum number of floating point operations per second (Flop/s), while keeping cost and power consumption at a minimum. This is perfect for image 
+
+Such devices can often this by combining up to thousands of computing cores that each performs modestly, but combined performs impressively. 
+
+
+Image processing favours such designs, because each pixel is often pixels can be processed independently, as well as many of the tasks on a subpixel level.
 
 
 % We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
@@ -503,9 +507,9 @@ In this work, we show that the computation time can be reduced by 1-2 orders of 
 
 % Furthermore, 
 
-Comparable work may be found, e.g. in ultrasound, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
+Similar work may be found in e.g. medical ultrasound imaging, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. They report a significant reduction in computation time, but the real data constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. We have also investigated using MVDR on a GPU in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to other adaptive methods that is based on the same optimisation criterion~\cite{Buskenes2013a}.
 
-This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{too much overlap here}
+This article is outlined as follows: In section \ref{methods} we introduce the concept of adaptive beamforming and provide details on the MVDR method. Then we investigate the complexity issue, discuss means for reducing arithmetic complexity, and show how to properly map this algorithm to a GPU in section \ref{maptogpu}. Then we present results in \ref{benchmarks}, discuss them in \ref{discussion}, and finally conclude in \ref{conclusion}.
 
 %  Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
 
@@ -612,7 +616,7 @@ The results are shown in Fig. \ref{mvdr_complexity}. Note how the computation of
 
 
 
-\section{Mapping the MVDR to a GPU}
+\section{Mapping the MVDR to a GPU}\label{maptogpu}
 
 % \begin{itemize}
 % \item Keep delay step on CPU, as this is a common step in all beamforming
@@ -848,7 +852,7 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 % \item Optimized for small L, high M, hardly any time averaging. A typical sonar scenario.
 % \end{itemize}
 
-
+% mapping
 
 % - Split program into equally sized portions - load balancing
 % - Some portions depend on other potions already being carried outer - sequential dependencies
@@ -870,7 +874,7 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 
 
 
-\section{Images and Benchmarks}
+\section{Images and Benchmarks}\label{benchmarks}
 
 % In a practical system it should be moved to the GPU as well. Therefore, in the upcoming benchmarks, CPU computation time and data transfer to the GPU is neglected.
 
@@ -901,7 +905,7 @@ transfer.
 % The computational performance of our GPU implementation is displayed in (\Fig{benchmarks}). Processing times are shown for varying subarray lengths $L$ and varying amounts of temporal averaging $N_\text{avg}$. A single-thread C and Matlab implementation is added as reference, although only moderate optimization work was carried out on these. The test system was a quad-core Intel Xeon E5620, with 64Gb of \gls{RAM}, and an nVidia Quadro 6000 card.
 
 
-\section{Discussion}
+\section{Discussion}\label{discussion}
 
 \Fig{holmengraa} demonstrates the MVDR beamformer's ability to suppress interference and achieve better detail resolution. Compared the DAS beamformer, the ship's edges appear sharper and the shadows less noisy. This is in accordance with previous work.
 %But while \gls{DAS} processed this 1.3\,Mpixel image in milliseconds, our Matlab implementation\todo{never mentioned matlab vefore} of MVDR beamformer needed minutes.
@@ -938,7 +942,7 @@ If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maxi
 % \end{itemize}
 
 
-\section{Conclusion}
+\section{Conclusion}\label{conclusion}
 
 The MVDR beamformer is an algorithm capable of producing images with improved detail resolution and contrast compared to conventional DAS beamforming. The downside is its inherent need for robustification and the high compuational complexity associated with estimating and inverting the spatial covariance matrix.
 
