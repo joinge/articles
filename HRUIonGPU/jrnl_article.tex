@@ -736,17 +736,17 @@ The computational complexities of these three steps are $O(N_KN_LL^2)$, $O(L^3)$
 
 Calculation of one element of \R is from (\ref{eq:R}) found to be independent of calculation of the other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$ \cite{Chen2011}. This will minimize global reads and writes needed per thread, but since we want to avoid block-to-block synchronization, the maximum subarray length is limited to 32 by this approach. Since most medical ultrasound arrays have 64 elements or more, an implementation not limited by $L_{max}=M/2=32$ is preferable.
 
-In \cite{asen2012, Buskenes} we demonstrated how the cubic complexity with $L$ and linear complexity with $N_K$ can be reduced by realizing that calculations in (\ref{eq:R}) overlap both across subarrays and in time. Element $(i,j)$ of $\mat{\breve{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ in a sliding window maner as
+In \cite{asen2012, Buskenes} we demonstrated how the cubic complexity with $L$ and linear complexity with $N_K$ can be reduced by realizing that calculations in (\ref{eq:R}) overlap both across subarrays. Element $(i,j)$ of $\mat{\breve{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ in a sliding window maner as
 \begin{align}
 \mat{\breve{R}}_{i,j}[n] &=  \mat{\breve{R}}_{i-1,j-1}[n]  \nonumber \\
 &+ \sum_{n'=n-K}^{n+K} (x_{i+N_L-1}[n']x_{j+N_L-1}[n']^* \nonumber \\
 &- x_{i-1}[n']x_{j-1}[n']^H). \label{eq:sliding}
 \end{align}
-Along the time dimension we also find that
-\begin{align}
-\mat{\breve{R}}[n] &= \mat{\breve{R}}[n-1] + \sum_{l=0}^{N_L-1} (\vec{x}_l[n+K]\vec{x}_l[n+K]^H \nonumber \\
-&- \vec{x}[n-K-1]\vec{x}[n-K-1]^H).
-\end{align}
+%Along the time dimension we also find that
+%\begin{align}
+%\mat{\breve{R}}[n] &= \mat{\breve{R}}[n-1] + \sum_{l=0}^{N_L-1} (\vec{x}_l[n+K]\vec{x}_l[n+K]^H \nonumber \\
+%&- \vec{x}[n-K-1]\vec{x}[n-K-1]^H).
+%\end{align}
 %- \mat{\breve{R}}[n-K-1] + \mat{\breve{R}}[n-K].
 Sliding windows across subarrays and in time can be realized simultaneously if $\mat{\hat{R}}$, averaged over subarrays, is calculated from an $N_K$-average in time of the outer products $\vec{x}[n]\vec{x}[n]^H$. However, since $N_K$ typically is small, and the GPU has a limited amount of shared memory available per thread, we focus on subarrays only. In that case, the complexity of calculating $\mat{\hat{R}}$ is reduced to $O(N_K(L(N_L-2)+2L^2))$. For $L=M/2$ this reduces to $O(N_KM^2)$. 
 
@@ -794,6 +794,13 @@ The final output can be formed by either reducing the data down to length $L$ as
 \breve{x}_{r} = \sum_{k=r}^{r+N_L-1}x_{k} \text{ for } r \in [0, L-1].
 \end{align}
 Each thread now computes $z_r = w_r^*x_r$, and finally one thread computes and outputs $z = \frac{1}{N_L}\sum_{r=0}^{L-1} z_r$ to global memory. %The last sum can also be performed using a binary reduction sum across several threads for increased speed.
+
+
+\begin{figure}
+\centerline{\includegraphics[width=3.5in]{gfx/gpu_layout_bs.eps}}
+\caption{Calculation of the sliding beamspace transformation. A group of $N_b$ threads are assigned a set of subarrays which they transform to beamspace in a sliding window fashion. In this example $N_b=3$ and $N_L\,\text{mod}\,N_b = 0$.}
+\label{fig:gpulayoutbs}
+\end{figure}
 
 \section{Parallel BS-Capon}\label{sec:bs}
 In this section we will derive a parallel implementation of the BS-Capon beamformer, and comment on how it deviates from the implementation in Section \ref{sec:meth}. The three main steps described in Section \ref{sec:meth} are present here as well, but in addition we need to transform the per-element data to beamspace. This can be done using a FFT, but for few beams ($N_b < \log{L}$) a matrix multiply with the truncated Butler matrix is less costly. 
@@ -1101,7 +1108,7 @@ both beamformers have successfully been implemented on the GPU. For a three dime
 
 % use section* for acknowledgement
 \section*{Acknowledgment}
-The authors would like to thank Dr K. Kristoffersen, GE Vingmed Ultrasound, for valuable comments. 
+The authors would like to thank Dr. K. Kristoffersen, GE Vingmed Ultrasound, for valuable comments. 
 
 
 % Can use something like this to put references on a page
