@@ -475,17 +475,11 @@ Despite its inherent potential, the MVDR beamformer has yet to see widespread ad
 % R estimate accuracy vs. dynamic trackability: (1) Trade observation time for bandwidth (2) Partial adaptiveness (less degrees of freedom than channels) (3) Quadratic constraint on sensor weights to limit the norm to some preset value.
 % -  
 
-In previous work it has been shown that the robustness issue can be solved by means such as temporal and spatial averaging, and regularisation, in e.g. \cite{VanTrees2002,Kailath1985}. To reduce computational complexity, one possibility is to assume data stationarity which allows the formation of a Toeplitz-structured covariance matrix that is simpler to invert~\cite{Asl2012a,Jakobsson2000}. Another possibility is to perform MVDR beamforming in beamspace (the frequency domain)~\cite{VanTrees2002,Nilsen2009}.
+The MVDR's robustness has been extensively studied, and can usually be achieved by combining means such as temporal and spatial averaging, and regularisation~\cite{VanTrees2002,Kailath1985}. To reduce computational complexity, one possibility is to assume data stationarity which allows the formation of a Toeplitz-structured covariance matrix that is simpler to invert~\cite{Asl2012a,Jakobsson2000}. Another possibility is to perform MVDR beamforming in beamspace (the frequency domain)~\cite{VanTrees2002,Nilsen2009}.
 
 % Some low complexity approximations to the MVDR beamformer is also available, such as the Low Complexity Adaptive (LCA) beamformer, 
 
-In this work, we show that such approximations may not be necessary since the computation time can be reduced by 1-2 orders of magnitude by implementing MVDR on a Graphics Processing Unit (GPU). We will show how we achieved this by altering and carefully mapping the algortithm to effectively make use of the vast parallel processing power present in such devices. The final implementation is then measured in terms of absolute performance, the results are compared to the theroetical peak, and some resoahow close to the peak performance it is, and the reasons for performance relative to the teoretical peak, and design optim We will explai will detail the challenges met, show how to make efficient use of the GPUs resources this can be done in the case of the MVDR method, provide details on challenges and solutions, was adapted  design is very well suited for performing parallel reconstruction of images, but in the case of the MVDR
-
-Such devices can often this by combining up to thousands of computing cores that each performs modestly, but combined performs impressively. 
-
-
-Image processing favours such designs, because each pixel is often pixels can be processed independently, as well as many of the tasks on a subpixel level.
-
+% Such devices can often this by combining up to thousands of computing cores that each performs modestly, but combined performs impressively. 
 
 % We will show that by exploiting symmetry and avoiding unnecessary computations, the spatial averaging will also aid in reducing the overall arithmetic complexity\todo{make sure this is shown clearly somewhere}. for Unlike other work, which focus modifying or transforming\todo{get low channel count in, as it makes a case against the other solutions.} We make no approximations, but rather stay with a textbook example of the method that handle complex basebanded data\todo{misplaced?}.
 
@@ -505,11 +499,9 @@ Image processing favours such designs, because each pixel is often pixels can be
 % (Made partially adaptive by employing subarray averaging to reduce degrees of freedom to L.)
 
 
-% Furthermore, 
+In this work, we show that such approximations may not be necessary since the computation time can be reduced by 1-2 orders of magnitude by implementing MVDR on a Graphics Processing Unit (GPU). Similar work may be found in e.g. medical ultrasound imaging, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. While this implementation is fast, the real data constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. In related work we have  investigated using MVDR on a GPU in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to adaptive methods that are based on the same optimisation criterion~\cite{Buskenes2013a}.
 
-Similar work may be found in e.g. medical ultrasound imaging, where Chen \emph{et al.} has demonstrated a GPU implementation of the MVDR that operates on real data~\cite{Chen2011,Chen2011a}. They report a significant reduction in computation time, but the real data constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. We have also investigated using MVDR on a GPU in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to other adaptive methods that is based on the same optimisation criterion~\cite{Buskenes2013a}.
-
-This article is outlined as follows: In section \ref{methods} we introduce the concept of adaptive beamforming and provide details on the MVDR method. Then we investigate the complexity issue, discuss means for reducing arithmetic complexity, and show how to properly map this algorithm to a GPU in section \ref{maptogpu}. Then we present results in \ref{benchmarks}, discuss them in \ref{discussion}, and finally conclude in \ref{conclusion}.
+This article is outlined as follows: In section \ref{methods} we introduce the concept of adaptive beamforming and provide details on the MVDR method. Then in \ref{maptogpu} we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in section \ref{images_and_benchmarks}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how well the full capacity of the GPU was reached. We discuss these results in \ref{discussion}, and conclude in \ref{conclusion}.
 
 %  Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
 
@@ -545,7 +537,7 @@ z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. Various weighting patterns exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two\todo{don't quite like this one}~\cite{Harris1978}.
 
-Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield, the rationale being that the a priori knowledge embedded in the data may be used to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution:
+Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. Or, in other words, assessing the \emph{a priori} information present in the data when can likely be used improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
@@ -874,7 +866,7 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 
 
 
-\section{Images and Benchmarks}\label{benchmarks}
+\section{Images and Benchmarks}\label{images_and_benchmarks}
 
 % In a practical system it should be moved to the GPU as well. Therefore, in the upcoming benchmarks, CPU computation time and data transfer to the GPU is neglected.
 
