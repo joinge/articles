@@ -589,7 +589,7 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 
 \subsection{Computational Complexity}
 
-When assessing the MVDR beamformer's complexity and mapability to parallel hardware, computing and inverting $\eR$ is by far the most computationally intensive task. If we neglect spatial and temporal averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
+When assessing the MVDR beamformer's complexity and mapability to parallel hardware, computing and inverting $\eR$ is by far the most computationally intensive tasks. If we neglect spatial and temporal averaging then computing $\eR$ is of O($M^2$), and inverting it is of O($M^3$). But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ becomes of O($N_K N_L L^2$) and the inversion of O($L^3$). Furthermore, assuming rectangular complex notation, we should take into account that a complex multiplication is roughly 3 times as arithmetically intense as a complex addition. So what does it all amount to in the end?
 
 To investigate this aspect we derived exact complexity formulas for each step in the MVDR process\todo{except partial pivoting, diagonal loading}. Then these were evaluated for the entire range of possible subarray sizes from $L\in[1,M]$, with temporal averaging assessed with values $K\in\{0,1,2\}$ and the number of channels set to $M\in\{8,16,24,32\}$.
 
@@ -720,7 +720,7 @@ These challenges are very closely linked. The Quadro 6000 architecture is of com
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{gfx/mvdr_implementation.eps}
-\caption{MVDR implementated on a GPU. The sample covariance matrix is formed by threads running along its diagonals, performing spatial averaging iteratively. Then Nvidia's     ces for each image pixel are computed .}\label{mvdr_implementation}
+\caption{MVDR implementated on a GPU. We do this in 3 steps, where each step process the full image before moving on to the next step. Step 1: The sample covariance matrix $\eR$ is formed by threads running along its diagonals. This allows spatial averaging to be implemented in a computaionally efficient manner and minimizes inter-thread communication. Step 2: $\eRi$ is computed using the heavily optimized batched linear equation solver from Nvidia. Step 3: The beamformer output $z$ is      each image pixel are computed .}\label{mvdr_implementation}
 \end{figure}
 
 % What about the GPU implementation? This one was tricky. Balance load, avoid inter-thread dependencies when performing iterative summations, keep thread memory consumption at a minimum, and promote collective access patterns (coalesced reads/writes) to global memory.
