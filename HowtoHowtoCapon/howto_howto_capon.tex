@@ -698,15 +698,27 @@ To study the effect of these optimization strategies we derived complexity curve
 
 We chose the iterative solution based on its overall excellent performance, and because it can be altered to consume very little memory. This is \emph{very} important, as we will see next.
 
+% \begin{table}[b]\centering%\normalsize
+% \begin{tabular}[c]{l r@{:}  l}\hline
+% \rowcolor{tabBlue}\bf Memory type & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+% Global memory &\hspace{30pt} 1 & 30 \\
+% Shared memory & 1 & 4 \\
+% Registers & $>$3 & 2~\cite{Vasilyy}
+% \end{tabular}
+% \caption{Nvidia Quadro 6000 bandwidth ratios.}\label{tabbandwidth}
+% \end{table}
+
 \begin{table}[b]\centering%\normalsize
-\begin{tabular}[c]{l r@{:}  l}\hline
-\rowcolor{tabBlue}\bf Memory type & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
-Global memory &\hspace{30pt} 1 & 30 \\
-Shared memory & 1 & 4 \\
-Registers & $>$3 & 2~\cite{Vasilyy}
+\begin{tabular}[c]{l r r r@{:}  l}\hline
+\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{arithmetic}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf BW$_\text{memory}$/BW$_\text{arithmetic}$} \\\hline
+Arithmetic throughput & 1.03 Tflop/s & & \hspace{30pt} 1 & 30 \\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 & 30 \\
+Shared memory & & 257 Gfloats/s & 1 & 4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 & 2~\cite{Vasilyy}
 \end{tabular}
-\caption{Nvidia Quadro 6000 bandwidth ratios.}\label{tabbandwidth}
+\caption{Nvidia Quadro 6000: Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
 \end{table}
+
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
