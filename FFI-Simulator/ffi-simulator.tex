@@ -37,7 +37,7 @@
 
 \begin{center}
 
-{\Large Design Suggestion}\\[0.2cm]
+{\Large Design Suggestion} v2\\[0.2cm]
 {\itshape for a}\\[0.2cm]
 {\Large GPU Based Sonar Template Simulator}\\[2cm]
 {\itshape by}\\[0.2cm]
@@ -97,7 +97,7 @@ Most of the specifications received from FFI are illustrated in Figure \ref{spec
 
 \section{Design Suggestion}
 
-The way we see it, there are two possible approaches to implementing the mentioned simulator (figure \ref{implementation}). One can either
+In the original specification we put forth two possible approaches to implementing the mentioned simulator (figure \ref{implementation}). We envisioned to either
 
 \begin{figure}[b]
 \begin{narrow}{-2.5cm}{-2.5cm}
@@ -107,22 +107,33 @@ The way we see it, there are two possible approaches to implementing the mention
 \end{figure}
 
 \begin{itemize0}
-\item use OpenGL to produce depth-maps of the scene, and CUDA to illuminate it as a sonar would, or
+\item use OpenGL to produce depth-maps of the scene, and CUDA/OpenCL to illuminate it as a sonar would, or
 \item use OpenGL to render the full scene with lighting.
 \end{itemize0}
 
-In either case the simulator will take a seafloor and target model as input, and generate a simulated sonar image. To offload the CPU further, the GPU can then proceed to compute the correlation between the template and the isolated image segment, and an image mask. This should be fairly easy to implement, will compute efficiently on the GPU, and allows us to avoid sending each template back to the CPU over the limited bandwidth CPU$\leftrightarrow$GPU bus. Note that these steps will have to be carried out in CUDA regardless of the approach selected.
+In each of these cases the simulator takes a seafloor and target model as input, and generates a simulated sonar image. 
+
+
+
+
+
+We believe the first alternative is the more customizable of the two, and the second being the least complex to implement. 
+
+To further offload the CPU, the GPU could proceed to compute the correlation between the template and the isolated image segment, and an image mask. The advantages included a fairly straight forward implementation that would compute efficiently on the GPU,
+
+
+ and allows us to avoid sending each template back to the CPU over the limited bandwidth CPU$\leftrightarrow$GPU bus. Note that these steps will have to be carried out in CUDA regardless of the approach selected.
 
 In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
 
 \subsection{Using only OpenGL for the simulator?}
 
 
-When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
+When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA/OpenGL. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
 
 Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
 
-The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. However, this will also lead to increased code complexity and development time, and  will naturally increase. However, we expect that such features will be more realizable in CUDA than OpenGL.  
+The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. The drawback is the added code complexity and development time.
 
 We have compared the two methods in Table \ref{comparison}.
 
