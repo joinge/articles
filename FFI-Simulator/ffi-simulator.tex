@@ -97,7 +97,7 @@ Most of the specifications received from FFI are illustrated in Figure \ref{spec
 
 \section{Design Suggestion}
 
-As detailed below, in this revision we have decided to opt for slightly more flexibile design to better be able to handle effects such as geometric layover.
+As detailed below, in this revision we have decided to add a couple alternative designs that is more flexible and able to handle effects such as geometric layover and multipath.
 % This is to better be able to simulate geometrical sonar imaging effects such as layover. We will describe both the original suggestions and the updated design here.
 
 \subsection{The Initial Suggestion}
@@ -120,9 +120,9 @@ In each of these cases the simulator takes a seafloor and target model as input,
 
 But can we accurately simulate a sonar system using a framework designed to simulate optics?
 
-\subsection{Geometrical Layover}
+\subsection{Layover and multipath}
 
-
+When using OpenGL, there is 
 
 When we wish to , it is better to use e.g. OpenGL than CUDA/OpenGL.
 
@@ -139,7 +139,12 @@ In addition we see that each approach shares the same initial steps. The risk of
 
 \subsection{Using only OpenGL for the simulator?}
 
-
+\begin{figure}[b]
+\begin{narrow}{-2.3cm}{-2.3cm}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulation_setup.png}
+\end{narrow}
+\caption{Two possible implementation strategies.}\label{implementation}
+\end{figure}
 
 
 Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
