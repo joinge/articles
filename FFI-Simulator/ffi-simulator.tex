@@ -37,7 +37,7 @@
 
 \begin{center}
 
-{\Large Design Suggestion} v2\\[0.2cm]
+{\Large Design Suggestion}\\[0.2cm]
 {\itshape for a}\\[0.2cm]
 {\Large GPU Based Sonar Template Simulator}\\[2cm]
 {\itshape by}\\[0.2cm]
@@ -68,7 +68,7 @@ Roy Edgar \textsc{Hansen}\\
 \end{minipage}
 \vfill
 \small
-\today
+Revision 2, \today
 \end{center}
 
 
@@ -97,10 +97,15 @@ Most of the specifications received from FFI are illustrated in Figure \ref{spec
 
 \section{Design Suggestion}
 
+As detailed below, in this revision we have decided to opt for slightly more flexibile design to better be able to handle effects such as geometric layover.
+% This is to better be able to simulate geometrical sonar imaging effects such as layover. We will describe both the original suggestions and the updated design here.
+
+\subsection{The Initial Suggestion}
+
 In the original specification we put forth two possible approaches to implementing the mentioned simulator (figure \ref{implementation}). We envisioned to either
 
 \begin{figure}[b]
-\begin{narrow}{-2.5cm}{-2.5cm}
+\begin{narrow}{-2.3cm}{-2.3cm}
 \graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}
 \end{narrow}
 \caption{Two possible implementation strategies.}\label{implementation}
@@ -111,9 +116,15 @@ In the original specification we put forth two possible approaches to implementi
 \item use OpenGL to render the full scene with lighting.
 \end{itemize0}
 
-In each of these cases the simulator takes a seafloor and target model as input, and generates a simulated sonar image. 
+In each of these cases the simulator takes a seafloor and target model as input, and generates a simulated sonar image, as well as perform template correlation if desired. For the first step of setting up the 3D scene, move objects and cameras around, and render it using a GPU, we initially believed OpenGL to be the better choice. OpenGL was made for this specific task, is cross-platform, feature-rich, well-matured and tuned to peak performance to meet the heavy needs of the gaming industry.
+
+But can we accurately simulate a sonar system using a framework designed to simulate optics?
+
+\subsection{Geometrical Layover}
 
 
+
+When we wish to , it is better to use e.g. OpenGL than CUDA/OpenGL.
 
 
 
@@ -129,7 +140,7 @@ In addition we see that each approach shares the same initial steps. The risk of
 \subsection{Using only OpenGL for the simulator?}
 
 
-When we wish to set up a 3D scene, move objects and cameras around, and render it using a GPU, it is better to use e.g. OpenGL than CUDA/OpenGL. OpenGL was made for this specific task, is cross-platform, feature-rich and well-matured. By looking at the graphics quality and frame-rates displayed by modern OpenGL-based games it should also be fairly straight-forward to get the performance we need out of this library.
+
 
 Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
 
