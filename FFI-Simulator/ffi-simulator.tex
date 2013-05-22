@@ -120,6 +120,29 @@ In each of these cases the simulator takes a seafloor and target model as input,
 
 But can we accurately simulate a sonar system using a framework designed to simulate optics?
 
+\subsection{Simulating a sonar scenario using optics}
+
+\begin{figure}[b]
+\begin{narrow}{-2.3cm}{-2.3cm}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulation_setup.png}
+\end{narrow}
+\caption{Two possible implementation strategies.}\label{simulation_setup}
+\end{figure}
+
+As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (fig. \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects is 1\;m.
+
+\begin{figure}[H]
+\begin{minipage}[c]{0.49\linewidth}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulation_mask.png}
+\end{minipage}\mbox{}\hfill
+\begin{minipage}[c]{0.49\linewidth}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulation_object.png}
+\end{minipage}
+\graphicsAI[drawing,width=\linewidth]{gfx/simulation_optical.png}
+\caption{Optical rendering.}\label{s}
+\end{figure}
+
+
 \subsection{Layover and multipath}
 
 When using OpenGL, there is 
@@ -137,14 +160,8 @@ To further offload the CPU, the GPU could proceed to compute the correlation bet
 
 In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
 
-\subsection{Using only OpenGL for the simulator?}
 
-\begin{figure}[b]
-\begin{narrow}{-2.3cm}{-2.3cm}
-\graphicsAI[drawing,width=\linewidth]{gfx/simulation_setup.png}
-\end{narrow}
-\caption{Two possible implementation strategies.}\label{implementation}
-\end{figure}
+
 
 
 Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
