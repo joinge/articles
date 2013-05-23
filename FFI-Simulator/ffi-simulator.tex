@@ -120,6 +120,7 @@ In each of these cases the simulator takes a seafloor and target model as input,
 
 But can we accurately simulate a sonar system using a framework designed to simulate optics?
 
+
 \subsection{Simulating a sonar scenario using optics}
 
 \begin{figure}[b]
@@ -129,34 +130,31 @@ But can we accurately simulate a sonar system using a framework designed to simu
 \caption{Two possible implementation strategies.}\label{simulation_setup}
 \end{figure}
 
-As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (fig. \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects is 1\;m.
+As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (fig. \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects was 1\;m.
 
-\begin{figure}[H]
+\begin{figure}[b]
 \begin{minipage}[c]{0.49\linewidth}
 \graphicsAI[drawing,width=\linewidth]{gfx/simulation_mask.png}
+\centering\itshape Simulation mask
 \end{minipage}\mbox{}\hfill
 \begin{minipage}[c]{0.49\linewidth}
 \graphicsAI[drawing,width=\linewidth]{gfx/simulation_object.png}
+\centering\itshape Simulated object
 \end{minipage}
 \graphicsAI[drawing,width=\linewidth]{gfx/simulation_optical.png}
+\centering\itshape Combined image\vspace{5pt}
 \caption{Optical rendering.}\label{s}
 \end{figure}
+
+To simulate this scene we combine a normal optical simulation with a mask image. The mask image scene is set up with a powerful light source and highly diffractive surfaces, which causes everything that is hit by light to obtain a high intensity value. Only direct light is processed, so shadows will come out as empty. In the scene with the simulated object material properties are adjusted to reflect a more reasonable amount of light, and a light insensitive background was chosen. The two images was finally combined by colour multiplication.
+
+Are such an approach accurate enough? Or do we need to consider layover, multipath, or other effects as well?
 
 
 \subsection{Layover and multipath}
 
-When using OpenGL, there is 
+If layover and multipath are important, then the techniques used to simulate the previous images can not be used. Then we believe that a pure CUDA / OpenCL implementation is the better choice, but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
 
-When we wish to , it is better to use e.g. OpenGL than CUDA/OpenGL.
-
-
-
-We believe the first alternative is the more customizable of the two, and the second being the least complex to implement. 
-
-To further offload the CPU, the GPU could proceed to compute the correlation between the template and the isolated image segment, and an image mask. The advantages included a fairly straight forward implementation that would compute efficiently on the GPU,
-
-
- and allows us to avoid sending each template back to the CPU over the limited bandwidth CPU$\leftrightarrow$GPU bus. Note that these steps will have to be carried out in CUDA regardless of the approach selected.
 
 In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
 
@@ -180,7 +178,7 @@ Maintainability                     & Moderate       & Moderate \\
 Code readability                    & Moderate       & Moderate \\
 Signal model                        & Arbitrary      & Light rays  \\
 Sound$\rightarrow$light calibration & Not necessary  & Necessary(?) \\
-Multipath support                   & Possible       & Possible \\
+Multipath support                   & Possible       & Hard \\
 Speckle support                     & Possible       & Hard \\
 Diffraction support                 & Possible       & Hard \\
 Complex image                       & Easy           & Hard \\
@@ -192,11 +190,13 @@ ATI/nVidia support                  & nVidia only    & Both \\
 
 \section{Final thoughts}
 
-We propose using OpenGL to simulate the scene, and model the array as lightsources. This will make it unsuitable for simulating speckle and diffraction effects, but a "simple'' simulator should probably not take such effects into account anyhow. Penetrable objects can be simulated in either case, although we are not sure whether the OpenGL framework can support this with ease. An OpenGL implementation will be highly portable, and believed to support the functionality needed to generate a good enough template image.
+Do we need to include effects such as layover and multipath in our simulations?
 
-We aim to start development in July. The goal is to have an OpenGL prototype ready within a couple weeks, and from there decide which approach to go for. We propose monthly progress reports and meetings to discuss further 
-development.
+If the answer to this is no, then we propose using a OpenGL to simulate the scene, and model the array as lightsources. Geometrical effects can be added in the post-processing using CUDA / OpenCL, but extending the simulator to support other sonar specific effects will likely be hard. This approach with also be very portable, and should not require too much effort.
 
+On the other hand, a CUDA / OpenCL implementation can handle anything. But does it need to? We should be fairly certain what we aim for here, since the various advanced effects calls for completely different implementation strategies.
+
+We aim to start development in July. The goal is to have an OpenGL prototype ready within a couple weeks, and from there decide which approach to go for. We propose monthly progress reports and meetings to discuss further development.
 
 
 
