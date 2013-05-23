@@ -97,7 +97,7 @@ Most of the specifications received from FFI are illustrated in Figure \ref{spec
 
 \section{Design Suggestion}
 
-As detailed below, in this revision we have decided to add a couple alternative designs that is more flexible and able to handle effects such as geometric layover and multipath.
+As detailed below, in this revision we have decided to add a couple of alternative designs that is more flexible and able to handle effects such as geometric layover and multipath.
 % This is to better be able to simulate geometrical sonar imaging effects such as layover. We will describe both the original suggestions and the updated design here.
 
 \subsection{The Initial Suggestion}
@@ -153,11 +153,11 @@ Are such an approach accurate enough? Or do we need to consider layover, multipa
 
 \subsection{Layover and multipath}
 
-If layover and multipath are important, then the techniques used to simulate the previous images can not be used. Then we believe that a pure CUDA / OpenCL implementation is the better choice, but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
+If layover and multipath are important, then the techniques used to simulate the previous images can not be used. A CUDA / OpenCL implementation can handle this. but no implementation is best at everything. but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
 
 
 In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
-
+%
 
 
 
