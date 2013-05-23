@@ -118,7 +118,7 @@ In the original specification we put forth two possible approaches to implementi
 
 In each of these cases the simulator takes a seafloor and target model as input, and generates a simulated sonar image, as well as perform template correlation if desired. For the first step of setting up the 3D scene, move objects and cameras around, and render it using a GPU, we initially believed OpenGL to be the better choice. OpenGL was made for this specific task, is cross-platform, feature-rich, well-matured and tuned to peak performance to meet the heavy needs of the gaming industry.
 
-But can we accurately simulate a sonar system using a framework designed to simulate optics?
+But can we accurately simulate a sonar system using a framework designed to simulate optics? We did a quick simulation to get a feel for this.
 
 
 \subsection{Simulating a sonar scenario using optics}
@@ -134,26 +134,26 @@ As a preliminary study we created a 3D model of a manta mine and a cylinder loca
 
 \begin{figure}[b]
 \begin{minipage}[c]{0.49\linewidth}
-\graphicsAI[drawing,width=\linewidth]{gfx/simulation_mask.png}
+\graphicsAI[drawing,width=\linewidth]{gfx/simMask0001.png}
 \centering\itshape Simulation mask
 \end{minipage}\mbox{}\hfill
 \begin{minipage}[c]{0.49\linewidth}
-\graphicsAI[drawing,width=\linewidth]{gfx/simulation_object.png}
+\graphicsAI[drawing,width=\linewidth]{gfx/simObject0001.png}
 \centering\itshape Simulated object
 \end{minipage}
-\graphicsAI[drawing,width=\linewidth]{gfx/simulation_optical.png}
+\graphicsAI[drawing,width=\linewidth]{gfx/simScene0001.png}
 \centering\itshape Combined image\vspace{5pt}
 \caption{Optical rendering.}\label{s}
 \end{figure}
 
 To simulate this scene we combine a normal optical simulation with a mask image. The mask image scene is set up with a powerful light source and highly diffractive surfaces, which causes everything that is hit by light to obtain a high intensity value. Only direct light is processed, so shadows will come out as empty. In the scene with the simulated object material properties are adjusted to reflect a more reasonable amount of light, and a light insensitive background was chosen. The two images was finally combined by colour multiplication.
 
-Are such an approach accurate enough? Or do we need to consider layover, multipath, or other effects as well?
+Is such an approach accurate enough? Or do we need to consider layover, multipath, or other effects as well?
 
 
 \subsection{Layover and multipath}
 
-If layover and multipath are important, then the techniques used to simulate the previous images can not be used. A CUDA / OpenCL implementation can handle this. but no implementation is best at everything. but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
+If layover and multipath are important, then the techniques used to simulate the previous images can not be used. A CUDA / OpenCL implementation can handle this, but no implementation is best at everything. but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
 
 
 In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
