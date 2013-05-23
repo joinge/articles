@@ -127,7 +127,7 @@ But can we accurately simulate a sonar system using a framework designed to simu
 \begin{narrow}{-2.3cm}{-2.3cm}
 \graphicsAI[drawing,width=\linewidth]{gfx/simulation_setup.png}
 \end{narrow}
-\caption{Two possible implementation strategies.}\label{simulation_setup}
+\caption{Simulating a sonar in a optics render. The transmitter is modelled as a light source, and a camera is placed directly above the object looking down on them.}\label{simulation_setup}
 \end{figure}
 
 As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (fig. \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects was 1\;m.
@@ -146,28 +146,20 @@ As a preliminary study we created a 3D model of a manta mine and a cylinder loca
 \caption{Optical rendering.}\label{s}
 \end{figure}
 
-To simulate this scene we combine a normal optical simulation with a mask image. The mask image scene is set up with a powerful light source and highly diffractive surfaces, which causes everything that is hit by light to obtain a high intensity value. Only direct light is processed, so shadows will come out as empty. In the scene with the simulated object material properties are adjusted to reflect a more reasonable amount of light, and a light insensitive background was chosen. The two images was finally combined by colour multiplication.
+To simulate this scene we combined a normal optical simulation with a mask image. The mask image scene was set up with a powerful light source and highly diffractive surfaces, which caused everything that was hit by light to obtain a high intensity value. Only direct light was processed, so shadows came out as empty. In the simulated object scene materials were adjusted to reflect a more reasonable amount of light, and a light insensitive background was chosen to avoid double shadows. The two images were finally combined using RGB multiplication.
 
-Is such an approach accurate enough? Or do we need to consider layover, multipath, or other effects as well?
+We believe these simulations to be similar to be similar to the ones initially supplied by FFI, made in Matlab. But are these models accurate enough? Or do we need to consider layover, multipath, or other effects as well?
 
 
 \subsection{Layover and multipath}
 
-If layover and multipath are important, then the techniques used to simulate the previous images can not be used. A CUDA / OpenCL implementation can handle this, but no implementation is best at everything. but how these should be designed depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, let it find all the points in the image that contributes with direct returns to that pixel, and sum the contributions up. For multipath a ray tracer customized for sound is likely the better option.
+If layover and multipath are important, then we believe the techniques used to simulate the previous images can not be used. A CUDA / OpenCL implementation can handle this, but the proper way to design it depends on the effects we wish to implement. For layover one could launch a thread for each pixel in the image, which may proceed by finding all patches in the image that contributes by direct returns to that pixel (fig \ref{single_path}). For multipath a ray tracer customized for sound is likely the better option.
 
 \begin{figure}[b]
 \graphicsAI[drawing,width=\linewidth]{gfx/layover.svg}
 \caption{A CUDA / OpenCL implementation able to handle single path return.}\label{single_path}
 \end{figure}
 
-
-In addition we see that each approach shares the same initial steps. The risk of choosing an OpenGL-only implementation is therefore reduced, since we may easily switch to the CUDA implementation if an OpenGL prototype fails to produce the desired results.
-%
-
-
-
-
-Our original idea was to use OpenGL to produce depth-maps of the object and (optionally) the seafloor, and then use CUDA to compute how a sonar array would illuminate this scene. However, since were only interested in pixel intensities, and sound may be treated as ``light'' with reasonable accuracy, we believe that OpenGL can be used to simulate the entire scene. This way we may support whatever OpenGL supports with little extra effort. The gaming industry demands speed, so such a simulator should also be very fast.
 
 The main advantage of the CUDA implementation lies in its flexibility. If desired, it can be modified to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. The drawback is the added code complexity and development time.
 
