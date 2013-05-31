@@ -130,7 +130,7 @@ But can we accurately simulate a sonar system using a framework designed to simu
 \caption{Simulating a sonar in a optics render. The transmitter is modelled as a light source, and a camera is placed directly above the object looking down on them.}\label{simulation_setup}
 \end{figure}
 
-As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (fig. \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects was 1\;m.
+As a preliminary study we created a 3D model of a manta mine and a cylinder located on a flat ground surface (Figure  \ref{simulation_setup}). Here we placed the camera 6 meters above the surface looking down on it. The light source was put at a 50\;m distance and set up without falloff, and the light hits the centre of the scene at an angle of 10$^\circ$. The manta mine was made according to specifications with 48\;cm height and 98\;cm ground diameter, the same applies to the cylinder. The distance between the two objects was 1\;m.
 
 \begin{figure}[b]
 \begin{minipage}[c]{0.49\linewidth}
@@ -146,25 +146,25 @@ As a preliminary study we created a 3D model of a manta mine and a cylinder loca
 \caption{Optical rendering.}\label{s}
 \end{figure}
 
-To simulate this scene we combined a normal optical simulation with a mask image. The mask image scene was set up with a powerful light source and highly diffractive surfaces, which caused everything that was hit by light to obtain a high intensity value. Only direct light was processed, so shadows came out as empty. In the simulated object scene materials were adjusted to reflect a more reasonable amount of light, and a light insensitive background with some added noise was chosen to avoid double shadows. The two images were finally combined using RGB multiplication.
+To simulate this scene we combined a normal optical simulation with a mask image. The mask image scene was set up with a powerful light source and highly diffractive surfaces, which caused everything that was hit by light to obtain a high intensity value. Only direct light was processed, so shadows came out as empty. In the scene with the simulated object the materials were adjusted to reflect a more reasonable amount of light, and a light insensitive background with some added noise was chosen to avoid double shadows. The two images were finally combined using RGB multiplication.
 
 We believe these simulations to be similar to the ones initially supplied by FFI, which were made in Matlab. But are these models accurate enough? Or do we need to consider layover, multipath, or other effects as well?
 
 
 \subsection{Layover and multipath}
 
-If layover and multipath are important, then we believe the techniques used to simulate the previous images can not be used. In this case we are likely better off using CUDA / OpenCL from the beginning. For layover one could launch a thread for each pixel in the image, which may proceed by finding all patches in the image that contributes by direct returns to that pixel (fig \ref{single_path}). For multipath a ray tracer altered to handle some sound effects is likely the better option.
+If effects such as layover and multipath are important the techniques used to simulate the previous images are less attractive. In such a case we are likely better off using CUDA/OpenCL from the beginning. A possible implementation for simulating layover is to launch a thread for each pixel in the image, which may proceed by finding all patches in the image that contributes by direct returns to that pixel (Figure \ref{single_path}). For simulating multipath a custom ray tracer is likely a better option.
 
 \begin{figure}[b]
 \graphicsAI[drawing,width=\linewidth]{gfx/layover.svg}
-\caption{A CUDA / OpenCL implementation able to handle direct returns and arbitrary geometries. Might approximate the effects of multipath and layover fairly well.}\label{single_path}
+\caption{A CUDA/OpenCL implementation able to handle direct returns and arbitrary geometries. Might approximate the effects of multipath and layover fairly well.}\label{single_path}
 \end{figure}
 
-We believe the added flexibility of a CUDA / OpenCL based approach will also make it easier to add new features to the implementation at a later stage, should this be deemed necessary. It could e.g. be altered to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. The drawback is the added code complexity and development time.
+We believe the added flexibility of a CUDA/OpenCL based approach will also make it easier to add new features to the implementation at a later stage, should this be deemed necessary. It could e.g. be altered to handle sound propagation in non-ideal mediums, penetrable objects, signal multipath, diffraction and phase-dependent effects such as speckle. The drawback is the added code complexity and development time.
 
 We also suggest using OpenCL these days, since it is a standard promoted by major players such as Intel and AMD, and because it allows the code to be almost as portable as CUDA. In terms of syntax and maturity the two standards are fairly similar.
 
-We have compared the two alternatives in Table \ref{comparison}.
+We have compared the OpenGL alternative to CUDA/OpenCL in Table \ref{comparison}.
 
 \begin{table}[t]\centering
 \begin{tabular}[c]{l l l}\hline
@@ -190,9 +190,9 @@ ATI/nVidia support                  & nVidia only    & Both \\
 
 Do we need to include effects such as layover and multipath in our simulations?
 
-If the answer to this is no, then we propose using a OpenGL to simulate the scene, and model the array as light sources. Geometrical effects can be added in the post-processing using CUDA / OpenCL, but extending the simulator to support other sonar specific effects will likely be hard. On the upside this approach will be very portable, and should not require too much effort.
+If the answer to this is no, then we propose using a OpenGL to simulate the scene, and model the array as light sources. Geometrical effects can be added in the post-processing using CUDA/OpenCL, but extending the simulator to support other sonar specific effects will likely be hard. On the upside this approach will be very portable, and should not require too much effort.
 
-On the other hand, a CUDA / OpenCL implementation can handle anything. But does it need to? We should be fairly certain what we aim for here, since the various advanced effects calls for completely different implementation strategies.
+A CUDA/OpenCL implementation can handle anything. But does it need to? We should be fairly certain what we aim for here, since the various advanced effects calls for completely different implementation strategies.
 
 We aim to start development in July. The goal is to have an OpenGL prototype ready within a couple weeks, and from there decide which approach to go for. We propose monthly progress reports and meetings to discuss further development. See our specification on the next page.
 
@@ -201,38 +201,40 @@ We aim to start development in July. The goal is to have an OpenGL prototype rea
 \section{Specification}
 
 
-\begin{tabular}[c]{l p{0.6\linewidth}}
+\begin{tabular}[c]{>{\bf}l p{0.6\linewidth}}
 Development time       & 4-6 weeks per person  \\
-Our price              & 98\;000 NOK \\
-We deliver        & 
+Our price              & 98\;000 NOK
+\end{tabular}
+
+\begin{tabular}[c]{>{\bf}l p{0.6\linewidth}}
+We provide        &
 \end{tabular}
 \begin{itemize0}
-\item A fully functional simulator with the features requested.
-\item Support up to 6 months after delivery.
-\item Through documentation.
-\item All rights to use, alter and redistribute the code in whatever way the customer see fit.
+\item A fully functional simulator with the specifications mutually agreed upon.
+\item A thorough documentation.
+\item The customer obtains ownership of the code, including all rights to use, alter and redistribute it.
 \end{itemize0}
-\begin{tabular}[c]{l p{0.6\linewidth}}
+\begin{tabular}[c]{>{\bf}l p{0.6\linewidth}}
 We reserve the right to &
 \end{tabular}
 \begin{itemize0}
-\item Use the code and ideas obtained during the development of this simulator for research purposes, but only with the consent of FFI.
+\item Use the code and ideas obtained during the development of this simulator for research purposes, but we refrain from publishing anything without a full consent from the customer.
 \end{itemize0}
 
-\section{Ideas for paper}
-
-\begin{itemize}
-\item With effects such as layover, shadows, limited resolution (detail retention capability), and complex object and surface shapes, computing the actual scenario based on the sonar image is hard.
-\item Better to perform fast, recursive simulations instead?
-\item Adaptive images in a video makes it much easier to understand what is going on. Need much better erfora
-\item Litits: massive storage, fixed templates, amplitude/noise sensitive
-\item Alternatives: Pattern recognition (hard to extract decent features, selection, fixed templates) and model-based (massive computational requirements)
-\item Why models? Hard to get accurate models from limted amount dat, targets not always availagme, variations in target/terrain.
-\item CAD models. Sufficient complexity? Materials? Transparency, characterisation, multilauers.
-\item Accuracy vs. comp. speed.
-\end{itemize}
-
-\newpage
+% \section{Ideas for paper}
+% 
+% \begin{itemize}
+% \item With effects such as layover, shadows, limited resolution (detail retention capability), and complex object and surface shapes, computing the actual scenario based on the sonar image is hard.
+% \item Better to perform fast, recursive simulations instead?
+% \item Adaptive images in a video makes it much easier to understand what is going on. Need much better erfora
+% \item Litits: massive storage, fixed templates, amplitude/noise sensitive
+% \item Alternatives: Pattern recognition (hard to extract decent features, selection, fixed templates) and model-based (massive computational requirements)
+% \item Why models? Hard to get accurate models from limted amount dat, targets not always availagme, variations in target/terrain.
+% \item CAD models. Sufficient complexity? Materials? Transparency, characterisation, multilauers.
+% \item Accuracy vs. comp. speed.
+% \end{itemize}
+% 
+% \newpage
 
 % \section{Documentation}
 
