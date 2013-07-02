@@ -226,6 +226,10 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \renewcommand\vec[1]{\boldsymbol{#1}}
 \newcommand\mat[1]{\boldsymbol{#1}}
 
+\newcommand\Om{O_\text{m}}
+\newcommand\Oa{O_\text{a}}
+\newcommand\Nl{N_\text{l}}
+\newcommand\Nk{N_\text{k}}
 \newcommand\1{\vec 1}
 \newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
@@ -463,10 +467,7 @@ Adaptive beamforming, MVDR, Capon, sonar, active sonar, GPU, graphics processing
 % 
 % As the processing power of modern computer systems keep improving, the use of data adaptive methods in various imaging fields. 
 
-
-Data driven methods have been introduced in various imaging fields over the years in attempts to improve image quality. One such method is the Minimum Variance Distortionless Response (MVDR) beamformer. When compared to conventional methods, MVDR is often able to improve image contrast and resolution, as shown in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and active sonar~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
-
-% \the\linewidth
+\IEEEPARstart{D}{ata} driven methods have been introduced in various imaging fields over the years in attempts to improve image quality. One such method is the Minimum Variance Distortionless Response (MVDR) beamformer. When compared to conventional methods, MVDR is often able to improve image contrast and resolution, as shown in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007}, and active sonar~\cite{Blomberg2012a,Blomberg2011,Dursun2009,Lo2004}.
 
 Despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and may suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O($M^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
 
@@ -491,7 +492,7 @@ To ensure MVDR robustness, the litterature suggests combining means such as temp
 % Us:
 % - Aim for the GPU. Simple is often better.
 % - Therefore: Optimize the standard MVDR chain.
-% 1. Reduce arithmethic instructions
+% 1. Reduce arithmetic instructions
 % 2. Implement for full utilisation of the arithmetic throughput on the GPU.
 % 
 % (Made partially adaptive by employing subarray averaging to reduce degrees of freedom to L.)
@@ -593,9 +594,9 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 
 If we neglect spatial and temporal averaging, then the computation of $\eR$ is reduced to a single outer product with complexity of O($M^2$), and the inversion is then of O($M^3$). This might lead us to believe that the inversion step is by far the most complex. But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ is of O($N_K N_L L^2$) and the inversion of O($L^3$). Computing $\eR$ is now the most complex operation whenever $N_LN_K>L$.
 
-To visualise these relations, and include the effects of using complex numbers, we derived near exact complexity formulas for each step in the MVDR process. We only excluded diagonal loading performed in the computation of $\eR$, and partial pivoting used in the inversion step, since these operations contribute marginally to the end result. The entire range of possible subarray sizes from $L\in[1,M]$ was finally evaluated, with temporal averaging set to $K\in\{0,1,2\}$, and the number of channels set to $M\in\{8,16,32\}$. The results are shown in \Fig{mvdr_complexity}.
+To visualize these relations, and include the effects of using complex numbers, we set up complexity formulas that accounts for the total number of arithmetic operations for each step in the MVDR process. We only excluded diagonal loading performed in the computation of $\eR$, and partial pivoting used in the inversion step, since these operations contribute marginally to the end result. The entire range of possible subarray sizes from $L\in[1,M]$ was finally evaluated, with temporal averaging set to $K\in\{0,1,2\}$, and the number of channels set to $M\in\{8,16,32\}$. The results are shown in \Fig{mvdr_complexity}. We regarded the formulas themselves as  were omitted for the sake of clarity, and  We omitted the formulas long and not are omitted for the sake of clarity, since they
 
-We note how the computation of $\eR$ completely dominates at smaller subarray sizes, that solving $\eRi\1$ only plays a notable role for larger array and subarray sizes, and that the computation of $z$ has a negligible impact on computation time. Also notice how temporal averaging comes with a high computational penalty. This is because building $\eR$ is heavy on complex multiplications, which require 3 times as many arithmetic instructions as a complex addition, and a lot of these are repeated unnecessary.
+We note how the computation of $\eR$ completely dominates at smaller subarray sizes, that solving $\eRi\1$ only plays a notable role for larger array and subarray sizes, and that the computation of $z$ has a negligible impact on computation time. Also notice how temporal averaging comes with a high computational penalty. This is because building $\eR$ is heavy on complex multiplications, which require 3 times as many arithmetic instructions as a complex addition, and a lot of these are repeated unnecessarily.
 
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
@@ -625,7 +626,7 @@ We decided to investigate the feasibility of running MVDR on a GPU by mapping it
 
 To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. Combined these cores deliver a peak performance of more than 1\;Tflop/s (appendix \ref{throughput}). In practice this performance is hard to obtain, but one can get fairly close by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. As the steps in the MVDR method require different strategies for achieving this, we have designed a different kernel and configuration for each of them. We will pay particular attention to building $\eR$, since the potential for gaining overall speedups are greatest here.
 
-%  this assumes that the implementation is solely bound by arithmethic throughput.  r bound by memory bandwidth, arithmethic latency or arithmethic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
+%  this assumes that the implementation is solely bound by arithmetic throughput.  r bound by memory bandwidth, arithmetic latency or arithmetic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
 
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
@@ -672,7 +673,7 @@ To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming mu
 % -bank conflicts when L > 32. not treated.
 
 
-\subsection{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}
+\subsection{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}\label{computing_eR}
 
 % As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
 
@@ -955,7 +956,7 @@ Even with all our efforts we were only able to obtain processing rates of 20-30\
 \caption{\protect MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20m Kepler GPU. The exact same scenario and code as in Fig. \ref{benchmarks} was used here. With no code alterations the performance was only improved marginally compared to running the code on the Quadro 6000.}\label{benchmarks_boston}
 \end{figure}
 
-The MVDR beamformer is an algorithm capable of producing images with improved detail resolution and contrast compared to conventional DAS beamforming. The downside is its inherent need for robustification and the high compuational complexity associated with estimating and inverting the spatial covariance matrix.
+The MVDR beamformer is an algorithm capable of producing images with improved detail resolution and contrast compared to conventional DAS beamforming. The downside is its inherent need for robustification and the high computational complexity associated with estimating and inverting the spatial covariance matrix.
 
 We have shown that for systems containing up to 32 channels the problem can be largely mitigated by building the covariance matrix in a clever way, and by making use of the massive computational power inherent in modern GPUs. We were able to improve upon the run time of a moderately optimized C-implementation by roughly 2 orders of magnitude. This performance is sufficient for computing properly sampled full-coverage sectorsscan images from the HISAS1030 sonar in real-time.
 
@@ -1012,18 +1013,6 @@ The MVDR maps well to the GPU since the computations involved are independent on
 % \item Beamspace
 % \item LCA (or other methods, as reference)
 % \end{itemize}
-% \item Choice of robustification parameters $L,M,\Delta$ largely impacts what the ``optimal'' way of implementing Capon 
-% \item In most imaging applications 
-% Outline:
-% \begin{itemize}
-% \item Speeding up: Build $\eR$ and solve $\w = \frac{\Ri\a}{\a\H\Ri\a}$. 
-% \item Iterative methods: Woodbury (Sherman Morrison), Conjugated gradients - show performance of GPU performance.
-% \item Woodbury: Must take the average over many samples in space and time - lots of (small) outerproducts. Can be used if not a lot of averaging is required.
-% \item Beamspace
-% \item LCA (or other methods, as reference)
-% \end{itemize}
-% \end{itemize}
-% 
 % fs = 100kHz*30\%*$\frac{4}{3}$ = 40kHz \\
 % $N_{range px} = \frac{2\;250m}{1500m/s}40kHz = 13.3kpx$ \\
 % $\times 32$ beams = 426kpx \\\\
@@ -1033,68 +1022,13 @@ The MVDR maps well to the GPU since the computations involved are independent on
 % 4 arrays: 1.28Mpx/s * 4 = 5.12Mpx/s
 % 
 % 
-% \section{Methods}
-% 
-% \begin{align}
-% z[n] = \sumb{m=0}{M-1} w_m[n]^*x_m[n-\Delta_m] = \w\H[n]\Xd[n]
-% \end{align}
-% where
-% \begin{align}
-% \w[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]} \quad \text{and} \quad\Xd[n] = \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]}.
-% \end{align}
-% 
-% Minimum variance distortionless resonse \cite{Capon1969}
-% \begin{align}
-% \underset{\w[n]}{\argmin}\; E\{ |z[n]|^2 \} = \underset{\w[n]}{\argmin}\; \w\H[n]\R[n]\w[n], 
-% \end{align}
-% subject to
-% \begin{align}
-% \w\H[n]\a = 1,
-% \end{align}
-% where
-% \begin{align}
-% \R[n] = E\{ \x\x\H \}.
-% \end{align}
-% If $\eR$ is the estimate of $\R$, the solution to the MVDR beamformer is
-% \begin{gather*}
-% \vec w[n] = \frac{\hat{\mat R}\;\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\;\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
-% \end{gather*}
-% A robust estimate of $\eR$ is found by
-% \begin{itemize}
-% \item Spatial averaging to decorrelate noise from signal. \emph{Subarray averaging} used here.
-% \item Temporal averaging to ensure valid speckle statistics.
-% \item \emph{Diagonal loading} to ensure  numerical stability prior to inversion.
-% \item Choice of robustification parameters \cite{Synnevag2007}
-% \end{itemize}
-% 
-
-% \appendix[Throughput]
-% 
-% {\bf Method complexity (instructions):}\\
-% \begin{tabular}{l l}
-% No optimizations            & $2M^2\;(2\Navg+1)$ \\
-% Banded symmetric            & $L(2M-L+1)\;(2\Navg+1)$ \\
-% Sliding, banded, symmetric  & $1.5L(2M-L+1)$ \\
-% \end{tabular}\\\\
-% 
-% {\bf Number of complex numbers needed per SM when building R:}\\
-% \begin{align*}
-% \left\lfloor\frac{T_b}{L}\right\rfloor(M+L)+2MN
-% \end{align*}
-
-% Is the method compute bound, memory throughput bound, or memory latency bound?
-% 
-% Take as example the case in Fig \ref{mvdr_complexity} in case where $M=32$, $L=16$ and $K=1$. The figure shows a that 300k floating point operations need to be performed per pixel. Furthermore, the total size of global reads is $(M+L)*8$bytes$ = 96$floats per px, and the total number of writes is $L^2*2$floats = 512 floats, leading to a total of 608 floats. This means that roughly 1000 arithmetic instructions are carried for every 0.6 float transferred from or to global memory.
-% 
-% If an algorithm is neither bandwidth bound or computationally bound, it might be bound by latency. 
-% 
 % 
 % 1Tflops (ops/cycle?)
 % 144GB/s global
 % 1TB/s shared
 % x6 regs
 % 
-% latency - arithmethic (20 cycles) and memory (400+ cycles)
+% latency - arithmetic (20 cycles) and memory (400+ cycles)
 % 
 % Little's law - needed parallelism = latency * throughput
 % arithmetic: 23 cycles * 32ops/SM/cycle = 576 ops/SM parallelism
@@ -1106,18 +1040,49 @@ The MVDR maps well to the GPU since the computations involved are independent on
 % - but only have 2 warp schedulers
 % - instead, can issue 2 instructions per warp in the same cycle
 % 
-% 
-% need to compute op/float ratios
-% non-optimized: M=32,L=16, 300kops/px / 40k floats/px = 8 ops/float. op bound if shared is used
-% optimized: 50kops/px / 40k floats/px = 1 ops/float. memm bound even if shared is used. some ilp advantageous
 
 \appendix
+
+\section*{MVDR Complexity Formulas}\label{mvdr_formulas}
+
+To estimate the number of floating point operations needed to MVDR beamform a single pixel, we formed expressions that accumulate the number of complex arithmetic operations found in the MVDR process. From observing the generated assembly code we inferred that each complex addition and multiplication would require $\Oa = 2$ and $\Om = 6$ floating point operations, respectively. The formulas are listed for each step below for reference.
+
+\emph{Building $\eR$}. The initial complexity of this step can be inferred directly from (\ref{spatialR}) and (\ref{finalR}):
+\begin{align}
+O_{\underset{\text{initial}}{\text{Build $\eR$}}} &= \underbrace{\Om\Nk\Nl L^2}_\text{Multiplications} + \Oa(\Nk+\Nl-2)L^2 + O_\text{dload},
+\end{align}
+where $O_\text{dload} = (2L-1)\Oa + \Om$ is the minor cost of performing diagonal loading. If we apply the optimization strategies discussed in section \ref{computing_eR} we can arrive at the following instead:
+\begin{align}
+O_{\underset{\text{min arith}}{\text{Build $\eR$}}} &= \underbrace{\Om\frac{M+\Nl}{2}L}_\text{Multiplications} + \underbrace{\Oa(\Nk-1)(\Nl-1)L}_\text{First row additions} \nonumber\\
+&+ \underbrace{\frac{(L-1)(L-2)}{2} \bigg[ 2\Oa + 2(\Nk-1)\Oa \Big]}_\text{Iteration additions} \nonumber\\
+&+ O_\text{dload}
+\end{align}
+Of the solutions discussed, this is the least expensive in terms of arithmetic instructions. However, if memory bandwidth is a limiting factor a better solution is to recompute multiplications where they are needed:
+\begin{align}
+O_{\underset{\text{min mem}}{\text{Build $\eR$}}} &= \underbrace{\Om\Nk\Nl{}L}_\text{First row multiplications} + \underbrace{O_a(\Nk-1)(\Nl-1)L}_\text{First row additions} \nonumber\\
+&+ \underbrace{\frac{(L-1)(L-2)}{2}\bigg[ 2\Oa + 2(\Nk-1)\Oa + 2\Nk\Om \bigg]}_\text{Iteration multiplications and additions} \nonumber\\
+&+ O_\text{dload}
+\end{align}
+
+\emph{Solving $\eRi\a$} is achieved by using a batched Gauss Jordan solver with support for complex numbers and partial pivoting. It complexity - with partial pivoting excluded - can be expressed as: 
+\begin{align}
+O_{\text{Solve $\eRi\a$}} = \sumb{r=0}{L} \bigg[&\underbrace{\big(L-r\big)\big((L-r+2)\Oa + (L-r+3)\Om\big)}_\text{Reduction}\nonumber\\
++ &\underbrace{(r-1)\Oa + r\Om}_\text{Backsubstitution}\bigg],
+\end{align}
+where $r$ is a running variable $r$ that indexes rows in [TODO result matrix] $\bmat{\eR|\a}$.
+
+\emph{Computing $z$} is very simple once the covariance matrix $\eR$ is built and inverted, and has an near negligible impact on performance: 
+\begin{align}
+O_\text{Compute $z$} = (2L-2)2 + \Om 3 L
+\end{align}
+
+
 
 \section*{GPU Throughput}\label{throughput}
 
 In the context of determining whether an implementation is computationally bound or memory bound, one should first compare the target platform's sustained computational throughput to sustained memory throughput. Let us start with the former.
 
-The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1148\;MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmethic throughput is then given as:
+The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1148\;MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmetic throughput is then given as:
 \begin{align}
 \text{B}_\text{arith} &= 2\cdot1148\;\text{flop/s/core}\cdot 32\;\text{cores/SM}\cdot 14\;\text{SMs}\nn
 &= 1.03\;\text{Tflop/s}.\label{flops}
@@ -1132,7 +1097,7 @@ The shared memory, on the other hand, is organized into 32 banks per SM, each be
 \text{B}_\text{smem} &= \frac{\frac{1148}{2}\;\text{Mbit/s}\cdot32\;\text{bit/bank}\cdot 32\;\text{banks/SM}\cdot 14\;\text{SMs}}{8\;\text{bit/byte}}\nn
 &\approx 1.03\;\text{TB/s}\ (257\;\text{Gfloats/s}).\label{bwshared}
 \end{align}
-The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using shared memory at least 4 floating point operations must be carried out per float transferred to the CUDA cores, otherwise the algorithm will be memory bound and the peak arithmethic throughput can not be reached. %In such cases instruction level parallelism can be exploited to move data from shared memory into the even faster register memory~\cite{Vasilyy}, but this is outside the scope of this article.
+The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using shared memory at least 4 floating point operations must be carried out per float transferred to the CUDA cores, otherwise the algorithm will be memory bound and the peak arithmetic throughput can not be reached. %In such cases instruction level parallelism can be exploited to move data from shared memory into the even faster register memory~\cite{Vasilyy}, but this is outside the scope of this article.
 
 
 % \subsection{Iterative methods}
@@ -1162,15 +1127,6 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % \item Run benchmarks on some sonar dataset(s)
 % \end{itemize}
 % 
-% 
-% \section{Conclusion}
-% 
-% \begin{itemize}
-% \item When to use what.
-% \end{itemize}
-% 
-% 
-% % \ \\
 % % \IEEEPARstart{T}{o} form images from a modern phased array sonar system the received wavefield is usually recorded, and then postprocessed by a digital beamformer. The beamformer applies delays and weights to the sensor channels, the beamformer adjusts the arrays spatial response to focus at one pixel at a time.  such that signals emanating from regions of interest add constructively, while ensuring that noise and interference from other angles do not. 
 % % 
 % % The imaging capabilities of a modern phased array sonar system depend on physical attributes such element response and array geometry, the transmitted signal, as well as the beamforming method being used on transmission and reception. Beamforming is the concept of applying delays and weights to the sensors channels to steer the arrays response to points of interest. 
@@ -1216,42 +1172,6 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % 
 % % Adaptive beamformers have only recently been introduced in active sonar imaging. For a while they were considered unsuited for this purpose because the backscattered signal is largely correlated with the 
 % % 
-% % 
-% % 
-% 
-% %\begin{figure}[!t]
-% %\centering
-% %\includegraphics[width=2.5in]{myfigure}
-% % where an .eps filename suffix will be assumed under latex, 
-% % and a .pdf suffix will be assumed for pdflatex; or what has been declared
-% % via \DeclareGraphicsExtensions.
-% %\caption{Simulation Results}
-% %\label{fig_sim}
-% %\end{figure}
-% 
-% 
-% % An example of a double column floating figure using two subfigures.
-% % (The subfig.sty package must be loaded for this to work.)
-% % The subfigure \label commands are set within each subfloat command, thees on a page
-% by themselves when using endfloat and the cap
-% % \label for the overall figure must come after \caption.
-% % \hfil must be used as a separator to get equal spacing.
-% % The subfigure.sty package works much the same way, except \subfigure is
-% % used instead of \subfloat.
-% %
-% % \begin{figure*}[!t]
-% % \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-% % \label{fig_first_case}}
-% % \hfil
-% % \subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-% % \label{fig_second_case}}}
-% % \caption{Simulation results}
-% % \label{fig_sim}
-% % \end{figure*}
-% %
-% % Note that often IEEE papers with subfigures do not employ subfigure
-% % captions (using the optional argument to \subfloat), but instead will
-% % reference/describe all of them (a), (b), etc., within the main caption.
 % 
 % 
 % % An example of a floating table. Note that, for IEEE style tables, the 
@@ -1450,7 +1370,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % Us:
 % % - Aim for the GPU. Simple is often better.
 % % - Therefore: Optimize the standard MVDR chain.
-% % 1. Reduce arithmethic instructions
+% % 1. Reduce arithmetic instructions
 % % 2. Implement for full utilisation of the arithmetic throughput on the GPU.
 % % 
 % % (Made partially adaptive by employing subarray averaging to reduce degrees of freedom to L.)
@@ -1460,7 +1380,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % 
 % Comparable work may be found in e.g. ultrasound, where Chen et. al. demonstrated a GPU implementation of the MVDR that operated on real data~\cite{Chen2011,Chen2011a}. While promoting impressing performance, such a constraint disallow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. The complexity issue has been targeted in various ways. 
 % 
-% This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmethic reduction, and show how to properly map it to a GPU.\todo{too much overlap here}
+% This article is outlined as follows. First, we will introduce the concept of adaptive beamforming and provide details MVDR beamforming and our selected robustification techniques. Then we will investigate the complexity issue, discuss means for arithmetic reduction, and show how to properly map it to a GPU.\todo{too much overlap here}
 % 
 % %  Furthermore, by implementing it on a modern \gls{GPU} we have gained a speedup of around 2 orders of magnitude compared to an optimized single-thread implementation in C.
 % 
@@ -1582,7 +1502,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % 
 % To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. Combined these cores are able to deliver more than 1\;Tflop/s (appendix \ref{throughput}), but only if the implementation is computationally bound. This can be achieved by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. As the best way to do this is completely different for each step in the MVDR process, we have designed a different kernel and configuration for each of them. Particular attention will be paid to building $\eR$, since the potential for gaining overall speedups are greatest here\todo{review}.
 % 
-% %  this assumes that the implementation is solely bound by arithmethic throughput.  r bound by memory bandwidth, arithmethic latency or arithmethic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
+% %  this assumes that the implementation is solely bound by arithmetic throughput.  r bound by memory bandwidth, arithmetic latency or arithmetic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
 % 
 % \begin{figure}[t]\centering
 % \includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
@@ -1645,7 +1565,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % \item implement the spatial sum iteratively by sliding along the diagonals of $\eR$.
 % \end{enumerate}
 % %
-% To study the effect of these optimization strategies we derived complexity curves for the plain implementation with and without swapped sums, a couple that take symmetry into account, and a couple that iteratively sum up the diagonals of $\eR$. Then these curves were normalized to the complexity curve of the reference implementation in Fig. \ref{mvdr_complexity}. The results, shown in Fig. \ref{mvdr_optimization}, illustrate that taking symmetry into account and implementing iterative summing both lead to considerably reduced arithmethic complexity, especially at lower subarray sizes and when using temporal averaging. 
+% To study the effect of these optimization strategies we derived complexity curves for the plain implementation with and without swapped sums, a couple that take symmetry into account, and a couple that iteratively sum up the diagonals of $\eR$. Then these curves were normalized to the complexity curve of the reference implementation in Fig. \ref{mvdr_complexity}. The results, shown in Fig. \ref{mvdr_optimization}, illustrate that taking symmetry into account and implementing iterative summing both lead to considerably reduced arithmetic complexity, especially at lower subarray sizes and when using temporal averaging. 
 % 
 % We chose the iterative solution based on its overall excellent performance, and because it can be altered to consume very little memory. This is \emph{very} important, as we will see next.
 % 
@@ -2029,13 +1949,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % 
 % % If an algorithm is neither bandwidth bound or computationally bound, it might be bound by latency. 
 % % 
-% % 
-% % 1Tflops (ops/cycle?)
-% % 144GB/s global
-% % 1TB/s shared
-% % x6 regs
-% % 
-% % latency - arithmethic (20 cycles) and memory (400+ cycles)
+% % latency - arithmetic (20 cycles) and memory (400+ cycles)
 % % 
 % % Little's law - needed parallelism = latency * throughput
 % % arithmetic: 23 cycles * 32ops/SM/cycle = 576 ops/SM parallelism
@@ -2047,20 +1961,14 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % - but only have 2 warp schedulers
 % % - instead, can issue 2 instructions per warp in the same cycle
 % % 
-% % 
-% % need to compute op/float ratios
-% % non-optimized: M=32,L=16, 300kops/px / 40k floats/px = 8 ops/float. op bound if shared is used
-% % optimized: 50kops/px / 40k floats/px = 1 ops/float. memm bound even if shared is used. some ilp advantageous
-% 
-% \appendix
 % 
 % \section*{GPU Throughput}\label{throughput}
 % 
 % In the context of determining whether an implementation is computationally bound or memory bound, one should first compare the target platform's sustained computational throughput to sustained memory throughput. Let us start with the former.
 % 
-% The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\;148\;MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmethic throughput is then given as:
+% The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1\;148\;MHz and being able to perform 2 floating point operations (flop) per clock cycle when multiply-add instructions are used. Theoretical peak arithmetic throughput is then given as:
 % \begin{align}
-% \text{BW}_\text{arithmethic} &= 2\cdot1\;148\;\text{flop/s/core}\cdot 32\;\text{cores/SM}\cdot 14\;\text{SMs}\nn
+% \text{BW}_\text{arithmetic} &= 2\cdot1\;148\;\text{flop/s/core}\cdot 32\;\text{cores/SM}\cdot 14\;\text{SMs}\nn
 % &= 1.03\;\text{Tflop/s}.\label{flops}
 % \end{align}
 % Now let us compare this to the memory throughput. The ``global'' GDDR5 memory bus is 384\;bit wide, and operates at 3\;Ghz where 2 bits are sent every cycle. Its peak bandwidth is then:
@@ -2073,42 +1981,9 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % \text{BW}_\text{shared} &= \frac{\frac{1\;148}{2}\;\text{Mbit/s}\cdot32\;\text{bit/bank}\cdot 32\;\text{banks/SM}\cdot 14\;\text{SMs}}{8\;\text{bit/byte}}\nn
 % &\approx 1.03\;\text{TB/s}\ (257\;\text{Gfloats/s}).\label{bwshared}
 % \end{align}
-% The bandwidths are compared in Tab. \ref{tabbandwidth}. Note that even when using shared memory at least 4 floating point operations must be carried out per float transferred to the CUDA cores, otherwise the algorithm will be memory bound and the peak arithmethic throughput can not be reached. %In such cases instruction level parallelism can be exploited to move data from shared memory into the even faster register memory~\cite{Vasilyy}, but this is outside the scope of this article.
+% The bandwidths are compared in Tab. \ref{tabbandwidth}. Note that even when using shared memory at least 4 floating point operations must be carried out per float transferred to the CUDA cores, otherwise the algorithm will be memory bound and the peak arithmetic throughput can not be reached. %In such cases instruction level parallelism can be exploited to move data from shared memory into the even faster register memory~\cite{Vasilyy}, but this is outside the scope of this article.
 % 
 % 
-% % \subsection{Iterative methods}
-% % 
-% % \begin{itemize}
-% % \item Woodbury
-% % \item Conjugated gradients
-% % \end{itemize}
-% % 
-% % 
-% % \subsection{Beamspace}
-% % 
-% % \begin{itemize}
-% % \item Some minimum of background, and good references.
-% % \end{itemize}
-% % 
-% % 
-% % \section{Results/Discussion}
-% % 
-% % 
-% % 
-% % 
-% % 
-% % \begin{itemize}
-% % \item Compare computational complexity vs. memory constraints for the various methods. Supporting plots.
-% % \item Relate this to whether the favourable architecture is a CPU or a GPU \todo{check ``when to gpu article''}
-% % \item Run benchmarks on some sonar dataset(s)
-% % \end{itemize}
-% % 
-% % 
-% % \section{Conclusion}
-% % 
-% % \begin{itemize}
-% % \item When to use what.
-% % \end{itemize}
 % % 
 % % 
 % % % \ \\
@@ -2136,28 +2011,6 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % % 
 % % % \section{Methods}
 % % % 
-% % % Basically, we are working with a practical implementation of the Capon beamformer that computes a set of weights $\vec w$ for every single sample $n$ by solving:
-% % % \begin{gather*}
-% % % \vec w[n] = \frac{\hat{\mat R}\;\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\;\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
-% % % \end{gather*}%
-% % % where
-% % % % \newcommand\X{\text{\raisebox{2pt}{$\vec\chi$}}}
-% % % \begin{gather*}
-% % % \text{\raisebox{1.9pt}{$\vec\chi$}} = \hat{\mat R}\;\!^{-1}\vec a \qquad\qquad\text{is the solution to}\qquad\qquad \hat{\mat R}\text{\raisebox{1.9pt}{$\vec\chi$}} = \vec a.
-% % % \end{gather*}
-% % 
-% % % 
-% % % , and maximum suppression of while ensuring that the beamformer digitally  before each of the pixels are estimated one at a time. The resolution and contrast of such a system will depend on the systems spatial response, which ideally should be narrow  be very sharp in the desired direction its ability to achieve  fundamental principle of forming a sonar image is to record the received wavefield, 
-% % % 
-% % % image quality of a phased array sonar imaging systems depend on  the choice of weights to apply to each of the sensors are crucial. 
-% % % 
-% % % A modern phased array imaging system may be thought of as a spatial filter. To achieve the best possible performance, the 
-% % % 
-% % % resolution and contrast 
-% % % 
-% % % Adaptive beamformers have only recently been introduced in active sonar imaging. For a while they were considered unsuited for this purpose because the backscattered signal is largely correlated with the 
-% % % 
-% % % 
 % % % 
 % % 
 % % %\begin{figure}[!t]
@@ -2170,176 +2023,8 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % % %\label{fig_sim}
 % % %\end{figure}
 % % 
-% % 
-% % % An example of a double column floating figure using two subfigures.
-% % % (The subfig.sty package must be loaded for this to work.)
-% % % The subfigure \label commands are set within each subfloat command, thees on a page
-% % by themselves when using endfloat and the cap
-% % % \label for the overall figure must come after \caption.
-% % % \hfil must be used as a separator to get equal spacing.
-% % % The subfigure.sty package works much the same way, except \subfigure is
-% % % used instead of \subfloat.
-% % %
-% % % \begin{figure*}[!t]
-% % % \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
-% % % \label{fig_first_case}}
-% % % \hfil
-% % % \subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
-% % % \label{fig_second_case}}}
-% % % \caption{Simulation results}
-% % % \label{fig_sim}
-% % % \end{figure*}
-% % %
-% % % Note that often IEEE papers with subfigures do not employ subfigure
-% % % captions (using the optional argument to \subfloat), but instead will
-% % % reference/describe all of them (a), (b), etc., within the main caption.
-% % 
-% % 
-% % % An example of a floating table. Note that, for IEEE style tables, the 
-% % % \caption command should come BEFORE the table. Table text will default to
-% % % \footnotesize as IEEE normally uses this smaller font for tables.
-% % % The \label must come after \caption as always.
-% % %
-% % %\begin{table}[!t]
-% % %% increase table row spacing, adjust to taste
-% % %\renewcommand{\arraystretch}{1.3}
-% % % if using array.sty, it might be a good idea to tweak the value of
-% % % \extrarowheight as needed to properly center the text within the cells
-% % %\caption{An Example of a Table}
-% % %\label{table_example}
-% % %\centering
-% % %% Some packages, such as MDW tools, offer better commands for making tables
-% % %% than the plain LaTeX2e tabular which is used here.
-% % %\begin{tabular}{|c||c|}
-% % %\hline
-% % %One & Two\\
-% % %\hline
-% % %Three & Four\\
-% % %\hline
-% % %\end{tabular}
-% % %\end{table}
-% % 
-% % 
-% % % Note that IEEE does not put floats in the very first column - or typically
-% % % anywhere on the first page for that matter. Also, in-text middle ("here")
-% % % positioning is not used. Most IEEE journals use top floats exclusively.
-% % % However, Computer Society journals sometimes do use bottom floats - bear
-% % % this in mind when choosing appropriate optional arguments for the
-% % % figure/table environments.
-% % % Note that, LaTeX2e, unlike IEEE journals, places footnotes above bottom
-% % % floats. This can be corrected via the \fnbelowfloat command of the
-% % % stfloats package.
-% % 
-% 
-% %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% % DOCUMENT APPENDICES %
-% %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 
-% \appendices
-% 
-% % use section* for acknowledgement
-% \ifCLASSOPTIONcompsoc
-%   \section*{Acknowledgments}
-% \else
-%   \section*{Acknowledgment}
-% \fi
-% 
-% 
-% The authors would like to thank Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data.
-% 
-% 
-% % Can use something like this to put references on a page
-% % by themselves when using endfloat and the captionsoff option.
-% \ifCLASSOPTIONcaptionsoff
-%   \newpage
-% \fi
-% 
-% 
-% 
-% % trigger a \newpage just before the given reference
-% % number - used to balance the columns on the last page
-% % adjust value as needed - may need to be readjusted if
-% % the document is modified later
-% %\IEEEtriggeratref{8}
-% % The "triggered" command can be changed if desired:
-% %\IEEEtriggercmd{\enlargethispage{-5in}}
-% 
-% % references section
-% 
-% \bibliographystyle{IEEEtran}
-% \bibliography{../../Library/library}
-% 
-% % End up doing this:
-% % \begin{thebibliography}{1}
-% % 
-% % \bibitem{IEEEhowto:kopka}
-% % H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
-% %   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-% % 
-% % \end{thebibliography}
-% 
-% 
-% 
-% % biography section
-% % 
-% % If you have an EPS/PDF photo (graphicx package needed) extra braces are
-% % needed around the contents of the optional argument to biography to prevent
-% % the LaTeX parser from getting confused when it sees the complicated
-% % \includegraphics command within an optional argument. (You could create
-% % your own custom macro containing the \includegraphics command to make things
-% % simpler here.)
-% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jo_inge.eps}}]{Jo Inge Buskenes}
-% received the B.S. degree in electrical engineering from Gj\o{}vik College University, Norway, in 2007, and the M.S. degree in instrumentation for particle physics from the University of Oslo, Norway, in 2010. He is currently pursuing the Ph.D. degree in image reconstruction and technology at the University of Oslo.
-% 
-% His industry experience includes the European Organization for Nuclear Research (CERN), Geneva, Switzerland (2007-2008), and the Norwegian Defence Research Establishment, Kjeller, Norway (2009). He has lectured in digital signal processing at the Gj\o{}vik College University (2009), and at the University of Oslo (2010-2012). His research interests include adaptive beamforming, digital image reconstruction, high performance computing, intelligent detector design and embedded Linux platforms.
-% \end{IEEEbiography}
-% 
-% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jon_petter.eps}}]{Jon Petter {}sen}
-% (S'12) was born in Porsgrunn, Norway in 1986. He received the M.S degree in computer science from the University of Oslo, Norway, in 2010. He is currently pursuing his Ph.D degree in medical ultrasound technology at the Norwegian University of Science and Technology (NTNU) Medical Imaging Lab (MI-Lab), Trondheim, Norway. His research interests include adaptive ultrasound processing techniques and acceleration of ultrasound algorithms using Graphics processing units (GPUs). 
-% \end{IEEEbiography}
-% 
-% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/carl-inge.eps}}]{Carl-Inge Colombo Nilsen}
-% (S'06-M'10) received the M.sc. and Ph.d. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustic applications.
-% \end{IEEEbiography}
-% 
-% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/andreas.eps}}]{Andreas Austeng}
-% was born in Oslo, Norway, in 1970. He received the M.S. degree in physics in 1996 and the Ph.D. degree in computer science in 2001, both from the University of Oslo. since 2001, he has been working at the department of Informatics, University of Oslo, first as a postdoctoral research fellow and currently as an associate Professor. His research interests include signal processing for acoustical imaging.
-% \end{IEEEbiography}
-% 
-% 
-% 
-% % or if you just want to reserve a space for a photo:
-% 
-% \vfill 
-% 
-% % \begin{IEEEbiography}{Jo Inge Buskenes}
-% % He doesn't exist.
-% % \end{IEEEbiography}
-% % 
-% % % if you will not have a photo at all:
-% % \begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-% % \includegraphics{gfx/profile_photo.jpg}
-% % \end{IEEEbiographynophoto}
-% 
-% %\newpage
-% 
-% % \begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-% % Not in at the moment.
-% % \end{IEEEbiographynophoto}
-% 
-% %\vfill
-% 
-% % Can be used to pull up biographies so that the bottom of the last one
-% % is flush with the other column.
-% %\enlargethispage{-5in}
-% \the\columnwidth
-% \markboth{}%
-% {}
-% % \input{gfx/gfx_input}
-% 
-% \end{document}
-% 
-% 
+
+
 
   \section*{Acknowledgments}
 \else
@@ -2347,7 +2032,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 \fi
 
 
-The authors would like to thank Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data.
+The authors would like to thank Kongsberg Maritime and the Norwegian Defence Research Establishment (FFI) for providing experimental data, and thank Nvidia for providing support for running the batched linear equation solver as well as for granting us a testdrive at the Boston HPC center.
 
 
 % Can use something like this to put references on a page
@@ -2357,39 +2042,9 @@ The authors would like to thank Kongsberg Maritime and the Norwegian Defence Res
 \fi
 
 
-
-% trigger a \newpage just before the given reference
-% number - used to balance the columns on the last page
-% adjust value as needed - may need to be readjusted if
-% the document is modified later
-%\IEEEtriggeratref{8}
-% The "triggered" command can be changed if desired:
-%\IEEEtriggercmd{\enlargethispage{-5in}}
-
-% references section
-
 \bibliographystyle{IEEEtran}
 \bibliography{../../Library/library}
 
-% End up doing this:
-% \begin{thebibliography}{1}
-% 
-% \bibitem{IEEEhowto:kopka}
-% H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
-%   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-% 
-% \end{thebibliography}
-
-
-
-% biography section
-% 
-% If you have an EPS/PDF photo (graphicx package needed) extra braces are
-% needed around the contents of the optional argument to biography to prevent
-% the LaTeX parser from getting confused when it sees the complicated
-% \includegraphics command within an optional argument. (You could create
-% your own custom macro containing the \includegraphics command to make things
-% simpler here.)
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/jo_inge.eps}}]{Jo Inge Buskenes}
 received the B.Sc. degree in electrical engineering from Gj\o{}vik College University, Norway, in 2007, and the M.Sc. degree in instrumentation for particle physics from the University of Oslo, Norway, in 2010. He is currently pursuing the Ph.D. degree in image reconstruction and technology at the University of Oslo.
 
@@ -2410,34 +2065,20 @@ was born in Oslo, Norway, in 1970. He received the M.Sc. degree in physics in 19
 
 
 
-% or if you just want to reserve a space for a photo:
+% 
+% IMAGE METRICS
+%
+% - Point spread function (res via main lobe width, SAS gain via PDF height)
+% - Constrast measures
+%
+% ACR = cL/2
+% C = (s+n)/n ratio
+% - 
+% WHO's needing processing power
+% - Centre for Maritime Research and Experimentation
+
 
 \vfill 
-
-% \begin{IEEEbiography}{Jo Inge Buskenes}
-% He doesn't exist.
-% \end{IEEEbiography}
-% 
-% % if you will not have a photo at all:
-% \begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-% \includegraphics{gfx/profile_photo.jpg}
-% \end{IEEEbiographynophoto}
-
-%\newpage
-
-% \begin{IEEEbiographynophoto}{Jo Inge Buskenes}
-% Not in at the moment.
-% \end{IEEEbiographynophoto}
-
-%\vfill
-
-% Can be used to pull up biographies so that the bottom of the last one
-% is flush with the other column.
-%\enlargethispage{-5in}
-% \the\columnwidth
-\markboth{}%
-{}
-% \input{gfx/gfx_input}
 
 \end{document}
 
