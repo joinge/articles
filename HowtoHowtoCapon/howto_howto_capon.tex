@@ -3,7 +3,7 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewfalse             % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewtrue             % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
                                                 % subfolders for graphics etc.
@@ -25,6 +25,18 @@
 % \RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1)
 % \RequirePackage[T1]{fontenc}%                 % Set font encoding
 % \usepackage[norsk]{babel}
+
+% Single column review mode:
+%\documentclass[12pt,journal,onecolumn]{IEEEtran}
+%\newcommand\CLASSINPUTbaselinestretch{2}
+%\RequirePackage{calc}
+%\RequirePackage{fp} 
+% Left margin = 1 inch + hoffset + oddsidemargin (or evensidemargin)
+% Adding the 2cm gutter width to the odd/even side margins:
+%\setlength\hoffset{0pt}
+%\setlength\oddsidemargin{4cm}       % 4cm margins on the left side
+%\addtolength\oddsidemargin{-1in}    % Subtract the initial 1 inch
+%\setlength\textwidth{21cm-8cm}    % A4 width (21cm) minus margins on either side
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEE ''APPROVED'' PACKAGES %
@@ -83,7 +95,7 @@
 \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
 pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
 colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-pdftitle={Low Complexity Adaptive Beamformer for Active Sonar Imaging},
+pdftitle={An Optimized GPU Implementation of the MVDR Beamformer for Active Sonar Imaging},
 pdfsubject={},
 pdfauthor={Jo Inge Buskenes},
 pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
@@ -930,11 +942,11 @@ Even with all our efforts we were only able to obtain processing rates of 40\;MF
 
 The MVDR beamformer is an algorithm capable of producing images with improved detail resolution and contrast compared to conventional DAS beamforming. The downside is its inherent need for robustification and the high computational complexity associated with estimating and inverting the spatial covariance matrix.
 
-We have shown that for systems containing up to 32 channels the problem can be largely mitigated by building the covariance matrix in a clever way, and by making use of the massive computational power available in modern GPUs. We were able to improve upon the run-time of a single thread C-implementation by roughly two orders of magnitude. For most choices of parameters the GPU was able to images at ~1 Mpx/s when processing data at ~40;\;GFlop/s on average. This is less than 5\% of the peak performance of the GPU, but it is still higher than the theoretical peak performance of the CPU we used. The 
+We have shown that for systems containing up to 32 channels the problem can be largely mitigated by building the covariance matrix in a clever way, and by making use of the massive computational power available in modern GPUs. We were able to improve upon the run-time of a single thread C-implementation by roughly two orders of magnitude. For most choices of parameters the GPU was able to create images at ~1 Mpx/s at an average data processing rate of ~40\;GFlop/s. This is less than 5\% of the peak performance of the GPU, but we believe it to be near optimal given the constraints of memory bandwidth and the sequential nature of some parts of the MVDR implementation.
 
 %  This performance is sufficient for computing properly sampled full-coverage sectorscan images from the HISAS1030 sonar in real-time.
 
-The MVDR maps well to the GPU since the computations involved are independent on the pixel level, and partially also within each pixel. However, we found it challenging to adapt the MVDR implementation to make use of the limited amount of cache available to each GPU computing core, which is a prerequisite for obtaining peak performance.
+All in all, the MVDR maps well to the GPU since the computations involved are independent on the pixel level, and partially also within each pixel. The GPU allows MVDR to be used in real-time processing of sonar data, and makes the MVDR a viable alternative to conventional methods in practical systems.
 
 
 % \begin{figure}[t]
