@@ -274,7 +274,7 @@
 % IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later 
 % (recommended due to many improvements over 1.2) of subfig.sty supports
 % the caption=false option directly:
-%\usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage[caption=false,font=footnotesize]{subfig}
 %
 % The latest version and documentation can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
@@ -395,6 +395,11 @@
 %%% My commands
 \newcommand{\mat}[1]{\mathbf{#1}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\R}{$\mat{\hat{R}}$ }
+
+  \newcommand{\img}{img/}
+
+\newcommand\multimedia[1]{\textbf{{\color{red}#1}}}
 
 
 \begin{document}
@@ -413,12 +418,16 @@
 % was not built to handle multiple paragraphs
 %
 
-\author{J. P. \AA{}sen, C.-I. C. Nilsen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
-\thanks{M. Shell is with the Department
-of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
-GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
-\thanks{J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
-\thanks{Manuscript received April 19, 2005; revised January 11, 2007.}}
+\author{
+   J. P. \AA{}sen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
+   
+   \thanks{...}
+}
+%M. Shell is with the Department
+%of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
+%GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this % stops a space
+%\thanks{J. Doe and J. Doe are with Anonymous University.}% <-this % stops a space
+%\thanks{Manuscript received April 19, 2005; revised January 11, 2007.}}
 
 % note the % following the last \IEEEmembership and also \thanks - 
 % these prevent an unwanted space from occurring between the last author name
@@ -441,7 +450,7 @@ GA, 30332 USA e-mail: (see http://www.michaelshell.org/contact.html).}% <-this %
 
 
 % The paper headers
-\markboth{Transactions on Ultrasonics and Ferroelectrics and Frequency Control,~Vol.~x, No.~y, January~2013?}%
+\markboth{Transactions on Ultrasonics and Ferroelectrics and Frequency Control,~Vol.~x, No.~y, January~201\AA{}}%
 {\AA{}sen \MakeLowercase{\textit{et al.}}: The Capon Adaptive Beamformer Applied on Moving Objects }
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
@@ -528,53 +537,110 @@ With the introduction of a fast implementation of the Capon adaptive beamformer,
 
 In this paper we analyze the shift invariance property of the Capon beamformer by studying simulated and in vivo images of moving objects. We show that when imaging moving point scatterers using the Capon beamformer with the same beam spacing as used for delay-and-sum, artifacts arise in the image, manifested as oscillating point scatteres. (TODO: Process csound data to see if we need over sampling on in vivo data, How often do we have bright point scatterers in vivo?).
 
-Delay and sum beamformer (DAS):
-\begin{align}
-z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
-\end{align}
-where $M$ is the number of elements.
-
-Capon weights are found by solving the following minimization problem:
-\begin{align}
-&\min_{\vec{w}} E\{|z[n]|^2\} = \vec{w}^H\mat{R}\vec{w}\\
-&\text{subjected to } \vec{w}^H\vec{1} = 1,
-\end{align}
-where $\mat{R} = E\{\vec{x}[n]\vec{x}[n]^H\}$.
-
-The solution to this minimization problem is
-\begin{align}
-\vec{w}[n] = \frac{\mat{R}[n]^{-1}\vec{a}}{\vec{a}^H\mat{R}[n]^{-1}\vec{a}},
-\end{align}
-where $\vec{a} = \vec{1}$ when $\vec{x}$ are pre-delayed to broadside,  and $\vec{w} \in \mathbb{C}^M$.
-
-Estimation of $\mat{R}[n]$: $\mat{\hat{R}}[n] = \vec{x}[n]\vec{x}[n]^H$.
-
-In order to get a well conditioned $\mat{\hat{R}}$, avoid signal cancellation and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ subarrays and $N_{avg}$ time samples.
-\begin{align}
-\mat{\hat{R}} = \frac{1}{(2N_{avg} + 1)K}\sum_{n'=n-N_{avg}}^{n+N_{avg}} \sum_{l=0}^{K} \vec{x}_l[n']\vec{x}_l[n']^H,
-\end{align}
-where $K = M-L+1$, $Y_{avg}\sim \tau/T_s$ ($\tau$ is the imaging pulse length and $T_s$ is the sampling period.) and $\vec{x}_l$ is the $l^\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$.
-
-Finally, $\mat{\hat{R}}$ is loaded with diagonal factor $\epsilon$, $\mat{\hat{R}} = \mat{\hat{R}} + \epsilon\mat{I}$. A weighting proportional to the output power is beneficial, and the trace of $\mat{\hat{R}}$, $\epsilon = d*tr\{\mat{\hat{R}}\}$, has previously shown good results in the literature (cite). 
-
-Building and calculating the inverse of $\hat{R}$ is computational demanding, limiting the methods accessibility. Following the innovation in GPU computing, this has now started to change.
-
-Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
 
-\section{Temporal Artifacts}
+\section{Background}
 
-\section{Causes}\label{sec:meth}
-   
-\subsection{Local Shift Variance}
+The standard form of time domain array beamforming is the delay and sum beamformer (DAS):
+\begin{align}\label{eq:das}
+z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
+\end{align}
+where $M$ is the number of elements or channels in the array, $\Delta_m[n]$ is the per-element focusing and steering delay, and $\vec{w}$ is a weight vector or window function. The weight vector is typically selected in order to trade resolution for a lower side lobe level.
 
-\section{Cures}
+\subsection{Capon Beamforming}
+The Capon beamformer produce a weight vector, like the one in (\ref{eq:das}), based on the impinging signal and an optimization criteria. The weights are found by solving the following minimization problem:
+\begin{align}
+&\min_{\vec{w}} E\{|z[n]|^2\} \rightarrow \min_{\vec{w}} \vec{w}^H \mat{\hat{R}} \vec{w} \label{eq:capon_optimization_criteria} \\
+&\text{subjected to } \vec{w}^H\vec{a} = 1,
+\end{align}
+where $\mat{\hat{R}}$ is the sample covariance matrix. Hence, the resulting weight vector will minimizes the output power while maintaining unit gain along the steering direction $\vec{a}$. %The covariance matrix is usually unknown and has to be estimated from the element data. The covariance matrix in (\ref{eq:capon_optimization_criteria}) is therefore substituted with the sample covariance matrix.
 
-\subsection{Multiple Parallel Recieve Lines}
+The sample covariance matrix can be estimated in the following way \cite{Synnevag2009}:
+\begin{align}
+\mat{\breve{R}} = \frac{1}{N_LN_K}\sum_{n'=n-K}^{n+K} \sum_{l=0}^{N_L-1} \vec{x}_l[n']\vec{x}_l[n']^H,
+\end{align}
+where $K = M-L+1$, $K\sim \tau/T_s$ ($\tau$ is the imaging pulse length and $T_s$ is the sampling period.) and $\vec{x}_l$ is the $l\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$ of length $L$. Finally $\mat{\hat{R}}$ is loaded with diagonal factor for numerical stability and increased robustness, 
+\begin{align}
+\epsilon &= d*\text{trace}\{\mat{\breve{R}}\}\\
+\mat{\hat{R}} &= \mat{\breve{R}} + \epsilon\mat{I}.
+\end{align} 
 
-\subsection{Phase Rotation}
+The solution to the minimization problem in (\ref{eq:capon_optimization_criteria}) is
+\begin{align}
+\vec{w}[n] = \frac{\mat{\hat{R}}[n]^{-1}\vec{a}}{\vec{a}^H\mat{\hat{R}}[n]^{-1}\vec{a}} \in \mathbb{C}^L,
+\end{align}.
+
+Note that one matrix has to be constructed and inverted for each raw data pixel in the image. This is indeed computational demanding, and has for long limited the methods accessibility. Following the innovation in GPU computing, this has now started to change.
+
+%Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
+
+\subsection{Sampling and Shift-Invariance}
+
+\begin{figure*}[!t]
+\centerline{
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img das_no_undersampling.eps}\label{fig:das_shiftinvariant}}
+\hfill{}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img das_undersampled_2x.eps}\label{fig:das_shiftvariant}}
+}
+\caption{...}
+\label{fig:das}
+\end{figure*}
+
+\section{Local Shift Invariance of the Capon Beamformer}
+
+\begin{figure*}[!t]
+\centerline{
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_normal.eps}\label{fig:capon}
+}
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=1_normal.eps}
+}
+}
+\caption{...}
+\label{fig:image_capon}
+\end{figure*}
+
+\section{Oversampling on Transmitt}
+
+\begin{figure*}[!t]
+\centerline{
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x.eps}
+}
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x.eps}
+}
+}
+\caption{...}
+\label{fig:capon_oversampling}
+\end{figure*}
+
+\section{Oversampling by Phase Rotation}
+
+\begin{figure*}[!t]
+\centerline{
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x_microsteering_correct_pitch.eps}
+}
+\subfloat[]{
+\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x_microsteering_correct_pitch.eps}
+}
+}
+\caption{...}
+\label{fig:benchmark_capon_bs}
+\end{figure*}
+
+\section{Oversampling by Parallel Recieve Lines}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{\img capon_L=32_K=1_d=001_2MLA_and_2x_microsteering_correct_pitch.eps}
+\label{fig:image_capon_bs}
+\end{figure}
+
+\section{Simulation Setup}
 
 \section{Results}\label{sec:res}
 
@@ -770,13 +836,13 @@ The authors would like to thank... \cite{Synnevag2009}
 Biography text here.
 \end{IEEEbiography}
 
-\begin{IEEEbiography}{Carl-Inge Colombo Nilsen}
-Biography text here.
-\end{IEEEbiography}
+%\begin{IEEEbiography}{Carl-Inge Colombo Nilsen}
+%Biography text here.
+%\end{IEEEbiography}
 
 % insert where needed to balance the two columns on the last page with
 % biographies
-\newpage
+%\newpage
 
 \begin{IEEEbiography}{Andreas Austeng}
 Biography text here.
