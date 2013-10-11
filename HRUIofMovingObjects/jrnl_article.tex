@@ -391,6 +391,7 @@
 %%% My packages
 \usepackage{amsmath,epsfig}
 \usepackage{amsfonts}
+\usepackage{color}
 
 %%% My commands
 \newcommand{\mat}[1]{\mathbf{#1}}
@@ -400,7 +401,7 @@
   \newcommand{\img}{img/}
 
 \newcommand\multimedia[1]{\textbf{{\color{red}#1}}}
-
+\newcommand\comment[1]{\textit{{\color{red}#1}}}
 
 \begin{document}
 %
@@ -483,7 +484,7 @@
 
 \begin{abstract}
 %\boldmath
-The abstract goes here.
+\comment{The abstract goes here.}
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -531,11 +532,15 @@ Adaptive beamforming, Capon beamformer, Shift Invariance, Ultrasound Imaging.
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
 
-\IEEEPARstart{I}{ntroduction} to Capon adaptive beamforming and temporal artifacts.
+\IEEEPARstart{W}{ith} the introduction of a fast implementation of the Capon adaptive beamformer, a stream of images can now be processed at interactive frame rates \cite{Asen}. A natural question then is how a moving object appear after Capon beamforming has been applied. Earlier work on Capon beamforming for medical ultrasound imaging has investigated the method's capabilities in single frames only, and temporal behaviour and effects has therefore been neglected. 
 
-With the introduction of a fast implementation of the Capon adaptive beamformer, a stream of images can now be processed at interactive frame rates. A natural question then is how a moving object behaves throughout the stream of images. An important property of an ultrasound imaging system is its local shift invariance. An object’s appearance should be preserved when moved slightly, or if the ultrasound probe moves. The Capon beamformer has previously only been investigated intra-frame; it is therefore unknown how it works when applied in a real-time ultrasound setting.
+An important property of an ultrasound imaging system is its local shift invariance. Local shift invariance means that an object’s appearance should be preserved when the object, or the ultrasound probe, is moved slightly. Local shift invariance is what makes techniques like doppler and flow imaging and speckle tracking possible \comment{(need citation)} . 
 
-In this paper we analyze the shift invariance property of the Capon beamformer by studying simulated and in vivo images of moving objects. We show that when imaging moving point scatterers using the Capon beamformer with the same beam spacing as used for delay-and-sum, artifacts arise in the image, manifested as oscillating point scatteres. (TODO: Process csound data to see if we need over sampling on in vivo data, How often do we have bright point scatterers in vivo?).
+Capon beamforming has the ability to provide increased lateral resolution and contrast in an ultrasound image \cite{Synnevag2009, Chen2011}. However, it is also sensitive to errors like perturbations of the array element, correlated signals and errors in the assumed steering vector.
+
+\comment{Add intro to other work.}
+
+In this paper we analyze the shift invariance property of the Capon beamformer by studying simulated and in vivo images of moving objects. We show that when imaging moving point scatterers using the Capon beamformer with the same beam spacing as used for delay-and-sum, artifacts arise in the image, manifested as oscillating point scatteres. \comment{(TODO: Process csound data to see if we need over sampling on in vivo data, How often do we have bright point scatterers in vivo? Might improve contrast further)}.
 
 
 % needed in second column of first page if using \IEEEpubid
@@ -543,14 +548,14 @@ In this paper we analyze the shift invariance property of the Capon beamformer b
 
 \section{Background}
 
-The standard form of time domain array beamforming is the delay and sum beamformer (DAS):
+The standard form of time domain array beamforming is the delay-and-sum beamformer (DAS):
 \begin{align}\label{eq:das}
 z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
 \end{align}
 where $M$ is the number of elements or channels in the array, $\Delta_m[n]$ is the per-element focusing and steering delay, and $\vec{w}$ is a weight vector or window function. The weight vector is typically selected in order to trade resolution for a lower side lobe level.
 
 \subsection{Capon Beamforming}
-The Capon beamformer produce a weight vector, like the one in (\ref{eq:das}), based on the impinging signal and an optimization criteria. The weights are found by solving the following minimization problem:
+The Capon beamformer produce a weight vector, like the one in (\ref{eq:das}), based on the impinging signal and an optimization criteria. The minimization problem is as follow:
 \begin{align}
 &\min_{\vec{w}} E\{|z[n]|^2\} \rightarrow \min_{\vec{w}} \vec{w}^H \mat{\hat{R}} \vec{w} \label{eq:capon_optimization_criteria} \\
 &\text{subjected to } \vec{w}^H\vec{a} = 1,
@@ -559,11 +564,11 @@ where $\mat{\hat{R}}$ is the sample covariance matrix. Hence, the resulting weig
 
 The sample covariance matrix can be estimated in the following way \cite{Synnevag2009}:
 \begin{align}
-\mat{\breve{R}} = \frac{1}{N_LN_K}\sum_{n'=n-K}^{n+K} \sum_{l=0}^{N_L-1} \vec{x}_l[n']\vec{x}_l[n']^H,
+\mat{\breve{R}}[n] = \frac{1}{N_LN_K}\sum_{n'=n-K}^{n+K} \sum_{l=0}^{N_L-1} \vec{x}_l[n']\vec{x}_l[n']^H,
 \end{align}
-where $K = M-L+1$, $K\sim \tau/T_s$ ($\tau$ is the imaging pulse length and $T_s$ is the sampling period.) and $\vec{x}_l$ is the $l\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$ of length $L$. Finally $\mat{\hat{R}}$ is loaded with diagonal factor for numerical stability and increased robustness, 
+where $K = M-L+1$ typical is proportional to the pulse length, $N_K = 2K + 1$, $N_L = M-L+1$, and $\vec{x}_l$ is the $l\text{th}$ subarray $[x_l[n], \dotso x_{l+L}[n]]$ of length $L$. Finally $\mat{\hat{R}}$ is loaded with a diagonal factor for numerical stability and increased robustness, 
 \begin{align}
-\epsilon &= d*\text{trace}\{\mat{\breve{R}}\}\\
+\epsilon &= d*\text{trace}\{\mat{\breve{R}}\}/L\\
 \mat{\hat{R}} &= \mat{\breve{R}} + \epsilon\mat{I}.
 \end{align} 
 
@@ -572,11 +577,19 @@ The solution to the minimization problem in (\ref{eq:capon_optimization_criteria
 \vec{w}[n] = \frac{\mat{\hat{R}}[n]^{-1}\vec{a}}{\vec{a}^H\mat{\hat{R}}[n]^{-1}\vec{a}} \in \mathbb{C}^L,
 \end{align}.
 
-Note that one matrix has to be constructed and inverted for each raw data pixel in the image. This is indeed computational demanding, and has for long limited the methods accessibility. Following the innovation in GPU computing, this has now started to change.
+Note that one matrix has to be constructed and inverted for each data vector $\vec{x}$ received by the system. This is indeed computational demanding, and has for long limited the methods accessibility. Following the innovation in GPU computing, this has now changed.
 
 %Nilsen et. al has proposed to apply beamspace processing to further reduce the computations required. With beamspace we mean transforming the channel data from element space to a fan of beams covering the imaging sector, $\vec{x}_{BS} = \mat{B}x$.  The steering vectors in $\mat{B}$, the so-called Butler matrix, determines each beams direction in space. We can therefore easily remove beams where no interference is present by removing rows in $\mat{B}$. For a focused system like medical ultrasound, where the received signal is concentrated in a narrow band around broadside, there is a small percentage of the beams that contains almost all of the energy. Nilsen et. al has shown that as little as three beams still produced results comparable with applying the full Capon estimation in element space.
 
 \subsection{Sampling and Shift-Invariance}
+
+The lateral sampling of an ultrasound image is given by the aperture size on transmit ($D_{tx}$) and receive ($D_{rx}$) combined and the center frequency ($f_c = c/\lambda$), where $c$ is the speed of sound in the media and $\lambda$ is the wavelength. The required beam spacing is then:
+\begin{align}
+\Delta < \frac{\lambda}{D_{tx} + D_{rx}}.
+\end{align}
+If this requirement is not met, aliasing effects will appear in the image and the system will not be lateral shift invariant.
+
+In order to visualize the local shift-invariance of a given imaging system, we will use lateral shift invariance plots, introduced by Hergum \textit{et al} \cite{Hergum2007}.
 
 \begin{figure*}[!t]
 \centerline{
@@ -643,6 +656,7 @@ Note that one matrix has to be constructed and inverted for each raw data pixel 
 \section{Simulation Setup}
 
 \section{Results}\label{sec:res}
+Make plot of contrast between two areas in a simulation for different values of $L$. Make the same plot for different number of rx beams. Do the same for an in-vivo image. The rational being that contrast is also improved by denser rx-sampling not just shift-invariance. 
 
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
