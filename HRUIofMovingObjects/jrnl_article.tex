@@ -548,11 +548,13 @@ where $\vec{k}_1$ is the delay-and-sum (DAS) beamformer. In Fig.\,\ref{fig:das_c
 \centerline{
 \includegraphics[width=\linewidth]{\img steerd_respons_capon_das_resolution.eps}
 }
-\caption{...}
+\caption{Comparison of drop in output power in between beams (half the system resolution) for delay-and-sum (DAS) and Capon beamforming.}
 \label{fig:das_capon_beams}
 \end{figure}
 
-In previous literature on Capon beamforming for medical ultrasound imaging in single frames this effect has been passed over in silence by either oversampling on transmit, or carefully position point scatterers on transmit-receive beam pairs, or ignorance. In this paper we show that when imaging a moving point scatterer with ultrasound using the Capon beamformer with the same beam spacing used for DAS the same scallop loss is observed, manifested as oscillating point scatteres. The question is then, what can we do in order to improve on the situation.
+In previous literature on Capon beamforming for medical ultrasound imaging this effect has been passed over in silence (in single frames) by either oversampling on transmit, or carefully position point scatterers on transmit-receive beam pairs, or ignorance. In this paper we show that when imaging a moving point scatterer with ultrasound and the Capon beamformer with the same beam spacing sufficient for DAS the same scallop loss is observed, manifested as oscillating point scatteres. The question is then, what can we do in order to improve on the situation.
+
+\comment{Next sections summary.}
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
@@ -596,11 +598,13 @@ Note that one matrix has to be constructed and inverted for each data vector $\v
 
 The lateral sampling of an ultrasound image is given by the aperture size on transmit ($D_{tx}$) and receive ($D_{rx}$) combined \cite{Hergum2007} and the center frequency ($f_c = c/\lambda$), where $c$ is the speed of sound in the media and $\lambda$ is the wavelength. The required Nyquist beam spacing is then:
 \begin{align}
-\Delta < \frac{\lambda}{D_{tx} + D_{rx}}.
+\Delta < \frac{\lambda}{D_{tx} + D_{rx}}. \label{eq:resolution}
 \end{align}
 If this requirement is not fulfilled, aliasing effects will appear in the image and the system will not be lateral shift invariant.
 
-In order to visualize the local shift-invariance of a given imaging system, we will use lateral shift invariance plots, introduced by Hergum \textit{et al} \cite{Hergum2007}.
+In order to visualize the local lateral shift-invariance of a given imaging system, we will use lateral shift-variance plots (LSV-plots), introduced by Hergum \textit{et al.} \cite{Hergum2007}. A LSV-plot is constructed for a given imaging system by imaging a laterally moving point scatterer. For each lateral position the root-mean-square (RMS) is calculated in range, and the resulting beam profiles are stacked in order to produce an image. The system is said to be local lateral shift-invariant if the plot shows straight diagonals with close to constant amplitude.
+
+Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for imaging system using DAS beamforming and with a beam spacing following (\ref{eq:resolution}).
 
 \begin{figure*}[!t]
 \centerline{
