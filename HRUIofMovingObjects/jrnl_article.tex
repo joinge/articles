@@ -604,11 +604,11 @@ The lateral sampling required in an ultrasound image is given by the combined ap
 \end{align}
 If this requirement is not fulfilled, the scallop loss will be to high and the system will not be lateral shift-invariant.
 
-In order to visualize the local lateral shift-invariance of a given imaging system, we will use lateral shift-variance plots (LSV-plots), introduced by Hergum \textit{et al.} \cite{Hergum2007}. A LSV-plot is constructed for a given imaging system by imaging a laterally moving point scatterer. For each lateral position the root-mean-square (RMS) is calculated in range, and the resulting beam profiles are stacked in order to produce an image. The image is in this paper displayed as a contour plot with contours on -1, -2, -3, -6, -12 and -24 dB. The maximum for each beam profile is also marked with a black dot. The system is said to be local lateral shift-invariant if the contours are diagonal, hence the diagonals have constant amplitude.
+In order to visualize the local lateral shift-invariance of a given imaging system, we will use lateral shift-variance plots (LSV-plots), introduced by Hergum \textit{et al.} \cite{Hergum2007}. A LSV-plot is constructed for a given imaging system by imaging a laterally moving point scatterer. For each lateral position the root-mean-square (RMS) is calculated in range, and the resulting beam profiles are stacked in order to produce an image. The LSV-plots in this paper are displayed as a contour plot with contours on -1, -2, -3, -6, -12 and -24 dB. In a ultrasound image with 256 gray levels and 50 dB dynamic range 1 dB will corresponds to 5 gray levels. Depending on the surroundings, this is around the lowest difference a human being can detect \comment{need reference}. A loss larger than 1dB will therefore be visible in the image. The maximum for each beam profile is also marked with a black dot. The system is said to be local lateral shift-invariant if the contours are diagonal, hence the diagonals have constant amplitude.
 
-To further quantify the shift-invariance we have calculated the mean absolute error (MAE) of the maximum point in each beam profile versus $f(x)=x$, and the MAE of the amplitude variation for the same set of points. The first number quantifies the amount of geometric distortion, and the latter quantifies the gain variation or in our case the loss of signal. The maximum amplitude deviation along the max-point trace is also measured. We present all these numbers together with the LSV-plots.
+To further quantify the shift-invariance we have calculated the mean absolute error (MAE) of the maximum point in each beam profile versus $f(x)=x$, and the MAE of the amplitude variation for the same set of points. The first number quantifies the amount of geometric distortion, and the latter quantifies the gain variation or in our case the loss of signal. The maximum amplitude deviation along the max-point trace is also calculated and reported. We present all these numbers together with the LSV-plots.
 
-Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using DAS beamforming with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of tx-rx beams. The point scatterer response has been simulated using Field II \comment{add citations}. We see that the contours are approximately diagonal and therefore we can conclude that the system is lateral shift-invariant. The P-MAE and A-MAE are also minimal. \comment{Why is the scallop loss only 0.78 dB when Fig. 1 says it could be 3.92?}. In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of two. We see that the scallop loss increases to a level where the contours no longer are diagonal. This loss can not be reconstructed through IQ or in-coherent interpolation, the max peak is forever lost when the point is located between two beams and the distance between the two beams are to high.
+Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using DAS beamforming with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of tx-rx beam pairs. The point scatterer response has been simulated using Field II \comment{add citations} \comment{add table with simulation settings}. We see that the contours are approximately diagonal and therefore we can conclude that the system is locally lateral shift-invariant. The P-MAE and A-MAE are also minimal. \comment{Why is the scallop loss only 0.78 dB when Fig. 1 says it could be 3.92?}. In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of two. We see that the scallop loss (max A-MAE) increases to a level where the contours no longer are diagonal. The maximum peak is lost when the point is located between two beams and the distance between the two beams are too high.
 
 \begin{figure*}[!t]
 \centerline{
@@ -616,12 +616,12 @@ Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system usi
 \hfill{}
 \subfloat[]{\includegraphics[width=0.5\linewidth]{\img das_undersampled2_2x.eps}\label{fig:das_shiftvariant}}
 }
-\caption{...}
+\caption{LSV-plots of DAS beamforming. If the contours are diagonal the imaging system is said to be lateral local shif-invariant. Red vertical lines are plotted where tx-rx beams are located. a) Sampling corresponding to (\ref{eq:resolution}). b) Undersampling with a factor two.}
 \label{fig:das}
 \end{figure*}
 
 \section{Local Lateral Shift-Invariance of the Capon Beamformer}
-We will now investigate the lateral local shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \comment{cite}. A  . Fig.\,\ref{fig:capon1}.
+We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \comment{cite}. A  . Fig.\,\ref{fig:capon1}.
 
 \begin{figure*}[!t]
 \centerline{
@@ -638,36 +638,20 @@ We will now investigate the lateral local shift-invariance of the Capon beamform
 
 \section{Methods}
 
-\section{Oversampling on Transmit}
+\subsection{Oversampling on Transmit}
 The typical way of obtain sufficient sampling in active broadband application is by  increasing the number of transmit beams until (\ref{eq:resolution}) is fulfilled.  If the number of tr
 
 \begin{figure*}[!t]
 \centerline{
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x.eps}
+%\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x.eps}
 }
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x.eps}
+%\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x.eps}
 }
 }
-\caption{...}
+\caption{Oversampling on transmit ...}
 \label{fig:capon_oversampling}
-\end{figure*}
-
-\subsection{Oversampling by Phase Rotation}
-The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportunity for oversampling using phase rotation. The steering vector $\vec{a}$ has previously been set to $\vec{1}$ since the data are pre-delayed, but it could be varied over a set of pre-defined steering vectors. \comment{Look at the poster for notation}
-
-\begin{figure*}[!t]
-	\centerline{
-		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x_microsteering_correct_pitch.eps}
-		}
-		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x_microsteering_correct_pitch.eps}
-		}
-	}
-	\caption{...}
-	\label{fig:benchmark_capon_bs}
 \end{figure*}
 
 \subsection{Oversampling by Parallel Recieve Lines}
@@ -678,16 +662,59 @@ In (\comment{Cite paper where they use STB + Capon if its out}) it is shown that
 %	\label{fig:image_capon_bs}
 %\end{figure}
 
+\subsection{Oversampling by Phase Rotation}
+The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportunity for oversampling using phase rotation. The steering vector $\vec{a}$ has previously been set to $\vec{1}$ since the data are pre-delayed, but it could be varied over a set of pre-defined steering vectors. \comment{Look at the poster for notation}
+
+\begin{figure*}[!t]
+	\centerline{
+%		\subfloat[]{
+%			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_2x_microsteering_correct_pitch.eps}
+%		}
+%		\subfloat[]{
+%			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x_microsteering_correct_pitch.eps}
+%		}
+	}
+	\caption{Oversampling using phase rotation ...}
+	\label{fig:benchmark_capon_bs}
+\end{figure*}
+
 \section{Results}\label{sec:res}
 
 Acquire channel data from a phantom containing point wire targets and cysts while moving the probe laterally. Confirm the improved shift-invariance when using phase rotation. See if improved sampling also increase cyst contrast.
 Make plot of contrast between two areas in a simulation for different values of $L$. Make the same plot for different number of rx beams. Do the same for an in-vivo image. The rational being that contrast is also improved by denser rx-sampling not just shift-invariance. 
 
+\begin{figure}\caption{Plot of contrast vs oversampling factor (phase rotation) in in-vivo data.}
+\end{figure}
+
 \subsection{In-vitro Images}
 Acquire channel data from a phantom containing point wire targets and cysts while moving the probe laterally. Confirm the improved shift-invariance when using phase rotation. 
 
+\begin{figure*}[!t]
+\centerline{
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\hfill{}
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\hfill{}
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_undersampled2_2x.eps}\label{fig:das_shiftvariant}}
+}
+\caption{LSV-plots of in-vitro data. a) Image of the data. b) Normal. c) Oversampling with phase rotation}
+\label{fig:das}
+\end{figure*}
+
 \subsection{In-Vivo Images}
 Investigate if phase rotation improves contrast in in-vivo images of the heart.
+
+\begin{figure*}[!t]
+\centerline{
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\hfill{}
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\hfill{}
+%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_undersampled2_2x.eps}\label{fig:das_shiftvariant}}
+}
+\caption{LSV-plots of in-vivo data. a) Image of the data. b) Normal. c) Oversampling with phase rotation}
+\label{fig:das}
+\end{figure*}
 
 \section{Discussion}\label{sec:dis}
 Discuss results presented in Section \ref{sec:res}.
