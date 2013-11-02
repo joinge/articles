@@ -608,7 +608,7 @@ In order to visualize the local lateral shift-invariance of a given imaging syst
 
 To further quantify the shift-invariance we have calculated the mean absolute error (MAE) of the maximum point in each beam profile versus $f(x)=x$, and the MAE of the amplitude variation for the same set of points. The first number quantifies the amount of geometric distortion, and the latter quantifies the gain variation or in our case the loss of signal. The maximum amplitude deviation along the max-point trace is also calculated and reported. We present all these numbers together with the LSV-plots.
 
-Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using DAS beamforming with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of tx-rx beam pairs. The point scatterer response has been simulated using Field II \comment{add citations} \comment{add table with simulation settings}. We see that the contours are approximately diagonal and therefore we can conclude that the system is locally lateral shift-invariant. The P-MAE and A-MAE are also minimal. \comment{Why is the scallop loss only 0.78 dB when Fig. 1 says it could be 3.92?}. In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of two. We see that the scallop loss (max A-MAE) increases to a level where the contours no longer are diagonal. The maximum peak is lost when the point is located between two beams and the distance between the two beams are too high.
+Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using DAS beamforming with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of tx-rx beam pairs. The point scatterer response has been simulated using Field II \comment{add citations} \comment{add table with simulation settings}. We see that the contours are approximately diagonal and therefore we can conclude that the system is locally lateral shift-invariant. The P-MAE and A-MAE are also minimal. The scallop loss is smaller than what was predicted by Fig.\,\ref{fig:das_capon_beams}. The reason for this is that Fig.\,\ref{fig:das_capon_beams} only shows the one-way response, and the system resolution is therefore calculated based on the receive aperture only. The beamspacing in (\ref{eq:resolution}) is derived from the fact that the two-way response is $D_{tx}+D_{rx}$ in K-space. However, in space the mainlobe maintains the same width from zero too zero and therefore the resolution does not change that much. Sampling according to (\ref{eq:resolution}) is therefore more than what is strictly needed, thereby the smaller loss. In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of two. We see that the scallop loss (max A-MAE) increases to a level where the contours no longer are diagonal. The maximum peak is lost when the point is located between two beams and the distance between the two beams are too high.
 
 \begin{figure*}[!t]
 \centerline{
@@ -621,7 +621,7 @@ Fig.\,\ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system usi
 \end{figure*}
 
 \section{Local Lateral Shift-Invariance of the Capon Beamformer}
-We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \comment{cite}. A  . Fig.\,\ref{fig:capon1}.
+We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \comment{cite}. In Fig.\,\ref{fig:capon1}. the same point scatterer response as in Fig.\,\ref{fig:das_shiftinvariant} has been weighted with a Capon weight calculated using (\ref{eq:capon_weights}) with $L = M/2 = 32$, $K=1$ and $d=1/100$. The set of lateral shifts is constructed in a way that the central beam is the only one hitting the point scatterer exactly. We see that the scallop loss is tremendous, and not far from the value predicted by Fig\,\ref{fig:das_capon_beams}. The difference between .
 
 \begin{figure*}[!t]
 \centerline{
@@ -637,6 +637,7 @@ We will now investigate the local lateral shift-invariance of the Capon beamform
 \end{figure*}
 
 \section{Methods}
+We will now discuss different approaches to improve the lateral shift-invariance when using the Capon beamformer.
 
 \subsection{Oversampling on Transmit}
 The typical way of obtain sufficient sampling in active broadband application is by  increasing the number of transmit beams until (\ref{eq:resolution}) is fulfilled.  If the number of tr
