@@ -486,7 +486,25 @@
 
 \begin{abstract}
 %\boldmath
-\comment{The abstract goes here.}
+\comment{The abstract goes here.} 
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
+..............................................................................................................
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -625,9 +643,9 @@ In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of t
 \end{figure*}
 
 \section{Local Lateral Shift-Invariance of the Capon Beamformer}
-We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \cite{Synnevag2009, Asen}. In Fig.\,\ref{fig:capon1}. the same point scatterer response as presented in Fig.\,\ref{fig:das_shiftinvariant} has been weighted with Capon weights calculated using (\ref{eq:capon_weights}) with $L = M/2 = 32$, $K=1$ and $d=1/100$. The set of lateral displacements is constructed in such a way that the center beam is the only one hitting the point scatterer exactly. We see that the scalloping loss is tremendous, and not far from the value predicted by Fig\,\ref{fig:das_capon_beams}. The difference between the predicted and the simulated loss is due to several factors. The most important one being that Fig.\,\ref{fig:das_capon_beams} shows a single frequency whereas the RMS used in Fig.\,\ref{fig:capon1} average a wideband signal in range. For a slice through the center of the pulse the scalloping loss is below -30dB.
+We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \cite{Synnevag2009, Asen}. In Fig.\,\ref{fig:capon1}. the same point scatterer response as presented in Fig.\,\ref{fig:das_shiftinvariant} has been weighted with Capon weights calculated using (\ref{eq:capon_weights}) with $L = M/2 = 32$, $K=1$ and $d=1/100$. The set of lateral displacements is constructed in such a way that the center beam is the only one hitting the point scatterer exactly. We see that the scalloping loss is tremendous, and not far from the value predicted by Fig\,\ref{fig:das_capon_beams}. The difference between the predicted and the simulated loss is due to several factors. The most important one being that Fig.\,\ref{fig:das_capon_beams} shows a single frequency whereas the RMS used in Fig.\,\ref{fig:capon1} average a broadband signal in range. For a slice through the center of the pulse the scalloping loss is below -30dB.
 
-The diagonal factor $d$ and the effective adaptive aperture size $L$ can be used to control the mainlobe width of the Capon beamformer. In both extreme cases, $d=\infty$ and $L=1$, the Capon beamformer becomes the DAS beamformer, and will require a beamspacing according to (\ref{eq:resolution}). In Fig.\,\ref{fig:capon2} we show how the scalloping loss is reduced when the amount of diagonal loading is increased. We observe that Fig.\,\ref{fig:capon2} contains the same pattern as present in Fig.\,\ref{fig:das_shiftvariant}. From Fig.\,\ref{fig:image_capon} it should be obvious that the Capon beamformer either require an increase in the lateral sampling in order to make the imaging system locally lateral shift-invariant, or the resolution has to be reduced to the same level as DAS. It would be unwise to do all the computation involved with Capon beamforming with a high $d$ value and end up with a resolution equal to DAS. However, we see that the diagonal factor can be a useful tool if resolution has to be traded for the need of oversampling.
+The diagonal factor $d$ and the effective adaptive aperture size $L$ can be used to control the mainlobe width of the Capon beamformer. In both extreme cases, $d=\infty$ and $L=1$, the Capon beamformer becomes the DAS beamformer, and will require a beamspacing according to (\ref{eq:resolution}). In Fig.\,\ref{fig:capon2} we show how the scalloping loss is reduced when the amount of diagonal loading is increased. We observe that Fig.\,\ref{fig:capon2} contains the same pattern as present in Fig.\,\ref{fig:das_shiftvariant}. From Fig.\,\ref{fig:capon} it should be obvious that the Capon beamformer either require increased lateral sampling in order to make the imaging system locally lateral shift-invariant, or the resolution has to be reduced to the same level as DAS. It would be unwise to do all the computation involved with Capon beamforming with a high $d$ value and end up with a resolution equal to DAS. However, we see that the diagonal factor can be a useful tool if resolution has to be traded for the need of oversampling. The same is true for the subarray length parameter.
   
 
 \begin{figure*}[!t]
@@ -640,18 +658,19 @@ The diagonal factor $d$ and the effective adaptive aperture size $L$ can be used
 }
 }
 \caption{...}
-\label{fig:image_capon}
+\label{fig:capon}
 \end{figure*}
 
 \section{Methods}
-We will now discuss different ways to improve on the lateral shift-invariance when using the Capon beamformer. From the previous section it should now be clear that we somehow need to increase the lateral sampling. In this section we will investigate how this oversampling should be conducted, how large it needs to be and how the different methods will affect the system frame rate and the processing complexity.
+We will now discuss different ways to improve on the lateral shift-invariance when using the Capon beamformer. From the previous section it should now be clear that we somehow need to increase the lateral sampling to make the Capon imaging system lateral shift invariant. In this section we will investigate how this oversampling should be conducted, how large it needs to be and how the proposed methods will affect the system frame rate and the processing complexity.
 
 \subsection{Oversampling on Transmit}
-The typical way of obtaining sufficient sampling in an active broadband system is by increasing the number of transmit beams until (\ref{eq:resolution}) is fulfilled. In Fig.\,\ref{fig:capon_oversampling_a} and Fig.\,\ref{fig:capon_oversampling_b} we have increased the lateral sampling on transmit by a factor four and ten respectively. As expected the scalloping loss decreases with increased lateral sampling. Note that Fig.\,\ref{fig:capon_oversampling_b} is zoomed in order to better see the beam-to-beam variation.
+The straight forward way of obtaining sufficient sampling in an active broadband system is by increasing the number of transmit beams (tx-beams) until (\ref{eq:resolution}) is fulfilled. In Fig.\,\ref{fig:capon_oversampling_a} and Fig.\,\ref{fig:capon_oversampling_b} we have increased the lateral sampling on transmit by a factor four and ten respectively. As expected the scalloping loss decreases with increased lateral sampling. Note that Fig.\,\ref{fig:capon_oversampling_b} is zoomed compared to Fig.\,\ref{fig:capon} in order to better see the beam-to-beam variation.
 
-From Fig.\,\ref{fig:capon_oversampling_b} we see that more than ten times oversampling has to be applied to achieve local lateral shift-invariance when imaging a moving point scatterer with no spatially white noise and $1/100$ in diagonal loading. Note that a diagonal loading factor of $1/100$ will introduce a deterministic white noise component in the sample covariance matrix $40$ dB lower than the signal present. Hence, the covariance has been estimated from data which appeared to have an SNR of 40 dB.
+From Fig.\,\ref{fig:capon_oversampling_b} we see that more than ten times oversampling has to be applied to achieve local lateral shift-invariance when a moving point scatterer is imaged without noise and with the same parameters as in Fig\,\ref{fig:capon}. %$1/100$ in diagonal loading. 
+Note that a diagonal loading factor of $1/100$ will introduce a deterministic white noise component in the sample covariance matrix $40$ dB lower than the signal present. Hence, the covariance has been estimated from data which appeared to have an SNR of 40 dB.
 
-Even though increasing the number of transmit improves the lateral shift-invariance it will also reduce the imaging frame rate with a factor equal to the oversampling factor. It is therefore not a feasible option for real time ultrasound imaging.
+Even though increasing the number of transmits improves the lateral shift-invariance it will also reduce the imaging frame rate with a factor equal to the oversampling factor. The processing complexity will also increase equally. For these two reasons, oversampling on transmit is not a feasible option for real time ultrasound imaging.
 
 \begin{figure*}[!t]
 \centerline{
@@ -667,19 +686,32 @@ Even though increasing the number of transmit improves the lateral shift-invaria
 \end{figure*}
 
 \subsection{Oversampling by Parallel Receive Beamforming}
-Parallel receive beamforming (PRB) means that multiple rx-beams are constructed from one tx-beam. By reducing the number of tx-beams and relying on multiple receive beams in order to get sufficient sampling it is possible to achieve high frame rates in e.g. cardiac ultrasound imaging.  
+Parallel receive beamforming (PRB) means that multiple narrow receive beams (rx-beams) are constructed from one broad tx-beam. Then, by reducing the number of tx-beams and relying on multiple rx-beams in order to get sufficient sampling on receive, it is possible to achieve high frame rates in e.g. cardiac ultrasound imaging. However, PRB also introduce motion artifacts in the image which to some degree can be compensated for \cite{Hergum2007} \comment{cite Bastien}. In (\comment{Cite paper where they use STB + Capon if its out}) it is shown that synthetic transmit beamforming (STB) \cite{Hergum2007} works with Capon beamforming. In \cite{Asen} we also used STB in order to increase the beam density of a cardiac ultrasound recording. In this paper we will consider PRB as being equal to oversampling on transmit when it comes to image quality.
 
-In this paper we will not discuss the artifacts introduced by PRL and we will 
+In cardiac ultrasound imaging, PRB is typically used in order to keep the number of rx-beams while the number of tx-beams are reduced. When using PRB for oversampling we would like to keep the number of tx-beams while the number of rx-beams are increased. The acquisition frame rate will then not be affected. On the other hand PRB will also increase the number of covariance matrices, and thereby the number of matrix-inversions with a factor equal to the number of parallel receive lines. The processing times reported in \cite{Asen} will then also increase with a factor equal to the number of parallel receive lines. Since almost 10x oversampling is required in order to achieve lateral shift invariant imaging of a moving point scatterer, non of the implementations described in \cite{Asen} would be real time any more.
 
-In (\comment{Cite paper where they use STB + Capon if its out}) it is shown that  synthetic transmit beamforming (STB) \cite{Hergum2007} works with Capon beamforming. In  \cite{Asen} we also used STB in order to increase the beam density of a cardiac recording. STB has been shown to remove the blocky artifacts introduced by parallel receive lines (PRL) per transmit line. As long as some degree of motion compensation is applied (\comment{cite bastien's paper on motion compensation }) we can regard PRL as being equal to oversampling on transmit. It will also increase the number of covariance matrices, and thereby inversions with a factor equal to the number of parallel lines.
-%\begin{figure}[!t]
-%	\centering
-%	\includegraphics[width=\linewidth]{\img capon_L=32_K=1_d=001_2MLA_and_2x_microsteering_correct_pitch.eps}
-%	\label{fig:image_capon_bs}
-%\end{figure}
+One possible solution is to estimate the covariance matrix from multiple beams \cite{Jensen2012}, making one covariance matrix per range.  Tailoring the method of Jensen and Austeng to cardiac ultrasound imaging it makes more sense to construct one covariance matrix per tx-beam using multiple parallel rx-beams. This solution would then not increase the number of inversions needed, but the time taken to construct the matrices would increase. We will not investigate this method further in this paper.
 
 \subsection{Oversampling by Phase Rotation}
-The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportunity for oversampling using phase rotation. The steering vector $\vec{a}$ has in previous work been set to $\vec{1}$ since the ultrasound data are pre-delayed. The steering vector could be varied over a set of pre-defined steering vectors. \comment{Look at the poster for notation}
+The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportunity for oversampling using phase rotation. The steering vector $\vec{a}$ has in previous work been set to $\vec{1}$ since the ultrasound data are pre-delayed. However, the steering vector can also, as in narrow band applications, be varied over a set of pre-defined vectors. In a narrow band setting the beam can make a sweep across the whole sector by only using phase rotation. This is also possible in broadband applications as long as the phase rotation is limited to a fraction of the wave length. It is therefore possible to make a sweep between the current beam and its neighbours using only phase rotation.
+
+For a uniform linear array located along the x-axis the steering vector $\vec{a}$ should be calculated as 
+\begin{align}
+\vec{a} = 
+\begin{bmatrix}
+e^{-j\frac{2\pi}{\lambda_c}x_0\sin(\theta)} \\
+e^{-j\frac{2\pi}{\lambda_c}x_1\sin(\theta)} \\
+\vdots \\ 
+e^{-j\frac{2\pi}{\lambda_c}x_{L-1}\sin(\theta)}
+\end{bmatrix}
+\end{align}
+where $x_i$ is the element position and $\theta$ is swiped from $-\Delta/2$ too $\Delta/2$.
+
+\comment{Add phase rotation formula.}
+
+\comment{Discuss different ways of selecting angles}
+
+\comment{Phase rotation version of STB.}
 
 \begin{figure*}[!t]
 	\centerline{
@@ -709,13 +741,13 @@ Acquire channel data from a phantom containing point wire targets and cysts whil
 
 \begin{figure*}[!t]
 \centerline{
-%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\subfloat[]{\includegraphics[width=0.3\linewidth]{\img phantom1_standard_processing.png}\label{fig:phantom_das}}
 \hfill{}
-%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\subfloat[]{\includegraphics[width=0.3\linewidth]{\img LSV_capon.png}\label{fig:phantom_capon_LSV}}
 \hfill{}
-%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_undersampled2_2x.eps}\label{fig:das_shiftvariant}}
+\subfloat[]{\includegraphics[width=0.3\linewidth]{\img LSV_capon.png}\label{fig:phantom_capon_LSV_8PR}}
 }
-\caption{LSV-plots of in-vitro data. a) Image of the data. b) Normal. c) Oversampling with phase rotation}
+\caption{\comment{Not final figure. Need new data}. LSV-plots of in-vitro data. a) Image of the data. b) Normal capon. c) Capon with oversampling using 8PR.}
 \label{fig:das}
 \end{figure*}
 
@@ -724,13 +756,13 @@ Investigate if phase rotation improves contrast in in-vivo images of the heart.
 
 \begin{figure*}[!t]
 \centerline{
-%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img phantom1_capon_processing_K=0_L=24_full.png}\label{fig:in-vivo_capon}}
 \hfill{}
-%\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_normal2.eps}\label{fig:das_shiftinvariant}}
-\hfill{}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img phantom1_capon_processing_K=0_L=24_8pr_full.png}\label{fig:in-vivo_capon_8pr}}
+%\hfill{}
 %\subfloat[]{\includegraphics[width=0.3\linewidth]{\img das_undersampled2_2x.eps}\label{fig:das_shiftvariant}}
 }
-\caption{In-vivo data. a) Image of the data. b) Capon image. c) Capon image with oversampling with phase rotation}
+\caption{\comment{For the moment phantom data. Need to acquire some high quality in-vivo data.}. In-vivo data. a) Capon image. b) Capon image with oversampling using 8PR.}
 \label{fig:das}
 \end{figure*}
 
@@ -878,7 +910,7 @@ Discuss, and show with benchmarks how the different methods for making Capon bea
 \section*{Acknowledgment}
 
 
-The authors would like to thank... \cite{Synnevag2009}
+The authors would like to thank...
 
 
 % Can use something like this to put references on a page
@@ -935,24 +967,35 @@ The authors would like to thank... \cite{Synnevag2009}
 % biographies
 %\newpage
 
-\begin{IEEEbiography}{Jon Petter \AA{}sen}
-Biography text here.
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/jon_petter2.eps}}]{Jon Petter \AA{}sen}
+(S12) was born in Porsgrunn, Norway in 1986. He received the B.Sc. and M.Sc. degree in computer science from the University of Oslo, Norway, in 2008 and 2010. He is currently pursuing his Ph.D. degree in medical ultrasound technology at the Norwegian University of Science and Technology (NTNU) Medical Imaging Lab (MI-Lab), Trondheim, Norway. 
+
+He has industry experience from GE Vingmed Ultrasound, Horten, Norway, were he completed three summer internships from 2008 to 2010. His research interests include image and signal processing, adaptive ultrasound processing techniques and acceleration of ultrasound algorithms using Graphics Processing Units (GPUs). 
 \end{IEEEbiography}
 
-%\begin{IEEEbiography}{Carl-Inge Colombo Nilsen}
-%Biography text here.
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/jo_inge2.eps}}]{Jo Inge Buskenes}
+%received the B.Sc. degree in electrical engineering from Gj\o{}vik College University, Norway, in 2007, and the M.Sc. degree in instrumentation for particle physics from the University of Oslo, Norway, in 2010. He is currently pursuing the Ph.D. degree in image reconstruction and technology at the University of Oslo.
+
+%His industry experience includes the European Organization for Nuclear Research (CERN), Geneva, Switzerland (2007-2008), and the Norwegian Defence Research Establishment, Kjeller, Norway (2009). He has lectured in digital signal processing at the Gj\o{}vik College University (2009), and at the University of Oslo (2010-2012). His research interests include adaptive beamforming, digital image reconstruction, high performance computing, intelligent detector design and embedded Linux platforms.
+%\end{IEEEbiography}
+
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/carl-inge.eps}}]{Carl-Inge Colombo Nilsen}
+%(S’06–M’10) received the M.Sc. and Ph.D. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustic applications.
 %\end{IEEEbiography}
 
 % insert where needed to balance the two columns on the last page with
 % biographies
 %\newpage
 
-\begin{IEEEbiography}{Andreas Austeng}
-Biography text here.
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/andreas.eps}}]{Andreas Austeng}
+was born in Oslo, Norway, in 1970. He received the M.S. degree in physics in 1996 and the Ph.D. degree in computer science in 2001, both from the University of Oslo. Since 2001, he has been working at the Department of Informatics, University of Oslo, first as a postdoctoral research fellow and currently as an associate professor. His research interests include signal and array processing for acoustical imaging.
 \end{IEEEbiography}
 
-\begin{IEEEbiography}{Sverre Holm}
-Biography text here.
+%\newpage
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/sverre.eps}}]{Sverre Holm}
+(M’82-SM’02) was born in Oslo, Norway, in 1954. He received the M.S. and Ph.D. degrees in electrical engineering from the Norwegian Institute of Technology, Trondheim, in 1978 and 1982, respectively. His academic experience includes Yarmouk University in Jordan (1984-1986) and the Norwegian Institute of Technology and later the University of Oslo (1989-1994) as an adjunct professor. Since 1995, he has been a professor of signal processing in the Department of Informatics at the University of Oslo. In 2002, he was elected a member of the Norwegian Academy of Technological Sciences, and in 2009, he became an adjunct professor in the Norwegian University of Science and Technology (NTNU) Medical Imaging Lab, Trondheim. His industry experience includes GE Vingmed Ultrasound, Horten, Norway (1990-1994). He worked with Sonitor Technologies (2000-2005), where he developed ultrasonic technology that is the core of the indoor positioning system described in \textit{Scientific Americanin} 2008 as "a positioning system that goes where GPS can't." He has published about 130 publications internationally, plus about 10 patents. He has had sabbaticals at GE Global Research, NY (1998), and the Waves and 
+Acoustics Laboratory of ESPCI, Paris (2008-2009). He was an associate editor of the \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control} from 1997 to 2002. His research interests are medical ultrasound imaging, modeling of tissue-ultrasound interaction, and ultrasound positioning.
 \end{IEEEbiography}
 
 
