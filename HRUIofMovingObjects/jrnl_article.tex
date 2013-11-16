@@ -699,6 +699,8 @@ The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportun
 Acquire channel data from a phantom containing point wire targets and cysts while moving the probe laterally. Confirm the improved shift-invariance when using phase rotation. See if improved sampling also increase cyst contrast.
 Make plot of contrast between two areas in a simulation for different values of $L$. Make the same plot for different number of rx beams. Do the same for an in-vivo image. The rational being that contrast is also improved by denser rx-sampling not just shift-invariance. 
 
+Phase rotation will introduced block artifacts equal to the once observed when using PRB. This can be improved on by implementing a phase rotation version of STB where 8PR are converted to 4PR-STB by averaging 4 phase rotated outputs from two beams rotated to the same angle. 
+
 \begin{figure}\caption{Plot of contrast vs oversampling factor (phase rotation) in in-vivo data.}
 \end{figure}
 
@@ -740,6 +742,12 @@ When signal detection (absolute value and square root) is performed before an ul
 In this paper we have shown that this oversampling can be accomplished by phase rotation and the number of transmit beams are therefore left unchanged. 
 
 The figure below shows a lateral shift invariance plots for a well sampled delay-and-sum image (a), the same sampling with Capon processing (b), and 4x over sampling processed with Capon. The shift invariance plots the beamprofile (TODO: Make the shift invariance plot). The results show that when using the Capon beamformer we have to over sample with a factor four to remove the blinking artifact. This can be done without affecting frame rate by using the available parallel receive-lines found on most ultrasound systems. May also use phase rotation. 
+
+Other methods claiming super resolution would also need some degree of oversampling (Eigenspace, LCA etc.). 
+
+When oversampling is applied (L=M/2, K=1, d=1/100) becomes too extreme. L=M/4 with K=0 is better. 
+
+Oversampling is not only essential to keep the amplitude level of bright point scatterers it will also help to improve contrast and edge definitions. If oversampling is not applied the edge delineation of an moving object will fluctuate in the same way as a moving point scatterer. 
 
 TODO: Add citations – Hergum/Bjåstad Local shift invariance and MLA’s… Is there any publications stating that Capon do not work on moving objects?
 
