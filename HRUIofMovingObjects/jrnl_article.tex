@@ -422,9 +422,12 @@
 %
 
 \author{
-   J. P. \AA{}sen, A. Austeng and S. Holm%\IEEEmembership{Member,~IEEE,}% <-this % stops a space
+   Jon Petter \AA{}sen, \IEEEmembership{Student Member,~IEEE,}, Andreas Austeng, \IEEEmembership{Member,~IEEE,} and Sverre Holm, \IEEEmembership{Senior Member,~IEEE,}% <-this % stops a space
    
-   \thanks{...}
+\thanks{Manuscript received ...; accepted ...}
+\thanks{J. P. \AA{}sen and S. Holm is with the Medical Imaging Lab (MI-Lab) at the Norwegian University of Science and Technology, Trondheim, Norway.}
+\thanks{A. Austeng and S. Holm is with the Department of Informatics, University of Oslo, Oslo, Norway. (e-mail: jon.p.asen@ntnu.no)} 
+%J. I. Buskenes, C.-I. C. Nilsen, 
 }
 %M. Shell is with the Department
 %of Electrical and Computer Engineering, Georgia Institute of Technology, Atlanta,
@@ -486,25 +489,9 @@
 
 \begin{abstract}
 %\boldmath
-\comment{The abstract goes here.} 
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
-..............................................................................................................
+If an ultrasound imaging system provides a presentation of a moving object witch is not invariant to local spatial shifts the system is said to be local shift-variant. This can for instance happen if the axial and lateral sampling is insufficient. The Capon beamformer has been shown to provide increased lateral resolution in ultrasound images. Increased lateral resolution should demand denser lateral sampling. In previous literature on Capon beamforming for medical ultrasound imaging however only single frame scenarios have been simulated, and temporal behaviour and effects caused by the increased resolution and lack of oversampling has therefore been neglected.
+
+In this paper we investigate the local lateral shift-invariance of the Capon beamformer when imaging moving objects. We then discuss and investigate different methods in order to improve it. We show that insufficient lateral sampling makes an imaging system based on the Capon beamformer locally lateral shift-variant. We then show that the locally lateral shift-invariance can be improved by simple phase rotation without affecting the acquisition frame rate and with minor changes in processing complexity.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -552,17 +539,17 @@ Adaptive beamforming, Capon beamformer, Shift Invariance, Ultrasound Imaging.
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
 
-\IEEEPARstart{W}{ith} the introduction of a fast implementation of the Capon adaptive beamformer, a stream of images can now be processed at interactive frame rates \cite{Asen}. It is therefore an interesting question how a moving object appears after Capon beamforming has been applied. Earlier work on Capon beamforming for medical ultrasound imaging has investigated the method's capabilities in single frames only, and temporal behavior and effects has therefore been neglected. 
+\IEEEPARstart{W}{ith} the introduction of a fast implementation of the Capon adaptive beamformer, a stream of images can now be processed at interactive frame rates \cite{Asen}. It is therefore an interesting question how a moving object appears after Capon beamforming has been applied. Earlier work on Capon beamforming for medical ultrasound imaging has investigated the method's capabilities in single frames only, and temporal behaviour and effects has therefore been neglected. 
 
-An important property of an ultrasound imaging system is its local shift-invariance. Local shift-invariance means that an object’s appearance should be preserved when the object, or the ultrasound probe, is moved slightly. This invariance for local movements is what makes ultrasound imaging feasible in general, however it is specially important for quantitative techniques that correlate time-varying features, like pulsed doppler and flow imaging, and speckle tracking of tissue and blood. In this paper we analyze the shift-invariance property of the Capon beamformer by studying the beamformer output when applied on simulated and \textit{in vitro} images of moving objects. 
+An important property of an ultrasound imaging system is its local shift-invariance. Local shift-invariance means that an object’s appearance should be preserved when the object, or the ultrasound probe, is moved slightly. This invariance for local movements is what makes ultrasound imaging feasible in general, however it is specially important for quantitative techniques that correlate time-varying features, like pulsed doppler and flow imaging, and speckle tracking of tissue and blood. In this paper we analyze the shift-invariance property of the Capon beamformer by studying the beamformer output when applied on simulated and \textit{in vitro} images of moving objects. We also show some examples of how the shift-invariance and resolution is improved in \textit{in-vivo} images.
 
-Capon beamforming has been shown to provide increased lateral resolution and contrast in ultrasound images \cite{Synnevag2007, Synnevag2009, Chen2011}. The method accomplish this by adjusting the array weights based on element-to-element covariance. Hence, the method yields data dependent weights. Capon beamforming is however also known for its suboptimal performance if the sample size available for covariance estimation is limited \cite{Mestre2006}, if correlated signals are present \cite{Widrow1982}, and if the assumed steering vector does not match the signal propagation vector \cite{Wax1996, Wax1996a}. This has led to the development of several robust versions of the Capon beamformer with e.g. spatial smoothing \cite{Shan1985} or diagonal loading \cite{JianLi2003} of the covariance estimate, or by applying steering vector uncertainty sets (SVUS) \cite{Lorenz2005, Rubsamen2013}. The first two, together with temporal smoothing of the covariance estimate, have been applied in earlier work on Capon beamforming for medical ultrasound imaging \cite{Synnevag2009}. The first two trade resolution for robustness and temporal smoothing helps to preserve speckle statistics \cite{Synnevag2007a}. SVUS has not been applied, even though it is well known that the Capon beamformer exhibits severe signal-nulling if the signal is present during the covariance estimation process and if this estimate is later used with a steering vector that does not match the signal propagation vector exactly. This self-nulling actually contribute a lot to the method's super resolution capability in passive-narrowband applications. 
+Capon beamforming has been shown to provide increased lateral resolution and contrast in ultrasound images \cite{Synnevag2007, Synnevag2009, Chen2011}. The method accomplish this by adjusting the array weights based on element-to-element covariance. Hence, the method yields data dependent weights. Capon beamforming is however also known for its suboptimal performance if the sample size available for covariance estimation is limited \cite{Mestre2006}, if correlated signals are present \cite{Widrow1982}, and if the assumed steering vector does not match the signal propagation vector \cite{Wax1996, Wax1996a}. This has led to the development of several robust versions of the Capon beamformer with e.g. spatial smoothing \cite{Shan1985} or diagonal loading \cite{JianLi2003} of the covariance estimate, or by applying steering vector uncertainty sets (SVUS) \cite{Lorenz2005, Rubsamen2013}. The first two, together with temporal smoothing of the covariance estimate, have been applied in earlier work on Capon beamforming for medical ultrasound imaging \cite{Synnevag2009}. The first two trade resolution for robustness and temporal smoothing helps to preserve speckle statistics \cite{Synnevag2007a}. SVUS has not been applied, even though it is well known that the Capon beamformer exhibits severe signal-nulling if the signal is present during the covariance estimation process and if this estimate is later used with a steering vector that does not match the signal propagation vector exactly. This self-nulling is actually how the method obtains its super resolution capabilities. 
 
 In \cite{Cox1973}, Cox derives formulas for the resolution of the Capon beamformer (called the $\vec{k}_3$ processor), and presents in great detail how the amount of mismatch between the selected steering vector and the signal propagation vector impacts the beamformer output in simple situations. Cox states the following important fact about the Capon beamformer (the $\vec{k}_3$ processor): 
 \begin{quote}
 "\textit{... a $\vec{k}_3$ processor requires more closely spaced beams than a ... $\vec{k}_1$-processor in order to avoid serious signal suppression effects being introduced on signals arriving from directions between the beams}", 
 \end{quote}
-where $\vec{k}_1$ is the delay-and-sum (DAS) beamformer. In Fig.\,\ref{fig:das_capon_beams} we have plotted the steered response for DAS and the Capon beamformer using (26) and (32) in \cite{Cox1973}. A 64-element linear array with $\lambda/2$ element spacing, where $\lambda$ is the wavelength, is scanned over a sector equal to three times the system resolution. Impinging on the array is a monochromatic plane wave with a propagation vector orthogonal to the array surface with no spatially white noise present. Hence, the interference-noise matrix ($\sigma_0^2\mat{Q}$) is the identity. The effect of typical subarray averaging and diagonal loading ($L=32$ and $d=1/100$) has also been added to the Capon beamformer output. A diagonal loading of $1/100$ corresponds to an signal-to-noise ratio of 40 dB before array gain is applied. The figure shows that when the DAS beamformer is used, only a 3.92 dB scalloping loss \cite{Harris1978} should be observed if the source of the plane wave starts moving parallel to the array. However if the Capon beamformer is used with the beam density sufficient for DAS the scalloping loss could be as large as $31$ dB.
+where $\vec{k}_1$ is the delay-and-sum (DAS) beamformer. In Fig.\,\ref{fig:das_capon_beams} we have plotted the steered response for DAS and the Capon beamformer using (26) and (32) in \cite{Cox1973}. A 64-element linear array with $\lambda/2$ element spacing, where $\lambda$ is the wavelength, is scanned over a sector equal to three times the system resolution. Impinging on the array is a monochromatic plane wave with a propagation vector orthogonal to the array surface with no spatially white noise present. Hence, the interference-noise matrix ($\sigma_0^2\mat{Q}$) is the identity. The effect of typical subarray averaging and diagonal loading ($L=32$ and $d=1/100$) has also been added to the Capon beamformer output. A diagonal loading of $1/100$ corresponds to an signal-to-noise ratio of 40 dB before array gain is applied \comment{Is this correct?}. The figure shows that when the DAS beamformer is used, only a 3.92 dB scalloping loss \cite{Harris1978} should be observed if the source of the plane wave starts moving parallel to the array. However if the Capon beamformer is used with the beam density sufficient for DAS the scalloping loss could be as large as $31$ dB.
 
 \begin{figure}[!t]
 \centerline{
@@ -572,7 +559,11 @@ where $\vec{k}_1$ is the delay-and-sum (DAS) beamformer. In Fig.\,\ref{fig:das_c
 \label{fig:das_capon_beams}
 \end{figure}
 
-In previous literature on Capon beamforming for medical ultrasound imaging (single frames) this effect has been passed over in silence by either oversampling on transmit, or carefully position point scatterers on transmit-receive beam pairs, or by ignorance. In our first work where Capon beamforming was applied on multiple frames containing moving objects \cite{Asen} we commented on the effect, but no solution was presented other than oversampling on transmit in simulations. In this paper we investigate the issue further, and we show that when a moving point scatterer is imaged with ultrasound and the Capon beamformer with the same beam spacing sufficient for DAS a large scalloping loss is observed, manifested as oscillating point scatteres. The question is then, what can we do in order to improve on the situation without affecting the imaging frame rate. In this paper we therefore study the scalloping loss of the Capon beamforming and investigate different methods for oversampling and how they affect the imaging frame rate and the processing complexity. Before that we give an introduction to Capon beamforming for medical ultrasound imaging.  
+In previous literature on Capon beamforming for medical ultrasound imaging (with single frame simulations) this effect has been passed over in silence by either oversampling on transmit, or by carefully position point scatterers exactly on transmit-receive beam pairs, or by ignorance. In our first work where Capon beamforming was applied on a loop of images containing moving objects \cite{Asen2012, Asen} we commented on the effect, but no solution was presented other than oversampling on transmit when simulating. 
+
+In this paper we investigate the issue further, and we show that when a moving point scatterer is imaged with the Capon beamformer with the same beam spacing sufficient for DAS the predicted scalloping loss is observed, manifested as oscillating point scatteres. The question is then, what can we do in order to improve on the situation without affecting the imaging frame rate. In this paper we therefore study the scalloping loss of the Capon beamforming and investigate different methods aiming at reducing this effect, and how the different methods will affect the imaging frame rate and the processing complexity. 
+
+In the next section we give an introduction to Capon beamforming for medical ultrasound imaging together with a short introduction to lateral sampling and shift invariance. In Section \ref{sec:capon_LLSI} the local lateral shift-invariance of the Capon beamformer is investigated, before the different methods are presented in Section \ref{sec:methods}.
 
 %\comment{Next sections summary.}
 
@@ -642,7 +633,7 @@ In Fig.\,\ref{fig:das_shiftvariant} the beam spacing is reduced by a factor of t
 \label{fig:das}
 \end{figure*}
 
-\section{Local Lateral Shift-Invariance of the Capon Beamformer}
+\section{Local Lateral Shift-Invariance of the Capon Beamformer}\label{sec:capon_LLSI}
 We will now investigate the local lateral shift-invariance of the Capon beamformer with parameters equal to the once used in earlier work \cite{Synnevag2009, Asen}. In Fig.\,\ref{fig:capon1}. the same point scatterer response as presented in Fig.\,\ref{fig:das_shiftinvariant} has been weighted with Capon weights calculated using (\ref{eq:capon_weights}) with $L = M/2 = 32$, $K=1$ and $d=1/100$. The set of lateral displacements is constructed in such a way that the center beam is the only one hitting the point scatterer exactly. We see that the scalloping loss is tremendous, and not far from the value predicted by Fig\,\ref{fig:das_capon_beams}. The difference between the predicted and the simulated loss is due to several factors. The most important one being that Fig.\,\ref{fig:das_capon_beams} shows a single frequency whereas the RMS used in Fig.\,\ref{fig:capon1} average a broadband signal in range. For a slice through the center of the pulse the scalloping loss is below -30dB.
 
 The diagonal factor $d$ and the effective adaptive aperture size $L$ can be used to control the mainlobe width of the Capon beamformer. In both extreme cases, $d=\infty$ and $L=1$, the Capon beamformer becomes the DAS beamformer, and will require a beamspacing according to (\ref{eq:resolution}). In Fig.\,\ref{fig:capon2} we show how the scalloping loss is reduced when the amount of diagonal loading is increased. We observe that Fig.\,\ref{fig:capon2} contains the same pattern as present in Fig.\,\ref{fig:das_shiftvariant}. From Fig.\,\ref{fig:capon} it should be obvious that the Capon beamformer either require increased lateral sampling in order to make the imaging system locally lateral shift-invariant, or the resolution has to be reduced to the same level as DAS. It would be unwise to do all the computation involved with Capon beamforming with a high $d$ value and end up with a resolution equal to DAS. However, we see that the diagonal factor can be a useful tool if resolution has to be traded for the need of oversampling. The same is true for the subarray length parameter.
@@ -661,7 +652,7 @@ The diagonal factor $d$ and the effective adaptive aperture size $L$ can be used
 \label{fig:capon}
 \end{figure*}
 
-\section{Methods}
+\section{Methods}\label{sec:methods}
 We will now discuss different ways to improve on the lateral shift-invariance when using the Capon beamformer. From the previous section it should now be clear that we somehow need to increase the lateral sampling to make the Capon imaging system lateral shift invariant. In this section we will investigate how this oversampling should be conducted, how large it needs to be and how the proposed methods will affect the system frame rate and the processing complexity.
 
 \subsection{Oversampling on Transmit}
