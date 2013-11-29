@@ -612,15 +612,17 @@ The lateral sampling required in an ultrasound image is given by the combined ap
 \end{align}
 If this requirement is not fulfilled the scalloping loss could become visible in the image and the system will no longer be locally lateral shift-invariant. In an ultrasound image with 256 gray levels and 50 dB dynamic range, a 1 dB loss corresponds to 5 gray levels. This is approximately equal to the visibility threshold (Weber fraction of 2\%) for a grayscale image, and a loss larger than 1 dB could therefore end up being visible to the observer. In our analysis a system would, based on this reasoning, be regarded as locally lateral shift-invariant if the loss in between beams is smaller than 1 dB. However, depending on viewing light conditions and e.g. the selected gray level mapping, a larger loss might be acceptable.
 
-In order to visualize the local lateral shift-invariance of a given imaging system, we will make use of lateral shift-variance plots (LSV-plots), introduced by Hergum \textit{et al.} \cite{Hergum2007}. A LSV-plot is constructed for a given imaging system by imaging a laterally moving point scatterer. For each lateral position of the point scatterer the root-mean-square (RMS) of the image data is calculated in range, and the resulting beam profiles are stacked to produce an image. The LSV-plots in this paper are displayed as a contour plot with contours on -1, -2, -3, -6, -12 and -24 dB. The maximum for each beam profile is also marked with a black dot. The system is said to be locally lateral shift-invariant if the contours are diagonal, hence the diagonals have a loss less than 1 dB.
+In order to visualize the local lateral shift-invariance of a given imaging system, we will make use of lateral shift-variance plots (LSV-plots), introduced by Hergum \textit{et al.} \cite{Hergum2007}. A LSV-plot is constructed for a given imaging system by imaging a point scatterer moving laterally at constant speed. For each lateral position of the point scatterer the root-mean-square (RMS) of the image data is calculated in range, and the resulting beam profiles are stacked in to an image. For a given scan sequence there are twice as many point positions than there are receive lines. The LSV-plots in this paper are displayed as a contour plot with contours on -1, -2, -3, -6, -12 and -24 dB. The maximum for each beam profile is also marked with a black dot, and the amplitude variation among these points is presented in a subplot next to the LSV-plot. 
 
-To further quantify the shift-invariance we have calculated the mean absolute error (MAE) of the maximum point in each beam profile versus a straight line ($f(x)=x$). We name this measure P-MAE. The MAE of the amplitudes for the same set of maximum points versus the maximum in the whole plot is also measured. We call this measure A-MAE. The first measure quantifies the amount of geometric distortion, and the latter quantifies the peak gain variation or in our case the scalloping loss. The maximum amplitude deviation along the maximum-point trace, or the maximum scalloping loss, is also calculated and reported. We present all these numbers together with the LSV-plots.
+To further quantify the shift-invariance we have calculated the mean absolute error (MAE) of the maximum point position in each beam profile versus a straight line ($f(x)=x$). We will refer to this measure as P-MAE. The MAE of the maximum point's amplitude versus the data maximum is also measured. We refer to this measure as A-MAE. The first measure quantifies the amount of geometric distortion \cite{Hergum2007}, and the latter quantifies the peak gain variation or in our case the scalloping loss. The maximum amplitude deviation, or the maximum scalloping loss, along this point trace is also calculated. We present all these numbers together with the LSV-plots.
 
-Figure \ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using DAS beamforming with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of transmit-receive beam pairs. The point scatterer response has been simulated using Field II \cite{Jensen1992, Jensen1996a} with a probe setup mimicking the M5S probe by GE Vingmed Ultrasound, Horten, Norway. The probe was excited with a 2.5 MHz and 1.5 cycles long pulse. We see that the contours are approximately diagonal and therefore we conclude that the system is locally lateral shift-invariant. The P-MAE and A-MAE are also minimal. 
+An imaging system is said to be locally lateral shift-invariant if the contours are diagonal and if the amplitude deviation among the maximum points is less than 1 dB. Then there is minimal geometric distortion (low P-MAE) and the scalloping loss will not be visible for the observer (low A-MAE). %Since both effects can occur at the same time it is important to have a measure not effected by geometric distortion.
 
-The scalloping loss (max A-MAE) in Fig.\,\ref{fig:das_shiftinvariant} is smaller than what was predicted by Fig.\,\ref{fig:das_capon_beams}. To understand why note that Fig.\,\ref{fig:das_capon_beams} shows the one-way response of a passive array, and the system resolution has therefore been calculated based on the receive aperture only. Whereas the beamspacing in (\ref{eq:resolution}) is derived from the fact that the two-way lateral response of an active rectangular aperture is a $D_{tx}+D_{rx}$ wide triangle in K-space \cite{Hergum2009}. Even though the lateral bandwidth is increased on receive, the distance to the first zero (The Rayleigh criteria) remains the same when multiplying two sinc functions. Sampling according to (\ref{eq:resolution}) is therefore more than what is strictly needed in practise. The loss in Fig.\,\ref{fig:das_shiftinvariant} is because of this smaller than what was predicted.
+Figure \ref{fig:das_shiftinvariant} presents a LSV-plot for an imaging system using the DAS beamformer with a beam spacing equal to (\ref{eq:resolution}). The red dotted vertical lines indicates the position of transmit-receive beam pairs. The point scatterer response has been simulated using Field II \cite{Jensen1992, Jensen1996a} with a probe setup equal to the M5S probe by GE Vingmed Ultrasound, Horten, Norway. The probe was excited with a 2.5 MHz and 1.5 cycles long pulse, and the lateral sampling density has been doubled prior to detection through coherent interpolation. We see that the contours are approximately diagonal and therefore we conclude that the system is locally lateral shift-invariant. The P-MAE and A-MAE are also minimal. In this, and all the following LSV-plots based on simulations, the scan sequence always has a beam at zero degrees and the point scatterer is located exactly on this beam at one time instance.
 
-In Fig.\,\ref{fig:das_shiftvariant} the beam density is reduced by a factor of two. We see how the scalloping loss is increased to a level where the contours no longer are diagonal. Hence, the imaging system is no longer locally lateral shift-invariant. We observe that the maximum peak is greatly reduced when the point is located between two beams and the distance between the beams are too high.
+The scalloping loss in Fig.\,\ref{fig:das_shiftinvariant} is smaller than what was predicted by Fig.\,\ref{fig:das_capon_beams}. To understand why note that Fig.\,\ref{fig:das_capon_beams} shows the one-way response of a passive array, and the system resolution has therefore been calculated based on the receive aperture only. Whereas the beamspacing in (\ref{eq:resolution}) is derived from the fact that the two-way lateral response of an active rectangular aperture is a $D_{tx}+D_{rx}$ wide triangle in K-space \cite{Hergum2009}. Even though the lateral bandwidth is increased on receive, the distance to the first zero (The Rayleigh criteria) remains the same when multiplying two sinc functions. Sampling according to (\ref{eq:resolution}) is therefore more than what is strictly needed in practise. The loss in Fig.\,\ref{fig:das_shiftinvariant} is because of this smaller than what was predicted.
+
+In Fig.\,\ref{fig:das_shiftvariant} the beam density is reduced by a factor of two. We see how the scalloping loss is increased to a level where the contours no longer are diagonal. Hence, the imaging system is no longer locally lateral shift-invariant. We observe that the maximum peak is reduced when the point is located between two beams and the distance between the beams are too high. The loss in Fig.\,\ref{fig:das_shiftvariant} is smaller than the predicted loss in Fig\,\ref{fig:das_capon_beams} since there are only two samples per beam along the y-axis. Cubic interpolation of this result reveals a scalloping loss of 2.71 dB.
 
 \begin{figure*}[!t]
 \centerline{
@@ -628,7 +630,7 @@ In Fig.\,\ref{fig:das_shiftvariant} the beam density is reduced by a factor of t
 \hfill{}
 \subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig2b.eps}\label{fig:das_shiftvariant}}
 }
-\caption{LSV-plots of delay-and-sum beamforming. If the contours are diagonal the imaging system is said to be locally lateral shift-invariant. Red vertical lines are plotted where transmit-receive beam pairs are located. a) Sampling corresponding to (\ref{eq:resolution}). The system is locally lateral shift-invariant. b) Undersampling with a factor of two. The system is no longer locally lateral shift-invariant.}
+\caption{LSV-plots of delay-and-sum beamforming. If the contours are diagonal and the amplitude variation among the peak points is small, the imaging system is said to be locally lateral shift-invariant. Red vertical lines are plotted where transmit-receive beam pairs are located. a) Sampling corresponding to (\ref{eq:resolution}). The system is locally lateral shift-invariant. b) Undersampling with a factor of two. The system is no longer locally lateral shift-invariant.}
 \label{fig:das}
 \end{figure*}
 
@@ -665,10 +667,10 @@ Even though increasing the number of transmits improves the lateral shift-invari
 \begin{figure*}[!t]
 \centerline{
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x_oversampling_2_zoomed.eps}\label{fig:capon_oversampling_a}
+\includegraphics[width=0.5\linewidth]{\img fig4a.eps}\label{fig:capon_oversampling_a}
 }
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_10x_oversampling_2_zoomed.eps}\label{fig:capon_oversampling_b}
+\includegraphics[width=0.5\linewidth]{\img fig4b.eps}\label{fig:capon_oversampling_b}
 }
 }
 \caption{Capon beamforming as described in Fig\,\ref{fig:capon} with oversampling on transmit. The figure is zoomed compared with Fig\,\ref{fig:capon} to better see the beam-to-beam variation. a) 4x oversampling. b) 10x oversampling.}
@@ -700,10 +702,10 @@ The steering angles can be spread out in many different ways. If the number of s
 \begin{figure*}[!t]
 	\centerline{
 		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_4x_oversampling_2_PR_zoomed.eps}
+			\includegraphics[width=0.5\linewidth]{\img fig5a.eps}
 		}
 		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img capon_L=32_K=1_d=001_10x_oversampling_2_zoomed_PR.eps}
+			\includegraphics[width=0.5\linewidth]{\img fig5b.eps}
 		}
 	}
 	\caption{Capon beamforming as described in Fig\,\ref{fig:capon} with oversampling based on phase rotation. The figure is zoomed compared with Fig\,\ref{fig:capon} to better see the beam-to-beam variation. a) 4x oversampling. b) 10x oversampling.}
@@ -728,9 +730,9 @@ In Fig\,\ref{fig:image_das} one point scatterer has been selected (red box), and
 \centerline{
 \begin{tabular}{cc}
 \subfloat[]{\includegraphics[width=0.45\linewidth]{\img LSV_image.eps}\label{fig:image_das}}
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img LSV_das.eps}\label{fig:phantom_das}}\\
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img LSV_capon.eps}\label{fig:phantom_capon_LSV}}
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img LSV_capon_10pr.eps}\label{fig:phantom_capon_LSV_10PR}}
+\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7b.eps}\label{fig:phantom_das}}\\
+\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7c.eps}\label{fig:phantom_capon_LSV}}
+\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7d.eps}\label{fig:phantom_capon_LSV_10PR}}
 \end{tabular}
 }
 \caption{LSV-plots generated from \textit{in-vitro} phantom data. The probe was manually dragged across the phantom. See the supplementary material for videos of the whole loop \comment{Add ref to videos.} a) First frame in the recorded loop. A red box indicates the point scatterer used to construct the LSV-plots.  b) Delay-and-sum beamforming. The amplitude variation of the point scatterer is minimal. c) Capon beamforming without oversampling. In the frame where the point scatterer is at -6 degrees the receive beam direction is very close to the signal propagation vector. Hence, we get a high amplitude value. In all the other frames the signal loss is massive. d) Capon with 10 times oversampling using phase rotation. The amplitude of the point scatterer is better preserved in all frames. Note the the oscillation along the diagonal does not indicate shift-variance. It is a result of having to low frame rate and moving the probe to fast.}
