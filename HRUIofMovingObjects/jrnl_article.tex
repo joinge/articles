@@ -741,10 +741,10 @@ Figure \ref{fig:phantom_capon_LSV_10PR} presents the result of applying ten time
 \begin{figure*}[!t]
 \centerline{
 \begin{tabular}{cc}
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img LSV_image.eps}\label{fig:image_das}}
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7b.eps}\label{fig:phantom_das}}\\
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7c.eps}\label{fig:phantom_capon_LSV}}
-\subfloat[]{\includegraphics[width=0.45\linewidth]{\img fig7d.eps}\label{fig:phantom_capon_LSV_10PR}}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img LSV_image.eps}\label{fig:image_das}}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig7b.eps}\label{fig:phantom_das}}\\
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig7c.eps}\label{fig:phantom_capon_LSV}}
+\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig7d.eps}\label{fig:phantom_capon_LSV_10PR}}
 \end{tabular}
 }
 \caption{LSV-plots generated from \textit{in-vitro} phantom data where the probe has been manually dragged across the phantom. See the supplementary material for videos of the whole loop \multimedia{Videos}. Capon beamforming has been performed with the same settings as in Fig.\,\ref{fig:capon1}. a) First frame in the recorded loop. A red box indicates the point scatterer used to construct the LSV-plots.  b) Delay-and-sum beamforming. c) Capon beamforming without oversampling. d) Capon with ten times oversampling using phase rotation.}
@@ -767,39 +767,32 @@ Figure \ref{fig:phantom_capon_LSV_10PR} presents the result of applying ten time
 %\end{figure*}
 
 \section{Discussion}\label{sec:dis}
-In this paper we have investigated the lateral shift-invariance property of the Capon beamformer when imaging moving objects. In Section \ref{} it was shown that a Capon beamformer with standard settings is not locally laterally shift-invariant when subjected to motion. In Section \ref{} and \ref{} we presented restored 
+\comment{work in progress}
+In this paper we have investigated the lateral shift-invariance property of the Capon beamformer when imaging moving objects. In Section \ref{sec:capon_LLSI} it was shown that a Capon beamformer with high resolution parameters is not locally laterally shift-invariant when subjected to motion. In Section \ref{sec:methods} we therefore presented methods for improved shift-invariance. The most promising oversampling method, with respect to improved shift-invariance, reduction in acquisition frame rate and processing complexity, was based on phase rotation. In Section \ref{sec:res} we presented results showing that this method also works on \textit{in-vitro} data.
 
-%Discuss results presented in Section \ref{sec:res}.
+The phase rotation method in this paper is similar to a SVUS. However, where SVUSs typically has a criteria for selecting the best output after applying all the steering vectors contained in the set, oversampling with phase rotation outputs all. \comment{When all vectors are calculated I do not see the point of selecting only one}.
+
+Oversampling by phase rotation introduce similar block artifacts as PRB, but on a smaller scale. These artifacts could be removed in the same way as for PRB if we distributes our steering angles as beams are spread out for the STB technique. We then get a phase rotation version of STB where e.g. eight phase rotated beams are averaged into four. The geometric distortion, or stripes, see in the video \multimedia{Capon + 10PR} should be removed by this technique.
+
+This demand for oversampling does not only affect the Capon beamformer, other methods claiming super resolution, like the Eigenspace method, LCA beamformer and etc. \comment{add citations}, would also need oversampling. 
+
+When oversampling is applied it becomes evident that the high resolution settings $L=M/2$, $K=1$ and $d=1/100$ becomes too extreme. Traditionally the point spread function is always wider laterally than in range. With the Capon beamformer this is now changed. A more symmetric point spread function is obtained with the parameters $L=M/4$ and $K=0$. Another option is to perform pulse inversion if a spiky point spread function is desirable.
+
+Oversampling is not only essential to keep the amplitude level of bright point scatterers it will also helps to improve contrast and edge definitions. If oversampling is not applied the edge delineation of an moving object will fluctuate in the same way as a moving point scatterer.
+
+%Empirical testing is required to find how large the oversampling needs to be. Typically it depends on how bright the point scatterer or edge are with respect to the background. Cox \cite{Cox1973} derives formula for how large the oversampling has to be for a given signal-to-noise scenario. It is therefore possible to measure the highest bright-point-to-speckle value and derive the level of oversampling from this value.
+
+
 
 %When signal detection (absolute value and square root) is performed before an ultrasound image is displayed the lateral bandwidth is increased. In order to not introduce aliasing in the image, IQ-interpolation is typically used on ultrasound systems to double the lateral beam density before detection. For the same reason we need to increase the lateral sampling when Capon beamforming is applied, but now on a channel data level. The Capon beamformer improves the lateral resolution, hence the lateral bandwidth is increased, and higher lateral sampling is required. 
 
-In this paper we have shown that this oversampling can be accomplished by phase rotation and the number of transmit beams are therefore left unchanged. 
-
-%The figure below shows a lateral shift invariance plots for a well sampled delay-and-sum image (a), the same sampling with Capon processing (b), and 4x over sampling processed with Capon. The shift invariance plots the beamprofile (TODO: Make the shift invariance plot). The results show that when using the Capon beamformer we have to over sample with a factor four to remove the blinking artifact. This can be done without affecting frame rate by using the available parallel receive-lines found on most ultrasound systems. May also use phase rotation. 
-
-%Other methods claiming super resolution would also need oversampling (Eigenspace, LCA etc.) to some extent. 
-
-When oversampling is applied (L=M/2, K=1, d=1/100) becomes too extreme. L=M/4 with K=0 is better. 
-
-Oversampling is not only essential to keep the amplitude level of bright point scatterers it will also helps to improve contrast and edge definitions. If oversampling is not applied the edge delineation of an moving object will fluctuate in the same way as a moving point scatterer. 
-
-%One way of reducing the number of matrix inversions in PRB is to estimate the covariance matrix from multiple beams \cite{Jensen2012}, generating one covariance matrix per range.  Tailoring the method of Jensen and Austeng to cardiac ultrasound imaging it makes more sense, due to motion, to construct one covariance matrix per tx-beam using multiple parallel rx-beams. With this solution the number of matrix inversions will not changes, but the time taken to construct the matrices will increase. We will not investigate this method further in this paper. \comment{Kanskje litt dumt å nevne det da...?} \comment{move to discussion}
-
-%The phase rotation method in this paper is similar to a SVUS, but where SVUS typically has a criteria for selecting the best output after applying all the steering vectors we output all of them.
-
-%Oversampling by phase rotation introduce similar block artifacts as PRB, but on a smaller scale. These artifacts could be removed if we distributes our steering angles as beams are spread out for the STB technique. We then get a phase rotation version of STB where e.g. eight phase rotated beams are averaged into four. \comment{Move to discussion?}
-
-%Phase rotation will introduced block artifacts equal to the once observed when using PRB. This can be improved on by implementing a phase rotation version of STB where 8PR are converted to 4PR-STB by averaging 4 phase rotated outputs from two beams rotated to the same angle. 
-
-%The geometric distortion remaining in Fig. 7d should be possible to fix by a phase rotation version of STB.
-
-%Empirical testing is required to find how large the oversampling needs to be. Typically it depends on how bright the point scatterer or edge are with respect to the background. Cox \cite{Cox1973} derives formula for how large the oversampling has to be for a given signal-to-noise scenario. It is therefore possible to measure the highest bright-point-to-speckle value and derive the level of oversampling from this value.
+%One way of reducing the number of matrix inversions in PRB is to estimate the covariance matrix from multiple beams \cite{Jensen2012}, generating one covariance matrix per range.  Tailoring the method of Jensen and Austeng to cardiac ultrasound imaging it makes more sense, due to motion, to construct one covariance matrix per tx-beam using multiple parallel rx-beams. With this solution the number of matrix inversions will not changes, but the time taken to construct the matrices will increase. We will not investigate this method further in this paper.
 
 %\subsection{Impact on Real Time Performance}
 %Discuss, and show with benchmarks how the different methods for making Capon beamforming shift-invariant impact the total execution time.
 
 \section{Conclusion}\label{sec:con}
-In this paper we have investigated the lateral shift-invariance properties of the Capon beamformer when imaging moving objects. It was shown that Capon beamforming with the same beam density as required for delay-and-sum beforming results in blinking point scatterers when subjected to motion.  We then discussed and investigated different methods in order to reduced this effect. It was then shown that the local lateral shift-invariance could be improved by oversampling based on phase rotation without affecting the acquisition frame rate and with minor changes in processing complexity.
+In this paper we have investigated the lateral shift-invariance properties of the Capon beamformer when imaging moving objects. It was shown that Capon beamforming with the same beam density as required for delay-and-sum beforming results in blinking point scatterers when subjected to motion.  We then discussed and investigated different methods in order to reduced this effect. Finally we proved that the local lateral shift-invariance could be improved by oversampling based on phase rotation without affecting the acquisition frame rate and with minor changes in processing complexity.
 
 
 % An example of a floating figure using the graphicx package.
