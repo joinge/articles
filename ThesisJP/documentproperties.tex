@@ -1,0 +1,157 @@
+% Document properties
+\usepackage[twoside,paperwidth=176mm,paperheight=250mm,left=2.5cm,right=2cm,top=3cm,bottom=3.0cm]{geometry} % Margins as described by Tapir
+\usepackage[comma,sort&compress,square]{natbib}
+\usepackage{bibunits}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage[breaklinks=true,bookmarks=true,citecolor=blue,bookmarksopen=false,bookmarksnumbered=false,bookmarkstype=toc,colorlinks=true,linkcolor=blue,linktocpage]{hyperref}
+\hypersetup{ pdfauthor = {Jon Petter \AA{}sen},
+             pdftitle = {},
+             pdfsubject = {},
+             pdfkeywords = {Real-Time Capon Beamforming, Minimum Variance Beamforming, Graphics Processing Unit, GPGPU, Adaptive Visualization, }}
+
+%\usepackage{cite}      % Written by Donald Arseneau
+\usepackage[latin1]{inputenc} %To get the norwegian ��� printed correct.
+\usepackage{graphicx}  % Written by David Carlisle and Sebastian Rahtz
+\usepackage[tight,normalsize]{subfigure} % Written by Steven Douglas Cochran
+\usepackage{url}       % Written by Donald Arseneau
+\usepackage{bm} % bold math
+\usepackage{tabularx}
+\usepackage{placeins} % Keep figures within sections
+
+% Settings
+% Matrix and vector notation
+\newcommand{\matdef}{\mathbf} % Defined finite matrix
+\newcommand{\matndef}{\mathbf} % Undefined matrix
+\newcommand{\vectdef}{\mathbf} % Defined finite vector
+\newcommand{\vectndef}{\bm} % Undefined vector
+\newcommand{\change}{\textrm}
+\newcommand{\changeSecRev}{\textrm}
+
+% Define department command
+\newcommand{\department}[1]{\def\thedepartment{#1}}
+\department{(department ikke spesifisert)}
+
+\renewcommand{\contentsname}{Table of Contents}  % Original name = Contents
+\renewcommand{\bibname}{References}  % Original name = Bibliography
+\newcommand{\runningtitle}[1]{\chaptermark{#1}}
+\newcommand{\runningtitleTwo}[1]{\sectionmark{#1}}
+\newcommand{\initial}{\relax}
+\newcommand{\authors}[2]{\vspace*{-1cm}{\large #1}\\#2\par\vspace{\baselineskip}}
+\newcommand{\authorsSmall}[2]{\vspace*{-0.15cm}{\small #1}\\ {\small #2}\par\vspace{\baselineskip}}
+
+\hyphenpenalty=8000 \tolerance=2000
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+% Headers and footers
+\pagestyle{fancy} \fancyhf{} \fancyhead[LO]{\nouppercase{\leftmark}}
+\fancyhead[RE]{\nouppercase{\rightmark}}
+\cfoot{\rm\thepage} % page number
+
+% Renew maketitle for custom title page
+\makeatletter
+\renewcommand{\maketitle}{%
+\thispagestyle{empty}
+\begin{minipage}{14cm}
+\raggedright
+{\ }\\
+{\LARGE\@author}
+{\ }\\{\ }\\{\ }\\
+{\huge\@title}\\
+\vspace*{0.3\textheight}
+{\ }\\
+%{\ }\\
+{\large Thesis for the degree of Philosophiae Doctor}
+{\ }\\{\ }\\
+\large Trondheim, 1. March 2014\\
+{\ }\\
+{\large Norwegian University of Science and Technology\\
+Faculty of Medicine\\
+\thedepartment\\\vspace{1.9cm}
+\includegraphics[width=6cm]{./images/NTNULogoEng.pdf}
+}
+\end{minipage}
+
+\let\maketitle\relax
+} \makeatother
+
+% Define abstract enviroment
+\newenvironment{abstract}{\begin{minipage}[c]{0.9\columnwidth}\initial}{\end{minipage}}
+
+% Define preface enviroment
+\makeatletter
+\newenvironment{preface}{\chapter*{Preface}%
+\thispagestyle{empty}
+\begin{minipage}{0.9\textwidth}
+This thesis is submitted in partial fulfilment of the requirements
+for the degree of PhD at the Norwegian University of Science and
+Technology (NTNU). The research was funded by blabla., and was carried out at the \thedepartment, NTNU.
+The main supervisor has been Professor Hans Torp at \thedepartment,
+NTNU.}
+{\\\ \\\ \\Trondheim,\ \ \@date \\\\\\\@author%
+\end{minipage}
+} \makeatother
+
+% CUSTOM CHAPTER, TAKEN FROM BOOK.CLS
+\makeatletter
+\newcommand\CustChapter{\if@openright\cleardoublepage\else\clearpage\fi
+                    \thispagestyle{plain}%
+                    \global\@topnum\z@
+                    \@afterindentfalse
+                    \secdef\@CustChapter\@sCustChapter}
+\def\@CustChapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                       \if@mainmatter
+                         \refstepcounter{chapter}%
+                         \typeout{\@chapapp\space\thechapter.}%
+                         \addcontentsline{toc}{chapter}%
+                                   {\protect\numberline{\thechapter}#1}%
+                       \else
+                         \addcontentsline{toc}{chapter}{#1}%
+                       \fi
+                    \else
+                      \addcontentsline{toc}{chapter}{#1}%
+                    \fi
+                    \chaptermark{#1}%
+                    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                    \if@twocolumn
+                      \@topnewpage[\@makeCustChapterhead{#2}]%
+                    \else
+                      \@makeCustChapterhead{#2}%
+                      \@afterheading
+                    \fi}
+\def\@makeCustChapterhead#1{%
+  \vspace*{37\p@}% CHANGED FROM 50 TO 37! TO GET ROOM FOR OPT.VEL.EST.CHAPTER
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter
+        \huge\bfseries \@chapapp\space \thechapter
+        \par\nobreak
+        \vskip 20\p@
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\def\@sCustChapter#1{\if@twocolumn
+                   \@topnewpage[\@makesCustChapterhead{#1}]%
+                 \else
+                   \@makesCustChapterhead{#1}%
+                   \@afterheading
+                 \fi}
+\def\@makesCustChapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \Huge \bfseries  #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+% END CUSTOM CHAPTER
+
+\bibliographystyle{IEEEtran}

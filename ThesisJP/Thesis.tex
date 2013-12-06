@@ -1,0 +1,220 @@
+%\documentclass[11pt,a4paper]{book}
+\documentclass[10pt,b5paper,twoside]{book}
+
+% Line spacing
+%\linespread{1.0}
+
+% Include document setup script
+\include{documentproperties}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE PAGE
+\author{Jon Petter \AA{}sen}
+\title{%Integrated Ultrasound Visualization and Formation
+%Real-Time Adaptive Beamforming, Visualization, and Simulation 
+Real-Time Adaptive Ultrasound Algorithms
+\vspace{0.5cm}}
+\department{Department of Circulation and Medical Imaging}
+
+\begin{document}
+\date{\today}
+\pagestyle{empty} \maketitle
+
+%Norw.  sammendrag
+% Norsk sammendrag
+%\Chapter*{}
+\newpage%
+~\\
+\vspace{10.0cm}
+~\\
+{\bf NTNU}
+\\
+Norwegian University of Science and Technology\\
+\\
+Thesis for the degree of Philosophiae Doctor\\
+\\
+Faculty of Medicine\\
+Department of Circulation and Medical Imaging\\
+\\
+\copyright\,Jon Petter \AA{}sen\\
+\\
+ISBN XXX-XX-XXX-XXXX-X (printed version)\\
+ISBN XXX-XX-XXX-XXXX-X (electronic version)\\
+ISSN XX-XX\\
+\\
+Doctoral theses at NTNU, 20014:XX\\
+\\
+Printed by NTNU-trykk
+
+~\\
+\newpage
+\thispagestyle{empty}%
+~\\%
+~\\%
+~\\
+\noindent\large 
+Sammendrag p\aa{} norsk.
+%\vspace{0.2cm}\\%
+\\\\%
+\normalsize
+...
+
+\vspace{0.3cm}
+\noindent Jon Petter \AA{}sen\\
+Institutt for sirkulasjon og bildediagnostikk, NTNU\\
+Hovedveileder: Sverre Holm\\ 
+Biveiledere: Stein-Inge Rabben, Erik Steen and Hans Torp\\
+Finansieringskilde: MI-Lab
+
+\vspace{0.2cm}
+\noindent \emph{Ovennevnte avhandling er funnet verdig til \aa{} forsvares offentlig for graden Philosophiae Doctor (PhD) i medisinsk teknologi. Disputas finner sted ... .}
+
+
+
+% ENGLISH ABSTRACT / SUMMARY
+\chapter*{Abstract}
+\thispagestyle{empty}%
+...
+
+
+%\setcounter{page}{3} %I don't want the norwegian summary to be counted in. (This will change page numbering since the delivered version)
+
+
+% PREFACE AND ACKNOWLEDGEMENTS
+\CustChapter*{Preface}%
+\thispagestyle{empty}%
+The present thesis is submitted in partial fulfillment of the requirements for the degree of \textit{Philosophiae Doctor} (Ph.D.) at the Faculty of Medicine at the Norwegian University of Science and Technology (NTNU). The research was funded by \textit{Medical Imaging Laboratory} (MI-Lab), and was carried out at the Department of Circulation and Medical Imaging. The main supervisor has been Professor Sverre Holm  in the Department of Informatics, University of Oslo, and Professor II at MI-Lab. Co-supervisors have been PhD Stein Inge Rabben, PhD Erik Steen and Professor Hans Torp.
+
+
+\subsubsection{Acknowledgments}
+...
+%Several people have been involved in the work presented in this thesis and deserve my gratitude. First of all I would like to thank my supervisor, Professor Hans Torp. His support and guidance throughout this work has been invaluable. He has been available for assistance 24 hours a day, 365 days a year during my time here. Through his profound knowledge of ultrasound, he has always been able to find solutions or good approaches to solve my problems (preferably via a quick K-space analysis of it).
+
+%I would also like to thank my colleagues and co-authors Torbj�rn Hergum and Svein Arne Aase. Torbj�rn had a head start on the STB technique in the autumn of 2003. I joined in during the spring of 2004 as the co-author on the first article on STB. Discussions then and later have been of great importance for my work. Svein Arne has been my roommate during the last few years and co-author on my second and third paper. His efficiency and companionship has been very valuable both for my academic work and for enjoyable days at the office. I further would like to thank all my other colleagues and fellow PhD students in the department. Your social companionship and our technical discussions have made the days at the department fun and inspiring.
+
+%I would also like to express my gratitude to the people at GE Vingmed for their help and support with hardware and software. A special thanks goes to my co-supervisor, Kjell Kristoffersen. His broad technical knowledge has been of great help to my work. The Trondheim ultrasound group works in close collaboration with clinicians; through this collaboration I have been given help on clinical issues and have acquired professionally scanned ultrasound images. This has been greatly appreciated.
+
+%Finally I would like to thank my dear wife, Karianne, for her encouragement, understanding and love throughout these years.
+
+
+\newpage\thispagestyle{empty}
+\pagestyle{fancy}
+%
+\tableofcontents
+
+%%%% CHAPTER 1 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{Introduction} 
+\runningtitle{Introduction}
+\input{./introduction/introduction}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibIntroduction]
+\end{bibunit}
+
+
+
+%%%% Paper 1 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
+\runningtitle{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
+\authors{
+	Jo Inge Buskenes$^{1}$, 
+    	Jon Petter \AA{}sen$^{2}$, 
+    	Carl-Inge C. Nilsen$^{1}$ and
+    	Andreas Austeng$^{1}$
+} 
+{
+	$^{1}$Department of Informatics, University of Oslo, Oslo, Norway\\
+    	$^{2}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway
+}
+\noindent \textit{Submitted for review to IEEE Transactions on Oceanic Engineering}
+%\input{./STB/STB_manuscript}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibSTB]
+\end{bibunit}
+
+
+%%%% Paper 2 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}
+\runningtitle{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}
+\authors{
+	Jon Petter \AA{}sen$^{1}$,
+    	Jo Inge Buskenes$^{2}$,  
+    	Carl-Inge C. Nilsen$^{2}$,
+    	Andreas Austeng$^{2}$ and
+    	Sverre Holm$^{1,2}$
+} 
+{
+	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
+    	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
+}
+\noindent \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. XY, January 2014}
+%\input{./MLAandAb/Aberration_HiFR}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibMLAandAb]
+\end{bibunit}
+
+
+%%%% Paper 3 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{Capon Beamforming Applied on Moving Objects - An Analysis of Local Lateral Shift-Invariance}
+\runningtitle{Capon Beamforming Applied on Moving Objects - An Analysis of Local Lateral Shift-Invariance}
+\authors{
+	Jon Petter \AA{}sen$^{1}$, 
+    	Andreas Austeng$^{2}$ and
+    	Sverre Holm$^{1,2}$
+} 
+{
+	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
+    	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
+}
+\noindent \textit{Submitted for review to IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}
+%\input{./STBandAb/STBandAberration}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibSTBandAb]
+\end{bibunit}
+
+
+%%%% Paper 4 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}
+\runningtitle{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}
+\authors{
+	Jon Petter \AA{}sen$^{1}$,
+	Erik Steen$^2$,
+	Gabriel Kiss$^{3,4}$,
+	Anders Thorstensen$^{1,5}$,
+	Stein Inge Rabben$^2$
+}
+{
+$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
+$^{2}$ GE Vingmed Ultrasound, Horten, Norway\\
+$^{3}$ Norwegian University of Science and Technology, ISB - Department of Circulation and Medical Imaging, Trondheim, Norway\\
+$^{4}$ St. Olavs Hospital, Trondheim, Norway\\
+$^{5}$ Department of Cardiology, St. Olavs Hospital, Trondheim, Norway
+}
+\noindent \textit{Proc. SPIE Medical Imaging 2012}
+%\input{./SPTD/StbSinglePulseTissueDoppler}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibSPTD]
+\end{bibunit}
+
+%%%% Paper 5 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter{Huygens on Speed: Interactive Simulation of Ultrasound Pressure Fields}
+\runningtitle{Huygens on speed: Interactive simulation of ultrasound pressure fields}
+\authors{Jon Petter \AA{}sen$^1$ and Sverre Holm$^{1,2}$}
+{
+	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
+    	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
+}
+\noindent \textit{Proc. IEEE Ultrasonics Symposium 2012}
+%\input{./SPTD/StbSinglePulseTissueDoppler}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibSPTD]
+\end{bibunit}
+
+\appendix
+
+\end{document}
