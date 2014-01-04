@@ -12,9 +12,13 @@
 \author{Jon Petter \AA{}sen}
 \title{%Integrated Ultrasound Visualization and Formation
 %Real-Time Adaptive Beamforming, Visualization, and Simulation 
-Real-Time Adaptive Ultrasound Algorithms
+%Real-Time Adaptive Ultrasound Algorithms
+Accelerating adaptive ultrasound algorithms using graphics processing units 
 \vspace{0.5cm}}
 \department{Department of Circulation and Medical Imaging}
+
+\usepackage{color}
+\newcommand\todo[1]{{\textit{\color{red}(#1)}}}
 
 \begin{document}
 \date{\today}
@@ -57,7 +61,7 @@ Sammendrag p\aa{} norsk.
 %\vspace{0.2cm}\\%
 \\\\%
 \normalsize
-...
+\todo{Skriv sammendrag p\aa{} norsk}
 
 \vspace{0.3cm}
 \noindent Jon Petter \AA{}sen\\
@@ -72,9 +76,10 @@ Finansieringskilde: MI-Lab
 
 
 % ENGLISH ABSTRACT / SUMMARY
-\chapter*{Abstract}
+\CustChapter*{Abstract}
+%\chapter*{Abstract}
 \thispagestyle{empty}%
-...
+\todo{Write abstract ...}
 
 
 %\setcounter{page}{3} %I don't want the norwegian summary to be counted in. (This will change page numbering since the delivered version)
@@ -87,15 +92,36 @@ The present thesis is submitted in partial fulfillment of the requirements for t
 
 
 \subsubsection{Acknowledgments}
-...
-%Several people have been involved in the work presented in this thesis and deserve my gratitude. First of all I would like to thank my supervisor, Professor Hans Torp. His support and guidance throughout this work has been invaluable. He has been available for assistance 24 hours a day, 365 days a year during my time here. Through his profound knowledge of ultrasound, he has always been able to find solutions or good approaches to solve my problems (preferably via a quick K-space analysis of it).
+\todo{Write acknowledgments ...}
 
-%I would also like to thank my colleagues and co-authors Torbj�rn Hergum and Svein Arne Aase. Torbj�rn had a head start on the STB technique in the autumn of 2003. I joined in during the spring of 2004 as the co-author on the first article on STB. Discussions then and later have been of great importance for my work. Svein Arne has been my roommate during the last few years and co-author on my second and third paper. His efficiency and companionship has been very valuable both for my academic work and for enjoyable days at the office. I further would like to thank all my other colleagues and fellow PhD students in the department. Your social companionship and our technical discussions have made the days at the department fun and inspiring.
+\CustChapter*{List of publications}
+This thesis is based on the following five papers, referred to in the text by their Roman numerals (I-V): 
+\begin{enumerate}[I]
+\renewcommand\labelenumi{\bfseries\theenumi}
+	\item J. I. Buskenes, \textbf{J. P. \AA{}sen}, C.-I. C. Nilsen and A. Austeng, "An optimised GPU implementation of the MVDR beamformer for active sonar imaging", {\it  IEEE Transactions on Oceanic Engineering, submitted}.
+	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon beamforming on a GPU for real-time cardiac ultrasound imaging", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. \todo{add pages} January 2014}.
+ 	\item \textbf{J. P. \AA{}sen}, A. Austeng and S. Holm, "Capon beamforming and moving objects - An analysis of lateral shift-invariance", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, submitted}.
+	\item \textbf{J. P. \AA{}sen}, E. Steen, G. Kiss, A. Thorstensen and S. I. Rabben, "Adaptive volume rendering of cardiac 3D ultrasound images - utilizing blood pool statistics", {\it Proc. SPIE Medical Imaging 2012 \todo{add pages}}.
+	\item \textbf{J. P. \AA{}sen} and S. Holm, "Huygens on speed: Interactive simulation of ultrasound pressure fields", {\it Proc. IEEE Ultrasonics Symposium 2012 \todo{add pages}}.
+\end{enumerate}  
 
-%I would also like to express my gratitude to the people at GE Vingmed for their help and support with hardware and software. A special thanks goes to my co-supervisor, Kjell Kristoffersen. His broad technical knowledge has been of great help to my work. The Trondheim ultrasound group works in close collaboration with clinicians; through this collaboration I have been given help on clinical issues and have acquired professionally scanned ultrasound images. This has been greatly appreciated.
+\CustChapter*{Related publications}
+The following papers are related to the included papers, and are referred to in the text by their Roman numerals: 
 
-%Finally I would like to thank my dear wife, Karianne, for her encouragement, understanding and love throughout these years.
+\begin{enumerate}[VI]
+\setcounter{enumi}{5}
+\renewcommand\labelenumi{\bfseries\theenumi}
 
+	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon Beamforming on the GPU for Real-Time Cardiac Ultrasound Imaging", {\it Proc. IEEE Ultrasonics Symposium 2012}.
+
+	\item J. I. Buskenes, \textbf{J. P. \AA{}sen}, C.-I. C. Nilsen and A. Austeng, "Adapting the Minimum variance beamformer to a graphics processing unit for active sonar imaging systems", {\it Proc. Meetings on Acoustics 2013}.
+	
+	\item G. Kiss, E. Steen, \textbf{J. P \AA{}sen} and H. Torp, "GPU volume rendering in 3D echocardiography: real-time pre-processing and ray-casting", {\it Proc. IEEE Ultrasonics Symposium 2010}.
+
+	%\item G. Kiss, \textbf{J. P. \AA{}sen}, J. Bogaert, B. H. Amundsen, P. Claus, J. R. M. D'hooge and H. Torp, "Multi-modal cardiac image fusion and visualization on the GPU", {\it Proc. IEEE Ultrasonics Symposium 2011}.
+
+	\item E. S. Br\o{}nstad, \textbf{J. P. \AA{}sen}, H. Torp and G. Kiss, "Visibility driven visualization of 3D cardiac ultrasound data on the GPU", {\it Proc. IEEE Ultrasonics Symposium 2012}.
+\end{enumerate}
 
 \newpage\thispagestyle{empty}
 \pagestyle{fancy}
@@ -106,7 +132,7 @@ The present thesis is submitted in partial fulfillment of the requirements for t
 \begin{bibunit}[ieeetr]
 \CustChapter{Introduction} 
 \runningtitle{Introduction}
-\input{./introduction/introduction}
+\input{./Introduction/introduction}
 \newpage\addcontentsline{toc}{section}{References}
 \putbib[bibIntroduction]
 \end{bibunit}
@@ -115,10 +141,11 @@ The present thesis is submitted in partial fulfillment of the requirements for t
 \begin{bibunit}[ieeetr]
 \CustChapter{Background} 
 \runningtitle{Background}
-\input{./background/background}
+\input{./Background/background}
 \newpage\addcontentsline{toc}{section}{References}
 \putbib[bibBackground]
 \end{bibunit}
+
 
 %%%% Paper 1 %%%%
 \begin{bibunit}[ieeetr]
