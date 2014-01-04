@@ -21,6 +21,9 @@
 \usepackage{placeins} % Keep figures within sections
 
 \usepackage{enumerate}
+\usepackage{afterpage}%
+\usepackage{xcolor}%
+\usepackage{pagecolor}%
 
 % Settings
 % Matrix and vector notation
@@ -153,6 +156,82 @@ NTNU.}
     \Huge \bfseries  #1\par\nobreak
     \vskip 40\p@
   }}
+\makeatother
+% END CUSTOM CHAPTER
+
+% CUSTOM CHAPTER, TAKEN FROM BOOK.CLS
+\makeatletter
+\newcommand{\CustChapterPaper}{
+	\if@openright
+		\cleardoublepage
+	\else
+		\clearpage
+	\fi
+	\newpagecolor{lightgray}\afterpage{\restorepagecolor}
+	\thispagestyle{plain}%
+          \global\@topnum\z@
+          \@afterindentfalse
+          \secdef\@CustChapterPaper\@sCustChapterPaper % switch between * and not-* version
+}
+
+\def\@CustChapterPaper[#1]#2{
+	\ifnum \c@secnumdepth >\m@ne
+         		\if@mainmatter
+                   	\refstepcounter{chapter}%
+                         	\typeout{\@chapapp\space\thechapter.}%
+                         	\renewcommand*\thechapter{\Roman{chapter}}%
+                         	\addcontentsline{toc}{chapter}%
+                         		{Paper \protect\numberline{\thechapter}\\#1}%
+                	\else
+                   	\addcontentsline{toc}{chapter}{#1}%
+                  	\fi
+       	\else
+             	\addcontentsline{toc}{chapter}{#1}%
+       	\fi
+         	\chaptermark{#1}%
+         	\addtocontents{lof}{\protect\addvspace{10\p@}}%
+     	\addtocontents{lot}{\protect\addvspace{10\p@}}%
+         	\if@twocolumn
+           	\@topnewpage[\@makeCustChapterPaperhead{#2}]%
+        	\else
+                	\@makeCustChapterPaperhead{#2}%
+                  	\@afterheading
+     	\fi
+}
+\def\@makeCustChapterPaperhead#1{%
+  	\vspace*{37\p@}% CHANGED FROM 50 TO 37! TO GET ROOM FOR OPT.VEL.EST.CHAPTER
+  	{
+  		\parindent \z@ \raggedright \normalfont
+    		\ifnum \c@secnumdepth >\m@ne
+      			\if@mainmatter
+        				\huge\bfseries Paper \space \thechapter
+        				\par\nobreak
+        				\vskip 20\p@
+      			\fi
+    		\fi
+    		\interlinepenalty\@M
+    		\Huge \bfseries #1\par\nobreak
+    		\vskip 40\p@
+  	}
+}
+\def\@sCustChapterPaper#1{
+	\if@twocolumn
+                	\@topnewpage[\@makesCustChapterPaperhead{#1}]%
+         	\else
+                   \@makesCustChapterPaperhead{#1}%
+                   \@afterheading
+         	\fi
+}
+\def\@makesCustChapterPaperhead#1{%
+  	\vspace*{50\p@}%
+  	{
+  		\parindent \z@ \raggedright
+    		\normalfont
+    		\interlinepenalty\@M
+    		\Huge \bfseries  #1\par\nobreak
+    		\vskip 40\p@
+  	}
+}
 \makeatother
 % END CUSTOM CHAPTER
 

@@ -28,6 +28,9 @@ Accelerating adaptive ultrasound algorithms using graphics processing units
 % Norsk sammendrag
 %\Chapter*{}
 \newpage%
+
+\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+
 ~\\
 \vspace{10.0cm}
 ~\\
@@ -52,7 +55,7 @@ Printed by NTNU-trykk
 
 ~\\
 \newpage
-\thispagestyle{empty}%
+%\thispagestyle{empty}%
 ~\\%
 ~\\%
 ~\\
@@ -77,8 +80,9 @@ Finansieringskilde: MI-Lab
 
 % ENGLISH ABSTRACT / SUMMARY
 \CustChapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
 %\chapter*{Abstract}
-\thispagestyle{empty}%
+%\thispagestyle{empty}%
 \todo{Write abstract ...}
 
 
@@ -87,73 +91,94 @@ Finansieringskilde: MI-Lab
 
 % PREFACE AND ACKNOWLEDGEMENTS
 \CustChapter*{Preface}%
-\thispagestyle{empty}%
-The present thesis is submitted in partial fulfillment of the requirements for the degree of \textit{Philosophiae Doctor} (Ph.D.) at the Faculty of Medicine at the Norwegian University of Science and Technology (NTNU). The research was funded by \textit{Medical Imaging Laboratory} (MI-Lab), and was carried out at the Department of Circulation and Medical Imaging. The main supervisor has been Professor Sverre Holm  in the Department of Informatics, University of Oslo, and Professor II at MI-Lab. Co-supervisors have been PhD Stein Inge Rabben, PhD Erik Steen and Professor Hans Torp.
+\addcontentsline{toc}{chapter}{Preface}
+%\thispagestyle{empty}%
+The present thesis is submitted in partial fulfillment of the requirements for the degree of \textit{Philosophiae Doctor} (Ph.D.) at the Faculty of Medicine at the Norwegian University of Science and Technology (NTNU). The research was funded by \textit{Medical Imaging Laboratory} (MI-Lab), and was carried out at the Department of Circulation and Medical Imaging. The main supervisor has been Professor Sverre Holm  in the Department of Informatics, University of Oslo, and Professor II at MI-Lab, NTNU. Co-supervisors have been PhD Stein Inge Rabben, PhD Erik Steen and Professor Hans Torp.
 
 
 \subsubsection{Acknowledgments}
 \todo{Write acknowledgments ...}
 
 \CustChapter*{List of publications}
+\addcontentsline{toc}{chapter}{List of publications}
+
 This thesis is based on the following five papers, referred to in the text by their Roman numerals (I-V): 
 \begin{enumerate}[I]
 \renewcommand\labelenumi{\bfseries\theenumi}
 	\item J. I. Buskenes, \textbf{J. P. \AA{}sen}, C.-I. C. Nilsen and A. Austeng, "An optimised GPU implementation of the MVDR beamformer for active sonar imaging", {\it  IEEE Transactions on Oceanic Engineering, submitted}.
-	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon beamforming on a GPU for real-time cardiac ultrasound imaging", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. \todo{add pages} January 2014}.
+	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon beamforming on a GPU for real-time cardiac ultrasound imaging", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. \todo{add pages} Jan 2014}.
  	\item \textbf{J. P. \AA{}sen}, A. Austeng and S. Holm, "Capon beamforming and moving objects - An analysis of lateral shift-invariance", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, submitted}.
 	\item \textbf{J. P. \AA{}sen}, E. Steen, G. Kiss, A. Thorstensen and S. I. Rabben, "Adaptive volume rendering of cardiac 3D ultrasound images - utilizing blood pool statistics", {\it Proc. SPIE Medical Imaging 2012 \todo{add pages}}.
 	\item \textbf{J. P. \AA{}sen} and S. Holm, "Huygens on speed: Interactive simulation of ultrasound pressure fields", {\it Proc. IEEE Ultrasonics Symposium 2012 \todo{add pages}}.
 \end{enumerate}  
 
 \CustChapter*{Related publications}
+\addcontentsline{toc}{chapter}{Related publications}
 The following papers are related to the included papers, and are referred to in the text by their Roman numerals: 
 
 \begin{enumerate}[VI]
 \setcounter{enumi}{5}
 \renewcommand\labelenumi{\bfseries\theenumi}
 
-	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon Beamforming on the GPU for Real-Time Cardiac Ultrasound Imaging", {\it Proc. IEEE Ultrasonics Symposium 2012}.
+	\item \textbf{J. P. \AA{}sen}, J. I. Buskenes, C.-I. C. Nilsen, A. Austeng and S. Holm, "Implementing Capon Beamforming on the GPU for Real-Time Cardiac Ultrasound Imaging", {\it Proc. IEEE Ultrasonics Symposium 2012} \todo{add pages}.
 
-	\item J. I. Buskenes, \textbf{J. P. \AA{}sen}, C.-I. C. Nilsen and A. Austeng, "Adapting the Minimum variance beamformer to a graphics processing unit for active sonar imaging systems", {\it Proc. Meetings on Acoustics 2013}.
+	\item J. I. Buskenes, \textbf{J. P. \AA{}sen}, C.-I. C. Nilsen and A. Austeng, "Adapting the Minimum variance beamformer to a graphics processing unit for active sonar imaging systems", {\it Proc. Meetings on Acoustics 2013} \todo{add pages?}.
 	
-	\item G. Kiss, E. Steen, \textbf{J. P \AA{}sen} and H. Torp, "GPU volume rendering in 3D echocardiography: real-time pre-processing and ray-casting", {\it Proc. IEEE Ultrasonics Symposium 2010}.
+	\item G. Kiss, E. Steen, \textbf{J. P \AA{}sen} and H. Torp, "GPU volume rendering in 3D echocardiography: real-time pre-processing and ray-casting", {\it Proc. IEEE Ultrasonics Symposium 2010} \todo{add pages}.
 
 	%\item G. Kiss, \textbf{J. P. \AA{}sen}, J. Bogaert, B. H. Amundsen, P. Claus, J. R. M. D'hooge and H. Torp, "Multi-modal cardiac image fusion and visualization on the GPU", {\it Proc. IEEE Ultrasonics Symposium 2011}.
 
-	\item E. S. Br\o{}nstad, \textbf{J. P. \AA{}sen}, H. Torp and G. Kiss, "Visibility driven visualization of 3D cardiac ultrasound data on the GPU", {\it Proc. IEEE Ultrasonics Symposium 2012}.
+	\item E. S. Br\o{}nstad, \textbf{J. P. \AA{}sen}, H. Torp and G. Kiss, "Visibility driven visualization of 3D cardiac ultrasound data on the GPU", {\it Proc. IEEE Ultrasonics Symposium 2012} \todo{add pages}.
 \end{enumerate}
 
 \newpage\thispagestyle{empty}
 \pagestyle{fancy}
+
 %
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Contents}
+\renewcommand*\contentsname{Contents}
 \tableofcontents
+
+\clearpage
+\setcounter{page}{1}
+\renewcommand{\thepage}{\arabic{page}}
+
+\renewcommand*\thesection{\arabic{section}}
 
 %%%% CHAPTER 1 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Introduction} 
+\CustChapter*{Introduction} 
+\addcontentsline{toc}{chapter}{Introduction}
 \runningtitle{Introduction}
 \input{./Introduction/introduction}
 \newpage\addcontentsline{toc}{section}{References}
 \putbib[bibIntroduction]
 \end{bibunit}
 
+\setcounter{section}{0}
+\setcounter{chapter}{1}
+
 %%%% CHAPTER 2 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Background} 
+\CustChapter*{Background}
+\addcontentsline{toc}{chapter}{Background} 
 \runningtitle{Background}
 \input{./Background/background}
 \newpage\addcontentsline{toc}{section}{References}
 \putbib[bibBackground]
 \end{bibunit}
 
+\setcounter{chapter}{0}
 
 %%%% Paper 1 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
-\runningtitle{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
+\CustChapterPaper{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
+\runningtitle{GPU MVDR Beamformer for Active Sonar Imaging}
 \authors{
 	Jo Inge Buskenes$^{1}$, 
-    	Jon Petter \AA{}sen$^{2}$, 
+    	\textbf{Jon Petter \AA{}sen}$^{2}$, 
     	Carl-Inge C. Nilsen$^{1}$ and
     	Andreas Austeng$^{1}$
 } 
@@ -161,19 +186,19 @@ The following papers are related to the included papers, and are referred to in 
 	$^{1}$Department of Informatics, University of Oslo, Oslo, Norway\\
     	$^{2}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway
 }
-\noindent \textit{Submitted for review to IEEE Transactions on Oceanic Engineering}
-%\input{./STB/STB_manuscript}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibSTB]
+\noindent \textit{IEEE Transactions on Oceanic Engineering, submitted}
+%\newpage\input{./CaponSonarGPU/CaponSonarGPU}
+%\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibCaponSonarGPU]
 \end{bibunit}
 
 
 %%%% Paper 2 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}
-\runningtitle{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}
+\CustChapterPaper{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}
+\runningtitle{GPU Capon Beamformer for Cardiac Ultrasound Imaging}
 \authors{
-	Jon Petter \AA{}sen$^{1}$,
+	\textbf{Jon Petter \AA{}sen}$^{1}$,
     	Jo Inge Buskenes$^{2}$,  
     	Carl-Inge C. Nilsen$^{2}$,
     	Andreas Austeng$^{2}$ and
@@ -183,19 +208,19 @@ The following papers are related to the included papers, and are referred to in 
 	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
     	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
 }
-\noindent \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. XY, January 2014}
-%\input{./MLAandAb/Aberration_HiFR}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibMLAandAb]
+\noindent \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, Jan 2014}
+%\input{./CaponCardiacGPU/CaponCardiacGPU}
+%\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibCaponCardiacGPU]
 \end{bibunit}
 
 
 %%%% Paper 3 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Capon Beamforming Applied on Moving Objects - An Analysis of Local Lateral Shift-Invariance}
-\runningtitle{Capon Beamforming Applied on Moving Objects - An Analysis of Local Lateral Shift-Invariance}
+\CustChapterPaper{Capon Beamforming and Moving Objects - An Analysis of Lateral Shift-Invariance}
+\runningtitle{Capon Beamforming and Moving Objects}
 \authors{
-	Jon Petter \AA{}sen$^{1}$, 
+	\textbf{Jon Petter \AA{}sen}$^{1}$, 
     	Andreas Austeng$^{2}$ and
     	Sverre Holm$^{1,2}$
 } 
@@ -203,19 +228,19 @@ The following papers are related to the included papers, and are referred to in 
 	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
     	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
 }
-\noindent \textit{Submitted for review to IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}
-%\input{./STBandAb/STBandAberration}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibSTBandAb]
+\noindent \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, submitted}
+%\input{./CaponMovingObjects/CaponMovingObjects}
+%\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibCaponMovingObjects]
 \end{bibunit}
 
 
 %%%% Paper 4 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}
-\runningtitle{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}
+\CustChapterPaper{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}
+\runningtitle{Adaptive Volume Rendering of Cardiac Ultrasound}
 \authors{
-	Jon Petter \AA{}sen$^{1}$,
+	\textbf{Jon Petter \AA{}sen}$^{1}$,
 	Erik Steen$^2$,
 	Gabriel Kiss$^{3,4}$,
 	Anders Thorstensen$^{1,5}$,
@@ -228,25 +253,25 @@ $^{3}$ Norwegian University of Science and Technology, ISB - Department of Circu
 $^{4}$ St. Olavs Hospital, Trondheim, Norway\\
 $^{5}$ Department of Cardiology, St. Olavs Hospital, Trondheim, Norway
 }
-\noindent \textit{Proc. SPIE Medical Imaging 2012}
-%\input{./SPTD/StbSinglePulseTissueDoppler}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibSPTD]
+\noindent \textit{Proc. SPIE Medical Imaging 2012 \todo{add pages}}
+%\input{./AdaptiveVolumeRendering/AdaptiveVolumeRendering}
+%\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibAdaptiveVolumeRendering]
 \end{bibunit}
 
 %%%% Paper 5 %%%%
 \begin{bibunit}[ieeetr]
-\CustChapter{Huygens on Speed: Interactive Simulation of Ultrasound Pressure Fields}
-\runningtitle{Huygens on speed: Interactive simulation of ultrasound pressure fields}
-\authors{Jon Petter \AA{}sen$^1$ and Sverre Holm$^{1,2}$}
+\CustChapterPaper{Huygens on Speed: Interactive Simulation of Ultrasound Pressure Fields}
+\runningtitle{Huygens on speed}
+\authors{\textbf{Jon Petter \AA{}sen}$^1$ and Sverre Holm$^{1,2}$}
 {
 	$^{1}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway\\
     	$^{2}$Department of Informatics, University of Oslo, Oslo, Norway
 }
-\noindent \textit{Proc. IEEE Ultrasonics Symposium 2012}
-%\input{./SPTD/StbSinglePulseTissueDoppler}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibSPTD]
+\noindent \textit{Proc. IEEE Ultrasonics Symposium 2012 \todo{add pages}}
+%\input{./Hos/Hos}
+%\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibHos]
 \end{bibunit}
 
 \appendix
