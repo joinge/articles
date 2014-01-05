@@ -1,10 +1,16 @@
 \section{Motivation}
-Rapid development in computer game technology and accompanying programming languages have recently provided researchers with small personal super computers, comprised in a single graphics card (\nom{GPU}{Graphics Processing Unit}). The latest graphics cards\footnote{As of January 2014} from both Nvidia and AMD provides close to 6 T\nom{FLOPS}{Floating point operations per second} single precision and 1.5 TFLOPS double precision. For double precision this is more than the worlds most powerful supercomputer provided in 1998.
+Rapid development in computer game technology and accompanying programming languages have recently provided researchers with small personal super computers, comprised in a single graphics card (\nom{GPU}{Graphics Processing Unit}). The latest graphics cards\footnote{As of January 2014} from both Nvidia and AMD provides close to 6 T\nom{FLOPS}{Floating point operations per second} single precision and 1.5 TFLOPS double precision. For double precision this is more than the worlds most powerful supercomputer could provide in 1998.
 
-This immense rise in computational power and programming flexibility gives new possibilities when designing ultrasound imaging systems. Algorithms which previously had to be implemented in hardware for performance reasons can now be moved to software. It also means that algorithms, either too complicated to implement in hardware, or though to be too computationally heavy for real-time use, becomes realizable. It is clear that high performance programmable processors, like the GPU, have and will make future ultrasound imaging systems more flexible, cheaper to produce, and equipped with even more cutting-edge processing.
+This immense rise in computational power and programming flexibility gives new possibilities when designing ultrasound imaging systems. Algorithms which previously had to be implemented in hardware for performance reasons can now be implemented in software. And algorithms, either too complicated to implement in hardware, or though to be too computationally heavy for real-time use, becomes realizable. It is clear that high-performance programmable processors, like the GPU, already have and will continue to make future ultrasound imaging systems more flexible, cheaper to produce, and equipped with even more cutting-edge processing.
+
+The Capon beamformer is a good example of an algorithm which has been highly studied for the last decade for the application of medical ultrasound imaging \todo{cite papers}, but where the number of calculations was though to be too much for real time processing. No wonder, to achieve real-time processing in e.g. cardiac ultrasound imaging an effective processing rate of around 100 MFLOPS is required. This number, as explained in Background \ref{sec:adaptbf}, also grows with larger subarrays, more image pixels, and higher framerate requirements.  But with modern GPUs these levels of processing are actually within reach with only a single card.
 
 \section{Aims of study}
-The aim of this thesis has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. 
+The aim of this study has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. 
+
+My main focus have been the Capon beamformer, and the problem of making this computationally expensive algorithm available for real-time ultrasound imaging. However, two additional methods have also been included in the thesis. The first is adaptive volume rendering of cardiac ultrasound volumes and the latter is simulation of dense ultrasound pressure fields. Both share the property of being computationally heavy, but they also consist of many independent computations which is perfect for parallel GPU computing. 
+
+Well on my way into the project, when a real-time Capon beamformer was realized, and loops of images for the first time were processed, new issues where discovered and had to be solved. This led me to a more theoretical study of the Capon beamformer, and how to obtain high lateral resolution while preserving the important shift-invariant property of medical ultrasound imaging.
 
 %\subsubsection{Accelerate the Capon beamformer to facilitate real time imaging}
 
@@ -23,6 +29,8 @@ Summary of paper...
 \textbf{J.\:P.\:\AA{}sen}, J.\:I.\:Buskenes, C.-I.\:C\:Nilsen, A.\:Austeng and S.\:Holm\\
 {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. \todo{add pages}, Jan. 2014.}\\\\
 Summary of paper...
+
+To facilitate study of in-vitro performance.
 
 \subsection{Paper III}
 \textbf{Capon Beamforming and Moving Objects - An Analysis of Lateral Shift-Invariance}\\
@@ -52,8 +60,8 @@ The main contributions of this thesis are:
 \item an investigation of shift-invariance for the Capon beamformer
 \item a method for improved shift-invariance of the Capon beamformer
 \item a method for reduced blood-pool noise in volume rendering of cardiac ultrasound volumes
-\item a GPU implementation of the adaptive volume rendering method
-\item a GPU implementation of simple paint-like simulation tool
+\item a GPU implementation of this adaptive volume rendering method
+\item a GPU implementation of simple paint-like simulation tool for rapid visualization ultrasound pressure fields
 \item several discussions on how to utilize the GPU for computationally intense algorithms  
 \end{enumerate}
 
@@ -62,6 +70,7 @@ Discuss all papers.
 Paper1
 
 Paper2
+Discuss why cardiac ultrasound is selected and if full Capon will be real-time for other modalities.
 
 Paper3
 
