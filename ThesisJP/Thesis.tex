@@ -20,6 +20,12 @@ Accelerating adaptive ultrasound algorithms using graphics processing units
 \usepackage{color}
 \newcommand\todo[1]{{\textit{\color{red}(#1)}}}
 
+% symbol list
+\usepackage{nomencl}
+\makenomenclature
+\renewcommand{\nomname}{Symbols and Abbreviations}
+\newcommand*{\nom}[2]{#1\nomenclature{#1}{#2}}
+
 \begin{document}
 \date{\today}
 \pagestyle{empty} \maketitle
@@ -141,24 +147,15 @@ The following papers are related to the included papers, and are referred to in 
 \renewcommand*\contentsname{Contents}
 \tableofcontents
 
-\clearpage
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Symbols and Abbreviations}
+\printnomenclature
+
+\cleardoublepage
 \setcounter{page}{1}
 \renewcommand{\thepage}{\arabic{page}}
 
 \renewcommand*\thesection{\arabic{section}}
-
-%%%% CHAPTER 1 %%%%
-\begin{bibunit}[ieeetr]
-\CustChapter*{Introduction} 
-\addcontentsline{toc}{chapter}{Introduction}
-\runningtitle{Introduction}
-\input{./Introduction/introduction}
-\newpage\addcontentsline{toc}{section}{References}
-\putbib[bibIntroduction]
-\end{bibunit}
-
-\setcounter{section}{0}
-\setcounter{chapter}{1}
 
 %%%% CHAPTER 2 %%%%
 \begin{bibunit}[ieeetr]
@@ -168,6 +165,19 @@ The following papers are related to the included papers, and are referred to in 
 \input{./Background/background}
 \newpage\addcontentsline{toc}{section}{References}
 \putbib[bibBackground]
+\end{bibunit}
+
+\setcounter{section}{0}
+\setcounter{chapter}{1}
+
+%%%% CHAPTER 1 %%%%
+\begin{bibunit}[ieeetr]
+\CustChapter*{Introduction} 
+\addcontentsline{toc}{chapter}{Introduction}
+\runningtitle{Introduction}
+\input{./Introduction/introduction}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[bibIntroduction]
 \end{bibunit}
 
 \setcounter{chapter}{0}
