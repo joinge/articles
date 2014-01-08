@@ -1,16 +1,16 @@
 \section{Motivation}
-Rapid development in computer game technology and accompanying programming languages have recently provided researchers with small personal super computers, comprised in a single graphics card (\nom{GPU}{Graphics Processing Unit}). The latest graphics cards\footnote{As of January 2014} from both Nvidia and AMD provides close to 6 T\nom{FLOPS}{Floating point operations per second} single precision and 1.5 TFLOPS double precision. For double precision this is more than the worlds most powerful supercomputer could provide in 1998.
+A rapid development in computer game technology and accompanying programming languages have recently provided researchers with small personal super computers, comprised in a single graphics card (\nom{GPU}{Graphics Processing Unit}). The latest graphics cards\footnote{As of January 2014} from both Nvidia and AMD provides close to 6 T\nom{FLOPS}{Floating point operations per second} single precision and 1.5 TFLOPS double precision. For double precision this is more than the worlds most powerful supercomputer could provide in 1998.
 
 This immense rise in computational power and programming flexibility gives new possibilities when designing ultrasound imaging systems. Algorithms which previously had to be implemented in hardware for performance reasons can now be implemented in software. And algorithms, either too complicated to implement in hardware, or though to be too computationally heavy for real-time use, becomes realizable. It is clear that high-performance programmable processors, like the GPU, already have and will continue to make future ultrasound imaging systems more flexible, cheaper to produce, and equipped with even more cutting-edge processing.
 
-The Capon beamformer is a good example of an algorithm which has been highly studied for the last decade for the application of medical ultrasound imaging \todo{cite papers}, but where the number of calculations was though to be too much for real time processing. No wonder, to achieve real-time processing in e.g. cardiac ultrasound imaging an effective processing rate of around 100 MFLOPS is required. This number, as explained in Background \ref{sec:adaptbf}, also grows with larger subarrays, more image pixels, and higher framerate requirements.  But with modern GPUs these levels of processing are actually within reach with only a single card.
+The Capon beamformer is a good example of an algorithm which has been highly studied for the last decade for the application of medical ultrasound imaging \todo{cite papers}, but where the number of calculations was though to be too much for real time processing. No wonder, to achieve real-time processing for e.g. cardiac ultrasound imaging an effective processing rate of around 100 MFLOPS is required. This number, as explained in Background \ref{sec:adaptbf}, also grows with larger subarrays, more image pixels, and higher framerate requirements.  With modern GPUs these levels of processing are available within a single card.
 
 \section{Aims of study}
-The aim of this study has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. 
+The overall aim of this study has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. 
 
-My main focus have been the Capon beamformer, and the problem of making this computationally expensive algorithm available for real-time ultrasound imaging. However, two additional methods have also been included in the thesis. The first is adaptive volume rendering of cardiac ultrasound volumes and the latter is simulation of dense ultrasound pressure fields. Both share the property of being computationally heavy, but they also consist of many independent computations which is perfect for parallel GPU computing. 
+My main focus have been the Capon beamformer, and the problem of making this computationally intense algorithm available for real-time ultrasound imaging. However, two additional methods have also been included in the thesis. The first is adaptive volume rendering of cardiac ultrasound volumes and the latter is simulation of dense ultrasound pressure fields. Both share the property of being computationally heavy, but they also consist of many independent computations which is perfect for parallel GPU computing. 
 
-Well on my way into the project, when a real-time Capon beamformer was realized, and loops of images for the first time were processed, new issues where discovered and had to be solved. This led me to a more theoretical study of the Capon beamformer, and how to obtain high lateral resolution while preserving the important shift-invariant property of medical ultrasound imaging.
+Well on my way into the project, when a real-time Capon beamformer was realized, and loops of images for the first time were processed, new issues where discovered and had to be solved. This led me to a more theoretical study of the Capon beamformer in \textbf{Paper III}, with special attention on how to obtain high lateral resolution while preserving the important shift-invariant property of medical ultrasound imaging. Shift-invariant behavior is crucial if the method is going to be applied for live scanning. 
 
 %\subsubsection{Accelerate the Capon beamformer to facilitate real time imaging}
 
@@ -22,7 +22,9 @@ Well on my way into the project, when a real-time Capon beamformer was realized,
 \textbf{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}\\
 J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng\\
 {\it IEEE Transactions on Oceanic Engineering, submitted.}\\\\
-Summary of paper...
+The first paper describes in details how the Capon beamformer is mapped to GPU architecture. Even though the paper is written within the field of active sonar imaging, the implementation described is also applicable to other active ultrasound imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement, element count, center frequency, and relative bandwidth. 
+
+The estimation of the spatial covariance matrix receives special attention. In previous literature on Capon beamforming the matrix inversion is always regarded as the most computationally complex piece. 
 
 \subsection{Paper II}
 \textbf{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}\\
