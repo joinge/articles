@@ -22,7 +22,7 @@ Well on my way into the project, when a real-time Capon beamformer was realized,
 \textbf{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}\\
 J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng\\
 {\it IEEE Transactions on Oceanic Engineering, submitted.}\\\\
-The first paper describes in details how we have mapped the Capon beamformer to GPU architecture. Even though the paper is written within the field of active \nom{sonar}{SOund Navigation And Ranging (usually under water)} imaging, the depicted implementation is applicable to a vast range of active imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement and fewer array elements. This makes it somewhat easier to reach our goal of real-time processing. 
+The first paper describes in details how we mapped the Capon beamformer to GPU architecture. Even though the paper is written within the field of active \nom{sonar}{SOund Navigation And Ranging (usually under water)} imaging, the depicted implementation is applicable to a vast range of active imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement and fewer array elements. This makes it somewhat easier to reach our goal of real-time processing. 
 
 The estimation of the spatial covariance matrix receives special attention in this study. In previous literature on Capon beamforming the matrix inversion has always been regarded as the most computationally complex piece. In this paper we show that estimation of the sample covariance matrix is actually the most complex part when spatial and temporal smoothing is included with common parameters. It is then shown how the arithmetic complexity of this estimation process can be reduced from cubic to square. Finally, we give an in-depth analysis of the arithmetic throughput on multiple platforms. The reported throughput of 1 Mpx/s on a high-end GPU is, as far as the authors know, enough to provide real-time processing for all known sonar scan sequences. However, the number of effective FLOPS is only 5 \% of the theoretical throughput of the target GPU. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. 
 
@@ -84,6 +84,7 @@ Paper5
 This is not an adaptive algorithm.
 
 Mark that code for GPU-Capon and Huygens on speed have been made open source.
+It has over 200 downloads and soon 1000 views on youtube.
 
 \section{Conclusion}
 
