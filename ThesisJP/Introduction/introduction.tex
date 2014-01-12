@@ -22,7 +22,7 @@ Well on my way into the project, when a real-time Capon beamformer was realized,
 \textbf{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}\\
 J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng\\
 {\it IEEE Transactions on Oceanic Engineering, submitted.}\\\\
-The first paper describes in details how the Capon beamformer is mapped to GPU architecture. Even though the paper is written within the field of active \nom{sonar}{SOund Navigation And Ranging (usually under water)} imaging, the depicted implementation is applicable to a vast range of active imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement and fewer array elements. This makes it somewhat easier to reach our goal of real-time processing. 
+The first paper describes in details how we have mapped the Capon beamformer to GPU architecture. Even though the paper is written within the field of active \nom{sonar}{SOund Navigation And Ranging (usually under water)} imaging, the depicted implementation is applicable to a vast range of active imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement and fewer array elements. This makes it somewhat easier to reach our goal of real-time processing. 
 
 The estimation of the spatial covariance matrix receives special attention in this study. In previous literature on Capon beamforming the matrix inversion has always been regarded as the most computationally complex piece. In this paper we show that estimation of the sample covariance matrix is actually the most complex part when spatial and temporal smoothing is included with common parameters. It is then shown how the arithmetic complexity of this estimation process can be reduced from cubic to square. Finally, we give an in-depth analysis of the arithmetic throughput on multiple platforms. The reported throughput of 1 Mpx/s on a high-end GPU is, as far as the authors know, enough to provide real-time processing for all known sonar scan sequences. However, the number of effective FLOPS is only 5 \% of the theoretical throughput of the target GPU. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. 
 
@@ -30,43 +30,43 @@ The estimation of the spatial covariance matrix receives special attention in th
 \textbf{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}\\
 \textbf{J.\:P.\:\AA{}sen}, J.\:I.\:Buskenes, C.-I.\:C\:Nilsen, A.\:Austeng and S.\:Holm\\
 {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. \todo{add pages}, Jan. 2014.}\\\\
-The second paper aims at achieving real-time Capon beamforming for cardiac ultrasound imaging. Such an implementation will facilitates further study of the method's \textit{in vivo} performance in medical ultrasound imaging. This is something which has been sought for the past decade \todo{Add citations}. In \textbf{Paper I} we investigated arrays with no more than 32 elements. A linear array for cardiac ultrasound imaging typically has 64 or more elements. In \textbf{Paper VI}, which is summarized in \textbf{Paper II}, it is shown that our implementation from  \textbf{Paper I} does not reach the level of throughput required for real-time Capon beamforming of cardiac ultrasound imaging. The matrices that have to be inverted becomes to large, and the number of frames that needs to be processed per second is to many.
+The second paper aims at achieving real-time Capon beamforming for cardiac ultrasound imaging. Such an implementation will facilitates further study of the method's \textit{in vivo} performance for this modality. This is something which has been sought for the past decade \todo{Add citations}. In \textbf{Paper I} we investigated arrays with no more than 32 elements. A linear array for cardiac ultrasound imaging typically has 64 or more elements. In \textbf{Paper VI}, which is summarized in \textbf{Paper II}, it is shown that our implementation from  \textbf{Paper I} does not reach the level of throughput required for real-time Capon beamforming of cardiac ultrasound imaging. The matrices that have to be inverted becomes to large, and the number of frames that needs to be processed per second is to many.
 
-To reduce the matrix size we take, in this paper, advantage of the beamspace version of the Capon beamformer (\nom{BS-Capon}{Beamspace Capon beamforming}), and implement it on the GPU. For parameters previously derived to give similar performance for BS-Capon and element space Capon (\nom{ES-Capon}{Element Space Capon}), we show that real-time BS-Capon beamforming is feasible for cardiac ultrasound imaging. The reported processing throughput is able to keep up with the acquisition frame rate for a typical cardiac ultrasound imaging system with 64 and 96 element linear arrays.  \textbf{Paper II} and \textbf{VI} also presents, for the first time, videos where the Capon beamformer has been applied on loops of medical ultrasound images, both simulations and \textit{in vivo}.
+To reduce the matrix size we take, in this paper, advantage of the beamspace version of the Capon beamformer (\nom{BS-Capon}{Beamspace Capon beamforming}), and implement it on the GPU. For parameters previously derived to give similar performance for BS-Capon and element space Capon (\nom{ES-Capon}{Element Space Capon}), we show that real-time BS-Capon beamforming is feasible for cardiac ultrasound imaging. The reported processing throughput is able to keep up with the acquisition frame rate in a typical cardiac ultrasound imaging system equipped with 64 and 96 element linear arrays.  \textbf{Paper II} and \textbf{VI} also presents, for the first time, videos where the ES-Capon and BS-Capon beamformer have been applied on loops of simulated and \textit{in vivo} medical ultrasound images.
 
 \subsection{Paper III}
 \textbf{Capon Beamforming and Moving Objects - An Analysis of Lateral Shift-Invariance}\\
 \textbf{J.\:P.\:\AA{}sen}, A.\:Austeng and S.\:Holm\\
 {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, submitted.}\\\\
-In the third paper we study the shift-invariant property of an imaging system based on the Capon beamformer. As mentioned, shift-invariant imaging is essential if the method is ever to be adopted. The paper was written based on observations of aliasing artifacts when imaging bright point scatterers \textit{in vitro} and in simulations. The points were twinkling like stars in the sky. In earlier work on Capon beamforming for medical ultrasound imaging the real-time nature of ultrasound imaging has been ignored, and a large degree of oversampling on transmit has often been applied without comments. Oversampling on transmit is not an option if the imaging modality is used to image rapidly varying objects.
+In the third paper we study the shift-invariant property of an imaging system based on the Capon beamformer. As mentioned, shift-invariant imaging is essential if the method is ever to be adopted. The paper was written based on observations of aliasing artifacts when imaging bright point scatterers \textit{in vitro} and in simulations. The points were observed to twinkle like stars in the sky. In earlier work on Capon beamforming for medical ultrasound imaging the real-time nature of ultrasound imaging has been ignored, and a large degree of oversampling on transmit has often been applied without comments. Oversampling on transmit is not an option if the imaging modality is used to image rapidly varying objects.
 
-In \textbf{Paper III} we investigate how the Capon beamforming achieves its super resolution, and how this makes it highly sensitive to differences between the assumed steering vector and the signal propagation vector. Earlier work, focusing on single images, has typically referred to this effect as speed-of-sound errors, but it also comes naturally into play when objects moves from frame to frame and the beam density is insufficient. With a narrow band and farfield model we show that 25 times oversampling is required to obtain the same lateral gain variations as with \nom{DAS}{Delay-and-sum beamforming} beamforming. These calculations are done based on typical parameters for the Capon beamformer. For 
+In this paper we investigate how the Capon beamforming achieves its super resolution, and how this makes it highly sensitive to differences between the assumed steering vector and the signal propagation vector. Earlier work, focusing on single images, has typically referred to this effect as speed-of-sound errors, but it also comes naturally into play when objects moves from frame to frame and the beam density is insufficient. With a narrowband and farfield model we show that the Capon beamformer suffers from beam-to-beam gain variations as large as 27 dB for parameters previously used to obtain high resolution medical ultrasound images.  To obtain the same lateral gain variations as with \nom{DAS}{Delay-and-sum beamforming} beamforming, 25 times oversampling is shown to be required. For broadband nearfield simulations the same gain variations are observed. Finally we show that the gain variation can be reduced, hence improved shift-invariance, by oversampling on receive using phase rotation steering. This without affecting the acquisition frame rate and with a minor increase in computationally complexity. The method is successfully applied on simulations and \textit{in vitro} phantom data.
 
 \subsection{Paper IV}
 \textbf{Adaptive Volume Rendering of Cardiac 3D Ultrasound Images - Utilizing Blood Pool Statistics}\\
 \textbf{J.\:P.\:\AA{}sen}, E.\:Steen, G.\:Kiss, A.\:Thorstensen and S.\:I.\:Rabben\\
 {\it Proc. SPIE Medical Imaging 2012, \todo{add pages}.}\\\\
-Summary of paper...
+The fourth paper propose an adaptive volume rendering method based on statistics derived from the blood pool of the left ventricle. Noise located in the blood pool tends to occlude cardiac tissue when rendered in 3D, and is often impossible to remove by adjusting global rendering parameters. This because ultrasound signals have high variability within blood as well as high variability within tissue, even when heavily smoothed. Delineated of the blood pool is done by a state estimation algorithm, capable of tracking the endocardium in real time. The final visualizations are compared, with respect to location of tissue, with the result from a state-of-the-art endocardium segmentation tool. The paper presents both quantitative and qualitative results supporting the method's improved capabilities of reducing tissue dropouts and spurious structures inside the blood pool, and by that maximizing the amount of visible endocardium tissue. The proposed method is implemented on a GPU which results in interactive frame rates.
 
 \subsection{Paper V}
 \textbf{Huygens on Speed: Interactive Simulation of Ultrasound Pressure Fields}\\
 \textbf{J.\:P.\:\AA{}sen} and S.\:Holm\\
 {\it Proc. IEEE Ultrasonics Symposium 2012 \todo{add pages}.}\\\\
-Summary of paper...
+The fifth paper presents an interactive simulations tool capable of simulating dense pressure fields from ultrasound arrays in real time. Simulation tools are heavily used both by researchers and probe manufactures in order to test out new algorithms and to deduce the performance of new arrays prior to manufacturing. Unfortunately, simulation tools performing dense simulations are inherently slow. The tool is based on Huygens' principle which describes diffraction caused by a slit as the super position of several point sources located in the slit opening. Thus, the simulator works by accumulating the contribution from a collection of point sources in a set of observation points. This is the core engine of the simulator and it is, in the context of this thesis, of course running on a GPU. How the source and observation points are laid out is up to the client to decide. The simulator is provided with both a paint-like interface and a Matlab interface for precise scripting of array configurations. The main contributions in this paper is the increased performance of the GPU implementation compared with a CPU and Matlab (The Ultrasim toolbox) version. Second, the paint-like interface provides an interactive and neat way of demonstrating array beamforming principle. We believe this will be of great value both for array designers and teachers.
 
 \section{Discussion}
 The main contributions of this thesis are:
 \begin{enumerate}
 \item a GPU implementation of the Capon beamformer
 \item a GPU implementation of the beamspace Capon beamformer
-\item real-time beamspace Capon beamforming for cardiac ultrasound imaging
+\item that real-time beamspace Capon beamforming is achieved for cardiac ultrasound imaging
 \item the first investigation of Capon beamforming applied on multiple frames in medical ultrasound imaging (simulated, \textit{in-vitro}, and \textit{in-vivo})
-\item an investigation of shift-invariance for the Capon beamformer
+\item an investigation of shift-invariance when using the Capon beamformer
 \item a method for improved shift-invariance of the Capon beamformer
-\item a method for reduced blood-pool noise in volume rendering of cardiac ultrasound volumes
+\item a method for reduced blood-pool noise in volume renderings of cardiac ultrasound volumes
 \item a GPU implementation of this adaptive volume rendering method
 \item a GPU implementation of simple paint-like simulation tool for rapid visualization ultrasound pressure fields
-\item several discussions on how to utilize the GPU for computationally intense algorithms  
+\item several discussions on how to utilize the GPU for computationally intense algorithms for advanced ultrasound imaging 
 \end{enumerate}
 
 Discuss all papers.
@@ -81,6 +81,9 @@ Paper3
 Paper4
 
 Paper5
+This is not an adaptive algorithm.
+
+Mark that code for GPU-Capon and Huygens on speed have been made open source.
 
 \section{Conclusion}
 
