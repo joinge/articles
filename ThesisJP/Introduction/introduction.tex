@@ -24,7 +24,7 @@ J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng\\
 {\it IEEE Transactions on Oceanic Engineering, submitted.}\\\\
 The first paper describes in details how we mapped the Capon beamformer to GPU architecture. Even though the paper is written within the field of active \nom{sonar}{SOund Navigation And Ranging (usually under water)} imaging, the depicted implementation is applicable to a vast range of active imaging systems. A similar discussion for cardiac ultrasound imaging can be found in \textbf{Paper VI}.  Active sonar imaging typically differs from medical ultrasound imaging by a lower real-time requirement and fewer array elements. This makes it somewhat easier to reach our goal of real-time processing. 
 
-The estimation of the spatial covariance matrix receives special attention in this study. In previous literature on Capon beamforming the matrix inversion has always been regarded as the most computationally complex piece. In this paper we show that estimation of the sample covariance matrix is actually the most complex part when spatial and temporal smoothing is included with common parameters. It is then shown how the arithmetic complexity of this estimation process can be reduced from cubic to square. Finally, we give an in-depth analysis of the arithmetic throughput on multiple platforms. The reported throughput of 1 Mpx/s on a high-end GPU is, as far as the authors know, enough to provide real-time processing for all known sonar scan sequences. However, the number of effective FLOPS is only 4 \% and 14 \% of the theoretical throughput of the target GPU for the solver and covariance estimator respectively. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. 
+The estimation of the spatial covariance matrix receives special attention in this study. In previous literature on Capon beamforming the matrix inversion has always been regarded as the most computationally complex piece. In this paper we show that estimation of the sample covariance matrix is actually the most complex part when spatial and temporal smoothing is included with common parameters. It is then shown how the arithmetic complexity of this estimation process can be reduced from cubic to square. Finally, we give an in-depth analysis of the arithmetic throughput on multiple platforms. The reported throughput of 1 Mpx/s on a high-end GPU is, as far as the authors know, enough to provide real-time processing for all known sonar scan sequences. However, the number of effective FLOPS is only 4 \% and 14 \% of the theoretical throughput of the target GPU for the solver and covariance estimator respectively.
 
 \subsection{Paper II}
 \textbf{Implementing Capon Beamforming on a GPU for Real-Time Cardiac Ultrasound Imaging}\\
@@ -69,21 +69,22 @@ The main contributions of this thesis are:
 \item several discussions on how to utilize the GPU for computationally intense algorithms for advanced ultrasound imaging 
 \end{enumerate}
 
-Discuss all papers.
+Even with all our effort in \textbf{Paper I} we were only able to achieve a fraction of the maximum throughput of the target GPU. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. It might be ways of improving these numbers, but both the solver and covariance estimation step consist of several points where fine granular synchronization and serialized steps are needed. This will restrict even the most fine tuned implementation from reaching the maximum throughput of the GPU. An interesting observation can be found in Fig.\,10 in \textbf{Paper I}. Here we see how the throughput of the covariance estimation kernel is more than three times higher than the theoretical throughput of a modern, high-end, \nom{CPU}{Central processing unit}. This clearly shows the benefit of modern GPU computing. 
 
-Paper1
-Solving is done by a batched Gauss Jordan solver implemented by Nvidia. We decided to focus on the sample covariance estimation, and not trying to beat Nvidia's solver. A natural next step would be to analyze the current solver, and figure out if any optimizations are possible. Since the sample covariance matrix is hermitian, a solver based on Cholesky decomposition might improve the throughput for solving.
-
+Solving was done by a batched Gauss Jordan solver implemented by Nvidia. We decided to focus on the covariance estimation step, and did not try to beat Nvidia at home. Nevertheless, with the measured throughput in mind, a natural next step would be to analyze the current solver, and figure out if any further optimization is possible. Since the sample covariance matrix is hermitian, a solver based on Cholesky decomposition might also help to improve the solver's throughput.
+\\\\
 Paper2
+
 Discuss why cardiac ultrasound is selected and if full Capon will be real-time for other modalities.
 
 No detailed evaluation of \textit{in vivo} performance. In cardiac application it has been proven hard to transfer results obtained in simulations to \textit{in vivo}. The improvements given is minimal with respect to the amount of calculation required.
-
+\\\\
 Paper3
-
+\\\\
 Paper4
-
+\\\\
 Paper5
+
 This is not an adaptive algorithm.
 
 Mark that code for GPU-Capon and Huygens on speed have been made open source.
@@ -96,5 +97,7 @@ Concluding remarks...
 \section{Future work}
 
 All five papers...
+
+Integrated beamforming and visualization. Using adaptive beamforming to improve e.g. speckle tracking and segmentation. Use adaptive weight statistics to guide image smoothing.
 
 \endinput
