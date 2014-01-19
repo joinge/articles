@@ -54,13 +54,13 @@ The fourth paper propose an adaptive volume rendering method based on statistics
 {\it Proc. IEEE Ultrasonics Symposium 2012 \todo{add pages}.}\\\\
 The fifth paper presents an interactive simulations tool capable of simulating dense pressure fields from ultrasound arrays in real time. Simulation tools are heavily used by researchers in order to test out new algorithms and to deduce the performance of new array designs prior to manufacturing. But dense simulations also involves a lot of waiting. With the presented simulator we try to reduce the time for calculating pressure fields by means of GPU acceleration. The tool is based on Huygens' principle which describes diffraction caused by a slit as the super position of several point sources located inside the opening. Thus, the simulator works by accumulating the contribution from a collection of point sources in a set of observation points. How the source and observation points are laid out is up to the user to decide. The simulator is provided with both a paint-like interface for interactive drawing of arrays, and a Matlab interface for precise scripting of array configurations. The main contributions in this paper is the increased performance of the GPU implementation compared with a CPU and Matlab\footnote{The Ultrasim toolbox \todo{add citation}} version. Second, the paint-like interface provides a neat way of demonstrating array beamforming principle in real time. We believe this to be of great value both for array designers and teachers.
 
-\section{Discussion}
+\section{Discussion and future work}
 The main contributions of this thesis are:
 \begin{enumerate}
 \item a GPU implementation of the Capon beamformer
 \item a GPU implementation of the beamspace Capon beamformer
 \item that real-time beamspace Capon beamforming is achieved for cardiac ultrasound imaging
-\item the first investigation of Capon beamforming applied on multiple frames in medical ultrasound imaging (simulated, \textit{in-vitro}, and \textit{in-vivo})
+\item the first investigation of Capon beamforming applied on multiple frames in medical ultrasound imaging (simulated, \textit{in vitro}, and \textit{in vivo})
 \item an investigation of shift-invariance when using the Capon beamformer
 \item a method for improved shift-invariance of the Capon beamformer
 \item a method for reduced blood-pool noise in volume renderings of cardiac ultrasound volumes
@@ -70,18 +70,14 @@ The main contributions of this thesis are:
 
 In addition, the thesis provides several discussions on how to utilize the GPU to accelerate advanced ultrasound imaging algorithms. Now follows a discussion of the five papers that constitutes this thesis.
 
-Even with all our effort in \textbf{Paper I} we were only able to achieve a fraction of the maximum throughput of the target GPU. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. It might be ways of improving these numbers, but both the solver and covariance estimation step consist of several points where fine granular synchronization and serialized instructions are needed. This will restrict even the most fine tuned implementation from reaching the maximum throughput of the GPU. An interesting observation can be found in Fig.\,10 in \textbf{Paper I}. Here we see how the achieved throughput of the covariance estimation kernel is more than three times higher than the theoretical throughput of a modern, high-end, \nom{CPU}{Central processing unit}. This clearly shows the benefit of modern GPU computing. 
-
-Solving was done by a batched Gauss Jordan solver implemented by Nvidia. In our work we focused on the covariance estimation step, and did not try to beat Nvidia at home. Nevertheless, with the measured throughput in mind, a natural next step would be to analyze the current solver, and figure out if any further optimization is possible. Since the sample covariance matrix is hermitian, a solver based on Cholesky decomposition might also help to improve the solver's throughput.
+Even with all our effort in \textbf{Paper I} we were only able to achieve a fraction of the maximum throughput of the target GPU. This result shows how hard it is to reach the theoretical level of throughput, and that how close one can get is highly algorithm depended. It might be ways of improving these numbers, but both the solver and covariance estimation step consist of several points where fine granular synchronization and serialized instructions are needed. This will restrict even the most fine tuned implementation from reaching the maximum throughput of the GPU. An interesting observation can be found in Fig.\,10 in \textbf{Paper I}. Here we see how the achieved throughput of the covariance estimation kernel is more than three times higher than the theoretical throughput of a modern, high-end, \nom{CPU}{Central processing unit}. This clearly shows the benefit of modern GPU computing.  Solving was performed by a batched Gauss Jordan solver implemented by Nvidia. In our work we focused on the covariance estimation step, and did not try to beat Nvidia at home. Nevertheless, with the measured throughput in mind, a natural next step would be to analyze the current solver, and figure out if any further optimization is possible. Since the sample covariance matrix is hermitian, a solver based on Cholesky decomposition might also help to improve the solver's throughput.
 \\\\
-In \textbf{Paper II} we present the first medical ultrasound loops processed with ES- and BS-Capon beamforming.  The paper does not provide a detailed evaluation of the method's \textit{in vivo} performance. Yet, initially it has been proven hard to transfer results obtained in simulations to \textit{in vivo} applications. The improvements seen are minimal, especially with the amount of calculation required in mind. The method is clearly able to decrees the lateral with of lateral point scatterers and thin structures in addition to reduce sidelobes cluttering tissue edges. On the other hand, the overall contrast is visually not improved and sometimes worse. Since the Capon beamformer does not reduce the noise floor just directional noise, contrast will get worse in low SNR applications when signal cancellation occurs. 
-
-Discuss why cardiac ultrasound is selected and if full Capon will be real-time for other modalities.
-
-Discuss LCA.
+In \textbf{Paper II} we focused on achieving real time Capon processing for cardiac ultrasound, but we also present the first medical ultrasound loops processed with ES- and BS-Capon beamforming.  The paper does not provide any detailed evaluation of the method's \textit{in vivo} performance. Yet, initially is has been proven hard to transfer results obtained in simulations to \textit{in vivo} images. The improvements seen are minimal, especially with the amount of calculations required in mind. The beamformers are clearly able to decrees the lateral width of lateral point scatterers and thin structures, and to sharpen step edges. On the other hand, the overall contrast is visually not improved and sometimes it is even worse. Since the Capon beamformer only affect directional noise, it is clear that contrast will get worse in low \nom{SNR}{Signal-to-noise ratio} applications when signal cancellation occurs. The oversampling approach presented in \textbf{Paper III} might improve on this, but it will only reduce signal cancellation if the phase shifts across the aperture are small and close to linear. Another issue is that bright points with a wide lateral profile exhibits better visual contrast when surrounded by speckle noise than points with narrow lateral profiles. In future work a detailed investigation of why results obtained in simulations are not directly transferable to \textit{in vivo} needs to be performed. It will also be crucial to show larger improvements \textit{in vivio} than what is presented in \textbf{Paper II}. Both to justify all our computations, and to show an image which has improved resolution and contrast. As pointed out at the end of \textbf{Paper II}, cardiac ultrasound might not be the best modality for Capon beamforming. Cardiac ultrasound imaging was selected because it is the medical ultrasound modality which requires most floating points operations per second. An application where detection of closely spaced point targets are of importance might be better suited. A better suited adaptive beamformer for cardiac applications is the \nom{LCA}{Low complexity beamformer} beamformer, where the Capon optimization problem is applied on a set of predefined windows. This method has linear complexity and shares many properties with the Capon beamformer. 
 \\\\
 Paper3
 Discuss how contrast might get improved since the amount of signal cancellation is reduced. 
+
+Oversampling on receive will increase the penalty of processing beamspace data. Scan conversion will also take more time, and the end result should probably have higher resolution to provide the sharp definitions provided by Capon beamforming. 
 \\\\
 Paper4
 
@@ -96,17 +92,6 @@ This is not an adaptive algorithm.
 Mark that code for GPU-Capon and Huygens on speed have been made open source.
 It has over 200 downloads and soon 1000 views on youtube.
 
-\section{Conclusion}
-
-Concluding remarks...
-
-\section{Future work}
-
-Merge this section with discussions..?
-
-All five papers...
-
-Detailed investigation of why results obtained in simulations are not directly transferable to \textit{in vivo}.
 
 Integrated beamforming and visualization. Using adaptive beamforming to improve e.g. speckle tracking and segmentation. Use adaptive weight statistics to guide image smoothing.
 
