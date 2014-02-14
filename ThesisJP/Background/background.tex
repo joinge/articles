@@ -16,16 +16,18 @@ In a recent essay, Herb Sutter, a leading authority on software development, rev
 
 Around the same time as CPU manufactures hit the frequency wall, people started experimenting with programmable shaders which recently had been introduced in the field of graphics programming. The graphics processing pipeline had before this been a fixed function pipeline, where e.g. geometry and textures where fed to the graphics processing unit (GPU) in one end and a rasterized rendered image was outputted in the other. What programmable shaders  introduced was the ability to replace some steps in the fixed-function pipeline with custom computations. This made it possible to utilize the GPU for other tasks than just rendering graphics \cite{Seland2007}. The rationale behind this exploration was that GPUs were already highly available in consumer PCs, and hidden behind its graphics interface were processing powers an order of magnitude larger than what the CPU could provide (Fig.\,\ref{fig:cpu_vs_gpu}). Actually, at the time when CPU manufacturers hit the frequency wall the GPU had already gone multi-core, first of all driven by an ever-increasing demand for more realistic computer games. Second, the rendering pipeline exhibits minimal execution path branching, and data are typically used once. Designers of GPUs could therefore skip advance feature, found in most CPUs, like branch prediction and different levels of data caching. These measures reduced the silicon footprint of each core and made it possible to add multiple cores to one GPU before CPU designers where able to do the same. Today, even if more advanced caching has been added to GPUs, this is still the main reason why GPUs have higher peak performance than CPUs (Fig.\,\ref{fig:cpu_vs_gpu}). Another reason is the inherent parallel nature of the rendering problem. When geometry is projected and rasterized the same instruction is typically needed for a lot of data at the same time. This makes a special kind of instruction, Single Instruction Multiple Data (\nom{SIMD}{Single instruction multiple data (instruction type)}) instruction \cite{Flynn1966}, especially suited for this kind of problem. The differences between how SIMD instructions are utilized in modern CPUs and GPUs are discussed in Section \ref{sec:cpu_vs_gpu}.
 
-For the first adopters of GPU programming, or General-purpose programming on graphics processing units (GPGPU) as it was named, it soon became evident that offloading all types of computations to the GPU was not always a good idea. In most cases it is important to balance the load equally between the CPU and GPU to obtain their combined computationally power. Balancing typically means that highly parallel tasks should be offloaded to the GPU and serialized work should stay on the CPU. This paradigm of utilizing specialized cores for solving specific problems is today known as heterogeneous computing. The specialized core can be a GPU or e.g. a field-programmable gate array (\nom{FPGA}{Field-programmable gate array}). A recent trend is that specialized accelerator cores are embedded onto the CPU. This heterogeneous processors is often referred to as an accelerated processing unit (\nom{APU}{Accelerated processing unit}). The last three generations of CPUs from Intel have all had on-chip integrated graphics. Even if an on-chip GPU is less powerful than a discrete GPU, valuable time is saved by not having to send data across the PCI-express bus, which connects the different parts of a computer to the motherboard. This is the reason why the first rules of GPGPU is to minimize PCI-express traffic. 
+For the first adopters of GPU programming, or General-purpose programming on graphics processing units (GPGPU) as it was named, it soon became evident that offloading all types of computations to the GPU was not always a good idea. In most cases it is important to balance the load equally between the CPU and GPU to obtain their combined computationally power. Balancing typically means that highly parallel tasks should be offloaded to the GPU and serialized work should stay on the CPU. This paradigm of utilizing specialized cores for solving specific problems is today known as heterogeneous computing. The specialized core can be a GPU or e.g. a field-programmable gate array (\nom{FPGA}{Field-programmable gate array}). A recent trend is that specialized accelerator cores are embedded onto the CPU. This heterogeneous processors is often referred to as an accelerated processing unit (\nom{APU}{Accelerated processing unit}). The last three generations of CPUs from Intel have all had on-chip integrated graphics. Even if an on-chip GPU is less powerful than a discrete GPU, valuable time is saved by not having to send data across the PCI Express bus, which connects the different parts of a computer to the motherboard. This is the reason why the first rules of GPGPU (with discrete GPUs) is to minimize CPU-to-GPU transfers. 
 
-The final transition currently taking place in the computer industry is the introduction of cloud computing, where compute power is provided as a web-service and automatically scales on demand. Together, multi-core, heterogeneous cores, and cloud cores forms the "jungle" that today's software engineers have to tackle (Fig.\,\ref{fig:jungle}). This thesis focus on heterogeneous computing with one multi-core CPU and a discrete high performance GPU, a cheap system which is likely to be the specification of current and future ultrasound imaging system.
+The final transition currently taking place in the computer industry is the introduction of cloud computing, where compute power is provided as a web-service and automatically scales on demand. Together, multi-core, heterogeneous cores, and cloud cores forms the "jungle" that today's software engineers have to tackle (Fig.\,\ref{fig:jungle}). This thesis focus on heterogeneous computing with one multi-core CPU and a discrete high performance GPU, a cheap and high performance system which is likely to be the specification of current and future ultrasound imaging system.
 
 \subsection{Comparing CPU and GPU performance}\label{sec:cpu_vs_gpu}
+The CPU is design to be the main control unit of a computer. It is therefore good at general processing. The GPU, on the other hand, has a history of processing graphics which involves heavy vector arithmetic. Even though they started out as very different processors, modern CPUs are including more and more GPU-like features, and GPUs are adding CPU features. In this section we will see why there is a big difference in peak performance for a CPU and GPU.
+
 It is common to say that a CPU has few but advance generic cores, and the GPU has many but simple cores.
 
 The SIMD registers on a GPU is longer than on a CPU and the GPU have more of them.
 
- the most powerful one (HD 5200) have a peak performance of nearly one tera single precision floating point operations per second (FLOPs).
+ the most powerful integrated intel GPU (HD 5200) have a peak performance of nearly one tera single precision floating point operations per second (FLOPs).
 
 It it is also much less costly to switch between a pixel-thread for the GPU then a program thread for the CPU.  
 
@@ -38,6 +40,13 @@ Compare CPU and GPU ALUs. SSE, AVX ... The GPU has super-wide registers. The SM 
 \includegraphics[width=\textwidth]{img/cpu_vs_gpu.pdf}
 \caption{Development in theoretical peak throughput, single precision (SP) and double precision (DP), the last decade for Intel CPUs and Nvidia GPUs. Image courtesy of Michael Galloy (michaelgalloy.com).}
 \label{fig:cpu_vs_gpu}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{img/CPU-GPU.png}
+\caption{Overview of CPU and GPU architecture.}
+\label{fig:cpu_gpu}
 \end{figure}
 
 \subsection{Programming a GPU}
@@ -63,7 +72,7 @@ Add sentence about siemens and supersonic imagine scanners. They use GPUs? What 
 \end{figure}
 
 \section {Medical ultrasound imaging}\label{sec:ultrasound}
-Ultrasound imaging encompasses technology which generates images based on sound whose frequencies we can not hear. For medical ultrasound imaging frequencies above 2 MHz are typically used.
+Ultrasound imaging encompasses technology which generates images based on sound whose frequencies we can not hear. For medical ultrasound imaging frequencies between 2 MHz and 10 MHz are typically used. Frequency dependent attenuation force us to select a lower frequency if the object we want to image is located deep into the body. This is the reason why 2-4 MHz is used for cardiac imaging and a frequency around 7 MHz is used for vascular imaging.
 
 Typical probes, scan sequences, resolution and sampling.
 
@@ -104,7 +113,7 @@ Time v.s. phase delays.
 \subfigure[Capon]{
 	\includegraphics[width=0.47\textwidth]{img/scenario_mv_resp2.png}
 }
-\caption{Array beam pattern with uniform and Capon weights. An interfering source is located at 20 degrees.}
+\caption{Array beam pattern with uniform and Capon weights. An interfering source is located at 20\degree. Notice the reduced sidelobe level for the Capon beam pattern in the direction of the interferer.}
 \end{figure}
 
 Capon beamforming\footnote{The name ''Capon beamformer'' is due to work by J. Capon \todo{add citation} on seismic arrays \todo{Move to background.}} or minimum variance beamforming.
