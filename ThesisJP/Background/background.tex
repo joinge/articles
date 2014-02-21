@@ -9,12 +9,12 @@ In a recent essay, Herb Sutter, a leading authority on software development, rev
 
 \begin{figure}
 \centering
-\includegraphics[width=0.9\textwidth]{img/free_lunsh.png}
+\includegraphics[width=0.8\textwidth]{img/free_lunsh.png}
 \caption{Illustration of transitions between different eras in the computer industry. Currently there are three ongoing transitions; multi-core, heterogeneous-core and cloud-core. Image courtesy of Herb Sutter (herbsutter.com).}
 \label{fig:jungle}
 \end{figure}
 
-Around the same time as CPU manufactures hit the frequency wall, people started experimenting with programmable shaders which recently had been introduced in the field of graphics programming. The graphics processing pipeline had before this been a fixed function pipeline, where e.g. geometry and textures where fed to the graphics processing unit (GPU) in one end and a rasterized rendered image was outputted in the other. What programmable shaders  introduced was the ability to replace some steps in the fixed-function pipeline with custom computations. This made it possible to utilize the GPU for other tasks than just rendering graphics \cite{Seland2007}. The rationale behind this exploration was that GPUs were already highly available in consumer PCs, and hidden behind its graphics interface were processing powers an order of magnitude larger than what the CPU could provide (Fig.\,\ref{fig:cpu_vs_gpu}). Actually, at the time when CPU manufacturers hit the frequency wall the GPU had already gone multi-core, first of all driven by an ever-increasing demand for more realistic computer games. Second, the rendering pipeline exhibits minimal execution path branching, and data are typically used once. Designers of GPUs could therefore skip advance feature, found in most CPUs, like branch prediction and different levels of data caching. These measures reduced the silicon footprint of each core and made it possible to add multiple cores to one GPU before CPU designers where able to do the same. Today, even if more advanced caching has been added to GPUs, this is still the main reason why GPUs have higher peak performance than CPUs (Fig.\,\ref{fig:cpu_vs_gpu}). Another reason is the inherent parallel nature of the rendering problem. When geometry is projected and rasterized the same instruction is typically needed for a lot of data at the same time. This makes a special kind of instruction, Single Instruction Multiple Data (\nom{SIMD}{Single instruction multiple data (instruction type)}) instruction \cite{Flynn1966}, especially suited for this kind of problem. The differences between how SIMD instructions are utilized in modern CPUs and GPUs are discussed in Section \ref{sec:cpu_vs_gpu}.
+Around the same time as CPU manufactures hit the frequency wall, people started experimenting with programmable shaders which recently had been introduced in the field of graphics programming. The graphics processing pipeline had before this been a fixed function pipeline, where e.g. geometry and textures where fed to the graphics processing unit (GPU) in one end and a rasterized rendered image was outputted in the other. What programmable shaders  introduced was the ability to replace some steps in the fixed-function pipeline with custom computations. This made it possible to utilize the GPU for other tasks than just rendering graphics \cite{Seland2007}. The rationale behind this exploration was that GPUs were already highly available in consumer PCs, and hidden behind its graphics interface were processing powers an order of magnitude larger than what the CPU could provide (Fig.\,\ref{fig:cpu_vs_gpu}). Actually, at the time when CPU manufacturers hit the frequency wall the GPU had already gone multi-core, first of all driven by an ever-increasing demand for more realistic computer games. Second, the rendering pipeline exhibits minimal execution path branching, and data are typically used once. Designers of GPUs could therefore skip advance feature, found in most CPUs, like branch prediction and different levels of data caching. These measures reduced the silicon footprint of each core and made it possible to add multiple cores to one GPU before CPU designers where able to do the same. Today, even if more advanced caching has been added to GPUs, this is still the main reason why GPUs have higher peak performance than CPUs (Fig.\,\ref{fig:cpu_vs_gpu}). Another reason is the inherent parallel nature of the rendering problem. When geometry is projected and rasterized the same instruction is typically needed for a lot of data at the same time. This makes a special kind of instruction, Single Instruction Multiple Data (\nom{SIMD}{Single instruction multiple data (instruction)}) instruction \cite{Flynn1966}, especially suited for this kind of problem. The differences between how SIMD instructions are utilized in modern CPUs and GPUs are discussed in Section \ref{sec:cpu_vs_gpu}.
 
 For the first adopters of GPU programming, or General-purpose programming on graphics processing units (GPGPU) as it was named, it soon became evident that offloading all types of computations to the GPU was not always a good idea. In most cases it is important to balance the load equally between the CPU and GPU to obtain their combined computationally power. Balancing typically means that highly parallel tasks should be offloaded to the GPU and serialized work should stay on the CPU. This paradigm of utilizing specialized cores for solving specific problems is today known as heterogeneous computing. The specialized core can be a GPU or e.g. a field-programmable gate array (\nom{FPGA}{Field-programmable gate array}). A recent trend is that specialized accelerator cores are embedded onto the CPU. This heterogeneous processors is often referred to as an accelerated processing unit (\nom{APU}{Accelerated processing unit}). The last three generations of CPUs from Intel have all had on-chip integrated graphics. Even if an on-chip GPU is less powerful than a high-performance s discrete GPU, valuable time is saved by not having to send data across the PCI Express bus, which connects the different parts of a computer to the motherboard. This is the reason why the first rules of GPGPU (with discrete GPUs) is to minimize CPU-to-GPU transfers. 
 
@@ -23,23 +23,29 @@ The final transition currently taking place in the computer industry is the intr
 \subsection{Comparing CPU and GPU performance}\label{sec:cpu_vs_gpu}
 The CPU is design to be the main control unit of a computer. It is therefore good at general processing. The GPU, on the other hand, has a history of processing graphics which involves heavy vector arithmetic. Even though they started out as very different processors, modern CPUs are including more and more GPU-like features, and GPUs are adding CPU features. In this section we will see what these similarities are and why there is still a big difference in peak performance between a CPU and GPU.
 
-In Section \ref{sec:gpgpu} we introduced a special type of instructions, namely SIMD instructions, which are designed to execute a single instruction across multiple data element in one clock cycle. At the end of the 20th century, Intel introduced a SIMD instruction set for their Pentium III processor called the Streaming SIMD Extensions (\nom{SSE}{Streaming SIMD Extensions}). This extension has seen several updates since. The first SEE instructions set had 128 bit long registers which meant that four 32 bit floating point values could be processed per clock cycle\footnote{For simplicity we will assume that the whole register is processed in one clock cycle even if the actual implementation might distributes one instruction for the register across multiple cycles.}. Updates of the SSE instructions sets have added new instructions (SSE2, SSE3, and SSE4) and longer registers (\nom{AVX}{Advanced Vector Extensions}, AVX2, and AVX-512). AVX and AVX2 adds 256 bit long registers which means that eight 32 bit floating point values can be processed per clock cycle. This extension is found in the latest CPUs from Intel. AVX-512 extends the registers to 512 bit and is found in the Intel accelerator board  Xeon Phi and might show up in the next generation of CPUs. The latest quad-core CPU from Intel, the Haswell architecture, can therefore process 32 32 bit floating point values per clock cycle. With a clock frequency of 3.9 GHz this sums up to a theoretical peak single precision performance of 124.8 giga single precision floating point operations per second (GFLOPS). In addition, the most powerful integrated GPU found on Haswell CPUs have 40 execution units capable of processing 16 32 bit floating point values at 1.1 GHz. The total theoretical peak single precision FLOPS for a high-end Haswell CPU is therfore $124.8 + (40*16*1.1) = 828.8$ GFLOPS as visualized in Fig\,\ref{fig:cpu_vs_gpu}.
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{img/CPU-GPU.png}
+\caption{Overview of CPU and GPU architecture. (make my own)}
+\label{fig:cpu_gpu}
+\end{figure}
 
-Modern GPUs can also be interpreted as a unit consisting of multiple SIMD processors. The Fermi GPU architecture by Nvidia, which is used the most in this theses, have up to 16 SIMD units capable of performing 32 32 bit floats per clock cycle at 772 MHz. The theoretical peak single precision FLOPS for this architecture is by that found to be $16*32*772 = $ (needs to add FMA and SP-units, What about FMA on the CPU?)
+In Section \ref{sec:gpgpu} we introduced a special type of instructions, namely SIMD instructions, which are designed to execute a single instruction across multiple data element in one clock cycle. At the end of the 20th century, Intel introduced a SIMD instruction set for their Pentium III processor called the Streaming SIMD Extensions (\nom{SSE}{Streaming SIMD extensions (instruction)}). This extension has seen several updates since. The first SEE instructions set had 128 bit long registers which meant that four 32 bit floating point values could be processed per clock cycle\footnote{For simplicity we will assume that the whole register is processed in one clock cycle even if the actual implementation might distributes one instruction for the register across multiple cycles.}. Updates of the SSE instructions sets have added new instructions (SSE2, SSE3, and SSE4) and longer registers (\nom{AVX}{Advanced vector extensions (instruction)}, AVX2, and AVX-512). AVX and AVX2 adds 256 bit long registers and fused multiply-accumulate instructions (\nom{FMA}{Fused multiply-accumulate (instruction)})  which means that sixteen 32 bit floating point values can be processed per clock cycle per core. A new extension, AVX-512, extends the registers to 512 bit and is found in the Intel accelerator board  Xeon Phi and might show up in the next generation of CPUs. The latest CPU architecture from Intel, the Haswell architecture, has two FMA ports and is therefore capable of processing 32, 32 bit, floating point values per clock cycle per core (Fig.\,\ref{fig:cpu_gpu}). For an eight core\footnote{An 8-core Haswell CPU is scheduled to launch during 2014.} CPU with a clock frequency of 3.8 GHz this sums to 
+\begin{equation}
+32*8*3.8 = 972.8\,\text{GFLOPS},
+\end{equation}
+hence a theoretical peak single precision performance of close to one tera single precision floating point operations per second (TFLOPS). This is the same number as visualized in Fig\,\ref{fig:cpu_vs_gpu} for the Haswell architecture. In addition, the most powerful integrated GPU found on Haswell CPUs have 40 execution units capable of processing sixteen, 32 bit, floating points at 1.1 GHz, 
+\begin{equation}
+16*40*1.1 = 704\,\text{GFLOPS}.
+\end{equation}
 
-It is common to say that a CPU has few but advance generic cores, and the GPU has many but simple cores.
+Modern GPUs can also be interpreted as a unit consisting of multiple SIMD processors (Fig.\,\ref{fig:cpu_gpu}). The latest GPU architecture by Nvidia have up to 15 SIMD units capable of processing 192, 32 bit, floats per clock cycle at 745 MHz. This GPU is also capable of performing FMA instructions, doubling the number of theoretical FLOPS. The theoretical peak single precision FLOPS for this architecture is by that found to be 
+\begin{equation}
+15*192*2*745 = 4291\,\text{GFLOPS}.
+\end{equation} 
+Each SIMD core also comprise 16 special function units (\nom{SFU}{Special function unit (cos, exp, ect.)}) which add close to 1 TFLOPS in additional power. We see how the wide SIMD register found on GPUs results in five times the performance of a high-end CPU (without the integrated GPU). 
 
-The SIMD registers on a GPU is longer than on a CPU and the GPU have more of them.
-
- the most powerful integrated intel GPU (HD 5200) have a peak performance of nearly one tera single precision floating point operations per second (FLOPs).
-
-It it is also much less costly to switch between a pixel-thread for the GPU then a program thread for the CPU.  
-
-About theoretical FLOPS: Note that these are theoretical numbers and the actual throughput typically is algorithm dependent.
-
-Compare CPU and GPU ALUs. SSE, AVX ... The GPU has super-wide registers. The SM in Fermi have 32 cores or 1024 bit registers. The SMX in Kepler have 192 cores. 6144 bit registers. SSE (Streaming SIMD Extensions) instructions have 128 bit registers. AVX (Advanced Vector Extensions) have 256 bit registers. AVX-512 has 512 bit registers. Single instruction, multiple data (SIMD).
-
-In this section we have focused on CPUs from Intel and GPUs from Nvidia, note that GPUs and CPUs from AMD have similar features.
+Note that the derived numbers are strictly theoretical and that actual throughput typically is algorithm dependent. In this section we have focused on CPUs from Intel and GPUs from Nvidia, however, GPUs and CPUs from AMD have similar specifications.
 
 \begin{figure}
 \centering
@@ -48,17 +54,12 @@ In this section we have focused on CPUs from Intel and GPUs from Nvidia, note th
 \label{fig:cpu_vs_gpu}
 \end{figure}
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{img/CPU-GPU.png}
-\caption{Overview of CPU and GPU architecture.}
-\label{fig:cpu_gpu}
-\end{figure}
-
 \subsection{Programming a GPU}
 Early gpgpu programming required expert knowledge about graphics and the remaining fixed funtions in the pipeline. New programming languages where needed. OpenCL and CUDA. C++ AMP.
 
 Architecture and how to program. See Paper II.
+
+It it is also much less costly to switch between a pixel-thread for the GPU then a program thread for the CPU. 
 
 Hopefully, in the future, GPU programming will be the job of e.g. c++ compiler, and direct fiddling with GPU kernels should only be needed if maximum throughput is absolutely needed. (In the same way the compiler is able to translate c++ code into SSE and AVX instructions.)
 
