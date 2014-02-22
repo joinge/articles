@@ -46,19 +46,37 @@ Modern GPUs can also be interpreted as a unit consisting of multiple SIMD proces
 \end{equation} 
 Each SIMD core also comprise 16 special function units (\nom{SFU}{Special function unit (sin, exp, sqrt, ect.)}) which add close to 1 TFLOPS in additional computational power. This adds up to five TFLOPS in computationally power as shown in Fig.\,\ref{fig:cpu_vs_gpu} for the GeForce GTX 780 TI GPU. From Fig.\,\ref{fig:cpu_gpu} we see how the high number of SIMD cores found on GPUs and their larger width results in five times the computational performance of a high-end CPU (without the integrated GPU). 
 
-Note that the derived numbers are strictly theoretical and that actual throughput is highly algorithm dependent. Nevertheless, in theory, the benefit of GPU computing over CPU computing is currently a factor of ten\footnote{A factor of five when a eight core Haswell CPU is launched later this year.} in raw computationally power. A claimed speed-up larger than this is typically caused by comparing a non-optimized CPU implementation with an optimized GPU implementation or by comparing uneven hardware \cite{Lee2010, Kothapalli2013}. Also note that in this section we have focused on CPUs from Intel and GPUs from Nvidia, however, CPUs and GPUs from AMD have similar specifications.
+Note that the derived numbers are strictly theoretical and that actual throughput is highly algorithm dependent. Nevertheless, in theory, the benefit of GPU computing over CPU computing is currently a factor of five and ten\footnote{Until an eight core Haswell CPU is launched later this year.} in raw computationally power. A claimed speed-up larger than this is typically caused by comparing a non-optimized CPU implementation with an optimized GPU implementation or by comparing uneven hardware \cite{Lee2010, Kothapalli2013}. Also note that in this section we have focused on CPUs from Intel and GPUs from Nvidia, however, CPUs and GPUs from AMD have similar specifications.
 
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{img/cpu_vs_gpu.pdf}
-\caption{Development in theoretical peak throughput, single precision (SP) and double precision (DP), the last decade for Intel CPUs and Nvidia GPUs. Image courtesy of Michael Galloy (michaelgalloy.com).}
+\caption{Development in theoretical peak throughput, single precision (SP) and double precision (DP), the last decade for Intel CPUs and Nvidia GPUs.}
 \label{fig:cpu_vs_gpu}
 \end{figure}
 
 \subsection{Programming a GPU}
-Early GPGPU programming required expert knowledge about computer graphics and the remaining fixed functions in the pipeline. When GPGPU gained interest it quickly became evident that new programing languages where needed.  One of the first GPGPU oriented languages for the GPU was the Brook language by Buck \textit{et al.} \cite{Buck2004}. Buck later joined Nvidia where he led the work on \nom{CUDA}{Compute unified device architecture (GPGPU language)}, a GPGPU language by Nvidia for Nvidia GPUs only. The first version of CUDA was released in 2007. The following year, Apple launched their own GPGPU language called OpenCL, a standard which are administrated by the Krohnos Group.
+Early GPGPU programming required expert knowledge about computer graphics and the remaining fixed functions in the pipeline. When GPGPU gained interest it quickly became evident that new programing languages where needed.  One of the first GPGPU oriented languages for the GPU was the Brook language by Buck \textit{et al.} \cite{Buck2004}. Buck later joined Nvidia where he led the work on \nom{CUDA}{Compute unified device architecture (GPGPU language)}, a GPGPU language and framework by Nvidia for Nvidia GPUs only. The first version of CUDA was released in 2007. The following year, Apple launched a GPGPU framework called \nom{OpenCL}{Open Compute Language (GPGPU language)}, a standard which are maintained by the Khronos Group. These two are still today the main programming frameworks for GPGPU. CUDA only runs on Nvidia GPUs while OpenCL can now run on GPUs from both Nvidia and AMD, CPUs from both Intel and AMD, and on FPGAs from Altera.
 
-New programming languages where needed. OpenCL and CUDA. C++ AMP.
+\begin{figure}
+\centering
+\subfigure[Kernel]{
+	\includegraphics[width=0.5\textwidth]{img/kernel.pdf}\label{fig:gpu_kernel}
+}
+\subfigure[Threads, blocks and grid]{
+	\includegraphics[width=0.4\textwidth]{img/cuda_threads.png}\label{fig:gpu_grid}
+}
+\caption{The figure depicts how GPU threads are grouped into blocks and arranged in a grid. One thread runs a copy of a kernel function. In this example the kernel function performs an element-wise matrix square.}
+\label{fig:gpu_grid_kernel}
+\end{figure}
+
+Both CUDA and OpenCL is centered around a kernel function which are executed be a large group of threads. The kernel function, for both CUDA and OpenCL, has a C-like syntax with some additional specifiers. A CUDA kernel is depicted in Fig.\,\ref{fig:gpu_kernel}. The \texttt{\_\_global\_\_} specifier tells the CUDA compiler that this function is a kernel function, and, in CUDA, this kernel function is launched by using a CUDA specific syntax:
+\begin{align*}
+\texttt{square<<<grid, block>>>(a, N)}
+\end{align*}
+where \texttt{grid} and \texttt{block} is a structure containing the grid and block size as depicted in Fig.\,\ref{fig:gpu_grid}, and \texttt{a} is a pointer to a memory buffer located on the GPU. When launched, a copy of the kernel is executed for each thread in each block. Each kernel get as input its location in the compute grid (\texttt{blockIdx} and \texttt{threadIdx}).
+
+C++ AMP.
 
 Architecture and how to program. See Paper II.
 
@@ -68,18 +86,6 @@ Hopefully, in the future, GPU programming will be the job of e.g. c++ compiler, 
 
 \subsection{Accelerators in medical ultrasound imaging }
 Add sentence about siemens and supersonic imagine scanners. They use GPUs? What does this mean? FPGAs and ASICs.
-
-\begin{figure}
-\centering
-\subfigure[Threads, blocks and grid]{
-	\includegraphics[width=0.4\textwidth]{img/cuda_threads.png}
-}
-\subfigure[Kernel]{
-	\includegraphics[width=0.5\textwidth]{img/kernel.pdf}
-}
-\caption{Depicts how GPU threads are grouped into blocks and arranged in a grid. One thread runs a copy of a kernel function. In this example the kernel function performs an element-wise matrix square.}
-\label{fig:gpu_grid}
-\end{figure}
 
 \section {Medical ultrasound imaging}\label{sec:ultrasound}
 Ultrasound imaging encompasses technology which generates images based on sound whose frequencies we can not hear. For medical ultrasound imaging frequencies between 2 MHz and 10 MHz are typically used. Frequency dependent attenuation force us to select a lower frequency if the object we want to image is located deep into the body. This is the reason why 2-4 MHz is used for cardiac imaging and a frequency around 7 MHz is used for vascular imaging.
