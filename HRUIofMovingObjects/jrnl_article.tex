@@ -616,7 +616,7 @@ From (\ref{eq:capon_weights}) it is also clear that complex data [in-phase and q
 
 The required lateral sampling in an ultrasound image for a given center frequency, $f_c$, and bandwidth, $B$, is given by the aperture size, $D$, and the wavelength of the center frequency, $\lambda_c = c/f_c$, where $c$ is the speed of sound. The required Nyquist beam spacing is then \cite{Hergum2007}:
 \begin{align}
-\Delta < \frac{\lambda_c}{qpD}, \label{eq:resolution}
+\delta\theta < \frac{\lambda_c}{qpD}, \label{eq:resolution}
 \end{align}
 where the oversampling factor $p$ is applied to reduce folding of frequencies between $f_c$ and $f_c + B/2$. A $p$-factor of two has been used throughout this paper. The oversampling factor $q$ will be used to oversample prior to Capon beamforming and is one if not stated otherwise. 
 
@@ -704,9 +704,9 @@ In cardiac ultrasound imaging, PRB is typically used in order to keep the number
 \subsection{Oversampling by Phase Rotation}
 The Capon beamformer formula in (\ref{eq:capon_weights}) gives a direct opportunity for oversampling using phase rotation. The steering vector $\vec{a}$ has in previous work been set to $\vec{1}$ since ultrasound data have to be pre-delayed. However, the steering vector can also, as in narrow band applications, be varied over a set of pre-defined vectors. In a narrow band setting the beam can make a sweep across the whole imaging sector through phase steering. This is also possible in broadband applications as long as the phase rotation is less than one pulse length (See coarse-fine beamforming in \cite{Thomenius} and its references). The maximal steering angle is approximately given by
 \begin{align}
-\theta_{max} = \alpha p \Delta,
+\theta_{max} = \alpha p \delta\theta,
 \end{align}
-where $\alpha$ is the pulse length in $\lambda$'s, and $p$ and $\Delta$ is the oversampling factor and beam spacing respectively as defined in (\ref{eq:resolution}). For our simulations $\theta_{max} = 3\Delta$.
+where $\alpha$ is the pulse length in $\lambda$'s, and $p$ and $\delta\theta$ is the oversampling factor and beam spacing respectively as defined in (\ref{eq:resolution}). For our simulations $\theta_{max} = 3\delta\theta$.
 It is therefore possible to make a sweep based on phase rotation between a given beam and half-way to its two nearest neighbours without introducing large errors. Phase rotation is actually what the Capon beamformer uses internally to micro-steer away from bright point scatterers and to enhance edges.
 
 For a uniform linear array located along the x-axis the steering vector $\vec{a}_\theta$ should be calculated as 
@@ -719,7 +719,7 @@ e^{-j\frac{2\pi}{\lambda_c}x_1\sin(\theta)} \\
 e^{-j\frac{2\pi}{\lambda_c}x_{L-1}\sin(\theta)}
 \end{bmatrix}
 \end{align}
-where $x_i$ is the element position and $\theta$ is swept from $-\Delta/2$ to $\Delta/2$. Note that the steering vector must be calculated for an $L$ element symmetric subarray, even though the full array has $M$ elements. This subarray should have the same element pitch, $x_i - x_{i-1}$, as the full array. %The steering error introduced by this steering vector for a frequency band $B$ is less than $B/2 \times \Delta/2$.
+where $x_i$ is the element position and $\theta$ is swept from $-\delta\theta/2$ to $\delta\theta/2$. Note that the steering vector must be calculated for an $L$ element symmetric subarray, even though the full array has $M$ elements. This subarray should have the same element pitch, $x_i - x_{i-1}$, as the full array. %The steering error introduced by this steering vector for a frequency band $B$ is less than $B/2 \times \delta\theta/2$.
 
 The steering angles can be spread out in many different ways. If the number of steering angles is $N_\theta$ we have selected a uniform distribution of $\theta$  with $N_\theta/2$ angles on each side of the original steering direction when $N_\theta$ is even.%, and $(N_\theta-1)/2$ [including the original steering direction] if $N_\theta$ is odd. 
 
