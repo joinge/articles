@@ -89,23 +89,20 @@ If the width of a piezoelectric element is less than the wavelength of the trans
 \end{align}
 \nomi{$\delta\theta$}{Angular resolution} where \nom{$\lambda$}{Wavelength} is the ultrasound wavelength, and \nom{$D$}{Aperture width} is the aperture width. With a speed-of-sound in human tissue of $1540\frac{\text{m}}{\text{s}}$ the angular resolution of a 2 cm cardiac array at 3 MHz is around 1.5\degree, which at 8 cm gives a lateral resolution of 2 mm. The axial resolution is inverse proportional to the pulse length, and is typically better than the lateral resolution.
 
-If time delays are applied on the signal sent to the different elements it is possible to steer and focus the ultrasound beam in space. This technique is know as \textit{beamforming}, and for ultrasound imaging it is applied both when transmitting and receiving ultrasound pulses. For medical ultrasound imaging there are two main types of ultrasound probes, linear and phased arrays \cite{AngelUltrasound}. A cardiac ultrasound array is a phased array, which means that the image is constructed from beams, or A-mode images, which are gradually steered from $-\theta/2$ to $\theta/2$, resulting in sector which are $\theta$ wide. This kind of image is known as a B-mode image (B for brightness). If \nom{$M$}{Number of array elements} is the number of elements in the array, and \nom{$\Delta_m[n]$}{Per-element focusing and steering delays} is the per-element focusing and steering delay, the beamforming technique known as \textit{delay-and-sum} is given as:
+If time delays are applied on the signal sent to the different elements it is possible to steer and focus the ultrasound beam in space. This technique is know as \textit{beamforming}, and for ultrasound imaging it is applied both when transmitting and receiving ultrasound pulses. For medical ultrasound imaging there are two main types of ultrasound probes, linear and phased arrays \cite{AngelUltrasound}. A cardiac ultrasound array is a phased array, which means that the image is constructed from beams, or A-mode images, which are gradually steered from $-\theta/2$ to $\theta/2$, resulting in sector which are $\theta$ wide. This kind of image is known as a B-mode image (B for brightness). If \nom{$M$}{Number of array elements} is the number of elements in the array, and \nom{$\Delta_m[n]$}{Per-element focusing and steering delays} is the per-element focusing and steering delay, the standard form of beamforming used on receive, known as \textit{delay-and-sum}, is given as:
 \begin{align}\label{eq:das}
-z[n] = \sum_{m = 0}^{M-1}\vec{w}_m^*\vec{x}_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
+z[n] = \sum_{m = 0}^{M-1}w_m^*x_m[n - \Delta_m[n]] = \vec{w}^H\vec{x}[n],
 \end{align}
-where \nom{$\vec{w}$}{Array weight vector (apodization)} is know as the array weight vector or apodization, and $z[n]$ is an A-mode image.  If the phase center of our array is the origin and $p$ is the point where we want to steer and focus the ultrasound beam we have to use delays given as:
+where \nom{$\vec{w}$}{Array weight vector (apodization)} is know as the array weight vector or apodization, and $z[n]$ is the output A-mode image.  If $x_o$ is the phase center of our array and $p$ is the point where we want to steer and focus the ultrasound beam, we have to use the following delays:
 \begin{align}
-\Delta_m[n] =\frac{|x_m+p| - |p|}{c},
+\Delta_m[n] =\frac{|x_m+p| - |x_o+p|}{c},
 \end{align}
-where $c$ is the speed of sound.
+where \nom{$c$}{Speed of sound} is the speed of sound in human tissue. On transmit the inverse set of delays have to be used. Also note that on transmit we have to decide where to steer and focus prior to transmitting a pulse, transmit delays are therefore not time varying.
 
-%The weight vector is typically selected in order to trade resolution for a lower side lobe level. Hence, the weights are typically real and their K-space response is then symmetric.
-
-Typical probes, scan sequences, resolution and sampling.
+Resolution and sampling.
 
 Sampling rates, and data size.
 
-Delay and sum. Apodization. (See intro to Paper II or III).
 Time v.s. phase delays.
 
 Key selling points of ultrasound imaging: cost, safety and real-time user interaction.
