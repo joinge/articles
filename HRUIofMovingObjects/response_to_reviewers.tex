@@ -9,41 +9,52 @@ Answers to the reviewers in \textit{italic}.
 As my scores indicate, I think the paper addresses an interesting problem and does it very well. Beside two VERY minor typos, I think it can be published unaltered.
 1. "In" missing at the beginning of the Introduction section.
 2. In section IIB, the opening sentence, there is an 's' missing in 'produce'.
-
+\\\\
 \textit{We want to thank the reviewer for an encouraging review. Typos have been corrected.}
 
 \section*{Reviewer: 2}
 
 Thanks to the authors for addressing the problem of the temporal aspects in minimum variance beamforming, demonstrating the extra requirements on spatial sampling, and demonstrating how to efficiently oversample. The paper is good but I would like it to go through a second review round based on the following comments:
+\\\\
 \textit{We want to thank the reviewer for an encouraging review. Below follows our response to the comments given.}
 \\\\
 Page2 column2 lines 34-35, and Fig. 1, L, M and d have not been introduced (need to have read the previous literature or equation (4) to know their meaning). I would suggest that in the introduction we do not need these details.
+\\\\
 \textit{In order to reproduce Fig 1, L, M and d have to be known. We have now replaced abbreviations with full names (L in to subarray length etc.) in order to minimize the need for prior knowledge.}
 \\\\
 Equation (8) the two factors p and q are confusing. Because q is always one, I would suggest omitting it.  Let us say that the oversampling is used both for Capon and for reducing folding of frequencies over the bandwidth.
-\textit{We understand that this may be confusing and we have amended the text to make it more clear. The factor $q$ has been removed.}
+\\\\
+\textit{We understand that this may be confusing and we have amended the text to make it more clear. The factor $p$ has been removed, and $q$ is now the oversampling factor. An additional 2-factor has been added to Eq. (8) with a new reference to sampling of two-way imaging systems ([21]). This factor of two replaces the previous use of $p$.}
 \\\\
 At what depth are the LSV plots taken with respect to the focal depth? Does it matter?
-\textit{The shift-invariance caused by under-sampling will be at its maximum at the transmit focus. Simulated LSV-plots are generated from this point, as specified on page 5, first paragraph. In the in-vitro data, the point scatterer closest to the transmit focus is selected.}
+\\\\
+\textit{Yes. Shift invariance caused by under sampling will be at its maximum at the transmit focus (See [22]) (the two-way beam is at its narrowest at this location). Simulated LSV-plots are generated from this point, as specified on page 5, first paragraph. In the in-vitro data, the point scatterer closest to the transmit focus is selected. We have amended the text to clearly state why the transmit focus have been selected as the point of observation.}
 \\\\
 Please specify the characteristics of the M5S probe (size, number of elements) if GE permits. Is it a phased or a linear array? What is the physical beam spacing, the field of view, the number of transmit and receive beams in the base (non oversampled) configuration? What is the transmit focal depth? Are transmit and receive apodization applied? Without this information, the work is not reproductible.
-\textit{More extensive information about the probe and scan sequence have been added.}
+\\\\
+\textit{More extensive information about the probe and scan sequence have been added to the text. Simulated results should now be possible to reproduce.}
 \\\\
 In section “IV-A. Oversampling in transmit”: please confirm (specify) that 1x1 receive beamforming is performed at this point.
-\textit{We have now specified that our starting point is a system with a one-to-one relationship between tx and rx beams.}
+\\\\
+\textit{We have now specified in the text that our starting point in Section IV-A is a system with an one-to-one relationship between tx and rx beams.}
 \\\\
 In section “IV-B. Oversampling by parallel receive beamforming”, could you explain in more details what are the differences between Capon + STB and the technique proposed by Rabinovitch (2013) – reference [27]?
-\textit{There are no differences. Rabinovitch (2013), reference [25], does not propose any new technique, it is just Capon + STB.}
+\\\\
+\textit{Thank you for noticing that this point is hard to understand. As we see it there are actually no differences. Rabinovitch (2013), reference [25] in the first submission ([26] in the updated version), does not propose any new technique, it is just Capon + STB. The same combination of processing was performed in [18]. The text has been amended to make this observation simpler and more clear.}
 \\\\
 Page10 Column1 line56  write “should be removed” instead of “should be remove”
+\\\\
 \textit{Misspelling has been corrected.}
 \\\\
 Page 10 Column 1 lines 40-60, you state that with synthetic transmit beamforming, some of the artifacts seen in oversampling in receive by phase rotation could be eliminated. It would be interesting to see such technique implemented.
-\textit{It would, but while minimizing the length of the manuscript an actual result was left out. It should, however, be clear from how STB corrects errors introduced by PRB, that something similar will work for phase-rotated rx-beams.}
+\\\\
+\textit{It would, but while minimizing the length of the manuscript an actual result was left out for future work. The text is amended to make this more clear.}
 \\\\
 P10 column 2 line 28-29 write “too extreme” instead of “to extreme”
+\\\\
 \textit{Misspelling has been corrected.}
 \\\\
 Fig 6a: specify which beamforming is applied here (I suspect delay and sum with no multiline receive?). Maybe you want to consider showing still images of Capon and Capon-oversampled as well (not necessarily on fig. 6), just in case some people won’t look at the videos.
-\textit{We have now specified that the image is processed with delay-and-sum beamformer. Default values for $p$ and $q$ are used and are therefore not specified. Images are not added in order to minimize the length of the paper.}
+\\\\
+\textit{Thank you for noticing this lack of information. We have now specified that the image is processed with delay-and-sum beamforming. Images of Capon with and without oversampling have also been added to the manuscript.}
 \end{document}
