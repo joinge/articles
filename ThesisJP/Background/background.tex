@@ -155,7 +155,7 @@ If our cardiac probe has a relative bandwidth of $80$ \% we have to process almo
 \begin{align}
 \text{FLOPS}_{\text{DAS}} = MN_{\text{B-mode}}f_{\text{FPS}}
 \end{align}
-If our cardiac probe has $M=128$ elements, DAS beamforming requires a processing throughput of around $350$ MFLOPS. Hence, far below the peak processing throughput of modern GPUs and CPUs.
+If our cardiac probe has $M=128$ elements, DAS beamforming requires a processing throughput of around $350$ MFLOPS. Hence, far below the peak processing throughput of modern GPUs and CPUs. The main challange with DAS beamforming is the amount of data that has to be moved. If one element sample is two bytes long, for our example, around 700 MB has to be moved on to the GPU every second. This is however well below the maximum bandwidth of PCI Express 2.0 (8 GB/s).
 
 %Time v.s. phase delays. It is well described in the paper using phase delays.
 
