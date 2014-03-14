@@ -1,0 +1,331 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+\usepackage{xcolor}
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+\usepackage{amsmath}
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\newcommand\T{^{\scriptscriptstyle T}}
+\renewcommand\H{^{\scriptscriptstyle H}}
+
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\newcommand\mat[1]{\boldsymbol{#1}}
+
+\newcommand\Om{O_\text{m}}
+\newcommand\Oa{O_\text{a}}
+\newcommand\Nl{N_\text{l}}
+\newcommand\Nk{N_\text{k}}
+\newcommand\1{\vec 1}
+\newcommand\I{\mat I}
+\renewcommand*\a{\vec a}
+\renewcommand*\i{\vec i}
+\renewcommand*\k{\vec k}
+\newcommand*\n{\vec n}
+\newcommand*\p{\vec p}
+\newcommand*\s{\vec s}
+\newcommand*\w{\vec w}
+\newcommand*\x{\vec x}
+\newcommand*\y{\vec y}
+
+\newcommand*\A{\mat A}
+\newcommand*\B{\mat B}
+\newcommand*\C{\mat C}
+\newcommand*\E{\mat E}
+% \renewcommand*\H{\mat H}
+\renewcommand*\P{\mat P}
+\newcommand*\eP{\mat{\hat P}}
+\newcommand*\R{\mat R}
+\newcommand*\Ri{\R^{-1}}
+\newcommand*\eR{\mat{\hat R}}
+\newcommand*\eRi{\hat{\mat R}\;\!^{-1}}
+\newcommand*\Navg{N_\text{avg}}
+\newcommand*\W{\mat W}
+\newcommand*\X{\mat X}
+\newcommand*\Xd{\X_{\!\Delta}}
+\newcommand*\Y{\mat Y}
+
+\renewcommand*\L{\mat \Lambda}
+\newcommand*\U{\mat U}
+% \renewcommand*\t{\mathtiny{^T}}
+% \newcommand*\h{\mathtiny{^H}}
+\renewcommand*\t{^T}
+\newcommand*\h{^H}
+
+\newcommand\D{\vec\nabla} %Del: Vector differential operator - nabla
+\newcommand\Dx{\vec\nabla\times}
+\newcommand\Dd{\vec\nabla\cdot}
+
+\newcommand\q[1]{\textit{#1}}
+\newcommand\qi[1]{\item\q{#1}}
+\newcommand\hi[1]{\item[\textbf{#1}]}
+\newcommand\ans[1]{#1}
+\newcommand\ai[1]{\\[.5\baselineskip]\ans{#1}}
+
+\begin{document}
+% \maketitle
+
+\begin{center}\Large\bf
+Author's response to the reviewer's comments
+\end{center}
+
+\begin{center}
+\begin{tabular}{l p{.6\linewidth}}\centering
+Manuscript number: & 2013JOE001295 \\
+Title: & An Optimized GPU Implementation of the MVDR Beamformer for Active Sonar Imaging \\
+Authors: & Buskenes,~J.I., \AA{}sen,~J.P., Nilsen,~C.-I.C, Austeng,~A.
+\end{tabular}
+\end{center}
+
+We would like to thank the associate editor for his efforts and for his speedy replies to queries from the authors, and reviewers for their thorough and highly relevant comments. A summary of our answers are provided below, and subsequent sections will target each reviewer's comments in detail. We quote in \textbf{bold face} statements from the reviewers, and provide our replies in ordinary print, 
+
+
+\section{Summary of response to reviewer's comments}
+
+
+\newpage
+\section{Answer to reviewer 1}
+
+\begin{enumerate}
+% \emph{General}
+\hi{General}
+\qi{Mpx/s is not a widely known abbreviation. This needs to be defined upon first use.}
+\ai{This is a good point. The Oxford dictionary lists "MP" as the correct abbreviation for "megapixel", so we substituted "Mpx/s" with "MP/s" and included a proper definition.}
+\qi{"Matlab" should be all caps: "MATLAB" throughout the paper.}
+\ai{Thank you, we were not aware of this. Corrections applied.}
+%
+\hi{Abstract}
+\qi{A key attribute of the MVDR studied in this paper is the use of a subarray approximation. This should be stated up front in the abstract, i.e. "subarray MVDR" instead of MVDR.}
+\ai{You are right that subarray averaging is important in our study. But we believe that "subarray MVDR" would be misleading, as our use of subarrays is strictly due to the application of MVDR in an active system to decorrelate signal and interference. TODO: Citation }
+%
+\qi{This paper advertises an impressive ("more than two orders of magnitude) improvement over a C implementation of MVDR, but this is really misleading. In reality, an improvement of up to an order of magnitude is achieved over an optimized C implementation, as later stated in the caption for figure 8. A comparison of an optimized GPU implementation to an unoptimized C implementation is not very meaningful — both should be optimized. The abstract should be revised to indicate up to an order of magnitude over an optimized C implementation.}
+\ai{Thank you for this remark. We agree fully, and will state this better up front in the abstract. TODO}
+%
+\hi{Section I}
+\qi{Typo in second paragraph: "litterature" should be "literature".}
+\ai{Thank you. Fixed.}
+%
+\qi{Subarray processing is a common approximation and should be included in this list (reference D J Chapman, "Partial Adaptivity for the Large Array," IEEE Trans. Antennas \& Prop., Vol. Ap-24, No. 5, September 1976, pp. 685-696).}
+\ai{Thank you providing us with this interesting reference. However, we can not see that the technique described by Chapman is relevant for us. He is not using overlapping subarrays like we do, and obtains a sparse array with associated grating lobe problems. We use of subarrays to (1) deal with the coherency problem in active sonar, and (2) to provide robustness to our covariance estimate. The latter is particularly important in our near single snapshot application. We attempt to emphasize this further in the report, and suggest [9] Kailath and Shan, "Adaptive beamforming for coherent signals and interference", as well as R.T.Hoctor and S.A.Kassam, "The unifying role of the coarray in aperture synthesis for coherent and incoherent imaging" as good reads on the subject. }
+%
+\hi{Section II}
+\qi{Should reference the literature (from above comment 6) on the subarray approximation in paragraph 3.}
+\ai{Certainly. Reference added.}
+\hi{Section III (A-C)}
+\qi{Typo in first paragraph after figure: "got" should be "get".}
+\ai{Fixed.}
+\qi{Move "a" in "It is a Gauss Jordan based".}
+\ai{TODO}
+\qi{"which are a mere scaled version" should be "which are merely scaled versions".}
+\ai{Thank you. Corrected.}
+%
+\hi{Section IV}
+\qi{The sub-plots on the top break the processing out into 3 pieces, yet the lower sub-plots reflect the entire processing string for MATLAB and C. It would be useful to show the entire processing time for the GPU for better comparison. Perhaps breaking the two rows of sub-plots into two figures would work better.}
+\ai{Yes, the initial plots had the total GPU processing time included. But since there are three versions of the covariance building step, there TODO }
+%
+\qi{Comment about real processing improvement over optimized C should be related in the text instead of a caption. This is an important point about the comparisons made in the paper.}
+\ai{It is indeed. We dedicated the second paragraph in the discussion (IV) to this topic, but will reword the relevant result paragraph slightly to hopefully cause less confusion.}
+%
+\qi{(caption of figure 10) "cruel" should be "crude"}
+\ai{Thank you, crude grammar correction applied.}
+%
+\qi{The point made in the first paragraph about the data transfer from GPU to CPU being ignored further muddies the water in comparing the two approaches. This point should also be stated up front. I would suggest making a very clear itemization of the assumptions and caveats about the two approaches.}
+\ai{TODO}
+%
+\hi{Section V}
+\qi{The reason the C implementation is linear in L is because it is dominated by the calculation of the covariance matrix and data movement. The inversion is negligible here. On the other hand, the GPU optimizes the covariance calculation so much that now the inversion is significant, hence the non-linear computation time as a function of L. This is really the key point to be made in the comparison between the two approaches, in my opinion.}
+\ai{Yes! This is likely the reason. Thank you for pointing this out. This will be added to the conclusions.}
+\qi{Bottom of page, "hold- ups" has an extra space after the hyphen.}
+\ai{Fixed.}
+\hi{Section V}
+\qi{Two spaces before "1 Mpx/s" in 4th paragraph. }
+\ai{Thank you, corrected.}
+\end{enumerate}
+
+
+
+\newpage
+\section{Answer to reviewer 2}
+
+\q{The authors describe their work on implementing an MVDR adaptive beamformer for a high-frequency imaging sonar on a particular graphical processing unit (GPU), the prevous-generation NVIDIA Quadro 6000, using NVIDIA's CUDA C environment. The authors report 1-2 orders of magnitude faster processing with their GPU implementation, compared to their MATLAB and single-thread, unoptimized CPU implementations, without taking the input/output of data in and out of the GPU.}
+
+\q{Because the paper is a valuable result to imaging sonar users, who will (to some extent) know that they can speed up their processing by 1-2 orders of magnitude if they use a GPU, I think the paper should be published.}
+
+\q{However, I think the authors could greatly improve the appeal of the paper to a wider audience by adding helpful context and background on their implementation. I will suggest some questions that I think the authors could easily address toward this end. This is a report from the "front lines" of migrating scientific computing to GPUs, a topic which seems to be of great interest to everybody in our field that does numerical computing. In my review, I will comment on the information it provides to a reader interested in starting to use GPUs (and the authors for some selective elaboration).}
+
+\subsection*{Suggestions for improving the exposition of the processing}
+
+\q{I suspect many readers of the paper will not have the same assumptions as the authors, if they are not processing high-frequency narrowband signals with undersampled arrays. I see this disconnect between low-frequency passive processors and mid-frequency active processors, but the gap to imaging sonars is even greater. I venture that the authors can greatly broaden the appeal of their paper by addressing the questions I pose below.}
+
+\begin{enumerate}
+\qi{Here are my calculations of how the 32 elements are spaced in the HISAS 1030 system:}
+\begin{align}
+fc &= 100\;\text{kHz} \\
+c  &= 1500\;\text{m/s} \\
+\lambda &= c/f_c = 15\;\text{mm} \\
+\textcolor{red}{ d } &= \textcolor{red}{\lambda/2 } \\
+D &= 1200\;\text{mm} \\
+\textcolor{red}{M} &= D/d = \textcolor{red}{160}
+\end{align}
+\ai{Thank you, we realize that this was not clear enough in the article. The 32 elements are evenly spaced along the 1.2m array, so:
+\begin{align}
+M &= 32 \\
+d &= D / M = 3.75\;\text{cm} = 2.5\lambda
+\end{align}
+Further details are provided in 2.}
+%
+\qi{What is impact of using only 32 elements? How are they spaced? It would seem that spatial aliasing would be an issue. Authors should explain what their assumptions are.}
+\ai{Thank you for pointing this out, we agree that this should be clarified. The array configuration produce the first grating lobes at $\theta = \text{arcsin}(\lambda M/D) = 23.5^\circ$, but this is not a problem since the element opening angle is $25^\circ$ ($\theta\in[12.5^\circ,12.5^\circ]$) at $f_c=100$\;kHz. In the paper we addition we perform sidescan imaging where only very narrow beams need to be beamformed. These details are now included in the paper.}
+%
+\qi{What is bandwidth of transmitted waveform? At 100 kHz, perhaps the authors are comfortably in a narrowband regime, and they do not need to worry about array response changing over their bandwidth (which would suggest that MVDR would need to be performed at different frequencies independently, unless some sort of pre-steering was used, which may be what the authors are doing anyway). Authors should explain what their assumptions are.}
+\ai{Thank you. We mention in the beginning of section IIA that we pre-steer to every angle and range bin in the image, but will try to express this with greater clarity and emphasize that we are operating in the near field.}
+%
+\qi{Authors show solution of MVDR optimization as $\w = \frac{\Ri\1}{\1\T\Ri\1}$ and state this is the broadside solution. Are the authors pre-steering the array for every angle? Or are they using $w = \frac{\Ri\s}{\s\t\Ri\s}$ at off-broadside angles, with $\s$ the conventional steering vector (which would be a frequency-domain phase-shift vector, to be applied to a narrowband signal)? Pre-steering would enable disparate frequencies over a wide band to be coherently summed, to provide coherent gain in the look direction (over the band) by providing additional sample support for the sample covariance estimation.}
+\ai{Yes, we are pre-steering the array for every angle. We will attempt to clarify this further, and add a remark saying that while not necessary here we could have phase steered the array by introducing the steering vector $\vec s$.}
+%
+\qi{Authors time average $\x\x\H$ over $K\in\{0, 1, 2\}$ time samples. Without doing some sort of reduced-rank processing, why is as little as 2 samples enough to estimate the covariance? Perhaps this is due to high SNR? At high SNR, though, why are the authors doing MVDR at all? What interference is being canceled, and what is its spatial distribution and stationarity? }
+\ai{Again, thank you for a helpful remark, we will clarify this as well. After pulse compressing a chirp using the full transceiver bandwidth (30~kHz) range resolution is roughly $\Delta r \approx \frac{1}{B} = 2.5$~cm, which corresponds to a sample shift of $\Delta n = \frac{\Delta r f_s}{c} = 0.6$. Hence we cover the entire pulse compressed signal with only a few samples. $K=2$ corresponds to a window length of $2K+1=5$ samples, as is shown by (4) in the article.} 
+%
+\qi{I read the first paragraph of Section II, "..principle of adjusting the array's focus in range and bearing is commonly referred to as beamforming", and was confused - were the authors doing wavefront curvature beamforming, where every combination of range bin and beam angle required a distinct set of steering weights? After reading further, I would venture that the authors are steering only in angle, and that the index $n$ is over time of arrival, at the resolution of the width in time of the matched filter output (after pulse compression... the authors do not say anything about the waveform, so I have no idea whether there WAS any pulse compression). What is the resolution in time or range? }
+\ai{Thank you, we understand how the confusion might arise. We operate under near field conditions and are indeed performing wavefront curvature beamforming. Hence, the index $n$ just an index over time with an undefined offset, at a resolution given by the sampling frequency. We will clarify this in the paper.}
+\end{enumerate}
+
+
+\subsection{Suggestions for additional GPU details so that paper can also serve as "field report" on CPU work in general}
+
+\begin{enumerate}
+\qi{It is unfortunate that so little effort was made to speed up the CPU versions of the code. For example, there are public-domain versions of optimized LAPACK libraries that provide the same sort of linear algebra codes as the authors used in their CPU implementation (for example, GoToBLAS, or Intel's MKL libraries).}
+\ai{Thank you. We share these concerns but decided to leave CPU optimizations out of the paper. One reason is that we have not been able to find any other batch solvers out there and lacked the time to make our own. In our tests our custom inline Cholesky solver beat alternatives from e.g. MKL as our matrices are too small to justify the extra function call overhead. Another reason is that to make the comparison fair we feel an equal effort would have to put into writing a covariance builder for the CPU, and to minimize data movement in each step and in between them. Considering your remarks we will include these reasons in the paper.}
+%
+\qi{The extra input/output of data to the GPU is a burden only on the GPU implementation, so would penalize the GPU implementation only, unless the authors were to "hide" the i/o by setting it up to run in parallel with the CPU processing, which is easier and easier with the latest GPU architectures. This should perhaps be pointed out.}
+\ai{Yes this is a good point. This is now included.}
+%
+\qi{The authors do not provide much information about the GPU hardware they used, the NVIDIA Quadro 6000. How does this compare to the desktop video cards that reside in most desktop, workstation, server and even high-end laptop systems? What is the vintage of the architecture of this GPU? How has the architecture evolved? For example, the authors tell us the Quadro 6000 (\$1900, 6GB VRAM, 448 cores) is a Fermi architecture - this is the previous architecture, having been superceded by the Kepler architecture, with a new Quadro K6000 board (\$3600, 12 GB VRAM, 2880 cores). The Quadro boards are high-end boards with video output targeting the CADAM market - there are many cheaper alternatives tar-geted at gangers and an even more expensive compute-only board called TESLA targeted at high performance computing. It's difficult to say how much of this irrelevant. }
+\ai{TODO}
+%
+\qi{The authors state that OpenCL is an equally attractive alternative to CUDA. This would be the case if the authors had been able to find something in OpenCL akin to the recently released batch-optimized linear solver code for CUDA. Unfortunately, this is a pervasive story - the support for scientific programming in CUDA is years ahead of OpenCL. The benefit of OpenCL is that it is supposed to be "cross-platform", which is true in theory, but it is hard to imagine being true in practice considering the wide range of heterogeneous computing elements OpenCL is supposed to cover; from phones to DSP chips to FPGAs. }
+\ai{These are important remarks, thank you. We have written OpenCL programs too, and run them on Intel CPUs and GPUs from AMD and Nvidia. It was no walk in the park, but with a satisfactory end result. But like you say, these are just a subset of devices that OpenCL support, and we have now changed the wording to be more specific here. Your remark on the lack a batched linear solver is spot in, the sentence is now rewritten.}
+\end{enumerate}
+ 
+\subsection{Not clear how R is being calculated in CPU}
+
+\q{
+Page 5, last paragraph in 1st column is puzzling. Authors say that "when a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of R." The diagonals are all of different lengths, and, presumably the code to do a copy and conjugation from the upper triangular part to the lower triangular part of R requires different instructions than the moving average being calculated along a diagonal in the upper triangular part. The cores MUST execute the exact same code; or "diverge" (with one set executing one set of code while the complementary set sitting idle, then vice versa, as you would get with two if-then-else code sections), since this is a SIMD architecture. What is going on here?}
+
+\q{This requires a better explanation.}
+
+\ans{You are absolutely right. The copy will be serialized due to divergent branching. It is unfortunate that no Cholesky based batch linear equation solver exist, which would have eliminated the need for the lower triangular... The paragraph will be improved to explain this better.}
+
+\subsection{Opportunities for additional GPU tutorial content?}
+
+The authors describe the methodology they used to get things to run fast on the GPU. The analysis of the workload was informative and I think it is very informative for readers to see how the analysis progresses from less hardware specific (operations counts), to algorithm restructuring to reduce operations; to more hardware specific concerns (relative throughput of operations and memory transfers) . 
+
+Let me suggest some concepts that could be discussed a little bit more to give readers more of a sense of what programming GPUs is like.
+
+\begin{enumerate}
+\qi{What does somebody need to program in CUDA? Authors can mention that CUDA C is just C with a few extra language features to specify how to distribute the work across the cores. Authors can mention that there is a nvcc compiler, a profiler, a debugger, math libraries (CUFFT, CUBLAS), and a large number of examples of varying complexity, all from NVIDIA. Authors can mention that CUDA can be used on Windows, MacOSX, or Linux, with an NVIDIA graphics card. Authors can mention that there are also third party CUDA interfaces in Fortran and Python. When discussing the batch-optimized linear solver code from NVIDIA, the authors should cite the NVIDIA site, and also links to CULA and MAGMA, other CUDA versions of LAPACK or subsets thereof.}
+\qi{Problems need to have high "arithmetic intensity" (the authors use "computational intensity") so that the cores stay busy. If there is not enough arithmetic, the cores sit idle waiting for data to be moved around. The authors do a nice job describing this situation on page 4 and the start of page 5.}
+\ai{}
+\qi{The authors use the term "arithmetic reduction". Unfortunately, reduction is an important word/topic in GPU work. Perhaps "minimizing arithmetic operations" would be better. Reduction is any N-to-1 mapping, which poses a conundrum for N cores having to combine their individual results at a single location all at the same time... you don't want the cores to all line up and wait their turn.}
+\qi{On page 4, the authors talk about avoiding global memory, without get-ting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coa-lesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
+\end{enumerate}
+
+\subsection{Localized comments}
+
+\begin{enumerate}
+\qi{Equation (2) using a "broadside steering vector" - this is confusing... are the authors only steering at broadside? clearly not... do the authors pre-steer all of the elements prior to forming R so that can "focus" in a wideband sense?}
+\qi{Paragraph after equation (2) mentions "spatial averaging to avoid signal cancellation" - this problem might be better identified for readers by cit-ing the Kailath reference and using "signal cancellation due to coherent multipath".}
+\qi{Equation 4 has second summation using index n', but this index does not appear in any of the terms inside the summation.}
+\qi{Page 2 - R is averaged over K time samples... at what rate is beamformer output produced? is R averaged using a moving window process, so that R[n] is just a rank-1 update to R[n — 1] and there is one beamformer output for every input time sample?}
+\qi{Page 4, in list of three optimizations - item 3 is not self-evident, but if I understand what the authors are doing, it is described by the 1985 reference by Kailath.}
+\qi{Page 4, last paragraph of 1) Arithmetic reduction - authors should iden-tify that the "Minimized memory" version skips step 2) from list of three optimization, and that the "Minimized instructions" version uses all three steps... I had a hard time understanding how the three "arithmetic reduc-tion steps" were related to the plots in Figure 5, and was puzzled about where the "minimized memory" and "minimized instruction" variants of the processing had come from. Perhaps the authors can introduce these variants more clearly and more prominently.}
+\qi{On page 6, authors say "The bottleneck in the final design is now the in-version step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire pro-cess, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expec-tation of the relative times.}
+\qi{On page 6, authors say their implementation was improved by factor of 1.5 - 2 when run on a K20. Authors could say a few words about what a K20 is, how it differs from the Quadro 6000, that the Kepler architecture actually has features that are dramatically better for scientific computing if the code is adapted to use them (kernels can call kernels, more registers, more shared memory, ability to eliminate some host-to-GPU i/o).}
+\qi{Section I says 1-2 orders of magnitude. Section IV, page 6, says 2-3 orders of magnitude.}
+\qi{Reference 9 has two authors, Shan and Kailath. 11. Reference 17 seems to be the reviewed manuscript? }
+\end{enumerate}
+
+
+\begin{enumerate}
+\item Fig. 3 - Slightly increased spacing between subplots.
+\item Fig. 8 - Abbreviating megapixels as "MP" in stead of "MPx".
+\item Fig. 9 - Abbreviating megapixels as "MP" in stead of "MPx".
+\item Fig. 11 - Abbreviating megapixels as "MP" in stead of "MPx".
+\end{enumerate}
+
+
+% 
+% 
+% 
+% Describe how models should be loaded. Framework and formate etc.
+% 
+% \section{Calculation by Rasterization}
+% \subsection{From 3D Models to Rasterized Points}\label{sec:modelsToPoints}
+% The 3D models and sea floor has to be rasterized on to a view plane in order to calculate output intensity using CUDA.
+% 
+% We plan to use openGL to construct depth and reflection coefficient buffers at each along-track position. For this we need to set up a camera in a scene that mimic the sonar array imaging objects on a sea floor. The output from this step is a depth and a reflection coefficient buffer for each along-track position. Investigation has to be done to see if information is redundant along the track. We might also need to calculate per-pixel normals for use in the next step.
+% 
+% \subsection{Calculating Intensity}\label{sec:calcIntensity}
+% For each pixel, load normal, range, and reflection coefficient. Calculating the contribution from this location is then done by calculating the reciprocal doubled range, and weight it with the reflection coefficient and the normal component towards the along-track position. Saving these calculations to a buffer, we can now find the slant-range pixel by summing all values closer than half the sampling distance for the given slant-range value.
+% 
+% \subsection{Parallel Design Pattern for the GPU}
+% It is natural that we loop over along-track positions. At each position we generate the listed buffers in Section \ref{sec:modelsToPoints} and holds them in GPU memory. The buffers is then fed to a custom CUDA kernel that calculates the reflected intensity per buffer location. All buffers should be placed in texture memory so that resolution can be adjusted at any step. If we render each buffer listed in Section \ref{sec:modelsToPoints} at resolution $M \times N$, the step in Section \ref{sec:calcIntensity} can easily be rendered at $2M \times 2N$ by interpolation. Finally we arrive to what is believed to be the less parallel part of this approach, the sum operation. A kernel has to be launched that for each slant-range accumulates the total contribution in the given intensity buffer. We might want to use a library kernel for this if it exist. If we are going to code this step, one idea could be as follow: Assign a region to a block of treads, find min and max, and let one thread search for one ore more 
+% slant-range values\footnote{Need to do some more thinking here}.
+% 
+% \subsection{Concluding Remarks}
+% Uses a lot of memory, many calculations. Flexible. Will support point-based objects and sea floor out of the box. 
+% 
+% \section{Geometric Calculation of Output Intensity}
+% Inspired by the Field II ultrasound simulator, where array responses are found by considering geometry, the same concept can be used for reflection off object geometry. Geometry in our case can be viewed as arrays, where the emitted energy is reflected energy from a point source at the along-track position.
+% 
+% Given a list of triangle patches, were the three corners of each triangle has a corresponding reflection coefficient, normal and position/depth, the reflection intensity can be found by simple geometric considerations. First we should sort triangles in depth, so that GPU-threads in a block, process vertices that are close to each other in range. This to maximize throughput of writing to global memory. One thread loads a triangle and iterates from min to max depth using the slant-range sampling distance as step length. For each step the thread calculates the intersection between the triangle and a sphere with radius given by the current depth. The intersection length is weighted with both the reciprocal depth, the reflection coefficient and the triangle normal \footnote{We should only use triangles with equal normals in each corner. Hence they are all equal to the average triangle normal. Might not be compliant.}.
+% 
+% \subsection{Concluding Remarks}
+% Uses little memory, few calculations. Will not support point-based objects and sea floor out of the box. 
+
+
+\end{document}
