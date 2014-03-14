@@ -272,7 +272,10 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 \ai{Thank you for those kind words. In the mentioned context we agree that "arithmetic" is likely a better alternative to "computational", and will make the relevant edits.}
 %
 \qi{The authors use the term "arithmetic reduction". Unfortunately, reduction is an important word/topic in GPU work. Perhaps "minimizing arithmetic operations" would be better. Reduction is any N-to-1 mapping, which poses a conundrum for N cores having to combine their individual results at a single location all at the same time... you don't want the cores to all line up and wait their turn.}
-\qi{On page 4, the authors talk about avoiding global memory, without get-ting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coa-lesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
+\ai{Yet again, very true! Your suggestion is much better, granted your permission we will use it.}
+%
+\qi{On page 4, the authors talk about avoiding global memory, without getting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coalesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
+\ai{You are right. Initially we sought to avoid as much GPU jargon as we could, but in its current form it probably just adds confusion to leave it out. Your suggestion sounded well.}
 \end{enumerate}
 
 \subsection{Localized comments}
@@ -290,6 +293,8 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 \qi{Reference 9 has two authors, Shan and Kailath. 11. Reference 17 seems to be the reviewed manuscript? }
 \end{enumerate}
 
+\newpage
+\section{Changes to figures}
 
 \begin{enumerate}
 \item Fig. 3 - Slightly increased spacing between subplots.
