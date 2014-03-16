@@ -143,18 +143,18 @@ We would like to thank the associate editor for his efforts and for his speedy r
 \ai{You are right that subarray averaging is important in our study. But we believe that "subarray MVDR" would be misleading, as to the best of our knowledge this term is usually used to describe the use of subarrays to reduce complexity, while we average over subarrays to deal with the coherent echoes present in \emph{active} systems. We still apply the weights to the full array. To avoid confusion we have now stated this better up front in the article.}
 %
 \qi{This paper advertises an impressive ("more than two orders of magnitude) improvement over a C implementation of MVDR, but this is really misleading. In reality, an improvement of up to an order of magnitude is achieved over an optimized C implementation, as later stated in the caption for figure 8. A comparison of an optimized GPU implementation to an unoptimized C implementation is not very meaningful — both should be optimized. The abstract should be revised to indicate up to an order of magnitude over an optimized C implementation.}
-\ai{We agree with the reviewer that this should be improved. We still state the two order of magnitude improvement over our reference implementation as this is the total improvement we obtained, but also state that this figure would likely be 5-10 had a similar effort been carried out on the CPU side as well.}
+\ai{We agree with the reviewer that this should be improved. We still state the two order of magnitude improvement over our reference implementation as this ``total payoff'' of our efforts, but also state that this figure would likely be 5-10 had the CPU side received similar treatment.}
 %
 \hi{Section I}
 \qi{Typo in second paragraph: "litterature" should be "literature".}
 \ai{Thank you. Fixed.}
 %
 \qi{Subarray processing is a common approximation and should be included in this list (reference D J Chapman, "Partial Adaptivity for the Large Array," IEEE Trans. Antennas \& Prop., Vol. Ap-24, No. 5, September 1976, pp. 685-696).}
-\ai{Thank you providing us with this interesting reference. However, we can not see that the technique described by Chapman is relevant for us. He is not using overlapping subarrays like we do, and obtains a sparse array with associated grating lobe problems. We use of subarrays to (1) deal with the coherency problem in active sonar, and (2) to provide robustness to our covariance estimate. The latter is particularly important in our near single snapshot application. We attempt to emphasize this further in the report, and suggest [9] Kailath and Shan, "Adaptive beamforming for coherent signals and interference", as well as R.T.Hoctor and S.A.Kassam, "The unifying role of the coarray in aperture synthesis for coherent and incoherent imaging" as good reads on the subject. }
+\ai{We thank the reviewer for providing this reference. However, unlike the subarray technique described by Chapman, which seems focused on reducing array complexity but in a way that causes grating lobe trouble, we use overlapping subarrays to (1) deal with the coherency problem in active sonar, and (2) to improve the rank of covariance matrix. The latter is particularly important in our case since we have hardly any temporal sample support. The Chapman reference,  distinction and a reference to [9] Kailath and Shan, "Adaptive beamforming for coherent signals and interference" is now included in the introduction to hopefully avoid future confusion.}
 %
 \hi{Section II}
 \qi{Should reference the literature (from above comment 6) on the subarray approximation in paragraph 3.}
-\ai{Certainly. Reference added.}
+\ai{We agree that that this paragraph lacks a reference, but feel that [9] Kailath and Shan "Adaptive beamforming for coherent signals and interference" better describes this method in the context of active sonar. The Chapman reference is added to the introduction instead.}
 %
 \hi{Section III (A-C)}
 \qi{Typo in first paragraph after figure: "got" should be "get".}
@@ -294,10 +294,11 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 %
 \qi{Page 4, in list of three optimizations - item 3 is not self-evident, but if I understand what the authors are doing, it is described by the 1985 reference by Kailath.}
 \qi{Page 4, last paragraph of 1) Arithmetic reduction - authors should iden-tify that the "Minimized memory" version skips step 2) from list of three optimization, and that the "Minimized instructions" version uses all three steps... I had a hard time understanding how the three "arithmetic reduc-tion steps" were related to the plots in Figure 5, and was puzzled about where the "minimized memory" and "minimized instruction" variants of the processing had come from. Perhaps the authors can introduce these variants more clearly and more prominently.}
-\qi{On page 6, authors say "The bottleneck in the final design is now the in-version step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire pro-cess, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expec-tation of the relative times.}
+\qi{On page 6, authors say "The bottleneck in the final design is now the in-version step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire pro-cess, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expectation of the relative times.}
 \qi{On page 6, authors say their implementation was improved by factor of 1.5 - 2 when run on a K20. Authors could say a few words about what a K20 is, how it differs from the Quadro 6000, that the Kepler architecture actually has features that are dramatically better for scientific computing if the code is adapted to use them (kernels can call kernels, more registers, more shared memory, ability to eliminate some host-to-GPU i/o).}
 \qi{Section I says 1-2 orders of magnitude. Section IV, page 6, says 2-3 orders of magnitude.}
 \qi{Reference 9 has two authors, Shan and Kailath. 11. Reference 17 seems to be the reviewed manuscript? }
+\ai{Reference 9 has been corrected. }
 \end{enumerate}
 
 \newpage
@@ -305,9 +306,9 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 
 \begin{enumerate}
 \item Fig. 3 - Slightly increased spacing between subplots.
-\item Fig. 8 - Abbreviating megapixels as "MP" in stead of "MPx".
-\item Fig. 9 - Abbreviating megapixels as "MP" in stead of "MPx".
-\item Fig. 11 - Abbreviating megapixels as "MP" in stead of "MPx".
+\item Fig. 8 - Abbreviating megapixels as "MP" instead of "MPx".
+\item Fig. 9 - Abbreviating megapixels as "MP" instead of "MPx".
+\item Fig. 11 - Abbreviating megapixels as "MP" instead of "MPx".
 \end{enumerate}
 
 

@@ -504,7 +504,7 @@ To ensure MVDR robustness, the literature suggests combining means such as tempo
 
 In this work, we show that such approximations may not be necessary for sonar systems up to 32 channels, since here the computation time can be reduced by 1-2 orders of magnitude by implementing MVDR on a Graphics Processing Unit (GPU). Similar work may be found in e.g. medical ultrasound imaging, where Chen \emph{et al.} have demonstrated a GPU implementation of the MVDR that operates on real valued data~\cite{Chen2011,Chen2011a}. While this implementation is fast, the real valued data constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. Our implementation is not restricted in this manner.
 
-Our active sonar implementation of MVDR is intended used in a wideband  In related work, we investigated using the same MVDR GPU implementation in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to comparable adaptive methods~\cite{Buskenes2013a}.
+Our active sonar implementation of MVDR operates on basebanded wideband data. In related work, we investigated using the same MVDR GPU implementation in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to comparable adaptive methods~\cite{Buskenes2013a}.
 
 This article is outlined as follows: In section \ref{methods} we introduce the concept of adaptive beamforming and provide details on the MVDR method. Then in \ref{maptogpu} we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in \ref{images_and_benchmarks}-\ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
@@ -551,7 +551,19 @@ Various adaptive beamformers target this limitation by allowing the weights to c
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation due to coherent multipath~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. Combined, these steps will also ensure a numerically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by computing a sample covariance matrix $\eR$. In this computation we perform some degree of:
+\begin{itemize}
+\item \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}. We will compute 
+\item \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and
+\item \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}.
+\end{itemize}
+
+ will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
+
+
+
+
+Combined, these steps will also ensure a numerically well conditioned $\eR$.
 
 To form $\eR$ we will first compute an intermediate sample covariance matrix $\breve{\R}$, which we form using temporal and spatial averaging. To do this we need to segment our array into subarrays. If we let $x_l[n]$ represent the data vector from subarray $l$,
 \begin{gather}
@@ -643,7 +655,7 @@ We note how the computation of $\eR$ completely dominates at smaller subarray si
 
 An important feature of MVDR beamforming, as with beamforming in general, is that each pixel can be computed independently and in an identical fashion. Furthermore, a typical sonar image may contain millions of pixels. This represents a level of data parallelism that appears very well suited for a massively parallel architecture such as the GPU.
 
-We decided to investigate the feasibility of running MVDR on a GPU by mapping it to a Nvidia GeForce Quadro 6000. This is a high-end Compute Unified Device Architecture (CUDA) enabled GPU based on Nvidia's Fermi architecture. The code was written in Nvidia's ``C for CUDA'' framework. It would have been possible to use GPUs from AMD and the cross-platform OpenCL framework from the Khronos group in stead, but CUDA has a batch linear equation solver that no OpenCL library provides. As will be discussed later, this is a key component in our design.
+We decided to investigate the feasibility of running MVDR on a GPU by mapping it to a Nvidia GeForce Quadro 6000. This is a high-end Compute Unified Device Architecture (CUDA) enabled GPU based on Nvidia's Fermi architecture. The code was written in Nvidia's ``C for CUDA'' framework. It would have been possible to use GPUs from AMD and the cross-platform OpenCL framework from the Khronos group instead, but CUDA has a batch linear equation solver that no OpenCL library provides. As will be discussed later, this is a key component in our design.
 
 To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming multiprocessors (SMs), each having 32 CUDA cores that execute a common program called a kernel. Combined these cores deliver a peak performance of more than 1\;Tflop/s (appendix \ref{throughput}). In practice this performance is hard to obtain, but one can get fairly close by balancing the load evenly on all cores, and by trying to avoid that some cores are forced to idle due to a pending data transfer or thread synchronization. As the steps in the MVDR method require different strategies for achieving this, we have designed a different kernel and configuration for each of them. We will pay particular attention to building $\eR$, since the potential for gaining overall speedups are greatest here.
 
