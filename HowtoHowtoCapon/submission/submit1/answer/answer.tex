@@ -140,7 +140,7 @@ We would like to thank the associate editor for his efforts and for his speedy r
 %
 \hi{Abstract}
 \qi{A key attribute of the MVDR studied in this paper is the use of a subarray approximation. This should be stated up front in the abstract, i.e. "subarray MVDR" instead of MVDR.}
-\ai{You are right that subarray averaging is important in our study. But we believe that "subarray MVDR" would be misleading, as to the best of our knowledge this term is usually used to describe the use of subarrays to reduce complexity, while we average over subarrays to deal with the coherent echoes present in \emph{active} systems. We still apply the weights to the full array. To avoid confusion we have now stated this better up front in the article.}
+\ai{You are right that subarray averaging is important in our study. But we believe that "subarray MVDR" would be misleading, as to the best of our knowledge this term is usually used to describe the use of subarrays to reduce complexity, while we average over subarrays to deal with the coherent echoes present in \emph{active} systems. We still apply the weights to the full array. To avoid confusion we have now stated this better up front in the article (section I paragraph 5).}
 %
 \qi{This paper advertises an impressive ("more than two orders of magnitude) improvement over a C implementation of MVDR, but this is really misleading. In reality, an improvement of up to an order of magnitude is achieved over an optimized C implementation, as later stated in the caption for figure 8. A comparison of an optimized GPU implementation to an unoptimized C implementation is not very meaningful — both should be optimized. The abstract should be revised to indicate up to an order of magnitude over an optimized C implementation.}
 \ai{We agree with the reviewer that this should be improved. We still state the two order of magnitude improvement over our reference implementation as a "total payoff" for our efforts, but now also state that this figure would likely be 5-10 had the CPU side received similar treatment.}
@@ -164,7 +164,7 @@ We would like to thank the associate editor for his efforts and for his speedy r
 %
 \hi{Section IV}
 \qi{The sub-plots on the top break the processing out into 3 pieces, yet the lower sub-plots reflect the entire processing string for MATLAB and C. It would be useful to show the entire processing time for the GPU for better comparison. Perhaps breaking the two rows of sub-plots into two figures would work better.}
-\ai{Yes, the initial plots had the total GPU processing time included. But since there are three versions of the covariance building step, there TODO }
+\ai{The reviewer has a point. But since there are 3 occurrences of the covariance processing time, including the total time GPU processing time would introduce three new lines. We feel this would clutter the plot unnecessarily as it is not too hard to derive the total time by looking at the current plots. Putting the total processing time in the MATLAB/C total time figure is an option, but then a logarithmic y-scale would necessary and detail would be lost.}
 %
 \qi{Comment about real processing improvement over optimized C should be related in the text instead of a caption. This is an important point about the comparisons made in the paper.}
 \ai{It is indeed. We dedicated the second paragraph in the discussion (IV) to this topic, but will reword the relevant result paragraph slightly to hopefully cause less confusion.}
