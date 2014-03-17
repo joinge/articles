@@ -734,7 +734,7 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 \caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. \ref{mvdr_complexity} (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory optimized case, and by a factor 6-22 in the instruction optimized case.}\label{mvdr_complexity_optimized}
 \end{figure}
 
-To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we call it a "minimum instructions" solution, and when step 2 is left out we call it a "minimum instructions" solutions. Fig. \ref{mvdr_complexity_optimized} compares the two solutions. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
+To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we call it a "minimum instructions" solution, and when step 2 is left out we call it a "minimum instructions" solutions. Fig. \ref{mvdr_complexity_optimized} compares the two solutions, and formulas may be found in appendix \ref{mvdr_formulas}. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
 % \begin{table}[b]\centering%\normalsize
 % \begin{tabular}[c]{l r@{:}  l}\hline
@@ -1123,7 +1123,7 @@ All in all, the MVDR maps well to the GPU since the computations involved are in
 % - instead, can issue 2 instructions per warp in the same cycle
 % 
 
-\appendix
+\appendices
 
 \section{MVDR Complexity Formulas}\label{mvdr_formulas}
 

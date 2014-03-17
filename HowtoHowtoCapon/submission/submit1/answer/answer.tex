@@ -274,7 +274,7 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 \ai{Yet again, very true! Your suggestion is much better, granted your permission we will use it.}
 %
 \qi{On page 4, the authors talk about avoiding global memory, without getting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coalesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
-\ai{You are right. Initially we sought to avoid as much GPU jargon as we could, but in its current form it probably just adds confusion to leave it out. Your suggestion sounded well.}
+\ai{You are right. It is better to use the "official" terms. We have applied your suggestions.}
 \end{enumerate}
 
 \subsection{Localized comments}
@@ -290,7 +290,7 @@ Let me suggest some concepts that could be discussed a little bit more to give r
 \ai{Good catch! Fixed.}
 %
 \qi{Page 2 - $\R$ is averaged over K time samples... at what rate is beamformer output produced? is $\R$ averaged using a moving window process, so that $\R[n]$ is just a rank-1 update to $\R$[n — 1] and there is one beamformer output for every input time sample?}
-\ai{Actually, $\R$ is averaged over $2K+1$ time samples, this can be seen from (4) it in the text that follows. TODO}
+\ai{Actually, $\R$ is averaged over $2K+1$ time samples, this can be seen from (4) and in the text that follows. There is indeed one beamformer output for every input time sample. We are not sure where the article is indicating otherwise...}
 %
 \qi{Page 4, in list of three optimizations - item 3 is not self-evident, but if I understand what the authors are doing, it is described by the 1985 reference by Kailath.}
 \ai{We must have conveyed this in a flawed way. We are simply implementing a text-book sliding window summation, where a start sum is computed and then this is updated with a new term for each element in $\eR$. Item 3 has now been rewritten to hopefully express this better.}
