@@ -721,7 +721,7 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 \begin{enumerate}
 \item exploit the fact that $\eR$ is Hermitian positive semi-definite to compute only one half of it,
 \item avoid redundant multiplications, and
-\item implement the spatial sum iteratively by sliding along the diagonals of $\eR$.
+\item avoid redundant summations by first computing the upper row of $\eR$ and then add/subtract to these iteratively to find the diagonals of $\eR$.
 \end{enumerate}
 %
 \ifPeerReview
@@ -734,7 +734,7 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 \caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. \ref{mvdr_complexity} (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory optimized case, and by a factor 6-22 in the instruction optimized case.}\label{mvdr_complexity_optimized}
 \end{figure}
 
-To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. The effect of adding all the optimizations, or all but saving multiplications, is shown in Fig. \ref{mvdr_complexity_optimized}. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
+To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we call it a "minimum instructions" solution, and when step 2 is left out we call it a "minimum instructions" solutions. Fig. \ref{mvdr_complexity_optimized} compares the two solutions. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
 % \begin{table}[b]\centering%\normalsize
 % \begin{tabular}[c]{l r@{:}  l}\hline
@@ -772,7 +772,7 @@ Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
 When we compute $\eR$, we very rarely perform more than 1-3 floating point operations for every float read or written to memory. Unfortunately, the GPU prefers kernels to be more arithmetically intensive than this. This can be inferred from Table \ref{throughputs}, where the peak bandwidth of the three types of GPU memory are compared to the peak arithmetic throughput (see appendix \ref{throughput} for derivations). Global memory (RAM), in which all data must reside at some point, is at best only able to move one float for every 30 floats processed by the CUDA cores, and potentially much worse if care is not taken to use "coalesced" memory access patterns (that avoid memory bank conflicts). This is why the usage of global memory should be minimized. Shared memory, on the other hand, is a very fast level 1 cache that is shared by all threads on an SM. At peak performance it is almost able to keep up with the computing units, but to obtain this performance we must make sure that:
 \begin{enumerate}
 \item the data needed to compute a pixel can fit in shared memory, while
-\item the access patterns we use promotes maximum bandwidth.
+\item the access patterns we use promote maximum bandwidth.
 \end{enumerate}
  %Further alleviation is also possible by exposing instruction level parallelism within a thread, as this promotes the use of registers with a bandwidth at least 6 times higher than that of shared memory~\cite{Vasilyy}\todo{so why don't we? rephrase}.
 
