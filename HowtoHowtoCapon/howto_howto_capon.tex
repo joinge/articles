@@ -504,7 +504,7 @@ To ensure MVDR robustness, the literature suggests combining means such as tempo
 
 In this work, we show that such approximations may not be necessary for sonar systems up to 32 channels, since here the computation time can be reduced by 1-2 orders of magnitude by implementing MVDR on a Graphics Processing Unit (GPU). Similar work may be found in e.g. medical ultrasound imaging, where Chen \emph{et al.} have demonstrated a GPU implementation of the MVDR that operates on real valued data~\cite{Chen2011,Chen2011a}. While this implementation is fast, the real valued data constraint does not allow the creation of asymmetric and shifted responses, and hence prevents the MVDR's potential to be fully reached. Our implementation is not restricted in this manner.
 
-The implementation is adapted to a 100\;kHz active sonar system with 30\;kHz bandwidth. The system has a range resolution comparable to the sample period so our MVDR implementation runs in near single snapshot mode. To deal with this and avoid signal cancellation we compute and average the covariance estimates from overlapping subarrays~\cite{Kailath1985}. This may resemble techniques such as "subarray MVDR"~\cite{Chapman1976}, but unlike that technique we are not using subarrays to reduce complexity but to make MVDR in an active system possible. In related work, we investigated using the same MVDR GPU implementation in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to comparable adaptive methods~\cite{Buskenes2013}.
+The implementation is adapted to a well sampled 100\;kHz active sonar system with 30\;kHz bandwidth. The system has a range resolution comparable to the sample period so our MVDR implementation runs in near single snapshot mode. To deal with this and avoid signal cancellation we compute and average the covariance estimates from overlapping subarrays~\cite{Kailath1985}. This may resemble techniques such as "subarray MVDR"~\cite{Chapman1976}, but unlike that technique we are not using subarrays to reduce complexity but to make MVDR in an active system possible. In related work, we investigated using the same MVDR GPU implementation in cardiac ultrasound imaging~\cite{Asen2012,Asen2013}, and in active sonar imaging we have compared the performance of this implementation to comparable adaptive methods~\cite{Buskenes2013}.
 
 This article is outlined as follows: In section \ref{methods} we introduce the concept of adaptive beamforming and provide details on the MVDR method. Then in \ref{maptogpu} we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in \ref{images_and_benchmarks}-\ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
@@ -969,6 +969,7 @@ To demonstrate the imaging capability of the MVDR beamformer, we have processed 
 
 The computational performance of our implementation was first assessed on a test system with a quad-core Intel Xeon E5620, 64\;GB of RAM and an Nvidia Quadro 6000 card. The results were obtained by processing a 1\;MP image from the data from a 32 channel array, for all subarray sizes $L$, and for $K\in\{0,1,2\}$. Run-time measurements are shown in \Fig{benchmarks}, the run-times of memory-only and arithmetic-only GPU kernels are depicted in \Fig{code_assessment}, and an estimate of computation efficiency is presented in \Fig{code_assess_flops}. We were also granted a test drive at the Boston HPC centre on a machine with an Intel Xeon E5-2670, 32\;GB RAM and an Nvidia K20. The results from this run are shown in \Fig{benchmarks_boston}.
 
+GPU
 \begin{itemize}
 \item Pixels processed in batches.
 \item Multiple threads per pixel.
@@ -977,6 +978,7 @@ The computational performance of our implementation was first assessed on a test
 \item Design makes efficient use of cache and data transfers are kept to a minimum.
 \end{itemize}
 
+CPU
 \begin{itemize}
 \item Pixels processed one by one.
 \item Single thread per pixel.
