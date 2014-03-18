@@ -714,7 +714,7 @@ To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming mu
 
 As observed in Fig. \ref{mvdr_complexity}, a direct computation of $\eR$ by implementing (\ref{spatialR}) and (\ref{finalR}) is the greatest computational burden. We target this issue by first \emph{minimizing arithmetic operations}, then aim to get as close to the peak \emph{arithmetic throughput} on the GPU as possible.
 
-\subsubsection{Minimizing Arithmetic Operations}
+\subsubsection{Minimizing Arithmetic Operations}\label{minimizing_arithmetics}
 
 In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity of building $\eR$ in a system with $M=5$ sensors, a subarray size of $L=3$ and temporal averaging is set to $K=1$. Here the spatial sum is carried out before the temporal sum. To reduce arithmetic operations we may:
 %
@@ -734,7 +734,7 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 \caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. \ref{mvdr_complexity} (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory optimized case, and by a factor 6-22 in the instruction optimized case.}\label{mvdr_complexity_optimized}
 \end{figure}
 
-To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we call it a "minimized instructions" solution, and when step 2 is left out we call it a "minimized memory" solution. The formulas may be found in appendix \ref{mvdr_formulas}, and Fig. \ref{mvdr_complexity_optimized} compares the two solutions. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
+To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we will call it a \emph{minimized instructions} solution, and when step 2 is left out we call it a \emph{minimized memory} solution. The formulas may be found in appendix \ref{mvdr_formulas}, and Fig. \ref{mvdr_complexity_optimized} compares the two solutions. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
 % \begin{table}[b]\centering%\normalsize
 % \begin{tabular}[c]{l r@{:}  l}\hline
@@ -848,25 +848,26 @@ An important thing to note, however, is that unlike the problems most GPU librar
 
 The beamformer output $z$ is computed on a per-pixel basis by first computing the MVDR weights $\w$, which are merely scaled versions of $\eRi\1$ (\ref{weights}). Then the sum in (\ref{finalZ}) is found by assigning a group of $L$ threads to respective elements of $x_l$, which then proceed to accumulate these for all $N_L$ subarrays. The resulting data vector is finally multiplied with the weight vector using the same threads, and then a single thread is used to sum these products to obtain $z$.
 
-\subsection{Summary of GPU implementation}
+\subsection{Implementation Summary}
 
 The GPU implementation can be summarized as follows:
 \begin{itemize}
 \item Pixels are processed in batches.
 \item Multiple threads per pixel.
-\item $\eR$ is computed directly from raw data to minimize memory footprint.
+\item $\eR$ computed using the \emph{minimized memory} solution.
 \item Inversion step is performed by Nvidia's batch linear equation solver.
 \item Design makes efficient use of cache and data transfers are kept to a minimum.
 \end{itemize}
 
-Our CPU implementations, on the other hand, has the following features:
+This will be compared to our CPU implementations, which have the following features:
 \begin{itemize}
 \item Pixels are processed one by one.
 \item Single thread per pixel.
-\item Computation of $\eR$ is optimized for minumum number of instructions, as in \ref{mvdr_build_R}. Only upper half of $\eR$ is computed (see next point).
-\item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
-\item Design has generally not been optimized for efficient use of memory.
+\item $\eR$ computed using the \emph{minimized instructions} solution. Only upper half of $\eR$ is computed (see next point).
+\item Inversion step is performed by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
+\item Designs have generally not been optimized for efficient use of memory.
 \end{itemize}
+These designs are discussed further in the next two sections.
 
 %  The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
 
@@ -1135,7 +1136,7 @@ To estimate the number of floating point operations needed to MVDR beamform a si
 
 \emph{Building $\eR$}. The initial complexity of this step can be inferred directly from (\ref{spatialR}) and (\ref{finalR}):
 \begin{align}
-O_{\underset{\text{initial}}{\text{Build $\eR$}}} &= \underbrace{\Om\Nk\Nl L^2}_\text{Multiplications} + \Oa(\Nk+\Nl-2)L^2 + O_\text{dload},
+O_{\underset{\text{initial}}{\text{Build $\eR$}}} &= \underbrace{\Om\Nk\Nl L^2}_\text{Multiplications} + \underbrace{\Oa(\Nk+\Nl-2)L^2}_\text{Additions} + O_\text{dload},
 \end{align}
 where $O_\text{dload} = (2L-1)\Oa + \Om$ is the minor cost of performing diagonal loading. If we apply the optimization strategies discussed in section \ref{computing_eR} we can arrive at the following instead:
 \begin{align}
@@ -1175,12 +1176,12 @@ The Quadro 6000 has 32 CUDA cores per SM, each operating at a rate of 1148\;MHz 
 \end{align}
 Now let us compare this to the memory throughput. The ``global'' GDDR5 memory bus is 384\;bit wide, and operates at 3\;Ghz where 2 bits are sent every cycle. Its peak bandwidth is then:
 \begin{align}
-\text{B}_\text{gmem} &= \frac{2\cdot 3\;\text{Gbit/s}\cdot384\;\text{bit}}{8\;\text{bit/byte}}\nn
+\text{B}_\text{gmem} &= \frac{2\cdot 3\;\text{GHz}\cdot384\;\text{bit}}{8\;\text{bit/byte}}\nn
 &= 144\;\text{GB/s}\ (36\;\text{Gfloats/s}).\label{bwglobal}
 \end{align}
 The shared memory, on the other hand, is organized into 32 banks per SM, each being 32\;bit wide and operating at 1148\;MHz where 1 bit is sent per cycle. Its peak aggregated bandwidth is then:
 \begin{align}
-\text{B}_\text{smem} &= \frac{\frac{1148}{2}\;\text{Mbit/s}\cdot32\;\text{bit/bank}\cdot 32\;\text{banks/SM}\cdot 14\;\text{SMs}}{8\;\text{bit/byte}}\nn
+\text{B}_\text{smem} &= \frac{\frac{1148}{2}\;\text{MHz/s}\cdot32\;\text{bit/bank}\cdot 32\;\text{banks/SM}\cdot 14\;\text{SMs}}{8\;\text{bit/byte}}\nn
 &\approx 1.03\;\text{TB/s}\ (257\;\text{Gfloats/s}).\label{bwshared}
 \end{align}
 The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using shared memory at least 4 floating point operations must be carried out per float transferred to the CUDA cores, otherwise the algorithm will be memory bound and the peak arithmetic throughput can not be reached. %In such cases instruction level parallelism can be exploited to move data from shared memory into the even faster register memory~\cite{Vasilyy}, but this is outside the scope of this article.
