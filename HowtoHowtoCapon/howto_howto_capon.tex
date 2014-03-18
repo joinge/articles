@@ -982,7 +982,7 @@ The computational performance of our implementation was first assessed on a test
 \item Single thread per pixel.
 \item Computation of $\eR$ is optimized for minumum number of instructions, as in \ref{mvdr_build_R}. Only upper half of $\eR$ is computed (see next point).
 \item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $eR$.
-\item Design has generally not received the same memory optimization effort that the GPU implementation has.
+\item Design has generally not been optimized for efficient use of memory.
 \end{itemize}
 
 As seen in the run-time comparisons presented in \Fig{benchmarks}, the GPU method is now 2-3 orders of magnitude faster than the C implemtation we started out with. The bottleneck in the final design is now the inversion step, which is typically 5 times slower than the build step. In most cases the processing speed of the Quadro 6000 is above 1\;MP/s, and this was only improved by a factor 1.5-2 when run on the new K20 GPU. The benchmarks of our memory-only and arithmetic-only kernels show that the kernels spend roughly the same time on both these tasks, so optimising only one of these further will have marginal effect. All GPU kernels were compiled with \texttt{nvcc} at optimization level \texttt{O2}. Excluded from these benchmarks is the data transfer time from CPU to GPU, which account for 2-20\% of the total processing time. We believe it makes little sense to include them since it keeps getting easier perform these data transfers in parallel by offloading the task to the Direct Memory Access (DMA) controllers present on modern GPUs. Furthermore, the data rates in active sonar are relatively low compared to the bandwidth available for these transfers. 
