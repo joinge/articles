@@ -259,21 +259,24 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 
 \q{This requires a better explanation.}
 
-\ans{You are absolutely right. The copy will be serialized due to divergent branching. It is unfortunate that no Cholesky based batch linear equation solver exist, which would have eliminated the need for the lower triangular... The paragraph will be improved to explain this better.}
+\ans{You are absolutely right. The copy will be serialized due to divergent branching. It is unfortunate that no Cholesky based batch linear equation solver exist, which would have eliminated the need for the lower triangular... The paragraph has been edited to explain this better.}
 
 \subsection{Opportunities for additional GPU tutorial content?}
 
-The authors describe the methodology they used to get things to run fast on the GPU. The analysis of the workload was informative and I think it is very informative for readers to see how the analysis progresses from less hardware specific (operations counts), to algorithm restructuring to reduce operations; to more hardware specific concerns (relative throughput of operations and memory transfers) . 
+\q{The authors describe the methodology they used to get things to run fast on the GPU. The analysis of the workload was informative and I think it is very informative for readers to see how the analysis progresses from less hardware specific (operations counts), to algorithm restructuring to reduce operations; to more hardware specific concerns (relative throughput of operations and memory transfers).}\\[.5\baselineskip] 
+\ans{We thank the reviewer for the credit.}\\[-.5\baselineskip] 
 
-Let me suggest some concepts that could be discussed a little bit more to give readers more of a sense of what programming GPUs is like.
+\q{Let me suggest some concepts that could be discussed a little bit more to give readers more of a sense of what programming GPUs is like.}
 
 \begin{enumerate}
 \qi{What does somebody need to program in CUDA? Authors can mention that CUDA C is just C with a few extra language features to specify how to distribute the work across the cores. Authors can mention that there is a nvcc compiler, a profiler, a debugger, math libraries (CUFFT, CUBLAS), and a large number of examples of varying complexity, all from NVIDIA. Authors can mention that CUDA can be used on Windows, MacOSX, or Linux, with an NVIDIA graphics card. Authors can mention that there are also third party CUDA interfaces in Fortran and Python. When discussing the batch-optimized linear solver code from NVIDIA, the authors should cite the NVIDIA site, and also links to CULA and MAGMA, other CUDA versions of LAPACK or subsets thereof.}
+\ai{These are good suggestions. We have added some of these suggestions to the paragraph where we introduce CUDA, but regrettably had to leave some of it out due to space considerations. Citation to the "Nvidia Registered Developers Program" is added where we speak of the batch solver.}
+%
 \qi{Problems need to have high "arithmetic intensity" (the authors use "computational intensity") so that the cores stay busy. If there is not enough arithmetic, the cores sit idle waiting for data to be moved around. The authors do a nice job describing this situation on page 4 and the start of page 5.}
-\ai{Thank you for those kind words. In the mentioned context we agree that "arithmetic" is likely a better alternative to "computational", and will make the relevant edits.}
+\ai{We thank the reviewer for those kind words. In the mentioned context we agree that "arithmetic" is likely a better alternative to "computational", and will make the relevant edits.}
 %
 \qi{The authors use the term "arithmetic reduction". Unfortunately, reduction is an important word/topic in GPU work. Perhaps "minimizing arithmetic operations" would be better. Reduction is any N-to-1 mapping, which poses a conundrum for N cores having to combine their individual results at a single location all at the same time... you don't want the cores to all line up and wait their turn.}
-\ai{Yet again, very true! Your suggestion is much better, granted your permission we will use it.}
+\ai{Yet again, very true! The reviewer's suggestion is much better, we have used it.}
 %
 \qi{On page 4, the authors talk about avoiding global memory, without getting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coalesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
 \ai{You are right. It is better to use the "official" terms. We have applied your suggestions.}
