@@ -279,7 +279,7 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 \ai{Yet again, very true! The reviewer's suggestion is much better, we have used it.}
 %
 \qi{On page 4, the authors talk about avoiding global memory, without getting into "coalesced" memory access patterns. This might merit a mention - for example, is at best only able to move one float for every 30 floats processed, and potentially much worse if care is not taken to use "coalesced memory access patterns (that avoid memory bank conflicts)". On page 5, the authors talk about "a collective access pattern that maximizes global memory bandwidth". Here too, the authors should perhaps use the "coalesced" term, since this is the term used in all of the GPGPU documentation.}
-\ai{You are right. It is better to use the "official" terms. We have applied your suggestions.}
+\ai{The reviewer is right. It is better to use the "official" terms. We have applied the suggestions.}
 \end{enumerate}
 
 \subsection{Localized comments}
@@ -289,7 +289,7 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 \ai{We indeed presteer all the elements. To make this clearer we have now stated it again after equation (2), and explained that a generalization is straight forward by substituting $\1$ with a steering vector.}
 %
 \qi{Paragraph after equation (2) mentions "spatial averaging to avoid signal cancellation" - this problem might be better identified for readers by citing the Kailath reference and using "signal cancellation due to coherent multipath".}
-\ai{Thank you, both suggestions are now included.}
+\ai{Good point, both suggestions are now included.}
 %
 \qi{Equation 4 has second summation using index $n'$, but this index does not appear in any of the terms inside the summation.}
 \ai{Good catch! Fixed.}
@@ -305,6 +305,7 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 %
 \qi{On page 6, authors say "The bottleneck in the final design is now the inversion step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire pro-cess, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expectation of the relative times.}
 \qi{On page 6, authors say their implementation was improved by factor of 1.5 - 2 when run on a K20. Authors could say a few words about what a K20 is, how it differs from the Quadro 6000, that the Kepler architecture actually has features that are dramatically better for scientific computing if the code is adapted to use them (kernels can call kernels, more registers, more shared memory, ability to eliminate some host-to-GPU i/o).}
+\ai{}
 \qi{Section I says 1-2 orders of magnitude. Section IV, page 6, says 2-3 orders of magnitude.}
 \ai{Well seen. This is now corrected.}
 \qi{Reference 9 has two authors, Shan and Kailath. 11. Reference 17 seems to be the reviewed manuscript?}
