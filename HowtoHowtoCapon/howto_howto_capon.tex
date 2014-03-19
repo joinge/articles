@@ -3,7 +3,7 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewtrue             % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewfalse             % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
                                                 % subfolders for graphics etc.
@@ -582,18 +582,25 @@ Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M
 \begin{align}
 z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
-\ifPeerReview
-\begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske2.eps}
-\else
+
+\ifPeerReview\else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/implementation.eps}
-\fi%
 \caption{MVDR beamforming. For each pixel in range and azimuth,\newline
 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
 2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
 3. and the beamformer output $z$ is computed from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
 \end{figure}
+\fi%
+\ifPeerReview
+\begin{figure}[!t]\centering
+\includegraphics[width=.8\linewidth]{gfx/buske2.eps}
+\caption{MVDR beamforming. For each pixel in range and azimuth,\newline
+1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
+2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
+3. and the beamformer output $z$ is computed from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
+\end{figure}
+\fi%
 % \begin{figure}[!t]\centering
 % \includegraphics[width=\linewidth]{gfx/algorithm_structure.eps}
 % \caption{MVDR beamforming. First a spatial covariance matrix is estimated from the delayed data (\ref{spatialR}-\ref{finalR}), then the weights are computed (\ref{weights}) and finally applied to the delayed channel data (\ref{z}).}
@@ -787,13 +794,6 @@ These challenges are very closely linked. Since the Quadro 6000 architecture is 
 
 In Fig. \ref{mvdr_implementation} we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
 
-\ifPeerReview\else
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
-\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
-\end{figure}
-\fi%
-
 Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that row is saved back to global memory following a coalesced access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. Note that this is slightly non-optimal as the threads should carry out exactly the same operation otherwise they will execute in sequence. However, this can only be avoided if we were using a solver that only required one of the triangulars of $\eR$. Combined these steps balance the load fairly evenly on all threads, is almost completely free of arithmetic redundancy, and consumes little memory.
  
 % Hence, whenever $N_\text{avg}>1$ the sliding window approach will demand less instructions at the expense of a slightly higher memory consumption.
@@ -859,7 +859,7 @@ The GPU implementation can be summarized as follows:
 \begin{itemize}
 \item Pixels are processed in batches.
 \item Multiple threads per pixel.
-\item $\eR$ computed using the \emph{minimized memory} solution.
+\item $\eR$ is computed directly from the raw data to \emph{minimize memory}.
 \item Inversion step is performed by Nvidia's batch linear equation solver.
 \item Design makes efficient use of cache and data transfers are kept to a minimum.
 \end{itemize}
@@ -868,7 +868,7 @@ This will be compared to our CPU implementations, which have the following featu
 \begin{itemize}
 \item Pixels are processed one by one.
 \item Single thread per pixel.
-\item $\eR$ computed using the \emph{minimized instructions} solution. Only upper half of $\eR$ is computed (see next point).
+\item $\eR$ is computed using the \emph{minimized instructions} solution. Only upper half of $\eR$ is computed (see next point).
 \item Inversion step is performed by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
 \item Designs have generally not been optimized for efficient use of memory.
 \end{itemize}
@@ -947,9 +947,12 @@ These designs are discussed further in the next two sections.
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske7.eps}
-\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46\;MP. Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
+\else
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
+\fi
+\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
 \end{figure}
-\fi%
 
 \ifPeerReview
 \begin{figure}[!t]\centering
