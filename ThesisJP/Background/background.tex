@@ -236,20 +236,32 @@ The Capon beamformer is derived for narrowband applications and has traditionall
 %One sentence about speckle tracking.
 
 \section{Volume rendering}\label{sec:volren}
-
-Get section from master theses. Ray casting and opacity functions. (Fig.\,\ref{fig:vr})
-
 \begin{figure}
 \centering
 \subfigure[Ray-casting]{
-	\includegraphics[width=0.4\textwidth]{img/Volumeraycasting.png}
+	\includegraphics[width=0.4\textwidth]{img/Volumeraycasting.png}\label{fig:vr_rc}
 }
 \subfigure[Opacity transfer function]{
-	\includegraphics[width=0.5\textwidth]{img/otf.png}
+	\includegraphics[width=0.5\textwidth]{img/otf.png}\label{fig:vr_otf}
 }
-\caption{.}
+\caption{The principle behind volume ray casting. a) A ray is casted out from every pixel in the output image. Along the ray, samples are gathered from the volume. The samples are assigned a color and an opacity before they are combined into one pixel value. b) The opacity transfer function used to determine how opaque a sample should be.}
 \label{fig:vr}
 \end{figure}
+A 3D ultrasound dataset is a cloud of scalar values that somehow needs to be presented to the user. One approach used for cardiac ultrasound  is to extract slices corresponding to different long-axis and short-axis views of the cardiac chambers. Another way is to project the whole volume into a two dimensional image. The latter technique is known as volume rendering, and it present for the user the three dimensional structure of the heart in one two-dimensional image. Many different methods for volume rendering exists \cite{brodlie2001}, and in this thesis we will focus on ray casting \cite{Levoy1988}. 
+
+The principle behind ray casting is depicted in Fig.\,\ref{fig:vr}. The projection of volumetric data is with this technique performed by casting a ray out from every pixel in the output image (Fig.\,\ref{fig:vr_rc}). Along each ray, samples are gathered from the volume and assigned a color and opacity. For ultrasound visualization the color intensity is dictated by the ultrasound backscatter intensity, and the actual color is often encoded with depth information in order to improve depth perception. An example of a volume rendering of cardiac ultrasound data is presented in \textbf{Paper IV}. The opacity, however, is governed by a user controlled \textit{opacity transfer function} (\nom{OTF}{Opacity transfer function (volume rendering)}) as shown in Fig.\,\ref{fig:vr_otf}. For ultrasound visualization a monotonically increasing function is typically used, which means that below a certain threshold all samples will be rendered transparent (opacity = 0). We will refer to this as the \textit{opacity threshold}, and for the example in Fig.\,\ref{fig:vr_otf} this threshold is 25.
+
+The iterative composition scheme for front-to-back ray casting of one ray, from $s_0$ to $s_{N_s-1}$ where $s$ is the sample position and $N_s$ is the number of samples along the ray, is
+\begin{align}
+I(s_0, s_{i+1}) &= I(s_0, s_{i}) + (1 - \alpha_{\text{acc},i}) c_{i+1}\\
+\alpha_{\text{acc},i+1} &= \alpha_{\text{acc},i} + (1 - \alpha_{\text{acc},i}) \alpha(c_i+1).
+\label{eq:fronToBack}
+\end{align}
+Here, $\alpha(v)$ is the opacity transfer function, $c_{k}$ is the color intensity of sample $s_{k}$, $\alpha_{\text{acc}}$ is the accumulated opacity, and $I(s_0, s_{N_s-1})$ is the intensity value of all the projected samples combined. If $\alpha(v)$ is close to one for one or two consecutive samples, $\alpha_{\text{acc}}$ will quickly approach a value of one. An $\alpha_{acc,k}$-value close to one means that the contribution from $c_{k+1}, \cdots, c_{N_s-1}$ to the final value, $I(s_0, s_{N_s-1})$, will be minimal. Hence, the iteration can stop at $i=k$ without loosing visible samples. This optimization technique is known as \textit{early-ray-termination}, and will significantly speed up our rendering algorithm if an opaque material is rendered.
+
+For visualization of cardiac ultrasound we want $\alpha_{\text{acc}}$ to be close to one only when a tissue interface has been encountered. If a sample of clutter noise is assigned a high opacity value, cardiac tissue further behind will not be visible. It is said to be occluded by clutter noise. The general goal in cardiac ultrasound visualization is therefore to assign high opacity to cardiac tissue and low opacity to noise samples. This is a big challenge for cardiac ultrasound since the backscattered signal level from tissue varies a lot throughout the volume. The per-volume sample value distributions for tissue and noise therefore always overlap to some degree.
+
+Volume rendering of a single volume has a complexity of $O(N_xN_yN_s)$, where $N_xN_y$ is the number of pixels in the output image. With $N_x = N_y = N_s = 512$ and a required frame rate between ten and twenty, we find that the required number of FLOPS for real-time volume rendering of 3D cardiac ultrasound is in the order of several GFLOPS. When calculation of gradients for shading and more advanced processing is added this number continues to grow with a constant factor.
 
 \subsection{Adaptive volume rendering}
 
