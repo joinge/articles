@@ -64,10 +64,10 @@ Early GPGPU programming required expert knowledge about computer graphics and th
 
 \begin{figure}
 \centering
-\subfigure[Kernel]{
+\subfloat[Kernel]{
 	\includegraphics[width=0.5\textwidth]{img/kernel.pdf}\label{fig:gpu_kernel}
 }
-\subfigure[Threads, blocks and grid]{
+\subfloat[Threads, blocks and grid]{
 	\includegraphics[width=0.4\textwidth]{img/cuda_threads.png}\label{fig:gpu_grid}
 }
 \caption{The figure depicts how GPU threads are grouped into blocks and arranged in a grid. One thread runs a copy of a kernel function. In this example the kernel function performs an in-place element-wise matrix square.}
@@ -94,10 +94,10 @@ Medical ultrasound imaging is considered to be a low-risk tool for non-invasive 
 
 \begin{figure}
 \centering
-\subfigure[]{
+\subfloat[]{
 	\includegraphics[width=0.47\textwidth]{img/Diagram_of_the_human_heart.png}\label{fig:human_heart}
 }
-\subfigure[]{
+\subfloat[]{
 	\includegraphics[width=0.47\textwidth]{img/ultrasound_grid.pdf}\label{fig:us_grid}
 }
 \caption{a) Overview of the human heart. Illustration from wikipedia.org. b) Illustration of probe geometry and layout for phased array imaging.}
@@ -171,10 +171,10 @@ Ultrasound scanners generate an incredible amount of data. A modern system capab
 Adaptive beamforming has several meanings in the literature on medical ultrasound imaging. It can for instance refer to aberration correction \cite{cole1996method} which is the task of applying time delays to compensate for pulse distortion introduced by fatty layers in the human body. However, in this thesis adaptive beamforming will refer to data-dependent apodization (or weighting) derived from a given optimization criterion. The optimization criterion which we focus on in this thesis is the minimum variance distortionless response criterion, which is also known as Capon's method \cite{Capon1969}. A beamformer which uses weights derived using Capon's method will in this thesis mainly be referred to as the \textit{Capon beamformer} \cite{Vignon2008}. However, it is also known as the minimum variance  (\nom{MV}{Minimum variance beamformer (Synonym for Capon)}) beamformer \cite{Synnevag2007}, the minimum variance distortionless respons beamformer (\nom{MVDR}{Minimum variance distortionless respons beamformer (Synonym for Capon)}) (\textbf{Paper I}), or the constrained adaptive beamformer \cite{Mann2002}.
 
 \begin{figure}[t!]
-\subfigure[Uniform weights]{
+\subfloat[Uniform weights]{
 	\includegraphics[width=0.47\textwidth]{img/scenario_das_resp2.png}\label{fig:das_weights}
 }
-\subfigure[Capon weights]{
+\subfloat[Capon weights]{
 	\includegraphics[width=0.47\textwidth]{img/scenario_mv_resp2.png}\label{fig:capon_weights}
 }
 \caption{Examples of array beampatterns where the array weights are either uniform (a) or derived using Capon's method (b). An interfering source is located at 20\degree. Notice the reduced sidelobe level for the Capon beampattern in the direction of the interfering source. Image courtesy of Jo Inge Buskenes.}
@@ -243,10 +243,10 @@ The Capon beamformer is derived for narrowband applications and has traditionall
 \section{Volume rendering}\label{sec:volren}
 \begin{figure}[t!]
 \centering
-\subfigure[Ray-casting]{
+\subfloat[Ray-casting]{
 	\includegraphics[width=0.4\textwidth]{img/Volumeraycasting.png}\label{fig:vr_rc}
 }
-\subfigure[Opacity transfer function]{
+\subfloat[Opacity transfer function]{
 	\includegraphics[width=0.5\textwidth]{img/otf.png}\label{fig:vr_otf}
 }
 \caption{The principle behind volume ray casting. a) A ray is casted out from every pixel in the output image. Along the ray, samples are gathered from the volume. The samples are assigned a color and an opacity before they are combined into one pixel value. b) The opacity transfer function used to determine how opaque a sample should be.}
