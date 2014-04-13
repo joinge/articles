@@ -26,6 +26,10 @@ Accelerating adaptive ultrasound imaging algorithms by means of general-purpose 
 \usepackage{color}
 \newcommand\todo[1]{{\textit{\color{red}(#1)}}}
 
+% from Paper 1
+\usepackage{colortbl}
+\usepackage{appendix}
+
 % from Paper 3
 \usepackage{epstopdf}
 
@@ -133,17 +137,17 @@ During these years I have had the great pleasure of working with and getting to 
 
 Thank you to Ines Hafizovic and Carl-Inge Colombo Nilsen for extensive help with reviewing this thesis.  
 
-I would like to thank my family for all support. But most of all, I want to thank Beate for all her love, patient and support. Without it I would never have manage to complete this theses.
+I would like to thank my family and all my friends for all support. But most of all, I want to thank Beate for all her love, patient and support. Without it I would never have manage to complete this theses.
 \null
 \vfill
-\hfill Dedicated to Sofie Mathilde \AA{}sen
+\hfill To: Sofie Mathilde \AA{}sen
 \CustChapter*{List of publications}
 \addcontentsline{toc}{chapter}{List of publications}
 
 This thesis is based on the following five papers, referred to in the text by their Roman numerals (I-V): 
 \begin{enumerate}[I]
 \renewcommand\labelenumi{\bfseries\theenumi}
-	\item J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng, "An optimised GPU implementation of the MVDR beamformer for active sonar imaging", {\it  IEEE Transactions on Oceanic Engineering, accepted for publication}.
+	\item J.\:I.\:Buskenes, \textbf{J.\:P.\:\AA{}sen}, C.-I.\:C.\:Nilsen and A.\:Austeng, "An optimized GPU implementation of the MVDR beamformer for active sonar imaging", {\it  IEEE Transactions on Oceanic Engineering, accepted for publication}.
 	\item \textbf{J.\:P.\:\AA{}sen}, J.\:I.\:Buskenes, C.-I.\:C.\:Nilsen, A.\:Austeng and S.\:Holm, "Implementing Capon beamforming on a GPU for real-time cardiac ultrasound imaging", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, vol. 61, no. 1, pp. 76-85, Jan 2014}.
  	\item \textbf{J.\:P.\:\AA{}sen}, A.\:Austeng and S.\:Holm, "Capon beamforming and moving objects - An analysis of lateral shift-invariance", {\it IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control, accepted for publication}.
 	\item \textbf{J.\:P.\:\AA{}sen}, E.\:Steen, G.\:Kiss, A.\:Thorstensen and S.\:I.\:Rabben, "Adaptive volume rendering of cardiac 3D ultrasound images - utilizing blood pool statistics", {\it Proc. SPIE Medical Imaging 2012, vol. 8320, pp. 832008}.
@@ -210,7 +214,7 @@ The following papers are related to the included papers, and are referred to in 
 
 %%%% Paper 1 %%%%
 \begin{bibunit}[IEEEtran]
-\CustChapterPaper{An Optimised GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
+\CustChapterPaper{An Optimized GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
 \runningtitle{GPU MVDR Beamformer for Active Sonar Imaging}
 \authors{
 	Jo Inge Buskenes$^{1}$, 
@@ -223,9 +227,12 @@ The following papers are related to the included papers, and are referred to in 
     	$^{2}$Medical Imaging Lab (MI-Lab), Norwegian University of Science and Technology, Trondheim, Norway
 }
 \noindent \textit{IEEE Transactions on Oceanic Engineering, accepted for publication}.
-%\newpage\input{./CaponSonarGPU/CaponSonarGPU}
-%\newpage\addcontentsline{toc}{section}{References}
-%\putbib[./CaponSonarGPU/bibCaponSonarGPU]
+\newpage
+{
+\input{./Paper1/howto_howto_capon}
+}
+\newpage\addcontentsline{toc}{section}{References}
+\putbib[./Paper1/library]
 \end{bibunit}
 
 
