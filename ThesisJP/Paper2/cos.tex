@@ -31,7 +31,7 @@ In recent work we have applied a GPU-based Capon beamformer for both active sona
 %The beamspace transformation matches well with the focused transmit beams used in cardiac ultrasound imaging. 
 %(Referer til JOE-artikkelen, få med beskrivelse av hva som blir anerledes for ultralyd.)
 
-In the next section we present background information on Capon beamforming in both element-space and beamspace. We also give an introduction to the GPU computing model. In Section \ref{sec:meth} we give a summary of our parallel implementation of the element-space Capon beamformer, before the GPU implementation of the beamspace Capon beamformer is presented in Section \ref{sec:bs}. Benchmark results and resulting images for both implementations are presented in Section \ref{sec:bench} and \ref{sec:images}, together with a discussion of trading image quality for speed in Section \ref{sec:trade}. Finally we discuss the results in Section \ref{sec:dis}, and draw conclusions in Section \ref{sec:con}. 
+In the next section we present background information on Capon beamforming in both element-space and beamspace. We also give an introduction to the GPU computing model. In Section \ref{sec:meth} we give a summary of our parallel implementation of the element-space Capon beamformer, before the GPU implementation of the beamspace Capon beamformer is presented in Section \ref{sec:bs}. Benchmark results and resulting images for both implementations are presented in Section \ref{sec:bench} and \ref{sec:images}, together with a discussion of trading image quality for speed in Section \ref{sec:trade}. Finally we discuss the results in Section \ref{sec:dis_paper2}, and draw conclusions in Section \ref{sec:con_paper2}. 
 
 \section{Background}\label{background}
 
@@ -360,20 +360,24 @@ To summarize, by transforming data to beamspace the complexity of all subsequent
 
 \begin{figure*}[!t]
 \centerline{
-\subfloat[]{\includegraphics[width=0.5\textwidth]{gfx/benchmark_bar_64_80_540.png} \label{fig:benchUS64}}\\
-\hfil
-\subfloat[]{\includegraphics[width=0.5\textwidth]{gfx/benchmark_bar_96_120_540.png}%
-\label{fig:benchUS96}}}
-%\centerline{\includegraphics[width=3.5in]{gfx/benchmark_bar_64_80_540.png}}
+\begin{tabular}{c}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{gfx/benchmark_bar_64_80_540.png} \label{fig:benchUS64}}\\
+\subfloat[]{\includegraphics[width=0.7\textwidth]{gfx/benchmark_bar_96_120_540.png}%
+\label{fig:benchUS96}}
+\end{tabular}
+}
 \caption{Benchmarks of GPU Capon beamforming in element space for a cardiac image covering a $70\degree$ wide $15.4$ cm deep sector. Execution time is plotted as a function of subarray length $L$. The figures show execution times for the three steps listed in Section \ref{sec:meth}: Calculating covariance matrices with three different choices of temporal averaging, solver, and the final beamformer sum.}
 \label{fig:bench}
 \end{figure*}
 
 \begin{figure*}[!t]
-\centerline{\subfloat[]{\includegraphics[width=0.5\textwidth]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=540_Nb=3.png} \label{fig:benchBS64}}
-\hfil
-\subfloat[]{\includegraphics[width=0.5\textwidth]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=540_Nb=3.png}%
-\label{fig:benchBS96}}}
+\centerline{
+\begin{tabular}{c}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{gfx/benchmark_bar_bs_M=64_Nx=80_Ny=540_Nb=3.png} \label{fig:benchBS64}}\\
+\subfloat[]{\includegraphics[width=0.7\textwidth]{gfx/benchmark_bar_bs_M=96_Nx=120_Ny=540_Nb=3.png}%
+\label{fig:benchBS96}}
+\end{tabular}
+}
 \caption{Benchmarks of GPU beamspace Capon beamforming for a cardiac image covering a $70 \degree$ and $15.4$ cm deep sector. Execution time is plotted as a function of subarray length $L$.  If $L$ had been fixed at $M/2$ and execution time was plotted against $N_b$, the solver would have shown the same quadratic growth as in Fig.\ \ref{fig:bench}. When $N_b$ is fixed, calculating the covariance matrix and the BS-transform is inverse proportional and proportional to $L$ respectively. The large jumps in execution times are caused by adaptive kernel launch configurations, which depends on $M$, $L$ and $N_b$.}
 \label{fig:benchBS}
 \end{figure*}
@@ -410,14 +414,12 @@ In Fig.\ \ref{fig:benchBS} we present similar benchmarks for the BS-Capon beamfo
 
 \begin{figure*}[!t]
 \centerline{
-\subfloat[]{\includegraphics[width=0.3\textwidth]{gfx/das_invivo.png} \label{fig:invivoDAS}}
-\hfil
-\subfloat[]{\includegraphics[width=0.3\textwidth]{gfx/capon_invivo.png} \label{fig:invivoMV}}
-\hfil
-\subfloat[]{
-\includegraphics[width=0.3\textwidth]{gfx/capon_bs_invivo.png} \label{fig:invivoBS}}
-\hfil
-\includegraphics[height=0.3\textwidth]{gfx/colorBarInvivo2.png}
+\begin{tabular}{cc}
+\subfloat[]{\includegraphics[width=0.45\textwidth]{gfx/das_invivo.png} \label{fig:invivoDAS}} &
+\includegraphics[height=0.45\textwidth]{gfx/colorBarInvivo2.png}\\
+\subfloat[]{\includegraphics[width=0.45\textwidth]{gfx/capon_invivo.png} \label{fig:invivoMV}} &
+\subfloat[]{\includegraphics[width=0.45\textwidth]{gfx/capon_bs_invivo.png} \label{fig:invivoBS}}
+\end{tabular}
 }
 \caption{\textit{In-vivo} harmonic cardiac ultrasound image acquired using a 3.5 MHz, 64 elements phased array. Number of receive beams for the $70\degree$ sector is 98, and number of samples in range is 610. Dynamic range is -20 dB to 20 dB with mean value represented as 0 dB. The image is the first frame in the attached videos. a) Delay-and-sum with uniform weights \multimedia{Media-Movie 1}. b) Element-space Capon ($L=32, K=2, d=0.1$) \multimedia{Media-Movie 2}. c) Beamspace Capon ($L=32, K=2, N_b=3, d=0.01$) \multimedia{Media-Movie 3}.}
 \label{fig:invivo}
@@ -468,7 +470,7 @@ In element space, resolution decays rapidly since the effective adaptive apertur
 \label{fig:speed_res_trade}
 \end{figure}
 
-\section{Discussion}\label{sec:dis}
+\section{Discussion}\label{sec:dis_paper2}
 In this paper we have presented a parallel implementation of the BS-Capon beamformer for high-resolution cardiac ultrasound imaging. The results show that it is now possible to apply BS-Capon in real-time in cardiac ultrasound imaging by utilizing the power of a GPU. According to Fig.\ \ref{fig:benchBS} it is also possible to process two parallel receive lines per transmit beam (for both $M=64$ and $M=96$. $L=M/2$). %However, since we had to use oversampling in our simulation, these extra lines might be needed for increased sampling instead of increasing the frame rate. If parallel receive lines are used to obtain denser sampling, the acquisition time remains the same but the processing time is increased with a factor equal to the amount of oversampling. If parallel receive lines are used to increase the frame rate, the acquisition time is lowered, and the processing time remains constant. Hence, four parallel receive lines are not possible to process in real-time using BS-Capon with $N_b=3$ in combination with our single GPU setup.
 
 For ES-Capon, processing rates for high quality settings are still too high to support real-time cardiac ultrasound imaging. From Fig.\ \ref{fig:benchUS64} we see that for $L = M/2 = 32$ and $K=1$, the total execution time is 110 ms (9 FPS). Taking into account that we use complex data, but less samples per image, these results are similar to the performance reported by Chen et al. \cite{Chen2011}.
@@ -491,7 +493,7 @@ In the end we want to point out that cardiac ultrasound has not been selected as
 
 %For a typical cardiac ultrasound image of 80*400 pixels (70 degree sector, 15cm range) acquired using a 2.5MHz, $M=64$ element phased array, the result is 10fps (subarray length $L=M/2$, temporal smoothing over 3 samples). If we do a 2-element pre-beamforming to get the channel count down to 32, the rate increases to 44fps. For a 32 element phased array we need less beams to cover the sector ($40 \times 400$ pixels), hence with the same parameters the frame rate increases to 87fps. The bottleneck of the Capon algorithm is to find the inverse covariance matrix for all pixels. This is an $O(L^3)$ operation, and results show that when L is larger than 16, real time performance is not possible for cardiac imaging with current high-end hardware. The target GPU has been Nvidia’s Quadro 6000, capable of 1Tflops.
 
-\section{Conclusion}\label{sec:con}
+\section{Conclusion}\label{sec:con_paper2}
 In this paper a parallel formulation and implementation of the beamspace Capon beamformer have been presented, and
 the beamformer has successfully been implemented on the GPU. For a three dimensional beamspace, processing rates supporting real-time cardiac ultrasound imaging was shown to be possible, meaning that processing rates higher than the image acquisition rate are obtained for a wide range of parameters. Image quality was investigated in an \textit{in-vivo} cardiac dataset. These results showed that Capon beamforming is feasible for cardiac ultrasound imaging, providing images with improved lateral resolution both in element- and beamspace.
 

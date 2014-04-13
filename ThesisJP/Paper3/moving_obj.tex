@@ -46,7 +46,7 @@ In previous literature on Capon beamforming for medical ultrasound imaging only 
 
 In this paper we investigate the issue further. We show that when a moving point scatterer is imaged with the Capon beamformer with the same beam spacing which is sufficient for DAS, the predicted scalloping loss is observed both in simulations and \textit{in vitro} data. The question is then, what can we do in order to improve on the situation without affecting the acquisition frame rate and processing throughout. %We try two answer this by studying the scalloping loss of the Capon beamforming and investigating different methods aimed at reducing it. We also discuss how the different methods will affect the acquisition frame rate and the processing complexity. 
 
-The next section gives an introduction to Capon beamforming together with a short introduction to lateral sampling and shift-invariance. In Section \ref{sec:capon_LLSI} we study the scalloping loss yield by the Capon beamformer and its local lateral shift-invariance property.  Different methods for reduced scalloping loss and by that improved local lateral shift-invariance are presented in Section \ref{sec:methods}. Then, in Section \ref{sec:res} we present the results of applying the most promising method on \textit{in vitro} data. Finally we discuss our findings in Section \ref{sec:dis} and give our conclusions in Section \ref{sec:con}.
+The next section gives an introduction to Capon beamforming together with a short introduction to lateral sampling and shift-invariance. In Section \ref{sec:capon_LLSI} we study the scalloping loss yield by the Capon beamformer and its local lateral shift-invariance property.  Different methods for reduced scalloping loss and by that improved local lateral shift-invariance are presented in Section \ref{sec:methods}. Then, in Section \ref{sec:res_paper3} we present the results of applying the most promising method on \textit{in vitro} data. Finally we discuss our findings in Section \ref{sec:dis_paper3} and give our conclusions in Section \ref{sec:con_paper3}.
 
 %\comment{Next sections summary.}
 
@@ -120,9 +120,10 @@ In Fig.\,\ref{fig:das_shiftvariant} the beam density is reduced by a factor of t
 
 \begin{figure*}[!t]
 \centerline{
-\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig2a.eps}\label{fig:das_shiftinvariant}}
-\hfill{}
-\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig2b.eps}\label{fig:das_shiftvariant}}
+\begin{tabular}{c}
+\subfloat[]{\includegraphics[width=0.7\linewidth]{\img fig2a.eps}\label{fig:das_shiftinvariant}}\\
+\subfloat[]{\includegraphics[width=0.7\linewidth]{\img fig2b.eps}\label{fig:das_shiftvariant}}
+\end{tabular}
 }
 \caption{LSV-plots of delay-and-sum beamforming. If contours are diagonal and the amplitude variation among the peak points (black dots) is small, the imaging system is said to be locally laterally shift-invariant. Dotted vertical lines are plotted where transmit-receive beams are located. a) Sampling density according to (\ref{eq:resolution}). The system is locally laterally shift-invariant. b) Undersampling by a factor of two. The system is no longer locally laterally shift-invariant.}
 \label{fig:das}
@@ -137,12 +138,14 @@ We observe that Fig.\,\ref{fig:capon2} now contains a scaled version of the patt
 
 \begin{figure*}[!t]
 \centerline{
+\begin{tabular}{c}
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img fig3a.eps}\label{fig:capon1}
-}
+\includegraphics[width=0.7\linewidth]{\img fig3a.eps}\label{fig:capon1}
+}\\
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img fig3b.eps}\label{fig:capon2}
+\includegraphics[width=0.7\linewidth]{\img fig3b.eps}\label{fig:capon2}
 }
+\end{tabular}
 }
 \caption{LSV-plots of Capon beamforming with $L=M/2=48$ and $K=1$, and with sampling corresponding to (\ref{eq:resolution}). a) Capon beamforming with $d=1/100$ as diagonal loading. The system is not locally laterally shift-invariant. b) The diagonal loading factor $d$ is increased to 1. The scalloping loss is reduced, but the system is still not locally laterally shift-invariant.}
 \label{fig:capon}
@@ -161,12 +164,14 @@ Even though increasing the number of transmits improves the lateral shift-invari
 
 \begin{figure*}[!t]
 \centerline{
+\begin{tabular}{c}
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img fig4a.eps}\label{fig:capon_oversampling_a}
-}
+\includegraphics[width=0.7\linewidth]{\img fig4a.eps}\label{fig:capon_oversampling_a}
+}\\
 \subfloat[]{
-\includegraphics[width=0.5\linewidth]{\img fig4b.eps}\label{fig:capon_oversampling_b}
+\includegraphics[width=0.7\linewidth]{\img fig4b.eps}\label{fig:capon_oversampling_b}
 }
+\end{tabular}
 }
 \caption{Capon beamforming as described in Fig.\,\ref{fig:capon} with oversampling on transmit. The figure is zoomed compared with Fig.\,\ref{fig:capon} to better see the beam-to-beam variation. a) Four times oversampling ($q=4$). b) Sixteen times oversampling ($q=16$). The maximum scalloping loss is reduced, but it is still too high for the system to be locally laterally shift invariant.}
 \label{fig:capon_oversampling}
@@ -205,18 +210,20 @@ Since the phase rotation method operates on the same channel data as in Fig.\,\r
 
 \begin{figure*}[!t]
 	\centerline{
+		\begin{tabular}{c}
 		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img fig5a.eps}
-		}
+			\includegraphics[width=0.7\linewidth]{\img fig5a.eps}
+		}\\
 		\subfloat[]{
-			\includegraphics[width=0.5\linewidth]{\img fig5b.eps}
+			\includegraphics[width=0.7\linewidth]{\img fig5b.eps}
 		}
+		\end{tabular}
 	}
 	\caption{Capon beamforming as described in Fig.\,\ref{fig:capon} with oversampling based on phase rotation. The figure is zoomed compared with Fig.\,\ref{fig:capon} to better see the beam-to-beam variation. a) Four times oversampling on receive ($q=4$). b) Sixteen times oversampling on receive ($q=16$).}
 	\label{fig:capon_oversampling_pr}
 \end{figure*}
 
-\section{In Vitro Phantom Data}\label{sec:res}
+\section{In Vitro Phantom Data}\label{sec:res_paper3}
 In Fig.\,\ref{fig:LSV_invitro} we present the result of applying the Capon beamformer on \textit{in vitro} data with and without oversampling by phase rotation. The data was acquired using a modified Vivid E9 high-end cardiac ultrasound scanner by GE Vingmed Ultrasound, Horten, Norway, equipped with a M5S-D phased transducer operating in harmonic mode at 3.34 MHz. The transmit beam density was set to match (\ref{eq:resolution}) based on this frequency, and 111 tx-beams where therefore distributed on a 65\degree sector. Transmit focus is located at 8 cm range. Note that in harmonic imaging the generated transmit beam at the harmonic frequency will be wider and have lower sidelobes than the beam resulting from transmitting at the harmonic frequency \cite{Fedewa2004}. The lateral sampling is therefore increased compared with our simulations. A tissue mimicking phantom containing wire targets and anechoic cysts was imaged, and the data was acquired while the probe was moved across the phantom manually. Fig.\,\ref{fig:phantom_das_image} shows the first frame out of 14 in the acquired loop processed with DAS beamforming. %Movies of the whole loop processed with DAS and Capon beamforming with and without ten times oversampling by phase rotation can be found in the supplementary material \multimedia{Videos}.
 
 One point scatterer in Fig.\,\ref{fig:phantom_das_image} has been selected [white box], and then used to generate LSV-plots. The point scatterer is located close to the transmit focus. Figure \ref{fig:phantom_das_LSV} shows the resulting LSV-plot when using the DAS beamformer. The scalloping loss is less than 1 dB, and the system is by that locally laterally shift-invariant. As a consequence point scatterers have a consistent appearance when subjected to motion \multimedia{Media Movie 1}.  
@@ -249,8 +256,10 @@ Figure \ref{fig:phantom_capon_LSV_16PR} presents the result of applying sixteen 
 
 \begin{figure*}[!t]
 \centerline{
-\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig7a.png}\label{fig:phantom_capon_image}}
-\subfloat[]{\includegraphics[width=0.5\linewidth]{\img fig7b.png}\label{fig:phantom_capon_16PR_image}}
+\begin{tabular}{c}
+\subfloat[]{\includegraphics[width=0.7\linewidth]{\img fig7a.png}\label{fig:phantom_capon_image}}\\
+\subfloat[]{\includegraphics[width=0.7\linewidth]{\img fig7b.png}\label{fig:phantom_capon_16PR_image}}
+\end{tabular}
 }
 \caption{First frame from Fig.\,\ref{fig:phantom_das_image} processed with Capon beamforming. a) Without oversampling \multimedia{Media Movie 2}. b) With sixteen times oversampling using phase rotation \multimedia{Media Movie 3}. Notice how the point scatterers appear brighter in the image with oversampling.}
 \label{fig:img_invitro}
@@ -271,7 +280,7 @@ Figure \ref{fig:phantom_capon_LSV_16PR} presents the result of applying sixteen 
 %\label{fig:das}
 %\end{figure*}
 
-\section{Discussion}\label{sec:dis}
+\section{Discussion}\label{sec:dis_paper3}
 %Note that in this paper we have investigated a single array configuration and a limited parameter range for the Capon beamformer. The goal was not to make a reference for which oversampling factor to use in different scenarios, but rather do a detailed investigation of the scalloping loss effect. We hope with this investigation that future readers will be able to find out them self what oversampling factor to use for their system. 
 
 Faced with an imaging scene containing bright point scatterers or sharp edges, one could wonder how large the oversampling factor needs to be in order to avoid visible scalloping losses. In his seminal paper, Cox \cite{Cox1973} derives the required beam density for a given output SNR. For instance 47 dB requires a beam density for the Capon beamformer ten times the one given by (\ref{eq:resolution}) [with $q=1/2$]. Since resolution for the Capon beamformer depends on SNR we would recommend to first use the dynamic range in the image as guidance. The amount of diagonal loading will also dictate the maximal achievable resolution since $10\log{d}$ can be interpreted as the maximal input SNR seen by the Capon beamformer. Fig.\,\ref{fig:das_capon_beams} shows that 25 times oversampling is required for a $d$-value of $1/100$. When \textit{in vitro} data contains additional noise this oversampling requirement is reduced.%Cox measures resolution as the 3 dB saddle point between two impinging monochromatic plane waves. For ultrasound data only a 50 \% increase in resolution was found in \cite[Fig.~7]{Asen} for a 30 dB output SNR when measured in a similar way as Cox [6 dB saddle point]. However, sixteen times oversampling was required to make the imaging system shift invariant in the same paper. In this paper more than ten times oversampling was found to be required for a 40 dB output SNR (after array gain) in simulations, however for the \textit{in vitro} data ten times oversampling was enough for the system to be locally laterally shift-invariant. This might be a result of improved initial sampling (as discussed in Section \ref{sec:res}) and a higher initial noise level before diagonal loading was applied. 
@@ -293,7 +302,7 @@ Finally we want to stress the fact that this demand for oversampling does not on
 %\subsection{Impact on Real Time Performance}
 %Discuss, and show with benchmarks how the different methods for making Capon beamforming shift-invariant impact the total execution time.
 
-\section{Conclusion}\label{sec:con}
+\section{Conclusion}\label{sec:con_paper3}
 %In this paper we have investigated the lateral shift-invariance property of the Capon beamformer when imaging moving objects. We have shown that the Capon beamformer is less sensitive to small lateral shifts if oversampling based on phase rotation is applied. This without reducing the acquisition frame rate and with only a minor increase in processing complexity. %In Section \ref{sec:capon_LLSI} it was shown that a Capon beamformer with high resolution parameters is not locally laterally shift-invariant when subjected to motion. The root cause was found to be too coarse lateral sampling. 
 %In Section \ref{sec:methods} we presented methods for improved shift-invariance based on oversampling. The most promising method, with respect to improved shift-invariance, reduction in acquisition frame rate and processing complexity combined, was based on phase rotation. 
 %In Section \ref{sec:res} we presented results showing that this method also works on \textit{in vitro} data when the ultrasound probe is subjected to motion. 
