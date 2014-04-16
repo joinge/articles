@@ -829,9 +829,9 @@ Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On t
 
 \subsection{Solving $\hat{\boldsymbol{R}}$$\;\!^{-1}$$\mathbf{1}$}
 
-As intuition might suggest the matrix product $\eRi\1$ can be carried out by first inverting the matrix $\eR$, then performing the inner product with $\1$. However, one can also solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, where $\boldsymbol{b} = \eRi\1$. This is the preferred approach since the answer is obtained directly without needing to compute the final inner product.
+As intuition might suggest the matrix product $\eRi\1$ can be carried out by first inverting the matrix $\eR$, then performing the inner product with $\1$. However, one can also solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, where $\boldsymbol{b} = \eRi\1$. This is the preferred approach since the answer is obtained directly and without the added computational cost of the final inner product.
 
-An important thing to note, however, is that unlike the problems most GPU libraries tries to solve we do not attempt so solve large linear equations or invert large matrices; our matrices are small, but we have a very large number of them. Fortunately Nvidia recently released a highly optimized batched linear equation solver tailored for this particular task. It is Gauss Jordan based and supports partial pivoting and complex numbers. The only downside to using it in our application is that it does not exploit the Hermitian property of our sample covariance matrix. A better choice might be a solver based on Cholesky decomposition. These are designed for Hermitian positive semi-definite matrices, and require roughly half the arithmetic operations compared to a Gauss Jordan solver.
+An important thing to note, however, is that unlike the problems most GPU libraries tries to solve we do not attempt so solve large linear equations or invert large matrices; our matrices are small, but we have a very large number of them. Fortunately Nvidia recently released a highly optimized batched linear equation solver tailored for this particular task. It is Gauss Jordan based and supports partial pivoting and complex numbers. The only downside to using it in our application is that it does not exploit the Hermitian property of our sample covariance matrix. A better choice would be a solver based on Cholesky decomposition. These are designed for Hermitian positive semi-definite matrices, and require roughly half the arithmetic operations compared to a Gauss Jordan solver.
 
 
 
@@ -848,7 +848,7 @@ An important thing to note, however, is that unlike the problems most GPU librar
 
 The beamformer output $z$ is computed on a per-pixel basis by first computing the MVDR weights $\w$, which are merely scaled versions of $\eRi\1$ (\ref{weights}). Then the sum in (\ref{finalZ}) is found by assigning a group of $L$ threads to respective elements of $x_l$, which then proceed to accumulate these for all $N_L$ subarrays. The resulting data vector is finally multiplied with the weight vector using the same threads, and then a single thread is used to sum these products to obtain $z$.
 
-\subsection{Summary of GPU implementation}
+\subsection{Implementation summary}
 
 The GPU implementation can be summarized as follows:
 \begin{itemize}
@@ -859,14 +859,23 @@ The GPU implementation can be summarized as follows:
 \item Design makes efficient use of cache and data transfers are kept to a minimum.
 \end{itemize}
 
-Compared to our CPU implementations, where:
+We compare this to our CPU implementations, where:
 \begin{itemize}
 \item Pixels are processed one by one.
 \item Single thread per pixel.
 \item Computation of $\eR$ is optimized for minumum number of instructions, as in \ref{mvdr_build_R}. Only upper half of $\eR$ is computed (see next point).
-\item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $eR$.
+\item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
 \item Design has generally not been optimized for efficient use of memory.
 \end{itemize}
+
+\begin{tabular}{l l l}
+ & GPU & CPU \\
+Pixel processing & in batches & one by one \\
+Threads per pixel & multiple & one \\
+1. Build $\eR$  & min. memory & min. instructions \\
+2. Compute $\eRi\1$ & Nvidia batch linear equation solver
+\end{tabular}
+
 
 %  The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
 
