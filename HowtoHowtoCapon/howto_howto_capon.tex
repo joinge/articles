@@ -850,31 +850,39 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 
 \subsection{Implementation summary}
 
-The GPU implementation can be summarized as follows:
-\begin{itemize}
-\item Pixels are processed in batches.
-\item Multiple threads per pixel.
-\item $\eR$ is computed directly from raw data to minimize memory footprint.
-\item Inversion step is performed by Nvidias batch linear equation solver.
-\item Design makes efficient use of cache and data transfers are kept to a minimum.
-\end{itemize}
+% The GPU implementation can be summarized as follows:
+% \begin{itemize}
+% \item Pixels are processed in batches.
+% \item Multiple threads per pixel.
+% \item $\eR$ is computed directly from raw data to minimize memory footprint.
+% \item Inversion step is performed by Nvidias batch linear equation solver.
+% \item Design makes efficient use of cache and data transfers are kept to a minimum.
+% \end{itemize}
+% 
+% We compare this to our CPU implementations, where:
+% \begin{itemize}
+% \item Pixels are processed one by one.
+% \item Single thread per pixel.
+% \item Computation of $\eR$ is optimized for minumum number of instructions, as in \ref{mvdr_build_R}. Only upper half of $\eR$ is computed (see next point).
+% \item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
+% \item Design has generally not been optimized for efficient use of memory.
+% \end{itemize}
 
-We compare this to our CPU implementations, where:
-\begin{itemize}
-\item Pixels are processed one by one.
-\item Single thread per pixel.
-\item Computation of $\eR$ is optimized for minumum number of instructions, as in \ref{mvdr_build_R}. Only upper half of $\eR$ is computed (see next point).
-\item Inversion step carried out by a custom inline Cholesky based solver that only requires the upper triangular of $\eR$.
-\item Design has generally not been optimized for efficient use of memory.
-\end{itemize}
-
-\begin{tabular}{l l l}
- & GPU & CPU \\
-Pixel processing & in batches & one by one \\
-Threads per pixel & multiple & one \\
-1. Build $\eR$  & min. memory & min. instructions \\
-2. Compute $\eRi\1$ & Nvidia batch linear equation solver
+The GPU design is summarized and compared to our CPU designs in table \ref{implementation_summary}.
+\begin{table}[h]\centering%\normalsize
+% \begin{tabular}[c]{l r r r@{}  l}\hline
+\begin{tabular}[c]{l p{.29\linewidth} p{.29\linewidth}}\hline
+\rowcolor{tabBlue} & \bf GPU & \bf CPU \\\hline
+Pixel processing & In batches & One by one \\
+Threads per pixel & Multiple & One \\
+1. Build $\eR$  & & \\
+\ \ Values computed & \mbox{$\bullet$ Computing everything} \mbox{$\bullet$ Minimized memory} & \mbox{$\bullet$ Only upper triangular} \mbox{$\bullet$ Minimized instructions} \\
+2. Compute $\eRi\1$ & With a batch linear equation solver & With custom inline Cholesky solver \\
+Cache utilization & Efficient & Not efficient \\
+Data transfers & Minimum & Moderate
 \end{tabular}
+\caption{Implementation summary.}\label{implementation_summary}
+\end{table}
 
 
 %  The subarray data can, as here, be reduced to coincide in length with the subarray weights, or the weights can be extended to $M$ in size and applied directly on $\x[n]$ and summed.  
