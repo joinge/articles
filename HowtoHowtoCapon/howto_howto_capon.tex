@@ -336,6 +336,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 % \usepackage{yfonts}
 
+\graphicspath{submission/final/gfx}
 
 \begin{document}
 
@@ -526,7 +527,7 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
 \fi%
-\caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - prior to summation - a suitable set of delays, $\Delta$, and weights, $w$, are applied to focus on a pixel of interest at angle and range ($\theta,n$).}\label{beamforming}
+\caption{Beamforming principle. Signal signature is first removed by matched filtering. Then - before summation - a suitable set of delays, $\Delta$, and weights, $w$, are applied to focus on a pixel of interest at angle and range ($\theta,n$).}\label{beamforming}
 \end{figure}
 Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{beamforming}). Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
 
@@ -567,7 +568,7 @@ Finally, the end estimate $\eR$ is found by adding a fraction $d$ of the total p
 \end{align}
 where $\I$ is an identity matrix, $\tr\{\cdot\}$ represents the matrix trace operation, and $\tr\{\breve{\R}[n]\}$ is an estimate of the energy received from this pixel.
 
-Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M,M}$ to $\mathbb{C}^{L,L}$, and hence will produce an $L$-element weight set when substituted into (\ref{z}). This weight set is applied to all the subarrays, prior to computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weight set to the sum of all the subarrays:
+Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M,M}$ to $\mathbb{C}^{L,L}$, and hence will produce an $L$-element weight set when substituted into (\ref{z}). This weight set is applied to all the subarrays, before computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weight set to the sum of all the subarrays:
 \begin{align}
 z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
@@ -604,7 +605,7 @@ If we neglect spatial and temporal averaging, then the computation of $\eR$ is r
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
 \fi%
-\caption{Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic complexity, especially when performing temporal averaging.}\label{mvdr_complexity}
+\caption{Per-pixel computational complexity of the steps in MVDR beamforming (before any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic complexity, especially when performing temporal averaging.}\label{mvdr_complexity}
 \end{figure}
 To visualize these relations, and include the effects of using complex numbers, we set up complexity formulas that account for the total number of arithmetic operations for each step in the MVDR process (see appendix \ref{mvdr_formulas}). The only excluded operation was partial pivoting used in the inversion step, but it contributes marginally to the end result. The entire range of possible subarray sizes from $L\in[1,M]$ was finally evaluated, with temporal averaging set to $K\in\{0,1,2\}$, and the number of channels set to $M\in\{8,16,32\}$. The results are shown in \Fig{mvdr_complexity}.
 
@@ -721,13 +722,6 @@ These challenges are very closely linked. Since the Quadro 6000 architecture is 
 
 In Fig. \ref{mvdr_implementation} we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
 
-\ifPeerReview\else
-\begin{figure}[!t]\centering
-\includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
-\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
-\end{figure}
-\fi%
-
 Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row a full computation is carried out, then that row is saved back to global memory following a coalesced access pattern that maximizes global memory bandwidth. For subsequent rows the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and removing the correlation coefficients that enters and exits the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column is obtained by a complex conjugate copy of the relevant value in the first row. This is slightly non-optimal as it causes divergent branching, but is needed because the solver is Gauss Jordan based and thus require a full $\eR$. Combined these steps balance the load evenly on all threads, is almost completely free of arithmetic redundancy, and consumes less memory.
  
 
@@ -797,7 +791,10 @@ Data transfers & Minimum & Moderate
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske7.eps}
-\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46\;MP. Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
+\else
+\begin{figure}[!t]\centering
+\includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
+\caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. The image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
 \end{figure}
 \fi%
 
@@ -1057,7 +1054,7 @@ His industry experience includes the European Organization for Nuclear Research 
 \end{IEEEbiography}
 
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/carl-inge.eps}}]{Carl-Inge Colombo Nilsen}
-(S'06-M'10) received the M.Sc. and Ph.d. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustic applications.
+(S'06-M'10) received the M.Sc. and Ph.d. degrees in computer science from the University of Oslo, Norway, in 2005 and 2010. He is currently working at the University of Oslo as a postdoctoral research fellow. His research interests include signal and array processing for ultrasound imaging and other acoustical applications.
 \end{IEEEbiography}
 
 \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{gfx/photos/andreas.eps}}]{Andreas Austeng}

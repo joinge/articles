@@ -1,0 +1,42 @@
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}' && eval 'exec perl -S $0 $argv:q' if 0;
+
+# convert colour files produced by PAW into BW styled files 
+# -- Uta 1.11.00, outer Perl frame based on Naomi's script
+# -- Naomi 14.3.01, replaced colour 'black' (not always defined), and 
+#	added grayscaling 
+
+$use_gray = 1;
+$need_help = 0;
+foreach $text (@ARGV)  {
+  last if (!($text=~/^-/));
+  if ($text=~/-b/) {$use_gray = 0}
+  else {print "Unrecognized option $text \n"; $need_help = 1};
+  shift(@ARGV);
+}
+goto HELP if ($need_help);
+goto HELP if ($#ARGV != 1);
+  
+if (-e $ARGV[1]) {
+  print "\n >>> Output file $ARGV[1] already exists, overwrite? [<CR>=no] ";
+  $text = <STDIN>;
+  print "\n";
+  exit(0) if (!($text=~/^\s*y/i));
+}
+open (COLOR,"<$ARGV[0]"); open (BW,">$ARGV[1]");
+while (<COLOR>) {
+  if ($use_gray) {
+    s/\bsetrgbcolor\b/add add 3 div setgray/g;
+  } else {
+    s/\bsetgray\b/pop 0 setgray/g;
+    s/\bsetrgbcolor\b/pop pop pop 0 setgray/g;
+  }
+  print BW;
+}
+close(COLOR); close(BW);
+
+exit(1);
+
+HELP:
+print "\nUsage:   bw_convert [-b] <colour_file> <bw_file>  \n";
+print "\n  -b       : convert all colours and grays to black\n";
+print "\n"; exit(0);
