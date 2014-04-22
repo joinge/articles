@@ -41,6 +41,7 @@ cp code_assessment.eps buske9_online.eps
 cp code_assess_flops_bw.eps buske10_bw.eps
 cp code_assess_flops.eps buske10_online.eps
 
+cp benchmark_boston_bw.eps buske11_bw.eps
 cp benchmark_boston.eps buske11_online.eps
 
 # Coverts eps file to black-white using ghostscript
