@@ -35,8 +35,12 @@ cp plot_holmengraa_L16_Navg1.eps buske7_online.eps
 cp benchmark_bw.eps buske8_bw.eps
 cp benchmark.eps buske8_online.eps
 
+cp code_assessment_bw.eps buske9_bw.eps
 cp code_assessment.eps buske9_online.eps
+
+cp code_assess_flops_bw.eps buske10_bw.eps
 cp code_assess_flops.eps buske10_online.eps
+
 cp benchmark_boston.eps buske11_online.eps
 
 # Coverts eps file to black-white using ghostscript
