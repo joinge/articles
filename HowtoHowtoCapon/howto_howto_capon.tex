@@ -3,13 +3,21 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewfalse             % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewtrue              % Whether to create the PeerReview version or
                                                 % Journal version
+\newif\ifOnlineColor\OnlineColorfalse            % Compile online color version?
+
 \newif\ifFlatArchive\FlatArchivefalse           % Whether archive is flat (messy) or contain 
                                                 % subfolders for graphics etc.
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
 \newif\ifTODO\TODOtrue                        % Use todo notes?
+
+\ifOnlineColor
+   \newcommand\figPostfix{_online}              % Colored images online
+\else
+   \newcommand\figPostfix{_bw}                  % Black and white in journal
+\fi
 
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % IEEEtran %
@@ -236,16 +244,6 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
 
 %Math macros:
-\newcommand\diff[2]{\frac{\kw{d}\;\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
-\newcommand\ddiff[2]{\frac{\kw{d^2}\;\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
-
-\renewcommand\d[1]{\scriptstyle\kw{\;d\parm{#1}}\displaystyle}
-
-% These commands are mutually exclusive. Remember to "renew" in v2.
-\newcommand\intb[4]{\int\limits_{#3}^{#4} #1 \d{#2}} % \int{exp}{var}{from}{to}
-\newcommand\intl[3]{\int\limits_{#3} #1 \d{#2}} % \int{exp}{var}{for all}
-\newcommand\intu[2]{\int #1 \d{#2}} % \int{exp}{var}{for all}
-
 \newcommand\T{^{\scriptscriptstyle T}}
 \renewcommand\H{^{\scriptscriptstyle H}}
 
@@ -272,7 +270,6 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand*\B{\mat B}
 \newcommand*\C{\mat C}
 \newcommand*\E{\mat E}
-% \renewcommand*\H{\mat H}
 \renewcommand*\P{\mat P}
 \newcommand*\eP{\mat{\hat P}}
 \newcommand*\R{\mat R}
@@ -291,10 +288,6 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % \newcommand*\h{\mathtiny{^H}}
 \renewcommand*\t{^T}
 \newcommand*\h{^H}
-
-\newcommand\D{\vec\nabla} %Del: Vector differential operator - nabla
-\newcommand\Dx{\vec\nabla\times}
-\newcommand\Dd{\vec\nabla\cdot}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,snakes}
@@ -336,7 +329,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 % \usepackage{yfonts}
 
-\graphicspath{submission/final/gfx}
+\graphicspath{submission/final/gfx/}
 
 \begin{document}
 
@@ -522,7 +515,7 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 
 \ifPeerReview
 \begin{figure}[H]\centering
-\includegraphics[width=0.8\linewidth]{gfx/buske1.eps}
+\includegraphics[width=0.8\linewidth]{gfx/buske1\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
@@ -574,7 +567,7 @@ z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske2.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske2\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/implementation.eps}
@@ -600,7 +593,7 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 If we neglect spatial and temporal averaging, then the computation of $\eR$ is reduced to a single outer product with complexity of O($M^2$), and the inversion is then of O($M^3$). This might lead us to believe that the inversion step is by far the most complex. But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ is of O($N_K N_L L^2$) and the inversion of O($L^3$). Computing $\eR$ is now the most complex operation whenever $N_LN_K>L$.
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske3.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske3\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
@@ -627,7 +620,7 @@ To use Nvidia's own terminology, the Quadro 6000 is comprised of 14 streaming mu
 
 \ifPeerReview
 \begin{figure}[t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske4.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske4\figPostfix.eps}
 \else
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
@@ -676,7 +669,7 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 %
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske5.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske5\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
@@ -700,7 +693,7 @@ Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske6.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske6\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_implementation.eps}
@@ -790,17 +783,17 @@ Data transfers & Minimum & Moderate
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske7.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske7\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
+\fi%
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. The image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
 \end{figure}
-\fi%
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske8.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske8\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark.eps}
@@ -811,17 +804,17 @@ Data transfers & Minimum & Moderate
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske9.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske9\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/code_assessment.eps}
+\fi%
 \caption{Execution time of an arithmetic-only and a memory-only version of the MVDR code. A dataset from an $M=32$ array was processed for all $L$ using $K=1$, and the mean execution time for a 1 megapixel (MP) image was used here. From this plot we can infer that the kernel building $\eR$ is memory bound, as the time the kernel spends performing memory transactions is higher than the corresponding time it spends carrying out arithmetical operations. Furthermore, when the total runtime is larger than the restricted kernels this can largely be attributed to latency, which we can see that building $\eR$ suffers from with the chosen parameters.}\label{code_assessment}
 \end{figure}
-\fi%
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske10.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske10\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/code_assess_flops.eps}
@@ -831,7 +824,7 @@ Data transfers & Minimum & Moderate
 
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske11.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske11\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark_boston.eps}
