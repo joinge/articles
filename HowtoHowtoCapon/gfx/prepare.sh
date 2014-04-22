@@ -17,9 +17,11 @@ FILES=" \
 cp beamforming.eps buske1_online.eps
 cp implementation.eps buske2_online.eps
 cp mvdr_complexity.eps buske3_online.eps
+cp mvdr_complexity_bw.eps buske3_bw.eps
 cp mvdr_build_R.eps buske4_online.eps
 cp buildR-breakdown.eps buske5_online.eps
 cp mvdr_implementation.eps buske6_online.eps
+cp plot_holmengraa_L16_Navg1.eps buske7_bw.eps
 cp plot_holmengraa_L16_Navg1.eps buske7_online.eps
 cp benchmark.eps buske8_online.eps
 cp code_assessment.eps buske9_online.eps
@@ -33,18 +35,17 @@ function makeEpsBW {
    mv tmp.eps.eps $2
 }
 
-inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske1_bw.eps beamforming.svg
-inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske2_bw.eps implementation.svg
-inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske4_bw.eps mvdr_build_R.svg
-inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske6_bw.eps mvdr_implementation.svg
-cp plot_holmengraa_L16_Navg1.eps buske7_bw.eps
+# inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske1_bw.eps beamforming.svg
+# inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske2_bw.eps implementation.svg
+# inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske4_bw.eps mvdr_build_R.svg
+# inkscape --select=svg2 --verb org.inkscape.color.grayscale --export-eps=buske6_bw.eps mvdr_implementation.svg
 
-makeEpsBW buske3_online.eps buske3_bw.eps
-makeEpsBW buske5_online.eps buske5_bw.eps
-makeEpsBW buske8_online.eps buske8_bw.eps
-makeEpsBW buske9_online.eps buske9_bw.eps
-makeEpsBW buske10_online.eps buske10_bw.eps
-makeEpsBW buske11_online.eps buske11_bw.eps
+# makeEpsBW buske3_online.eps buske3_bw.eps
+# makeEpsBW buske5_online.eps buske5_bw.eps
+# makeEpsBW buske8_online.eps buske8_bw.eps
+# makeEpsBW buske9_online.eps buske9_bw.eps
+# makeEpsBW buske10_online.eps buske10_bw.eps
+# makeEpsBW buske11_online.eps buske11_bw.eps
 
 # for i in $(ls buske*eps); do
 #    FN=${i##*/}
