@@ -16,10 +16,15 @@ FILES=" \
 
 cp beamforming.eps buske1_online.eps
 cp implementation.eps buske2_online.eps
-cp mvdr_complexity.eps buske3_online.eps
+
 cp mvdr_complexity_bw.eps buske3_bw.eps
+cp mvdr_complexity.eps buske3_online.eps
+
+cp mvdr_build_R_bw.eps buske4_bw.eps
 cp mvdr_build_R.eps buske4_online.eps
+
 cp buildR-breakdown.eps buske5_online.eps
+
 cp mvdr_implementation.eps buske6_online.eps
 cp plot_holmengraa_L16_Navg1.eps buske7_bw.eps
 cp plot_holmengraa_L16_Navg1.eps buske7_online.eps
