@@ -23,12 +23,18 @@ cp mvdr_complexity.eps buske3_online.eps
 cp mvdr_build_R_bw.eps buske4_bw.eps
 cp mvdr_build_R.eps buske4_online.eps
 
+cp buildR-breakdown_bw.eps buske5_bw.eps
 cp buildR-breakdown.eps buske5_online.eps
 
+cp mvdr_implementation_bw.eps buske6_bw.eps
 cp mvdr_implementation.eps buske6_online.eps
+
 cp plot_holmengraa_L16_Navg1.eps buske7_bw.eps
 cp plot_holmengraa_L16_Navg1.eps buske7_online.eps
+
+cp benchmark_bw.eps buske8_bw.eps
 cp benchmark.eps buske8_online.eps
+
 cp code_assessment.eps buske9_online.eps
 cp code_assess_flops.eps buske10_online.eps
 cp benchmark_boston.eps buske11_online.eps
