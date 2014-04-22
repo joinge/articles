@@ -683,18 +683,6 @@ In Fig. \ref{mvdr_build_R} we illustrate how to reduce the arithmetic complexity
 
 To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied we call it a "minimum instructions" solution, and when step 2 is left out we call it a "minimum memory" solution. Fig. \ref{mvdr_complexity_optimized} compares the two solutions, and formulas may be found in appendix \ref{mvdr_formulas}. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
-
-\begin{table}[b]\centering%\normalsize
-\begin{tabular}[c]{l r r r@{}  l}\hline
-\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
-Arithmetic & 1.03 Tflop/s & & &\\
-Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
-Shared memory & & 257 Gfloats/s & 1 &:4 \\
-Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
-\end{tabular}
-\caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}\label{throughputs}
-\end{table}
-
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske6\figPostfix.eps}
@@ -707,15 +695,28 @@ Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
 
 \subsubsection{Arithmetic Throughput}
 
-When we compute $\eR$, we very rarely perform more than 1-3 floating point operations for every float read or written to memory. Unfortunately, the GPU prefers kernels to be more arithmetically intensive than this. This can be inferred from Table \ref{throughputs}, where the peak bandwidth of the three types of GPU memory are compared to the peak arithmetic throughput (see appendix \ref{throughput} for derivations). Global memory (RAM), in which all data must reside at some point, is at best only able to move one float for every 30 floats processed by the CUDA cores, and potentially much worse if care is not taken to use "coalesced" memory access patterns (that avoid memory bank conflicts). This is why the usage of global memory should be minimized. Shared memory, on the other hand, is a very fast level 1 cache that is shared by all threads on an SM. At peak performance it is almost able to keep up with the computing units, but to obtain this performance we must make sure that:
+When we compute $\eR$, we very rarely perform more than 1-3 floating point operations for every float read or written to memory. Unfortunately, the GPU prefers kernels to be more arithmetically intensive than this. This can be inferred from Table \ref{throughputs}, %
+%
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{}  l}\hline
+\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
+Arithmetic & 1.03 Tflop/s & & &\\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
+Shared memory & & 257 Gfloats/s & 1 &:4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
+\end{tabular}
+\caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}\label{throughputs}
+\end{table}%
+%
+where the peak bandwidth of the three types of GPU memory are compared to the peak arithmetic throughput (see appendix \ref{throughput} for derivations). Global memory (RAM), in which all data must reside at some point, is at best only able to move one float for every 30 floats processed by the CUDA cores, and potentially much worse if care is not taken to use "coalesced" memory access patterns (that avoid memory bank conflicts). This is why the usage of global memory should be minimized. Shared memory, on the other hand, is a very fast level 1 cache that is shared by all threads on an SM. At peak performance it is almost able to keep up with the computing units, but to obtain this performance we must make sure that:
 \begin{enumerate}
 \item the data needed to compute a pixel can fit in shared memory, while
 \item the access patterns we use promote maximum bandwidth.
 \end{enumerate}
  %Further alleviation is also possible by exposing instruction level parallelism within a thread, as this promotes the use of registers with a bandwidth at least 6 times higher than that of shared memory~\cite{Vasilyy}\todo{so why don't we? rephrase}.
 
-These challenges are very closely linked. Since the Quadro 6000 architecture is of compute capability 2.0, it has 48\;kB shared memory (L1 cache) and 128\;kB registers per streaming multiprocessor (SM)~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This is to expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (in accordance with Little's law). If we divide the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
 
+These challenges are very closely linked. Since the Quadro 6000 architecture is of compute capability 2.0, it has 48\;kB shared memory (L1 cache) and 128\;kB registers per streaming multiprocessor (SM)~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This is to expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (in accordance with Little's law). If we divide the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
 
 In Fig. \ref{mvdr_implementation} we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
 
@@ -757,7 +758,7 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 % \end{itemize}
 
 The GPU design is summarized and compared to our CPU designs in table \ref{implementation_summary}.
-\begin{table}[h]\centering%\normalsize
+\begin{table}[!h]\centering%\normalsize
 % \begin{tabular}[c]{l r r r@{}  l}\hline
 \begin{tabular}[l]{l >{\raggedright}p{.27\linewidth} p{.28\linewidth}}\hline
 \rowcolor{tabBlue} & \bf GPU & \bf CPU \\\hline
@@ -785,6 +786,8 @@ Data transfers & Minimum & Moderate
 
 \section{Images and Benchmarks}\label{images_and_benchmarks}
 
+To demonstrate the imaging capability of the MVDR beamformer, we have processed experimental datasets from the $M=32$ element Kongsberg Maritime HISAS1030 sonar mounted on a HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\;m, operating frequency of 100\;kHz, and bandwidth of 30\;kHz. The element size and spacing is 2.5$\lambda$ and the opening angle is 25$^\circ$. To produce the image shown in \Fig{holmengraa} the sonar was operated in sidescan mode. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\;m long and 9\;m wide, and lies at a slanted seabed at 77\;m depth outside of Horten, Norway. The 1 megapixel (MP) MVDR image were here processed with parameters $L=16$, $K=1$, and $d=1\%$.
+
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske7\figPostfix.eps}
@@ -794,6 +797,8 @@ Data transfers & Minimum & Moderate
 \fi%
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. The image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
 \end{figure}
+
+The computational performance of our implementation was first assessed on a test system with a quad-core Intel Xeon E5620, 64\;GB of RAM and an Nvidia Quadro 6000 card. The results were obtained by processing a 1\;MP image from the data from a 32 channel array, for all subarray sizes $L$, and for $K\in\{0,1,2\}$. Run-time measurements are shown in \Fig{benchmarks}, the run-times of memory-only and arithmetic-only GPU kernels are depicted in \Fig{code_assessment}, and an estimate of computation efficiency is presented in \Fig{code_assess_flops}. We were also granted a test drive at the Boston HPC centre on a machine with an Intel Xeon E5-2670, 32\;GB RAM and an Nvidia K20. The results from this run are shown in \Fig{benchmarks_boston}.
 
 \ifPeerReview
 \begin{figure}[!t]\centering
@@ -836,11 +841,6 @@ Data transfers & Minimum & Moderate
 \caption{\protect MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20 Kepler GPU. The exact same scenario and code as in Fig. \ref{benchmarks} was used here. With no code alterations the performance was only improved marginally compared to running on the Quadro 6000.}\label{benchmarks_boston}
 \end{figure}
 
-
-To demonstrate the imaging capability of the MVDR beamformer, we have processed experimental datasets from the $M=32$ element Kongsberg Maritime HISAS1030 sonar mounted on a HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\;m, operating frequency of 100\;kHz, and bandwidth of 30\;kHz. The element size and spacing is 2.5$\lambda$ and the opening angle is 25$^\circ$. To produce the image shown in \Fig{holmengraa} the sonar was operated in sidescan mode. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\;m long and 9\;m wide, and lies at a slanted seabed at 77\;m depth outside of Horten, Norway. The 1 megapixel (MP) MVDR image were here processed with parameters $L=16$, $K=1$, and $d=1\%$.
-
-The computational performance of our implementation was first assessed on a test system with a quad-core Intel Xeon E5620, 64\;GB of RAM and an Nvidia Quadro 6000 card. The results were obtained by processing a 1\;MP image from the data from a 32 channel array, for all subarray sizes $L$, and for $K\in\{0,1,2\}$. Run-time measurements are shown in \Fig{benchmarks}, the run-times of memory-only and arithmetic-only GPU kernels are depicted in \Fig{code_assessment}, and an estimate of computation efficiency is presented in \Fig{code_assess_flops}. We were also granted a test drive at the Boston HPC centre on a machine with an Intel Xeon E5-2670, 32\;GB RAM and an Nvidia K20. The results from this run are shown in \Fig{benchmarks_boston}.
-
 As seen in the run-time comparisons presented in \Fig{benchmarks}, the GPU method became 2-3 orders of magnitude faster than the C implemtation we started out with. The remaining bottleneck in the final design is the inversion step, which is typically 5 times slower than the build step. In most cases the processing speed of the Quadro 6000 is above 1\;MP/s, and this was only improved by a factor 1.5-2 when run on the new K20 GPU. The benchmarks of our memory-only and arithmetic-only kernels show that the kernels spend roughly the same time on both these tasks, so optimising only one of these further will have marginal impact. All GPU kernels were compiled with \texttt{nvcc} at optimization level \texttt{O2}. Excluded from these benchmarks is the data transfer time from CPU to GPU, which account for 2-20\% of the total processing time. We believe it makes little sense to include them since it keeps getting easier to perform these data transfers in parallel by offloading the task to the Direct Memory Access (DMA) controllers present on modern GPUs. Furthermore, the data rates in active sonar are relatively low compared to the bandwidth available for these transfers.
 
 
@@ -854,7 +854,7 @@ Note from \Fig{benchmarks} how the building of $\eR$ now only takes up a fractio
 
 When optimizing a GPU design it is important to know whether it is limited by memory bandwidth or arithmetical throughput. To measure this we made two versions of the MVDR kernel, one that only performs arithmetic operations, and one that only performs memory operations. Then we benchmarked these kernels and compared their run-times to the total run-time (\Fig{code_assessment}). A first thing to note is how these kernels seem equally occupied performing memory and arithmetic operations. This is a good sign, but since we consistently minimized memory consumption at the expense of some extra computations when building $\eR$ , we know it to be bound by memory bandwidth. It also has a problem with latency, which can be inferred from the total run-time being significantly higher than that of the two single-function kernels. Since the GPU hardware can carry out memory and arithmetic operations concurrently and independently, this gap indicates that the GPU sometimes does ``nothing''. In our case this is due to synchronization hold-ups when performing temporal averaging, which is carried out in a sequential manner.
 
-Even with all our efforts we were only able to obtain processing rates of 40\;GFlop/s on average in the desirable range of subarray sizes (\Fig{mvdr_complexity}). This is mainly due to the inversion step, since we for the most part obtained more than 100\;GFlop/s when building $\eR$. While these numbers are slightly underestimated, they are definitely far away from the Quadro 6000's peak of 1\;TFlop/s. Again, we believe this is due to the design being bound by memory bandwidth. This belief is further supported by the test results from running the code on the new K20 Kepler card, where we saw a modest factor 1.5-2 speedup. Although the Kepler card peaks at 3.5-4\;Tflop/s, its shared memory bandwidth is only approximately twice that of the Quadro 6000, i.e. the same as the observed speed-up. However, it is likely that the Kepler card would perform better had we optimized our design for it. For scientific computing the Kepler boards are considered more attractive, with the introduction of features such as kernels calling kernels, more registers, more shared memory, and better mechanisms for hiding or removing data transfers.
+Even with all our efforts we were only able to obtain processing rates of 40\;GFlop/s on average in the desirable range of subarray sizes (\Fig{mvdr_complexity}). This is mainly due to the inversion step, since we for the most part obtained more than 100\;GFlop/s when building $\eR$. While these numbers are slightly underestimated, they are regardless far away from the Quadro 6000's peak of 1\;TFlop/s. Again, we believe this is due to the design being bound by memory bandwidth. This belief is further supported by the test results from running the code on the new K20 Kepler card, where we saw a modest factor 1.5-2 speedup. Although the Kepler card peaks at 3.5-4\;Tflop/s, its shared memory bandwidth is only approximately twice that of the Quadro 6000, hence matches the observed speed-up. However, it is likely that the Kepler card would perform better had we optimized our design for it. For scientific computing the Kepler boards are considered more attractive, with the introduction of features such as kernels calling kernels, more registers, more shared memory, and better mechanisms for hiding or removing data transfers.
 
 
 % If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\;m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\;Hz. We could further assume a complex sampling frequency of 40\;kHz to accomodate the  HISAS1030's bandwidth of 30\;kHz, and beamform $M=32$ lateral beams. The throughput required for real-time processing of these images would then be 1\;MP/s. As we have seen, this is something our GPU implementation can handle if $L$ is not too large.\todo{droppe denne kanskje}%, leaving the \gls{CPU} free to take on other assignments.
@@ -885,7 +885,7 @@ Even with all our efforts we were only able to obtain processing rates of 40\;GF
 
 The MVDR beamformer is an algorithm capable of producing images with improved detail resolution and contrast compared to conventional DAS beamforming. The downside is its inherent need for robustification and the high computational complexity associated with estimating and inverting the spatial covariance matrix.
 
-We have shown that for systems consiting of up to 32 channels the problem can be largely mitigated by building the covariance matrix in a clever way, and by making use of the massive computational power available in modern GPUs. We were able to improve upon the run-time of a single thread C-implementation by roughly two orders of magnitude. For most choices of parameters the GPU was able to create images at $\sim$1\;MP/s at an average data processing rate of $\sim$40\;GFlop/s. This is less than 5\% of the peak performance of the GPU, but we believe it to be near optimal given the constraints of memory bandwidth and the sequential nature of some parts of the MVDR implementation.
+We have shown that for systems consisting of up to 32 channels the problem can be largely mitigated by building the covariance matrix in a clever way, and by making use of the massive computational power available in modern GPUs. We were able to improve upon the run-time of a single thread C-implementation by roughly two orders of magnitude. For most choices of parameters the GPU was able to create images at $\sim$1\;MP/s at an average data processing rate of $\sim$40\;GFlop/s. This is less than 5\% of the peak performance of the GPU, but we believe it to be near optimal given the constraints of memory bandwidth and the sequential nature of some parts of the MVDR implementation.
 
 %  This performance is sufficient for computing properly sampled full-coverage sectorscan images from the HISAS1030 sonar in real-time.
 
