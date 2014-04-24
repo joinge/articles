@@ -1021,7 +1021,7 @@
 \fi
 
 \ifOPTsubsecarab
-\renewcommand{\thesubsection}{\thesection.\arabic{subsection}\secspace}
+% \renewcommand{\thesubsection}{\thesection.\arabic{subsection}\secspace}
 \fi
 \ifOPTsubsecalph
 \renewcommand{\thesubsection}{\thesection\alph{subsection}\secspace}
@@ -1358,29 +1358,6 @@
 \fi
 \renewcommand\H{^{\scriptscriptstyle H}}
 
-\renewcommand\vec[1]{\boldsymbol{#1}}
-\newcommand\mat[1]{\boldsymbol{#1}}
-
-
-\renewcommand*\a{\vec a}
-\renewcommand*\i{\vec i}
-\renewcommand*\k{\vec k}
-\newcommand*\n{\vec n}
-\newcommand*\p{\vec p}
-\newcommand*\s{\vec s}
-\newcommand*\w{\vec w}
-\newcommand*\x{\vec x}
-
-\newcommand*\E{\mat E}
-\renewcommand*\H{\mat H}
-\renewcommand*\P{\mat P}
-\newcommand*\eP{\mat{\hat P}}
-\newcommand*\R{\mat R}
-\newcommand*\Ri{\R^{-1}}
-\newcommand*\eR{\mat{\hat R}}
-\newcommand*\W{\mat W}
-\newcommand*\X{\mat X}
-\newcommand*\Y{\mat Y}
 
 % \renewcommand*\t{\mathtiny{^T}}
 % \newcommand*\h{\mathtiny{^H}}
