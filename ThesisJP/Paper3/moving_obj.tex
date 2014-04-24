@@ -64,7 +64,7 @@ where $M$ is the number of elements or channels in the array, $\Delta_m[n]$ is t
 \subsection{Capon Beamforming}
 The Capon beamformer produces a weight vector, like the one in (\ref{eq:das}), based on the impinging signal and an optimization criterion. The problem is as follow \cite{Capon1969}:
 \begin{align}
-&\min_{\vec{w}} E\{|z[n]|^2\} \rightarrow \min_{\vec{w}} \vec{w}^H \mat{\hat{R}} \vec{w} \label{eq:capon_optimization_criteria} \\
+&\min_{\vec{w}} E\{|z[n]|^2\} \approx \min_{\vec{w}} \vec{w}^H \mat{\hat{R}} \vec{w} \label{eq:capon_optimization_criteria} \\
 &\text{subjected to } \vec{w}^H\vec{a} = 1,
 \end{align}
 where $\mat{\hat{R}}$ is a sample covariance matrix. Hence, the resulting weight vector minimizes the output power while maintaining unit gain in the steering direction $\vec{a}$. %The covariance matrix is usually unknown and has to be estimated from the element data. The covariance matrix in (\ref{eq:capon_optimization_criteria}) is therefore substituted with the sample covariance matrix.
