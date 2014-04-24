@@ -121,13 +121,9 @@ Authors: & Buskenes,~J.I., \AA{}sen,~J.P., Nilsen,~C.-I.C, Austeng,~A.
 \end{tabular}
 \end{center}
 
-We would like to thank the associate editor for his efforts and for his speedy replies to queries from the authors, and reviewers for their thorough and highly relevant comments. A summary of our answers are provided below, and subsequent sections will target each reviewer's comments in detail. We quote in \textbf{bold face} statements from the reviewers, and provide our replies in ordinary print, 
+We would like to thank the associate editor for his efforts and for his speedy replies to queries from the authors, and reviewers for their thorough and highly relevant comments. Subsequent sections will target each reviewer's comments in detail. We quote in \textit{italic} statements from the reviewers, and provide our replies in ordinary print, 
 
 
-\section{Summary of response to reviewer's comments}
-
-
-\newpage
 \section{Answer to reviewer 1}
 
 \begin{enumerate}
@@ -164,16 +160,16 @@ We would like to thank the associate editor for his efforts and for his speedy r
 %
 \hi{Section IV}
 \qi{The sub-plots on the top break the processing out into 3 pieces, yet the lower sub-plots reflect the entire processing string for MATLAB and C. It would be useful to show the entire processing time for the GPU for better comparison. Perhaps breaking the two rows of sub-plots into two figures would work better.}
-\ai{The reviewer has a point. But since there are 3 occurrences of the covariance processing time, including the total time GPU processing time would introduce three new lines. We feel this would clutter the plot unnecessarily as it is fairly easy derive the total time by looking at the current plots. Putting the total processing time in the MATLAB/C total time figure is an option, but then a logarithmic y-scale would necessary and detail would be lost.}
+\ai{The reviewer has a point. But since there are 3 occurrences of the covariance processing time, including the total GPU processing time would introduce three new lines. We feel this would clutter the plot unnecessarily as it is fairly easy to derive the total time by looking at the current plots. Putting the total processing time in the MATLAB/C total time figure is an option, but then a logarithmic y-scale would necessary and detail would be lost. In stead we have included a remark in the caption saying the total GPU time is the sum of all the lines.}
 %
 \qi{Comment about real processing improvement over optimized C should be related in the text instead of a caption. This is an important point about the comparisons made in the paper.}
-\ai{It is indeed. We dedicated the second paragraph in the discussion (IV) to this topic, but will reword the relevant result paragraph slightly to hopefully cause less confusion.}
+\ai{It is indeed. We dedicated the second paragraph in the discussion (IV) to this topic, but have revised the paragraph to emphasize this point better.}
 %
 \qi{(caption of figure 10) "cruel" should be "crude"}
-\ai{Thank you, crude grammar correction applied.}
+\ai{Crude grammar correction applied.}
 %
 \qi{The point made in the first paragraph about the data transfer from GPU to CPU being ignored further muddies the water in comparing the two approaches. This point should also be stated up front. I would suggest making a very clear itemization of the assumptions and caveats about the two approaches.}
-\ai{We agree that this should hould be clarified, and have We disagree that this }
+\ai{We agree that this should should be clarified, but since the transfer can happen in parallel without adding to the computation time we do not believe this point belongs in the introduction. An elaboration on the topic is included in the last paragraph in section IV. }
 %
 \hi{Section V}
 \qi{The reason the C implementation is linear in L is because it is dominated by the calculation of the covariance matrix and data movement. The inversion is negligible here. On the other hand, the GPU optimizes the covariance calculation so much that now the inversion is significant, hence the non-linear computation time as a function of L. This is really the key point to be made in the comparison between the two approaches, in my opinion.}
@@ -186,8 +182,6 @@ We would like to thank the associate editor for his efforts and for his speedy r
 \end{enumerate}
 
 
-
-\newpage
 \section{Answer to reviewer 2}
 
 \q{The authors describe their work on implementing an MVDR adaptive beamformer for a high-frequency imaging sonar on a particular graphical processing unit (GPU), the prevous-generation NVIDIA Quadro 6000, using NVIDIA's CUDA C environment. The authors report 1-2 orders of magnitude faster processing with their GPU implementation, compared to their MATLAB and single-thread, unoptimized CPU implementations, without taking the input/output of data in and out of the GPU.}
@@ -200,7 +194,7 @@ We would like to thank the associate editor for his efforts and for his speedy r
 
 \q{I suspect many readers of the paper will not have the same assumptions as the authors, if they are not processing high-frequency narrowband signals with undersampled arrays. I see this disconnect between low-frequency passive processors and mid-frequency active processors, but the gap to imaging sonars is even greater. I venture that the authors can greatly broaden the appeal of their paper by addressing the questions I pose below.}\\[-.5\baselineskip]
 
-\ans{We thank the reviewer for these remarks, it seems we should state this better upfront. In the 5th paragraph of the introduction we now explain that our system is a well sampled wideband sonar.}
+\ans{We thank the reviewer for these remarks, it seems we should state this better upfront. In the 5th paragraph of the introduction we now explain that our system is a well sampled wideband sonar and that we operate in near field conditions.}
 
 \begin{enumerate}
 \qi{Here are my calculations of how the 32 elements are spaced in the HISAS 1030 system:}
@@ -212,7 +206,7 @@ c  &= 1500\;\text{m/s} \\
 D &= 1200\;\text{mm} \\
 \textcolor{red}{M} &= D/d = \textcolor{red}{160}
 \end{align}
-\ai{The reviewer made us realize that this was not clear enough in the article. The 32 elements are evenly spaced along the 1.2m array, so:
+\ai{The reviewer made us realize that we should clarify this. The 32 elements are evenly spaced along the 1.2m array, so:
 \begin{align}
 M &= 32 \\
 d &= D / M = 3.75\;\text{cm} = 2.5\lambda
@@ -220,13 +214,13 @@ d &= D / M = 3.75\;\text{cm} = 2.5\lambda
 Further details are provided in 2. A sentence elaborating on the element spacing has been added in section IV first paragraph; where the HISAS1030 is introduced.}
 %
 \qi{What is impact of using only 32 elements? How are they spaced? It would seem that spatial aliasing would be an issue. Authors should explain what their assumptions are.}
-\ai{Appreciations for pointing this out. We agree that this should be clarified. The array configuration produce the first grating lobes at $\theta = \text{arcsin}(\lambda M/D) = 23.5^\circ$, but this is not a problem since the element opening angle is $25^\circ$ ($\theta\in[12.5^\circ,12.5^\circ]$) at $f_c=100$\;kHz. In the paper we addition we perform sidescan imaging where only very narrow beams need to be beamformed. These details are now included in the paper, some in the 5th paragraph of the introduction and some in the first paragraph of section IV.}
+\ai{Appreciations for pointing this out. We agree that this should be clarified. The array configuration produce the first grating lobes at $\theta = \text{arcsin}(\lambda M/D) = 23.5^\circ$, but this is not a problem since the element opening angle is $25^\circ$ ($\theta\in[12.5^\circ,12.5^\circ]$) at $f_c=100$\;kHz. In the paper we perform sidescan imaging where only very narrow beams need to be beamformed. These details are now included in the paper, some in the 5th paragraph of the introduction and some in the first paragraph of section IV.}
 %
 \qi{What is bandwidth of transmitted waveform? At 100 kHz, perhaps the authors are comfortably in a narrowband regime, and they do not need to worry about array response changing over their bandwidth (which would suggest that MVDR would need to be performed at different frequencies independently, unless some sort of pre-steering was used, which may be what the authors are doing anyway). Authors should explain what their assumptions are.}
 \ai{We mention in the beginning of section IIA that we pre-steer to every angle and range bin in the image, but now repeat this in IIA paragraph 3, and state that we operate in wideband conditions in the introduction.}
 %
 \qi{Authors show solution of MVDR optimization as $\w = \frac{\Ri\1}{\1\T\Ri\1}$ and state this is the broadside solution. Are the authors pre-steering the array for every angle? Or are they using $\w = \frac{\Ri\s}{\s\t\Ri\s}$ at off-broadside angles, with $\s$ the conventional steering vector (which would be a frequency-domain phase-shift vector, to be applied to a narrowband signal)? Pre-steering would enable disparate frequencies over a wide band to be coherently summed, to provide coherent gain in the look direction (over the band) by providing additional sample support for the sample covariance estimation.}
-\ai{Yes, we are pre-steering the array for every angle. We have clarified this further (see 3.), and added a remark saying that while not necessary here we could have phase steered the array by introducing the steering vector $\vec s$.}
+\ai{Yes, we are pre-steering the array for every angle. We have clarified this further (see 3.), and added a remark saying that while we can not use it here (due to processing a wideband signal) a phase steered version of MVDR can be obtained by introducing a steering vector $\vec s$.}
 %
 \qi{Authors time average $\x\x\H$ over $K\in\{0, 1, 2\}$ time samples. Without doing some sort of reduced-rank processing, why is as little as 2 samples enough to estimate the covariance? Perhaps this is due to high SNR? At high SNR, though, why are the authors doing MVDR at all? What interference is being canceled, and what is its spatial distribution and stationarity? }
 \ai{Again, a helpful remark, we will clarify this as well. After pulse compressing a chirp using the full transceiver bandwidth (30~kHz) range resolution is roughly $\Delta r \approx \frac{1}{B} = 2.5$~cm, which corresponds to a sample shift of just 1.2\footnote{$\Delta n = \frac{\Delta r f_s}{c} = 1.2$}. Hence we cover the entire pulse compressed signal with only a few samples. $K=2$ corresponds to a window length of $2K+1=5$ samples, as is shown by (4) in the article. Some edits have been made to make this clearer.} 
@@ -246,7 +240,7 @@ Further details are provided in 2. A sentence elaborating on the element spacing
 \ai{Yes this is a good point. Included in last paragraph of section IV.}
 %
 \qi{The authors do not provide much information about the GPU hardware they used, the NVIDIA Quadro 6000. How does this compare to the desktop video cards that reside in most desktop, workstation, server and even high-end laptop systems? What is the vintage of the architecture of this GPU? How has the architecture evolved? For example, the authors tell us the Quadro 6000 (\$1900, 6GB VRAM, 448 cores) is a Fermi architecture - this is the previous architecture, having been superceded by the Kepler architecture, with a new Quadro K6000 board (\$3600, 12 GB VRAM, 2880 cores). The Quadro boards are high-end boards with video output targeting the CADAM market - there are many cheaper alternatives targeted at gamers and an even more expensive compute-only board called TESLA targeted at high performance computing. It's difficult to say how much of this irrelevant.}
-\ai{There is certainly a potential for comparing with many other cards here, but we decided to be thorough with one architecture than to compare with everything. To the paragraph introducing the Quadro 6000 we have explained what its equivalent consumer grade Geforce card would be. We have also included remarks that we expect Kepler to perform better had the design been optimized for it.}
+\ai{There is certainly a potential for comparing with many other cards here, but we decided to be thorough with one architecture rather than to compare with everything. To the paragraph introducing the Quadro 6000 we have explained what its equivalent consumer grade Geforce card would be. We have also included remarks that we expect Kepler to perform better had the design been optimized for it.}
 %
 \qi{The authors state that OpenCL is an equally attractive alternative to CUDA. This would be the case if the authors had been able to find something in OpenCL akin to the recently released batch-optimized linear solver code for CUDA. Unfortunately, this is a pervasive story - the support for scientific programming in CUDA is years ahead of OpenCL. The benefit of OpenCL is that it is supposed to be "cross-platform", which is true in theory, but it is hard to imagine being true in practice considering the wide range of heterogeneous computing elements OpenCL is supposed to cover; from phones to DSP chips to FPGAs. }
 \ai{These are important remarks, thank you. We have written OpenCL programs too, and run them on Intel CPUs and GPUs from AMD and Nvidia. It was no walk in the park, but with a satisfactory end result. But like you say, these are just a subset of devices that OpenCL support, and we have now changed the wording to be more specific here. Your remark on the lack a batched linear solver is spot in, the sentence is now rewritten.}
@@ -259,7 +253,7 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 
 \q{This requires a better explanation.}
 
-\ans{The reviewer is absolutely right. The copy will be serialized due to divergent branching. It is unfortunate that no Cholesky based batch linear equation solver exist, which would have eliminated the need for the lower triangular... The paragraph has been edited to explain this better.}
+\ans{The reviewer is absolutely right. The copy will be serialized due to divergent branching. It is unfortunate that to the best of our knowledge no Cholesky based batch linear equation solver exist, which would have eliminated the need for the lower triangular. The paragraph has been edited to explain this better.}
 
 \subsection{Opportunities for additional GPU tutorial content?}
 
@@ -286,7 +280,7 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 
 \begin{enumerate}
 \qi{Equation (2) using a "broadside steering vector" - this is confusing... are the authors only steering at broadside? clearly not... do the authors pre-steer all of the elements prior to forming $\R$ so that can "focus" in a wideband sense?}
-\ai{We indeed presteer all the elements. To make this clearer we have now stated it again after equation (2), and explained that a generalization is straight forward by substituting $\1$ with a steering vector.}
+\ai{We indeed presteer all the elements to deal with with our wideband signal. To make this clearer we have now stated it again after equation (2), and explained that in a narrowband case a generalization is straight forward by substituting $\1$ with a steering vector.}
 %
 \qi{Paragraph after equation (2) mentions "spatial averaging to avoid signal cancellation" - this problem might be better identified for readers by citing the Kailath reference and using "signal cancellation due to coherent multipath".}
 \ai{Good point, both suggestions are now included.}
@@ -303,8 +297,9 @@ Page 5, last paragraph in 1st column is puzzling. Authors say that "when a threa
 \qi{Page 4, last paragraph of 1) Arithmetic reduction - authors should identify that the "Minimized memory" version skips step 2) from list of three optimization, and that the "Minimized instructions" version uses all three steps... I had a hard time understanding how the three "arithmetic reduction steps" were related to the plots in Figure 5, and was puzzled about where the "minimized memory" and "minimized instruction" variants of the processing had come from. Perhaps the authors can introduce these variants more clearly and more prominently.}
 \ai{The reviewer is right. This is now rewritten to be more explicit.}
 %
-\qi{On page 6, authors say "The bottleneck in the final design is now the inversion step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire pro-cess, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expectation of the relative times.}
-\ai{TODO}
+\qi{On page 6, authors say "The bottleneck in the final design is now the inversion step, which is typically 5 times slower than the build step". Surely, this merits an explanation. What is the final design being compared with? What was the expectation? What changed? Figure 3 shows FLOPs before optimization - this shows build and inversion steps of roughly the same order of magnitude in the right half of the figure. Does Figure 3 set the expectation? Figure 5 shows "relative complexity reduction" of entire process, so there is no information on relative speed of build and inversion steps. Figure 10 shows estimated FLOPs for the two steps, but since both steps have different theoretical complexities (operations counts), and the two steps do not optimize the same way, this does not provide an expectation of the relative times.}
+\ai{The explanation is provided in the section V, the discussion. We have now rewritten the relevant paragraphs to include answers to these and other comments. Regarding the discussion of the FLOPS these were never intended to be an accurate representation of the run-times but rather to provide an indication of how efficiently we are able to harness the GPU's resources. We have reworded the paragraph slightly to emphasize this.}
+%
 \qi{On page 6, authors say their implementation was improved by factor of 1.5 - 2 when run on a K20. Authors could say a few words about what a K20 is, how it differs from the Quadro 6000, that the Kepler architecture actually has features that are dramatically better for scientific computing if the code is adapted to use them (kernels can call kernels, more registers, more shared memory, ability to eliminate some host-to-GPU i/o).}
 \ai{Good suggestions. They are now added to the last paragraph of section V.}
 \qi{Section I says 1-2 orders of magnitude. Section IV, page 6, says 2-3 orders of magnitude.}
