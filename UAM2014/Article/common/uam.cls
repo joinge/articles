@@ -341,7 +341,7 @@
 
 \titleformat{\subsection}[hang]{\bf}
 {\thesubsection\enspace}%\thesubsubsection}%  {\footnotesize \enspace \emph{Sec.}  }
-   {0pt}{}[\newline\newline]
+   {0pt}{}[]%\newline\newline
 \titlespacing*{\subsection}{0pt}{2\lineheight}{0pt}
 
 \titleformat{\subsubsection}[runin]{\bf}
