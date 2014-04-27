@@ -42,6 +42,7 @@
 \newcommand*\V{\mat V}
 \newcommand*\M{\mat M}
 
+\usepackage{caption}
 \usepackage{subcaption}
 
 
@@ -118,8 +119,11 @@ where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and 
 
 \subsection{OpenGL Rendering}
 
+To produce the sonar templates we assume rough, isotropic surface that reflects energy equally in all directions. This well with a Lambertian scattering model where the backscatter intensity depends only on the angle between the incident angle and surface normal.  
 
 When our models loaded into the OpenGL scene we are ready to render. 
+
+
 
 \begin{itemize}
 \item Lambertian surface scattering model. Rough, isotropic, reflects energy equally in all directions. Intensity depends only on the angle between the look direction and surface normal.
@@ -145,12 +149,10 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \end{figure}
 
 
-
-
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.
-% Ikke adaptiv - dårlig. Feil lengde, skyggen for kort (synket). Orientering feil. Feil spacing. 
-% Adaptiv - målt objekt. Passer bra. 
+% Ikke adaptiv - darlig. Feil lengde, skyggen for kort (synket). Orientering feil. Feil spacing. 
+% Adaptiv - malt objekt. Passer bra. 
 % 
 % Videre:
 % - Mer testing
@@ -158,8 +160,9 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 % - Tuning
 
 % 
-% \newpage
-% \bibliography{references}
+\newpage
+\bibliography{references}
+% \bibliography{../../../library.bib}
 % 
 % % If biblatex (file is loaded in preamble):
 % % \printreferences
