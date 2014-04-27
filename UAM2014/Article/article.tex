@@ -44,6 +44,7 @@
 
 % \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{color}
 
 
 % Tune floats
@@ -115,6 +116,11 @@ A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify t
 \caption{Simulator specifications.}\label{specs}%
 \end{figure}
 
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}%
+\caption{Simulator.}\label{buildup}%
+\end{figure}
+
 
 OpenGL is a framework that 
 
@@ -180,20 +186,40 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \begin{figure}[tp]\centering%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
+\caption{Simulated cylinder (adaptive).}\label{sim_cylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive_bw.svg}%
+\caption{Simulated cylinder (adaptive).}\label{sim_cylinder_bw}%
+\end{subfigure} 
+\end{figure}
+
+\newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
+\fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
 \caption{Overlay.}\label{overlay_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
 \caption{Overlay (adaptive).}\label{overlay_cylinder_adaptive}%
-\end{subfigure} 
+\end{subfigure}
+\hfill\parbox{\linewidth-30pt}{
+\cdesc{800000}{Pixels in both template and image highlight segments}
+\cdesc{FF1000}{Pixels only in template highlight segment}
+\cdesc{FFEB00}{Pixels only in image highlight segment}
+\cdesc{83FF7C}{Background pixels}
+\cdesc{00EFFF}{Pixels only in the image shadow segment}
+\cdesc{00A7FF}{Pixels in the image segment, but in template shadow}
+\cdesc{0014FF}{Pixels only in the image template highlight segment}
+\cdesc{000083}{Pixels in both the template and image shadow segments}}
 \end{figure}
 
 
-\begin{figure}[tp]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/overlay_colors.svg}%
-\caption{Overlay.}\label{overlay_cylinder}%
-\end{figure}
+
+
 
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.
