@@ -127,16 +127,9 @@ where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and 
 
 \subsection{OpenGL Rendering}
 
-To produce the sonar templates we assume rough, isotropic surface that reflects energy equally in all directions. This well with a Lambertian scattering model where the backscatter intensity depends only on the angle between the incident angle and surface normal.  
+To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency\todo{is this unproblematic?}.   
 
 When our models loaded into the OpenGL scene we are ready to render. 
-
-
-
-\begin{itemize}
-\item Lambertian surface scattering model. Rough, isotropic, reflects energy equally in all directions. Intensity depends only on the angle between the look direction and surface normal.
-\item 
-\end{itemize}
 
 
 
@@ -151,7 +144,7 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
 \end{subfigure}\hspace{1cm}%
 \begin{subfigure}[b]{.5\linewidth-0.5cm}
-\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
+\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged_bw.svg}%
 \caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
 \end{subfigure} 
 \end{figure}
