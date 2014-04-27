@@ -1,0 +1,167 @@
+
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% DOCUMENTCLASS %                                See full option description in "mytemplate.cls"
+%===============%                               %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+ 
+\documentclass[
+   UAM                                          % Document type (non-standard)
+ , 12pt                                         % Text size
+%  , draft
+%  , final                                        % Quality
+%  , xelatex                                      % Use the XeLaTeX compiler
+%  , biblatex                                     % Use 'biblatex' for references (best by far)
+ , bibtex                                       % Use 'bibtex' for references (oldschool :)
+%  , movie
+%  , notodos                                      % Disable todos
+ , layout
+%  , defaultformat                                % Attempt to use default formatting options
+%  , glossary                                     % Use a glossary
+]{common/mytemplate}
+% \bibliography{references}
+\hypersetup{
+   bookmarksopen=true
+ , bookmarksopenlevel=2
+}
+
+
+\newlength\oldparindent
+\setlength\oldparindent{\parindent}
+
+\newlength\figwidth
+\setlength\figwidth{0.7\linewidth}
+
+% \setlength\floatsep{\baselineskip}
+\setcounter{topnumber}{1}
+% \setlength\baselineskip{12pt}
+% \selectfont
+
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\newcommand\mat[1]{\boldsymbol{#1}}
+
+\renewcommand*\P{\mat P}
+\newcommand*\V{\mat V}
+\newcommand*\M{\mat M}
+
+\usepackage{subcaption}
+
+
+\begin{document}
+% Load the references.bib file
+% \bibliography{../../../library.bib}
+
+\pagestyle{plain}
+% \layout
+% \printinunitsof{cm}
+% \prntlen{\baselineskip}
+% \the\textwidth
+% \the\linewidth
+% \prntlen{\textwidth}\\
+% \prntlen\linewidth\\
+% \prntlen\oddsidemargin\\
+% \prntlen\oddsidemargin
+% \newpage
+
+
+
+\title{A GPU Sonar Simulator for Automatic Target Recognition}%
+%
+\author{J.I.Buskenes\firstAddress, C.-I.C.Nilsen\secondAddress, A.Austeng\secondAddress}%
+%
+\begin{contact}
+  \firstAddress Dept. of Informatics, P.O.Box 1080 Blindern, N-0316 OSLO
+  \secondAddress Norwegian Defence Research Establishment (FFI) P.O.Box 25, NO-2027 Kjeller
+\end{contact}%
+%
+\begin{contact}
+Contact author: Jo Inge Buskenes\\
+Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
+\href{mailto:joibu@ifi.uio.no}{joibu@ifi.uio.no}
+\end{contact}%
+%
+\begin{abstract}
+Template matching is a common technique used when classifying objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing an object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a suitable set of template images considering that no seabed or object is truly alike.
+
+We target this challenge with a sonar simulator that first take as input a seabed model derived from the real sonar image. Then it places an object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object position, alignment, type and material, the procedure is repeated, and a correlation coefficient computed. The faster we are able to perform these simulations, the better we can expect the classification result to be. Therefore the simulator is written in OpenGL and OpenCL and run on graphics processing units (GPUs).
+
+The result is a fast performing, mobile and portable on-the-fly template generator which can adapt its behavior to the nature of the current scene. We believe this can prove a powerful tool for mobile sonar imaging platforms such as autonomous underwater vehicles (AUVs).
+\end{abstract}%
+%
+\keywords{Adaptive beamforming, minimum variance, MVDR, LCA, complexity, sonar}
+
+\section{Introduction}
+
+
+A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
+
+\begin{figure}[t]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
+\caption{Simulator specifications.}\label{specs}%
+\end{figure}
+
+
+OpenGL is a framework that 
+
+\section{Methods}
+
+
+\subsection{Setting up the scene}
+
+Before we can do anything with OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
+
+Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. It handles the intricacies of the various model formats and outputs the model as a node tree. Each node contains data such as vertices, facets and textures, and since they are formatted in an OpenGL friendly way we simply iterate through the nodes and load it.
+
+The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations are usually formalized like this:
+\begin{align*}
+\bmat{x\\y\\0\\1}_\text{image} = \P \cdot \V \cdot \M \cdot \bmat{x\\y\\z\\1}_\text{model},
+\end{align*}
+where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. The first transform we apply is the model matrix $\M$, which scales and rotates the model in its local coordinate system. Then we map this model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. 
+
+\subsection{OpenGL Rendering}
+
+
+When our models loaded into the OpenGL scene we are ready to render. 
+
+\begin{itemize}
+\item Lambertian surface scattering model. Rough, isotropic, reflects energy equally in all directions. Intensity depends only on the angle between the look direction and surface normal.
+\item 
+\end{itemize}
+
+
+
+It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
+
+
+\section{Results}
+
+\begin{figure}[t]\centering%
+\begin{subfigure}[b]{5cm}
+\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
+\end{subfigure}%
+\begin{subfigure}[b]{5cm}
+\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
+\end{subfigure} 
+\end{figure}
+
+
+
+
+% Ligger nesten med kortsiden til.
+% Bilde og templat segmenteres hver for seg.
+% Ikke adaptiv - dårlig. Feil lengde, skyggen for kort (synket). Orientering feil. Feil spacing. 
+% Adaptiv - målt objekt. Passer bra. 
+% 
+% Videre:
+% - Mer testing
+% - Robustifisering
+% - Tuning
+
+% 
+% \newpage
+% \bibliography{references}
+% 
+% % If biblatex (file is loaded in preamble):
+% % \printreferences
+
+\end{document}
