@@ -429,7 +429,7 @@
   \fi\fi
 \fi
 \RequirePackage{wrapfig}                        %For enabling text to wrap around figures
-\RequirePackage{subfigure}
+% \RequirePackage{subfigure}
 
 %~~ Floats ~~%
 \RequirePackage{float}                          % Needed for the 'H' 
