@@ -23,7 +23,7 @@
  , bookmarksopenlevel=2
 }
 
-
+\definecolor{tabBlue}{HTML}{AACCFF}
 \newlength\oldparindent
 \setlength\oldparindent{\parindent}
 
@@ -111,6 +111,7 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
 
+
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
 \caption{Simulator specifications.}\label{specs}%
@@ -120,9 +121,6 @@ A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify t
 \graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}%
 \caption{Simulator.}\label{buildup}%
 \end{figure}
-
-
-OpenGL is a framework that 
 
 Citations
 \begin{itemize}
@@ -217,7 +215,13 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \cdesc{000083}{Pixels in both the template and image shadow segments}}
 \end{figure}
 
-
+\begin{table}[bh]
+\begin{tabular}[c]{l l l l l}\hline
+\rowcolor{tabBlue} & cor   & ecor  & scor  & essum \\
+Standard template & 0.461 & 0.698 & 0.528 & 0.613 \\
+Adaptive template & 0.673 & 0.818 & 0.807 & 0.813
+\end{tabular}
+\end{table}
 
 
 
