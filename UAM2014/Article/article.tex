@@ -46,6 +46,22 @@
 \usepackage{subcaption}
 
 
+% Tune floats
+\renewcommand{\topfraction}{0.9}  % max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8} % max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9} % fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}  % allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.85}  % require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.85} % require fuller float pages
+
+
 \begin{document}
 % Load the references.bib file
 % \bibliography{../../../library.bib}
@@ -138,18 +154,46 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \section{Results}
 
-\begin{figure}[t]\centering%
-\begin{subfigure}[b]{.5\linewidth-0.5cm}
+\newlength\imgspacing\setlength\imgspacing{.5cm}
+
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
-\end{subfigure}\hspace{1cm}%
-\begin{subfigure}[b]{.5\linewidth-0.5cm}
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_sylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged_bw.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{cutmean}%
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_cylinder_bw}%
+\end{subfigure} 
+\end{figure}
+
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
+\caption{Simulated cylinder.}\label{sim_cylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_bw.svg}%
+\caption{Simulated cylinder.}\label{sim_cylinder_bw}%
+\end{subfigure} 
+\end{figure}
+
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
+\caption{Overlay.}\label{overlay_cylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
+\caption{Overlay (adaptive).}\label{overlay_cylinder_adaptive}%
 \end{subfigure} 
 \end{figure}
 
 
+\begin{figure}[tp]\centering%
+\graphicsAI[drawing,width=\linewidth]{gfx/overlay_colors.svg}%
+\caption{Overlay.}\label{overlay_cylinder}%
+\end{figure}
 
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.
