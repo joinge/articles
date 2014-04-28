@@ -161,14 +161,45 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
 \begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
 \caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_sylinder}%
+\end{subfigure}
+\end{figure}
+
+
+\begin{figure}[tp]\centering%
+\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
+\caption{``Typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
+\caption{Parameters adapted to fit SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}%
+\end{subfigure}
+\caption{Cylinder simulations}\label{sim_cylinder}
+\end{figure}
+
+\newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
+\fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
+\caption{Overlay.}\label{overlay_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
-\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }\label{sim_cylinder}%
-\end{subfigure}\hspace{\imgspacing}%
+\graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
+\caption{Overlay (adaptive).}\label{overlay_cylinder_adaptive}%
+\end{subfigure}
+\hfill\parbox{\linewidth-30pt}{
+\cdesc{800000}{Pixels in both template and image highlight segments}
+\cdesc{FF1000}{Pixels only in template highlight segment}
+\cdesc{FFEB00}{Pixels only in image highlight segment}
+\cdesc{83FF7C}{Background pixels}
+\cdesc{00EFFF}{Pixels only in the image shadow segment}
+\cdesc{00A7FF}{Pixels in the image segment, but in template shadow}
+\cdesc{0014FF}{Pixels only in the image template highlight segment}
+\cdesc{000083}{Pixels in both the template and image shadow segments}}
 \end{figure}
 
 
@@ -205,27 +236,7 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \end{subfigure} 
 \end{figure}
 
-\newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
-\fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
-\begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
-\caption{Overlay.}\label{overlay_cylinder}%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-\caption{Overlay (adaptive).}\label{overlay_cylinder_adaptive}%
-\end{subfigure}
-\hfill\parbox{\linewidth-30pt}{
-\cdesc{800000}{Pixels in both template and image highlight segments}
-\cdesc{FF1000}{Pixels only in template highlight segment}
-\cdesc{FFEB00}{Pixels only in image highlight segment}
-\cdesc{83FF7C}{Background pixels}
-\cdesc{00EFFF}{Pixels only in the image shadow segment}
-\cdesc{00A7FF}{Pixels in the image segment, but in template shadow}
-\cdesc{0014FF}{Pixels only in the image template highlight segment}
-\cdesc{000083}{Pixels in both the template and image shadow segments}}
-\end{figure}
+
 
 \begin{table}[bh]
 TODO: Probably not necessary to have this table...\\
