@@ -83,7 +83,7 @@
 
 \title{A GPU Sonar Simulator for Automatic Target Recognition}%
 %
-\author{J.I.Buskenes\firstAddress, C.-I.C.Nilsen\secondAddress, A.Austeng\secondAddress}%
+\author{J.I.Buskenes\firstAddress, \O{}ivind Midtgaard\secondAddress, Herman Midelfart\secondAddress}%
 %
 \begin{contact}
   \firstAddress Dept. of Informatics, P.O.Box 1080 Blindern, N-0316 OSLO
@@ -109,7 +109,7 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 \section{Introduction}
 
 
-A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
+% A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
 
 
 \begin{figure}[t]\centering%
@@ -174,22 +174,22 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \begin{figure}[tp]\centering%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
-\caption{Simulated cylinder.}\label{sim_cylinder}%
+\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }\label{sim_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_bw.svg}%
-\caption{Simulated cylinder.}\label{sim_cylinder_bw}%
+\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$.}\label{sim_cylinder_bw}%
 \end{subfigure} 
 \end{figure}
 
 \begin{figure}[tp]\centering%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Simulated cylinder (adaptive).}\label{sim_cylinder}%
+\caption{Adaptive cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive_bw.svg}%
-\caption{Simulated cylinder (adaptive).}\label{sim_cylinder_bw}%
+\caption{Adaptive cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder_bw}%
 \end{subfigure} 
 \end{figure}
 
@@ -216,14 +216,20 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \end{figure}
 
 \begin{table}[bh]
+TODO: Probably not necessary to have this table...\\
 \begin{tabular}[c]{l l l l l}\hline
-\rowcolor{tabBlue} & cor   & ecor  & scor  & essum \\
+\rowcolor{tabBlue} & cor   & ecor  & scor  & essum \\\hline
 Standard template & 0.461 & 0.698 & 0.528 & 0.613 \\
 Adaptive template & 0.673 & 0.818 & 0.807 & 0.813
 \end{tabular}
+\caption{Correlation scores. Description:\newline
+cor - correlation between image and template calculated over all pixels in the image\newline
+ecor - correlation calculated over the union of the echo pixels in the image\newline
+scor - correlation calculated over the union of the echo pixels in image and template\newline
+essum - 0.5*(ecor+scor). Average of the echo and shadows}
 \end{table}
 
-
+Reference correlation scores~\cite{Midelfart2010}
 
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.
