@@ -83,10 +83,10 @@
 
 \title{A GPU Sonar Simulator for Automatic Target Recognition}%
 %
-\author{J.I.Buskenes\firstAddress, \O{}ivind Midtgaard\secondAddress, Herman Midelfart\secondAddress}%
+\author{Jo Inge Buskenes\firstAddress, \O{}ivind Midtgaard\secondAddress, Herman Midelfart\secondAddress}%
 %
 \begin{contact}
-  \firstAddress Dept. of Informatics, P.O.Box 1080 Blindern, N-0316 OSLO
+  \firstAddress Dept. of Informatics, P.O.Box 1080 Blindern, N-0316 OSLO\\
   \secondAddress Norwegian Defence Research Establishment (FFI) P.O.Box 25, NO-2027 Kjeller
 \end{contact}%
 %
@@ -104,7 +104,7 @@ We target this challenge with a sonar simulator that first take as input a seabe
 The result is a fast performing, mobile and portable on-the-fly template generator which can adapt its behavior to the nature of the current scene. We believe this can prove a powerful tool for mobile sonar imaging platforms such as autonomous underwater vehicles (AUVs).
 \end{abstract}%
 %
-\keywords{Adaptive beamforming, minimum variance, MVDR, LCA, complexity, sonar}
+\keywords{Sonar, SAS, simulator, template, OpenGL}
 
 \section{Introduction}
 
@@ -159,6 +159,18 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \section{Results}
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
+
+\begin{figure}[tp]\centering%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_sylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
+\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }\label{sim_cylinder}%
+\end{subfigure}\hspace{\imgspacing}%
+\end{figure}
+
 
 \begin{figure}[tp]\centering%
 \begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
