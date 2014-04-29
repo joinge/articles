@@ -113,9 +113,12 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 % To obtain optimal classification performance using template matching techniques a large set of templates must be availab
 
-We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It uses OpenGL to render a optical 2D image and depth map from the 3D model and seafloor representation, and OpenCL compute a sonar template based on this.  
+We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It uses OpenGL to render a optical 2D image and depth map of scene with a custom 3D model of the object and seafloor, and OpenCL to post-process this data to form sonar templates.  
 
-By coincidence this implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC). They both take advantage of graphics processing to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, SIGMAS+ is not designed for creating object templates, and adds e.g. noise to the images for them to more closely  
+By coincidence our implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC)~\cite{Coiras2009a, Coiras2009b}. They both take advantage of OpenGL to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, while SIGMAS+ is geared more towards realistically looking sonar images and includes effects such as noise, we do not. Also, SIGMAS+ sum images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and tailor the sonar image with the flexibility of OpenCL. 
+
+does not use OpenCL but a OpenGL a multi-pass technique, and includes ting  W
+is not designed for creating object templates, and adds e.g. noise to the images for them to more closely  
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
@@ -131,7 +134,6 @@ Citations
 \begin{itemize}
 \item Midelfart/Midtgaard: Adaptive templates \cite{Midelfart2010}
 \item Simulation of sidescan images (Bell thesis \cite{Bell1997}, pre-work by V.Blake \cite{Blake1993})
-\item NURC SIGMAS+ (Coiras GPU article at OCEANS 2009 \cite{Coiras2009a}, Coiras on SIGMAS maths \cite{Coiras2009b})
 \end{itemize}
 
 
