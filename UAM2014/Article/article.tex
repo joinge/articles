@@ -113,7 +113,7 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 % To obtain optimal classification performance using template matching techniques a large set of templates must be availab
 
-We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It uses OpenGL to render a optical 2D image and depth map of scene with a custom 3D model of the object and seafloor, and OpenCL to post-process this data to form sonar templates.  
+We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It loads a 3D model of the sea floor and an object of interest into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. The backscattered sound intensity is assumed to follow a Lambertian model, i.e. only being dependent on incidence angle of the transmitted signal onto the model surface. After rendering OpenGL is set up to produce an optical 2D intensity image and a map of the distance from the propagation axis to each pixel in the image. This data is finally combined with OpenCL to produce the image templates.
 
 By coincidence our implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC)~\cite{Coiras2009a, Coiras2009b}. They both take advantage of OpenGL to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, while SIGMAS+ is geared more towards realistically looking sonar images and includes effects such as noise, we do not. Also, SIGMAS+ sum images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and tailor the sonar image with the flexibility of OpenCL. 
 
@@ -171,7 +171,8 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
-The simulator performance were tested on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m cylinder that was slightly buried in the sea sediments (Fig. \ref{data_sylinder}). 
+The simulator performance were tested on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m cylinder that was slightly buried in the sea sediments (Fig. \ref{data_sylinder}).
+
 
 
 \begin{figure}[tp]\centering%
