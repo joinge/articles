@@ -111,6 +111,7 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 % A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
 
+We have developed fast a synthetic aperture sonar (SAS) simulator that run on graphics processing units (GPUs)  using a combination of OpenGL for graphics processing and OpenCL for post-processing. This implementation resembles the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC). They both take advantage of graphics processing to render a 2D image from 3D models and assume a Lambertian scattering model. 
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
@@ -165,6 +166,7 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
+The simulator performance were tested on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m cylinder that was slightly buried in the sea sediments (Fig. \ref{data_sylinder}). 
 
 
 \begin{figure}[tp]\centering%
