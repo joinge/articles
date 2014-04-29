@@ -111,7 +111,11 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 % A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
 
-We have developed fast a synthetic aperture sonar (SAS) simulator that run on graphics processing units (GPUs)  using a combination of OpenGL for graphics processing and OpenCL for post-processing. This implementation resembles the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC). They both take advantage of graphics processing to render a 2D image from 3D models and assume a Lambertian scattering model. 
+% To obtain optimal classification performance using template matching techniques a large set of templates must be availab
+
+We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It uses OpenGL to render a optical 2D image and depth map from the 3D model and seafloor representation, and OpenCL compute a sonar template based on this.  
+
+By coincidence this implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC). They both take advantage of graphics processing to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, SIGMAS+ is not designed for creating object templates, and adds e.g. noise to the images for them to more closely  
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
@@ -133,9 +137,8 @@ Citations
 
 \section{Methods}
 
-The basic idea behind using a graphics 
 
-OpenGL is a multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. 
+OpenGL is a popular, well-matured, multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. 
 
 \subsection{Setting up the scene}
 
