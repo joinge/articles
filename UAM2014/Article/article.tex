@@ -167,22 +167,25 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \newpage
 
-\section{Results}
+\section{Results \& Discussion}
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
-The simulator performance were tested on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m cylinder that was slightly buried in the sea sediments (Fig. \ref{data_sylinder}).
+The main advantage of a GPU-based simulator over a standard simulator is its ability to create templates incredibly fast. This makes it possible to tailor the templates more closely to an image as the parameters needed by the simulator can be directly estimated from the image. In a standard approach, on the other hand, a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.
 
+This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was slightly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, burial depth, and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost a perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for very 10$^\text{th}$ degree of the aspect angle. We believe the assumptions are quite typical for a template library for cylinder mines. 
+
+The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. 4a for a standard template and in Fig. 4b for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. From these figures, it was quite clear the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
 
 
 \begin{figure}[tp]\centering%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_sylinder}%
+\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_cylinder}%
 \end{subfigure}
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Cylinder simulation with parameters adapted to fit the SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}%
+\caption{Cylinder simulation with parameters adapted to fit the SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
 \end{subfigure}
 \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure}
