@@ -99,16 +99,16 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 \begin{abstract}
 Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed.
 
-We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. Simulation speed is fundamental when templates are created as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable on-the-fly template generator which can adapt to the characteristics of the current scene.
+We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. Simulation speed is critical when templates are created as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable on-the-fly template generator which can adapt to the characteristics of the current scene.
 \end{abstract}%
 %
-\keywords{Sonar, SAS, simulator, template, OpenGL}
+\keywords{Sonar, SAS, simulator, template matching, OpenGL, OpenCL}
 
 \section{Introduction}
 
 Automatic target recognition (ATR) is a fundamental component to optimize the use of autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. The ATR algorithms must, however, be sufficiently fast to process the sensor data onboard the AUV in delayed real-time.
 
-Template matching is a common technique for classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed\todo{objects? seabeds?}. The use of a static, predetermined template library may be impractical, yield inaccurate results, or both~\cite{Midelfart2010}. 
+Template matching is a common technique for classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed. The use of a static, predetermined template library is often impractical and yield inaccurate results~\cite{Midelfart2010}.
 
 We have developed a sonar simulator that runs sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound only depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
 
@@ -131,16 +131,16 @@ Various simulators for high frequency, side-looking sonar imagery have been publ
 
 \section{Methods}
 
-Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter. This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured, and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of projecting vertices, faces and textures defined in a 3D space onto a suitable 2D image plane. This section explains how we set up OpenGL to do this for us, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
+Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter. This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of projecting vertices, faces and textures defined in a 3D space onto a suitable 2D image plane. This section explains how we set up OpenGL for this task, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
 
 
 \subsection{Setting up the scene}
 
-Before we can render anything OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
+Before we can render anything with OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
 
 Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. Given a model file it outputs the model as a node tree where node contains data such as vertices, facets and textures, all formatted in an OpenGL friendly way.
 
-The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations are usually formalized like this:
+The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations is usually formalized like this:
 \begin{align*}
 \bmat{x\\y\\0\\1}_\text{image} = \P \cdot \V \cdot \M \cdot \bmat{x\\y\\z\\1}_\text{model},
 \end{align*}
@@ -148,13 +148,13 @@ where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and 
 
 \subsection{OpenGL rendering}
 
-To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is needed.   
+To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
 \subsection{OpenCL post-processing}
 
-The image rendered with OpenGL is not in $(x,y)$ coordinates as we want it to be. It does, however, tell us what parts of the scene that is visible from the sonar. In addition, OpenGL can produce a depth map that reveals the distance to each template pixel. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL, which allow general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+The image rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, tell us what parts of the scene that are visible from the sonar. In addition, OpenGL can produce a depth map that reveals the distance to each template pixel. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL, which allow general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
 
 % It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
 
@@ -171,7 +171,7 @@ The image rendered with OpenGL is not in $(x,y)$ coordinates as we want it to be
 \end{subfigure}
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Cylinder simulation with parameters adapted to fit the SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
+\caption{Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
 \end{subfigure}
 \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure}
@@ -181,11 +181,11 @@ The image rendered with OpenGL is not in $(x,y)$ coordinates as we want it to be
 \begin{figure}[p]\centering%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
-\caption{Standard template. Predefine template's cylinder length, alignment and burial depth do no match. Shadow and highlight regions to not correspond well.}\label{overlay_cylinder}%
+\caption{Best match of a set of predefined templates. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.}\label{overlay_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-\caption{Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow regions.}\label{overlay_cylinder_adaptive}%
+\caption{Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow segments.}\label{overlay_cylinder_adaptive}%
 \end{subfigure}
 \hfill\parbox{\linewidth-0pt}{\small\centering
 Segmentation overlay color description:\\[.5\baselineskip]
@@ -214,15 +214,15 @@ Segmentation overlay color description:\\[.5\baselineskip]
 
 Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second with a size of 1000x1000 pixels (1 megapixel). This makes it possible to tailor the templates more closely to an image as the parameters needed by the simulator can be directly estimated from the image. In a standard approach, on the other hand, a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.
 
-This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was slightly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, burial depth, and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost a perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for very 10$^\text{th}$ degree of the aspect angle. We believe the assumptions are quite typical for a template library for cylinder mines. 
+This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was partly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, immersion depth and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a generic length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for every 10$^\text{th}$ degree of the aspect angle. We believe these assumptions to be typical for a template library for cylinder mines. 
 
 The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. \ref{overlay_cylinder} for a standard template and in Fig. \ref{overlay_cylinder_adaptive} for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. From these figures, it was quite clear the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
 
 \section{Conclusion}
 
-One way to automatically classify objects in SAS images is compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create templates for all configurations of seabeds and objects. Instead we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and the template significantly in most cases.
+One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create templates for all configurations of seabeds and objects. Instead we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and the template significantly in most cases.
 
-To obtain the delayed real-time performance we implemented the simulator on a GPU. Their theoretical peak performance is typically an order of magnitude higher than a CPU in a comparable price range. This potential is effectively utilized with a well matured and highly optimized graphics processing API such as OpenGL. Our simulator use OpenGL for most for most of the scene processing. A final post-processing step is performed in OpenCL
+To obtain the delayed real-time performance we implemented the simulator on a GPU. Their theoretical peak performance is typically an order of magnitude higher than a CPU in a comparable price range. This potential is effectively utilized with a well matured and highly optimized graphics processing API such as OpenGL. Our simulator use OpenGL for most of the scene processing. A final post-processing step is performed in OpenCL.
 
 \begin{itemize}
 \item Mer testing
