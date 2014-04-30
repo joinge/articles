@@ -220,12 +220,17 @@ Segmentation overlay color description:\\[.5\baselineskip]
 
 \section{Conclusion}
 
-Modern GPUs are customized to perform computer graphics. Their theoretical peak performance is typically and order of magnitude higher than a CPU in a comparable price range. This performance can not always be achieved in practice, unless the algorithm can be adapted to use a well matured and optimized graphics processing API such as OpenGL. Our simulator uses OpenGL for most of the , then it makes little 
+One way to automatically classify objects in SAS images is compare the imaged objects with a predefined set of templates. These are typically simple simulations of common objects with various sizes and shapes. With luck one might be a close match, but 
 
-Whether this performance can be achieved in practice 
-Whenever conventional computer graphics processing can be used to 
-GPUs are designed to provide the best possible graphics processing performance, and there large ecosystem of tools and libraries  available 
-Using a GPU to drive a simulator is advantageous since
+Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images.
+
+We have implemented a SAS simulator that creates object templates in delayed real-time based on parameters estimated from the current scene. Compared to the conventional method  having a predefined set of object templates 
+
+
+, and not just a  on-the-fly based on adapted parameters, and not just a predefined set. 
+Modern GPUs are customized to perform computer graphics. Their theoretical peak performance is typically and order of magnitude higher than a CPU in a comparable price range. While it is hard to obtain this performance in practice, one can get very close by using a well matured and highly optimized graphics processing API such as OpenGL. Because of this we use OpenGL for simulating a scene with 3D models of the seabed and objects.
+
+
 
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.
