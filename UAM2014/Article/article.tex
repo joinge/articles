@@ -97,21 +97,22 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 \end{contact}%
 %
 \begin{abstract}
-Template matching is a common technique used when classifying objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing an object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a suitable set of template images considering that no seabed or object is truly alike.
+Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed.
 
-We target this challenge with a sonar simulator that first take as input a seabed model derived from the real sonar image. Then it places an object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object position, alignment, type and material, the procedure is repeated, and a correlation coefficient computed. The faster we are able to perform these simulations, the better we can expect the classification result to be. Therefore the simulator is written in OpenGL and OpenCL and run on graphics processing units (GPUs).
-
-The result is a fast performing, mobile and portable on-the-fly template generator which can adapt its behavior to the nature of the current scene. We believe this can prove a powerful tool for mobile sonar imaging platforms such as autonomous underwater vehicles (AUVs).
+We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. Simulation speed is fundamental when templates are created as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable on-the-fly template generator which can adapt to the characteristics of the current scene.
 \end{abstract}%
 %
 \keywords{Sonar, SAS, simulator, template, OpenGL}
 
 \section{Introduction}
 
+Automatic target recognition (ATR) is a fundamental component to optimize the use of autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. The ATR algorithms must, however, be sufficiently fast to process the sensor data onboard the AUV in delayed real-time.
 
-% A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
+Template matching is a common technique for classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering  the actual configurations of object and seabed. The use of a static, preset template library may be impractical and/or yield inaccurate results [Midelfart 4]. 
 
-% To obtain optimal classification performance using template matching techniques a large set of templates must be availab
+We have developed a sonar simulator that runs sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model [1], where the intensity of the backscattered sound only depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+
+Various simulators for high frequency, side-looking sonar imagery have been published, e.g. [Bell][Sammelmann]. Most implementations have however prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in [2,3] which, similar to our approach, takes advantage of parallel processing at GPUs and uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image full flexibility.
 
 We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It loads a 3D model of the sea floor and an object of interest into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces that reflects sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Bell1997} where the intensity of the backscattered sound is said to depend only on the on incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixels to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
 
@@ -165,8 +166,6 @@ When our models loaded into the OpenGL scene we are ready to render.
 It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
 
 
-\newpage
-
 \section{Results \& Discussion}
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
@@ -177,8 +176,9 @@ This performance was demonstrated on an image from the HISAS 1030 synthetic aper
 
 The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. 4a for a standard template and in Fig. 4b for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. From these figures, it was quite clear the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
 
+\setcounter{topnumber}{2}
 
-\begin{figure}[tp]\centering%
+\begin{figure}[p]\centering%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
 \caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_cylinder}%
@@ -190,28 +190,33 @@ The standard and adaptive templates were then matched to the HISAS image. This i
 \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure}
 
-\setcounter{topnumber}{2}
-
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
 \fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
-\begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\begin{figure}[p]\centering%
+\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
-\caption{Overlay.}\label{overlay_cylinder}%
+\caption{Standard template. Predefine template's cylinder length, alignment and burial depth do no match. Shadow and highlight regions to not correspond well.}\label{overlay_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
+\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-\caption{Overlay (adaptive).}\label{overlay_cylinder_adaptive}%
+\caption{Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow regions.}\label{overlay_cylinder_adaptive}%
 \end{subfigure}
-\hfill\parbox{\linewidth-30pt}{
-\cdesc{800000}{Pixels in both template and image highlight segments}
-\cdesc{FF1000}{Pixels only in template highlight segment}
-\cdesc{FFEB00}{Pixels only in image highlight segment}
+\hfill\parbox{\linewidth-0pt}{\small\centering
+Segmentation overlay color description:\\[.5\baselineskip]
+\begin{minipage}{.49\linewidth}
+\cdesc{800000}{Template highlight and image highlight}
+\cdesc{FF1000}{Template highlight only}
+\cdesc{FFEB00}{Image highlight only}
 \cdesc{83FF7C}{Background pixels}
-\cdesc{00EFFF}{Pixels only in the image shadow segment}
-\cdesc{00A7FF}{Pixels in the image segment, but in template shadow}
-\cdesc{0014FF}{Pixels only in the image template highlight segment}
-\cdesc{000083}{Pixels in both the template and image shadow segments}}
+\end{minipage}%
+\begin{minipage}{.49\linewidth}
+\cdesc{000083}{Template shadow and image shadow}
+\cdesc{0014FF}{Template shadow only}
+\cdesc{00EFFF}{Image shadow only}
+\cdesc{00A7FF}{Template shadow and image highlight}
+\end{minipage}}
+\vspace{\baselineskip}
+\caption{Segmented simulation image overlaid the segmented SAS image.}
 \end{figure}
 
 
@@ -242,7 +247,6 @@ Reference correlation scores~\cite{Midelfart2010}
 % - Tuning
 
 % 
-\newpage
 \bibliography{references}
 % \bibliography{../../../library.bib}
 % 
