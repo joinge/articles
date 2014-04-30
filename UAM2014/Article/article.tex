@@ -146,18 +146,17 @@ The next step is to scale, orient and position the objects in the scene, and fin
 \end{align*}
 where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. The first transform we apply is the model matrix $\M$, which scales and rotates the model in its local coordinate system. Then we map this model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. 
 
-\subsection{OpenGL Rendering}
+\subsection{OpenGL rendering}
 
 To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is needed.   
 
-If we place the camera at the sonar and look in the direction of the image OpenGL will generate a image of all the pixels that are ``seen'' from the sonar. However, this can only provide us with optically looking images, while was not designed to does not produce camera where the sonar is and render the scene   handling computing the projection of a  and rather post-process its result with OpenCL to obtain 
+The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
+\subsection{OpenCL post-processing}
 
-When our models loaded into the OpenGL scene we are ready to render. 
+The image rendered with OpenGL is not in $(x,y)$ coordinates as we want it to be. It does, however, tell us what parts of the scene that is visible from the sonar. In addition, OpenGL can produce a depth map that reveals the distance to each template pixel. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL, which allow general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
 
-
-
-It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
+% It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
 
 
 \section{Results \& Discussion}
@@ -220,15 +219,9 @@ Segmentation overlay color description:\\[.5\baselineskip]
 
 \section{Conclusion}
 
-One way to automatically classify objects in SAS images is compare the imaged objects with a predefined set of templates. These are typically simple simulations of common objects with various sizes and shapes. With luck one might be a close match, but 
+One way to automatically classify objects in SAS images is compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create templates for all configurations of seabeds and objects. Instead we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and the template considerably.
 
-Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images.
-
-We have implemented a SAS simulator that creates object templates in delayed real-time based on parameters estimated from the current scene. Compared to the conventional method  having a predefined set of object templates 
-
-
-, and not just a  on-the-fly based on adapted parameters, and not just a predefined set. 
-Modern GPUs are customized to perform computer graphics. Their theoretical peak performance is typically and order of magnitude higher than a CPU in a comparable price range. While it is hard to obtain this performance in practice, one can get very close by using a well matured and highly optimized graphics processing API such as OpenGL. Because of this we use OpenGL for simulating a scene with 3D models of the seabed and objects.
+To obtain the delayed real-time performance we wanted to use modern GPUs. Their theoretical peak performance is typically an order of magnitude higher than a CPU in a comparable price range. While it is hard to obtain this performance in practice, we got very close by using a well matured and highly optimized graphics processing API such as OpenGL. Because of this we use OpenGL for rendering a 2D projection of a scene with 3D models of the seabed and objects. This is finally converted using the OpenCL language, which can interoperate with OpenGLTo convert this into a sonar template image we use Some additional prost-processing is required as well to form the actual template, but 
 
 
 
