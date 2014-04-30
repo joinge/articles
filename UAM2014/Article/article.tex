@@ -148,7 +148,7 @@ where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and 
 
 \subsection{OpenGL Rendering}
 
-To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but the purpose of creating templates this is needed.   
+To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is needed.   
 
 If we place the camera at the sonar and look in the direction of the image OpenGL will generate a image of all the pixels that are ``seen'' from the sonar. However, this can only provide us with optically looking images, while was not designed to does not produce camera where the sonar is and render the scene   handling computing the projection of a  and rather post-process its result with OpenCL to obtain 
 
@@ -164,11 +164,16 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
-The main advantage of a GPU-based simulator over a standard simulator is its ability to create templates incredibly fast. This makes it possible to tailor the templates more closely to an image as the parameters needed by the simulator can be directly estimated from the image. In a standard approach, on the other hand, a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.
+Whenever conventional computer graphics processing can be used to 
+GPUs are designed to provide the best possible graphics processing performance, and there large ecosystem of tools and libraries  available 
+Using a GPU to drive a simulator is advantageous since
+
+
+Using a GPU-based simulator is attractive since computer is an attractive solution as there are a  graphics traits. For one over a CPU-based standard simulator is two-fold: First is its ability to create templates incredibly fast. This makes it possible to tailor the templates more closely to an image as the parameters needed by the simulator can be directly estimated from the image. In a standard approach, on the other hand, a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.
 
 This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was slightly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, burial depth, and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost a perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for very 10$^\text{th}$ degree of the aspect angle. We believe the assumptions are quite typical for a template library for cylinder mines. 
 
-The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. 4a for a standard template and in Fig. 4b for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. From these figures, it was quite clear the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
+The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. \ref{overlay_cylinder} for a standard template and in Fig. \ref{overlay_cylinder_adaptive} for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. From these figures, it was quite clear the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
 
 \setcounter{topnumber}{2}
 
@@ -213,6 +218,14 @@ Segmentation overlay color description:\\[.5\baselineskip]
 \caption{Segmented simulation image overlaid the segmented SAS image.}
 \end{figure}
 
+\section{Conclusion}
+
+Modern GPUs are customized to perform computer graphics. Their theoretical peak performance is typically and order of magnitude higher than a CPU in a comparable price range. This performance can not always be achieved in practice, unless the algorithm can be adapted to use a well matured and optimized graphics processing API such as OpenGL. Our simulator uses OpenGL for most of the , then it makes little 
+
+Whether this performance can be achieved in practice 
+Whenever conventional computer graphics processing can be used to 
+GPUs are designed to provide the best possible graphics processing performance, and there large ecosystem of tools and libraries  available 
+Using a GPU to drive a simulator is advantageous since
 
 % Ligger nesten med kortsiden til.
 % Bilde og templat segmenteres hver for seg.

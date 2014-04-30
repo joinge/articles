@@ -119,6 +119,9 @@
 % Process the options specified so far
 \ProcessOptions
 
+% Let UAM class handle the format if it is specified
+\ifOPTuam\OPTdefaultformattrue 
+
 \ifOPTbeamer
   \typeout{argh}
 %    \DeclareOption{handout}{\PassOptionsToClass{handout}{\@bdoctype}}
