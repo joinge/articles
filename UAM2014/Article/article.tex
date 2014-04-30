@@ -111,6 +111,12 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 
 % A synthetic aperture sonar (SAS) utilizes a wider along-track beam to ensonify the same part of the seafloor with several sucessive pings. Later this data is combined coherently to allow the synthetization of a much larger receiving array, which drastically improves the along-track resolution. 
 
+% To obtain optimal classification performance using template matching techniques a large set of templates must be availab
+
+We have developed a simulator for synthetic aperture sonar (SAS) that creates object templates very quickly with the aid of the massive computing power in graphics processing units (GPUs). It loads a 3D model of the sea floor and an object of interest into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces that reflects sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Bell1997} where the intensity of the backscattered sound is said to depend only on the on incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixels to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+
+By coincidence our implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC)~\cite{Coiras2009a, Coiras2009b}. They both take advantage of OpenGL to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, while SIGMAS+ is geared more towards realistically looking sonar images, and include effects such as noise, we do not. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image full flexibility. 
+
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
@@ -122,23 +128,20 @@ The result is a fast performing, mobile and portable on-the-fly template generat
 \caption{Simulator.}\label{buildup}%
 \end{figure}
 
-Citations
 \begin{itemize}
 \item Midelfart/Midtgaard: Adaptive templates \cite{Midelfart2010}
 \item Simulation of sidescan images (Bell thesis \cite{Bell1997}, pre-work by V.Blake \cite{Blake1993})
-\item NURC SIGMAS+ (Coiras GPU article at OCEANS 2009 \cite{Coiras2009a}, Coiras on SIGMAS maths \cite{Coiras2009b})
 \end{itemize}
-
+ 
 
 \section{Methods}
 
-The basic idea behind using a graphics 
+Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter. This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured, and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of handling vertices, faces and textures, as well as from projecting this onto a suitable 2D image plane. This section explains how we set up OpenGL to do this for us, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
 
-OpenGL is a multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. 
 
 \subsection{Setting up the scene}
 
-Before we can do anything with OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
+Before we can render anything OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
 
 Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. It handles the intricacies of the various model formats and outputs the model as a node tree. Each node contains data such as vertices, facets and textures, and since they are formatted in an OpenGL friendly way we simply iterate through the nodes and load it.
 
@@ -151,6 +154,9 @@ where is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and 
 \subsection{OpenGL Rendering}
 
 To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency\todo{is this unproblematic?}.   
+
+If we place the camera at the sonar and look in the direction of the image OpenGL will generate a image of all the pixels that are ``seen'' from the sonar. However, this can only provide us with optically looking images, while was not designed to does not produce camera where the sonar is and render the scene   handling computing the projection of a  and rather post-process its result with OpenCL to obtain 
+
 
 When our models loaded into the OpenGL scene we are ready to render. 
 
@@ -165,6 +171,8 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 
 \newlength\imgspacing\setlength\imgspacing{.5cm}
 
+The simulator performance were tested on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m cylinder that was slightly buried in the sea sediments (Fig. \ref{data_sylinder}).
+
 
 
 \begin{figure}[tp]\centering%
@@ -176,22 +184,10 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
 \caption{Cylinder simulation with parameters adapted to fit the SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}%
 \end{subfigure}
-\caption{}
+\caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure}
 
 \setcounter{topnumber}{2}
-
-\begin{figure}[tp]\centering%
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
-\caption{``Typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Parameters adapted to fit SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}%
-\end{subfigure}
-\caption{Cylinder simulations}\label{sim_cylinder}
-\end{figure}
 
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
 \fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
@@ -214,41 +210,6 @@ It is also possible to compute the sonar image using the OpenGL ``blend'' featur
 \cdesc{0014FF}{Pixels only in the image template highlight segment}
 \cdesc{000083}{Pixels in both the template and image shadow segments}}
 \end{figure}
-
-
-\begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_sylinder}%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged_bw.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_cylinder_bw}%
-\end{subfigure} 
-\end{figure}
-
-\begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged.svg}%
-\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$. }\label{sim_cylinder}%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_bw.svg}%
-\caption{Cylinder simulation with ``typical'' parameters: Length 2.6\;m, burial depth 0.1\;m, aspect angle 100$^\circ$.}\label{sim_cylinder_bw}%
-\end{subfigure} 
-\end{figure}
-
-\begin{figure}[tp]\centering%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Adaptive cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[b]{.5\linewidth-\imgspacing/2}
-\graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive_bw.svg}%
-\caption{Adaptive cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder_bw}%
-\end{subfigure} 
-\end{figure}
-
 
 
 \begin{table}[bh]
