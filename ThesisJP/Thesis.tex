@@ -63,6 +63,7 @@ Accelerating adaptive ultrasound imaging algorithms by means of general-purpose 
 %\Chapter*{}
 \newpage%
 
+%\setcounter{page}{1}
 \renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
 
 ~\\
@@ -94,11 +95,11 @@ Printed by NTNU-trykk
 ~\\%
 ~\\
 \noindent\large 
-Sammendrag p\aa{} norsk.
+\textbf{Akselerering av adaptive algoritmer for ultralydavbildning ved hjelp a programmerbare grafikkprosessorer}
 %\vspace{0.2cm}\\%
 \\\\%
 \normalsize
-\todo{Skriv sammendrag p\aa{} norsk}
+En rivende utvikling innen spillteknologi og tilh\o{}rende programmeringsspr\aa{}k ...
 
 \vspace{0.3cm}
 \noindent Jon Petter Helgesen \AA{}sen\\
@@ -110,15 +111,18 @@ Finansieringskilde: MI-Lab
 \vspace{0.2cm}
 \noindent \emph{Ovennevnte avhandling er funnet verdig til \aa{} forsvares offentlig for graden Philosophiae Doctor (PhD) i medisinsk teknologi. Disputas finner sted ... .}
 
-
-
 % ENGLISH ABSTRACT / SUMMARY
 \CustChapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-%\chapter*{Abstract}
-%\thispagestyle{empty}%
-\todo{Write abstract ...}
+A rapid development in computer game technology and accompanying programming languages have recently provided researchers with small personal super computers, comprised in a single graphics card (GPU). This immense rise in computational capabilities and improved programmability are currently changing how ultrasound imaging systems are designed. When researchers are exploring new algorithms for ultrasound imaging, it is therefore important to keep the architecture of parallel accelerators in mind. If a new complex algorithm is supposed to run in real time, it needs to fit the programmable and parallel pipeline of modern ultrasound scanners.
 
+The aim of this study has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. Among the investigated problems are both adaptive beamforming, adaptive visualization of ultrasound volumes, and ultrasound simulations. The presented problems have in common that they require parallel programming in order to reach real-time processing. 
+
+In the first part of the thesis, the Capon adaptive beamformer is investigated and implemented on a GPU for the application of real-time sonar (\textbf{Paper\,I}) and medical ultrasound imaging (\textbf{Paper\,II}). Real-time frame rates are achieved for both modalities. \textbf{Paper\,II} also present, for the first time, videos where the Capon beamformer has been applied on loops of simulated and \textit{in vivo} medical ultrasound images. An investigation of shift-invariance for real-time Capon beamforming is performed in \textbf{Paper\,III}. Shift-invariant imaging is essential if the method is ever to be used in practice.
+
+In paper \textbf{Paper IV} we propose an adaptive method for visualization of volumetric cardiac ultrasound images. The method is capable of removing noise that by traditionally methods would have occlude cardiac tissue. This work also shows that with modern GPUs it is possible to add advanced visualization methods to an ultrasound imaging system and still have real-time performance.
+
+Finally, we investigate how GPUs can be utilized to accelerate ultrasound simulations (\textbf{Paper V}). The result of this work is a simulation program where array geometries can be interactively drawn and where the resulting pressure field is simulated and visualized in real time.
 
 %\setcounter{page}{3} %I don't want the norwegian summary to be counted in. (This will change page numbering since the delivered version)
 
