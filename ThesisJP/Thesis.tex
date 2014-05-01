@@ -99,7 +99,15 @@ Printed by NTNU-trykk
 %\vspace{0.2cm}\\%
 \\\\%
 \normalsize
-En rivende utvikling innen spillteknologi og tilh\o{}rende programmeringsspr\aa{}k ...
+En rivende utvikling innen spillteknologi og tilh\o{}rende programmeringsspr\aa{}k har nylig gjort super-datamaskiner tilgjengelige for forskere i form av et lite grafikkort (GPU). Denne utrolige \o{}kningen i beregningskraft og forbedret programmerbarhet er for \o{}yeblikket med p\aa{} \aa{} endre hvordan ultralydsystemer designes. N\aa{}r forskere utforsker nye algoritmer for ultralydavbildning er det derfor viktig at arkitekturen til parallelle akseleratorer tas h\o{}yde for. Hvis en ny, kompleks algoritme er tenkt til \aa{} kj\o{}res i sanntid, er det viktig at den kan tilpasses den programmerbare og parallelle prosesseringskjeden i moderne ultralydskannere. 
+
+M\aa{}let med denne studien har v\ae{}rt \aa{} utforske hvordan GPUer kan utnyttes til avansert prosessering i et avbildende ultralydsystem. Blant de problemene vi har sett n\ae{}rmere p\aa{} finner man b\aa{}de adaptiv str\aa{}leforming, adaptiv visualisering av volumetrisk ultralyd og ultralydsimuleringer. Felles for disse problemene er at de alle krever parallelprogrammering for at sanntidsprosessering skal oppn\aa{}s.
+
+I f\o{}rste del av avhandlingen utforskes Capon's adaptive str\aa{}leformings-metode. Metoden implementeres p\aa{} en GPU  for \aa{} muliggj\o{}re sanntidsprosessering for avbildende sonar (\textbf{Artikkel\,I}) og medisinsk ultralydavbildning (\textbf{Artikkel\,II}). Sanntidsprosessering oppn\aa{}s for begge modalitetene. \textbf{Artikkel\,II} presenterer ogs\aa{}, for f\o{}rste gang, videoer hvor b\aa{}de simulerte og \textit{in vivo} medisinsk ultralyddata er prosessert med Capon-str\aa{}leforming. I \textbf{Artikkel\,III} viser vi at Capon-str\aa{}leformeren ikke har skift-invariant oppf\o{}rsel n\aa{}r den anvendes til sanntidsavbildning. Videre foresl\aa{}s det en metode som gir mer shift-invariant avbildning. Skift-invariant avbildning er avgj\o{}rende for at metoden skal kunne tas ibruk i praktisk.
+
+I \textbf{Artikkel\,IV} foresl\aa{}r vi en adaptiv metode for visualisering av volumetriske ultralydbilder av hjertet. Metoden undertrykker st\o{}y som med konvensjonelle metoder hadde skygget for hjertevev. Dette arbeidet viser ogs\aa{} at det med moderne GPUer er mulig \aa{} utf\o{}re avansert visualisering i et ultralydsystem og fortsatt ha sanntidsytelse. 
+
+I siste del av avhandlingen utforsker vi hvordan GPUer kan utnyttes til \aa{} akselerere ultralydsimuleringer. Resultatet av dette arbeidet ble et simuleringsprogram hvor geometrien til en gitt ultralydprobe kan interaktivt tegnes, og hvor det resulterende trykkfeltet simuleres i sanntid.
 
 \vspace{0.3cm}
 \noindent Jon Petter Helgesen \AA{}sen\\
@@ -109,7 +117,7 @@ Biveiledere: Stein-Inge Rabben, Erik Steen and Hans Torp\\
 Finansieringskilde: MI-Lab
 
 \vspace{0.2cm}
-\noindent \emph{Ovennevnte avhandling er funnet verdig til \aa{} forsvares offentlig for graden Philosophiae Doctor (PhD) i medisinsk teknologi. Disputas finner sted ... .}
+\noindent \emph{Ovennevnte avhandling er funnet verdig til \aa{} forsvares offentlig for graden Philosophiae Doctor (Ph.D.) i medisinsk teknologi. Disputas finner sted ... .}
 
 % ENGLISH ABSTRACT / SUMMARY
 \CustChapter*{Abstract}
@@ -118,11 +126,11 @@ A rapid development in computer game technology and accompanying programming lan
 
 The aim of this study has been to investigate the possibility of utilizing GPUs for advanced processing in an ultrasound imaging system. Among the investigated problems are both adaptive beamforming, adaptive visualization of ultrasound volumes, and ultrasound simulations. The presented problems have in common that they require parallel programming in order to reach real-time processing. 
 
-In the first part of the thesis, the Capon adaptive beamformer is investigated and implemented on a GPU for the application of real-time sonar (\textbf{Paper\,I}) and medical ultrasound imaging (\textbf{Paper\,II}). Real-time frame rates are achieved for both modalities. \textbf{Paper\,II} also present, for the first time, videos where the Capon beamformer has been applied on loops of simulated and \textit{in vivo} medical ultrasound images. An investigation of shift-invariance for real-time Capon beamforming is performed in \textbf{Paper\,III}. Shift-invariant imaging is essential if the method is ever to be used in practice.
+In the first part of the thesis, the Capon adaptive beamformer is investigated and implemented on a GPU for the application of real-time sonar (\textbf{Paper\,I}) and medical ultrasound imaging (\textbf{Paper\,II}). Real-time frame rates are achieved for both modalities. \textbf{Paper\,II} also present, for the first time, videos where the Capon beamformer has been applied on loops of simulated and \textit{in vivo} medical ultrasound images. In \textbf{Paper\,III} we show that Capon beamforming does not provide shift-invariant imaging in a real-time imaging setting. A method is then proposed that improves the shift-invariant property. Shift-invariant imaging is essential if the method is ever to be used in practice.
 
-In paper \textbf{Paper IV} we propose an adaptive method for visualization of volumetric cardiac ultrasound images. The method is capable of removing noise that by traditionally methods would have occlude cardiac tissue. This work also shows that with modern GPUs it is possible to add advanced visualization methods to an ultrasound imaging system and still have real-time performance.
+In paper \textbf{Paper\,IV} we propose an adaptive method for visualization of volumetric cardiac ultrasound images. The method is capable of removing noise that by conventional methods would have occlude cardiac tissue. This work also shows that with modern GPUs it is possible to add advanced visualization methods to an ultrasound imaging system and still have real-time performance.
 
-Finally, we investigate how GPUs can be utilized to accelerate ultrasound simulations (\textbf{Paper V}). The result of this work is a simulation program where array geometries can be interactively drawn and where the resulting pressure field is simulated and visualized in real time.
+Finally, we investigate how GPUs can be utilized to accelerate ultrasound simulations (\textbf{Paper\,V}). The result of this work was a simulation program where ultrasound probe geometries can be interactively drawn and where the resulting pressure field is simulated and visualized in real time.
 
 %\setcounter{page}{3} %I don't want the norwegian summary to be counted in. (This will change page numbering since the delivered version)
 
