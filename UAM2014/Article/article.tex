@@ -99,7 +99,7 @@ Dept. of Informatics, Univ. of Oslo, P.Box 1080 Blindern, N-0316 OSLO\\
 \begin{abstract}
 Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed.
 
-We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For any object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. Simulation speed is critical when templates are created as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable on-the-fly template generator which can adapt to the characteristics of the current scene.
+We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For every object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. The best performance is obtained when these parameters are estimated from the sonar image as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable on-the-fly template generator which can adapt to the characteristics of the current scene.
 \end{abstract}%
 %
 \keywords{Sonar, SAS, simulator, template matching, OpenGL, OpenCL}
@@ -181,7 +181,7 @@ The image rendered with OpenGL is not in along-track and cross-track coordinates
 \begin{figure}[p]\centering%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
-\caption{Best match of a set of predefined templates. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.}\label{overlay_cylinder}%
+\caption{Best template out of a predefined set. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.}\label{overlay_cylinder}%
 \end{subfigure}\hspace{\imgspacing}%
 \begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
 \graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
@@ -220,16 +220,20 @@ The standard and adaptive templates were then matched to the HISAS image. This i
 
 \section{Conclusion}
 
-One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create templates for all configurations of seabeds and objects. Instead we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and the template significantly in most cases.
+One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create templates for all configurations of seabeds and objects. Instead we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
 
-To obtain the delayed real-time performance we implemented the simulator on a GPU. Their theoretical peak performance is typically an order of magnitude higher than a CPU in a comparable price range. This potential is effectively utilized with a well matured and highly optimized graphics processing API such as OpenGL. Our simulator use OpenGL for most of the scene processing. A final post-processing step is performed in OpenCL.
+To obtain the delayed real-time performance we implemented the simulator on a GPU. Their theoretical peak performance is typically an order of magnitude higher than a CPU in a comparable price range. This potential is effectively utilized with a well matured and highly optimized graphics processing API such as OpenGL. Our simulator use OpenGL for most of the scene processing.
 
-\begin{itemize}
-\item Mer testing
-\item Robustifisering
-\item Tuning
-\end{itemize}
+A final post-processing step is performed in OpenCL, which allow general purpose GPU programming. It interoperates well with OpenGL and adds a lot of flexibility to the simulation process. This is valuable as the simulator is still being actively developed and will likely need new features that can not easily be obtained using OpenGL alone.
 
+% 
+% 
+% \begin{itemize}
+% \item Mer testing
+% \item Robustifisering
+% \item Tuning
+% \end{itemize}
+% 
 
 
 
