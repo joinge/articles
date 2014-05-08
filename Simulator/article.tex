@@ -438,6 +438,28 @@ The next step is to scale, orient and position the objects in the scene, and fin
 \end{align*}
 where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. The first transform we apply is the model matrix $\M$, which scales and rotates the model in its local coordinate system. Then we map this model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. 
 
+\begin{align*}
+\left(\begin{matrix}
+x_c \\ y_c \\ z_c \\ w_c
+\end{matrix}\right)
+= \left(\begin{matrix}
+\frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
+0              &  \frac{2}{t-b}  &  0              &  -\frac{t+b}{t-b} \\
+0              &  0              &  \frac{-2}{f-n} &  -\frac{f+n}{f-n} \\
+0              &  0              &  0              &  1
+\end{matrix}\right)
+\left(\begin{matrix}
+x_e \\ y_e \\ z_e \\ w_e
+\end{matrix}\right)
+\end{align*}
+where
+\begin{align*}
+l &=   &  r &= \\
+b &=   &  t &= \\
+f &=   &  n &= 
+\end{align*}
+
+
 \subsection{OpenGL rendering}
 
 To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
@@ -519,8 +541,44 @@ To obtain the delayed real-time performance we implemented the simulator on a GP
 
 A final post-processing step is performed in OpenCL, which allow general purpose GPU programming. It interoperates well with OpenGL and adds a lot of flexibility to the simulation process. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
-% \appendices
-% 
+\appendix
+
+Matrices for translation, scale and rotation:
+\begin{align}
+\R_x &= \bmat{
+1  &  0           &  0           &  0 \\
+0  &  \cos\alpha  &  -\sin\alpha &  0 \\
+0  &  \sin\alpha  &  \cos\alpha  &  0 \\
+0  &  0           &  0           &  0 \\
+}
+\end{align}
+\begin{align}
+\R_y &= \bmat{
+0  &  \cos\alpha  &  \sin\alpha  &  0 \\
+1  &  0           &  0           &  0 \\
+0  &  -\sin\alpha &  \cos\alpha  &  0 \\
+0  &  0           &  0           &  0 \\
+}
+\end{align}
+\begin{align}
+\R_z &= \bmat{
+0  &  \cos\alpha  &  -\sin\alpha &  0 \\
+0  &  \sin\alpha  &  \cos\alpha  &  0 \\
+1  &  0           &  0           &  0 \\
+0  &  0           &  0           &  0 \\
+}
+\end{align}
+
+\begin{align}
+\T &= \bmat{
+0  &  \cos\alpha  &  -\sin\alpha &  0 \\
+0  &  \sin\alpha  &  \cos\alpha  &  0 \\
+1  &  0           &  0           &  0 \\
+0  &  0           &  0           &  0 \\
+}
+\end{align}
+
+
 % \section{MVDR Complexity Formulas}\label{mvdr_formulas}
 % 
 % \section{GPU Throughput}\label{throughput}
@@ -557,6 +615,9 @@ The authors would like to thank the Norwegian Defence Research Establishment (FF
 \ifCLASSOPTIONcaptionsoff
   \newpage
 \fi
+
+
+
 
 
 \bibliographystyle{IEEEtran}
