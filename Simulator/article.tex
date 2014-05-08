@@ -549,35 +549,43 @@ Matrices for translation, scale and rotation:
 1  &  0           &  0           &  0 \\
 0  &  \cos\alpha  &  -\sin\alpha &  0 \\
 0  &  \sin\alpha  &  \cos\alpha  &  0 \\
-0  &  0           &  0           &  0 \\
+0  &  0           &  0           &  1 \\
 }
 \end{align}
 \begin{align}
 \R_y &= \bmat{
 0  &  \cos\alpha  &  \sin\alpha  &  0 \\
-1  &  0           &  0           &  0 \\
+0  &  1           &  0           &  0 \\
 0  &  -\sin\alpha &  \cos\alpha  &  0 \\
-0  &  0           &  0           &  0 \\
+0  &  0           &  0           &  1 \\
 }
 \end{align}
 \begin{align}
 \R_z &= \bmat{
 0  &  \cos\alpha  &  -\sin\alpha &  0 \\
 0  &  \sin\alpha  &  \cos\alpha  &  0 \\
-1  &  0           &  0           &  0 \\
-0  &  0           &  0           &  0 \\
+0  &  0           &  1           &  0 \\
+0  &  0           &  0           &  1 \\
 }
 \end{align}
 
 \begin{align}
-\T &= \bmat{
-0  &  \cos\alpha  &  -\sin\alpha &  0 \\
-0  &  \sin\alpha  &  \cos\alpha  &  0 \\
-1  &  0           &  0           &  0 \\
-0  &  0           &  0           &  0 \\
+\boldsymbol{T} &= \bmat{
+1  &  0  &  0  &  dx \\
+0  &  1  &  0  &  dy \\
+0  &  0  &  1  &  dz \\
+0  &  0  &  0  &  1 \\
 }
 \end{align}
 
+\begin{align}
+\boldsymbol{S} &= \bmat{
+s_x  &  0    &  0    &  dx \\
+0    &  s_y  &  0    &  dy \\
+0    &  0    &  s_z  &  dz \\
+0    &  0    &  0    &  1 \\
+}
+\end{align}
 
 % \section{MVDR Complexity Formulas}\label{mvdr_formulas}
 % 
