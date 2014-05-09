@@ -543,30 +543,36 @@ A final post-processing step is performed in OpenCL, which allow general purpose
 
 \appendix
 
-Matrices for translation, scale and rotation:
+We implement rotations in a 3D euclidean space by combining matrices that rotate around each of the three respective dimensions.. For rotation by an angle $\phi_x$ clockwise around the $x$-axis we have:
 \begin{align}
-\R_x &= \bmat{
+\R_x(\phi_x) &= \bmat{
 1  &  0           &  0           &  0 \\
-0  &  \cos\alpha  &  -\sin\alpha &  0 \\
-0  &  \sin\alpha  &  \cos\alpha  &  0 \\
+0  &  \cos\phi_x  &  -\sin\phi_x &  0 \\
+0  &  \sin\phi_x  &  \cos\phi_x  &  0 \\
 0  &  0           &  0           &  1 \\
-}
+},
 \end{align}
+and for the other two euclidean dimensions we have:
 \begin{align}
-\R_y &= \bmat{
-0  &  \cos\alpha  &  \sin\alpha  &  0 \\
-0  &  1           &  0           &  0 \\
-0  &  -\sin\alpha &  \cos\alpha  &  0 \\
-0  &  0           &  0           &  1 \\
-}
+\R_y(\phi_y) &= \bmat{
+\cos\phi_y  &  0  &  \sin\phi_y  &  0 \\
+0           &  1  &  0           &  0 \\
+-\sin\phi_y &  0  &  \cos\phi_y  &  0 \\
+0           &  0  &  0           &  1 \\
+},
 \end{align}
+and
 \begin{align}
-\R_z &= \bmat{
-0  &  \cos\alpha  &  -\sin\alpha &  0 \\
-0  &  \sin\alpha  &  \cos\alpha  &  0 \\
-0  &  0           &  1           &  0 \\
-0  &  0           &  0           &  1 \\
-}
+\R_z(\phi_z) &= \bmat{
+\cos\phi_z  &  -\sin\phi_z &  0  &  0 \\
+\sin\phi_z  &  \cos\phi_z  &  0  &  0 \\
+0           &  0           &  1  &  0 \\
+0           &  0           &  0  &  1 \\
+}.
+\end{align}
+The order in which these are applied matters. We rotate around the $x$-axis first, then around $y$ and finally around $z$:
+\begin{align}
+\R(\phi_x, \phi_y, \phi_z) &= \R_z(\phi_z)\;\R_y(\phi_y)\;\R_x(\phi_x).
 \end{align}
 
 \begin{align}
@@ -580,9 +586,9 @@ Matrices for translation, scale and rotation:
 
 \begin{align}
 \boldsymbol{S} &= \bmat{
-s_x  &  0    &  0    &  dx \\
-0    &  s_y  &  0    &  dy \\
-0    &  0    &  s_z  &  dz \\
+s_x  &  0    &  0    &  1 \\
+0    &  s_y  &  0    &  1 \\
+0    &  0    &  s_z  &  1 \\
 0    &  0    &  0    &  1 \\
 }
 \end{align}
