@@ -543,6 +543,13 @@ A final post-processing step is performed in OpenCL, which allow general purpose
 
 \appendix
 
+We place, resize and orient objects in an euclidean 3D space using suitable transformation matrices that are applied to each of the object's vertices:
+\begin{align}
+\bmat{x_t \\ y_t \\ z_t \\ w} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
+\end{align}
+Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\R$
+There is nothing special to these matrices, but we supply them here for completeness.
+
 We implement rotations in a 3D euclidean space by combining matrices that rotate around each of the three respective dimensions.. For rotation by an angle $\phi_x$ clockwise around the $x$-axis we have:
 \begin{align}
 \R_x(\phi_x) &= \bmat{
@@ -576,7 +583,7 @@ The order in which these are applied matters. We rotate around the $x$-axis firs
 \end{align}
 
 \begin{align}
-\boldsymbol{T} &= \bmat{
+\boldsymbol{T}(dx,dy,dz) &= \bmat{
 1  &  0  &  0  &  dx \\
 0  &  1  &  0  &  dy \\
 0  &  0  &  1  &  dz \\
@@ -585,10 +592,10 @@ The order in which these are applied matters. We rotate around the $x$-axis firs
 \end{align}
 
 \begin{align}
-\boldsymbol{S} &= \bmat{
-s_x  &  0    &  0    &  1 \\
-0    &  s_y  &  0    &  1 \\
-0    &  0    &  s_z  &  1 \\
+\boldsymbol{S}(s_x,s_y,s_z) &= \bmat{
+s_x  &  0    &  0    &  0 \\
+0    &  s_y  &  0    &  0 \\
+0    &  0    &  s_z  &  0 \\
 0    &  0    &  0    &  1 \\
 }
 \end{align}
