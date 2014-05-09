@@ -438,6 +438,11 @@ The next step is to scale, orient and position the objects in the scene, and fin
 \end{align*}
 where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. The first transform we apply is the model matrix $\M$, which scales and rotates the model in its local coordinate system. Then we map this model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. 
 
+
+\begin{align}
+\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
+\end{align}
+
 \begin{align*}
 \left(\begin{matrix}
 x_c \\ y_c \\ z_c \\ w_c
@@ -458,7 +463,6 @@ l &=   &  r &= \\
 b &=   &  t &= \\
 f &=   &  n &= 
 \end{align*}
-
 
 \subsection{OpenGL rendering}
 
@@ -545,7 +549,7 @@ A final post-processing step is performed in OpenCL, which allow general purpose
 
 We place, resize and orient objects in an euclidean 3D space using suitable transformation matrices that are applied to each of the object's vertices:
 \begin{align}
-\bmat{x_t \\ y_t \\ z_t \\ w} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
+\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
 \end{align}
 Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\R$
 There is nothing special to these matrices, but we supply them here for completeness.
