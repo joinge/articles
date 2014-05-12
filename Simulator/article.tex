@@ -450,8 +450,7 @@ Next we map the model into world coordinates using the view matrix $\V$. This in
 a
 \end{align}
 
-Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. 
-
+Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. Its projection matrix is defined as
 \begin{align}
 \P = \left(\begin{matrix}
 \frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
@@ -460,7 +459,7 @@ Finally the relevant part of the scene is projected onto the image plane with a 
 0              &  0              &  0              &  1
 \end{matrix}\right)
 \end{align}
-where
+where $l,r,b,t,n$ and $f$ are left, right, bottom, top, near and far boundaries of the projection plane, respectively.
 \begin{align*}
 l &= x_\text{min}  &  r &= x_\text{max}\\
 b &=   &  t &= \\
