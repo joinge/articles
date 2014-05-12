@@ -344,8 +344,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
         Jon~Petter~\AA{}sen,~\IEEEmembership{Student Member,~IEEE,} %
         Carl-Inge~Colombo~Nilsen,~\IEEEmembership{Member,~IEEE,} %
         Andreas~Austeng,~\IEEEmembership{Member,~IEEE}%
-\thanks{J. I. Buskenes, C.-I. C. Nilsen and A. Austeng are with the Department of Informatics, University of Oslo, Norway.}%
-\thanks{J. P. \AA{}sen is with MI-Lab, Norwegian University of Science and Technology, Trondheim, Norway.}% <-this % stops a space
+\thanks{J. I. Buskenes, C.-I. C. Nilsen and A. Austeng are with the Department of Informatics, University of Oslo, 0316 Oslo, Norway.}%
+\thanks{J. P. \AA{}sen is with MI-Lab, Norwegian University of Science and Technology, 7491 Trondheim, Norway.}% <-this % stops a space
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
 
@@ -376,12 +376,10 @@ In this study we show that for active sonar systems up to 32 channels, the compu
 \end{abstract}
 
 % Keywords (normally not used for peer reviews)
-% \ifPeerReview\else
 \begin{IEEEkeywords}
 Adaptive beamforming, MVDR, Capon, sonar, active sonar, GPU, graphics processing unit, complexity.
 \end{IEEEkeywords}
 }
-% \fi
 
 % make the title area
 \maketitle
@@ -720,7 +718,7 @@ These challenges are very closely linked. Since the Quadro 6000 architecture is 
 
 In Fig. \ref{mvdr_implementation}, we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
 
-Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row, a full computation is carried out, then that row is saved back to global memory following a coalesced access pattern that maximizes global memory bandwidth. For subsequent rows, the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and subtracting the correlation coefficients that enter and exit the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column are obtained by a complex conjugate copy of the relevant value in the first row. This is slightly nonoptimal as it causes divergent branching, but it is needed because the solver is Gauss Jordan based and thus require a full $\eR$. Combined these steps balance the load evenly on all threads, is almost completely free of arithmetic redundancy, and cause little memory consumption.
+Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row, a full computation is carried out, then that row is saved back to global memory following a coalesced access pattern that maximizes global memory bandwidth. For subsequent rows, the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and subtracting the correlation coefficients that enter and exit the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column are obtained by a complex conjugate copy of the relevant value in the first row. This is slightly nonoptimal as it causes divergent branching, but it is needed because the solver is Gauss Jordan based and thus require a full $\eR$. Combined these steps balance the load evenly on all threads, is almost completely free of arithmetic redundancy, and cause minimal memory consumption.
  
 
 % \cite{Owens2007}\todo{Find a good spot for these}
