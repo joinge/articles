@@ -443,20 +443,14 @@ where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image
 \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
 \end{align}
 
-\begin{align*}
-\left(\begin{matrix}
-x_c \\ y_c \\ z_c \\ w_c
-\end{matrix}\right)
-= \left(\begin{matrix}
+\begin{align}
+\P = \left(\begin{matrix}
 \frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
 0              &  \frac{2}{t-b}  &  0              &  -\frac{t+b}{t-b} \\
 0              &  0              &  \frac{-2}{f-n} &  -\frac{f+n}{f-n} \\
 0              &  0              &  0              &  1
 \end{matrix}\right)
-\left(\begin{matrix}
-x_e \\ y_e \\ z_e \\ w_e
-\end{matrix}\right)
-\end{align*}
+\end{align}
 where
 \begin{align*}
 l &=   &  r &= \\
