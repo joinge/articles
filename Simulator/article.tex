@@ -459,12 +459,27 @@ Finally the relevant part of the scene is projected onto the image plane with a 
 0              &  0              &  0              &  1
 \end{matrix}\right)
 \end{align}
-where $l,r,b,t,n$ and $f$ are left, right, bottom, top, near and far boundaries of the projection plane, respectively.
-\begin{align*}
-l &= x_\text{min}  &  r &= x_\text{max}\\
+where $l,r,b,t,n$ and $f$ are the left, right, bottom, top, near and far boundaries of the projection plane, respectively. They define the window through which we observe our scene. We want this adapted to perfectly fit the specified image size. This is straightforward for left and right since it matches the $x$-axis
+\begin{align}
+l &= x_\text{min}  &  r &= x_\text{max}
+\end{align}
+For the near and far limits one simply needs to make sure the scene will fit in it
+\begin{align}
 b &=   &  t &= \\
-f &=   &  n &= 
-\end{align*}
+f &= 0.1   &  n &= 200 
+\end{align}
+How to set the bottom and top bounaries can be inferred from \Fig{camera_top_bottom}. First we define an origin vector that points to the center of the image
+\begin{align}
+\vec o &= \left[\frac{x_\text{min}+x_\text{max}}{2}, \frac{y_\text{min}+y_\text{max}}{2}, \frac{z_\text{min}+z_\text{max}}{2} \right]\T,
+\end{align}
+and the distance from the image origin to its $y$-boundaries is given as
+\begin{align}
+\Delta y &= \frac{y_\text{max} - y_\text{min}}{2}.
+\end{align}
+To find the nearest and farthest point in the image that will be part of the projected scene, $\alpha$ and $\beta$, we must consider the seafloor rotation angle around the $x$-axis, $\Phi_x$ 
+\begin{align}
+\alpha &= \vec 0 - \left[0, \Delta y, \Delta y \times \arctan\Phi_\text{x} \right]
+\end{align}
 
 \begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/opengl_part.svg}%
