@@ -200,7 +200,7 @@ where\nomi{$K$}{Temporal averaging parameter (Capon)} $N_K = 2K + 1$ \nomi{$N_K$
 \epsilon &= d\times\text{trace}\{\mat{\breve{R}}\}/L\\
 \mat{\hat{R}} &= \mat{\breve{R}} + \epsilon\mat{I}.
 \end{align} 
-This corresponds to a white noise component proportional to the in-coherent signal power is added to the estimate \cite{Featherstone1997b}.
+This adds a white noise component proportional to the in-coherent signal power to the estimate \cite{Featherstone1997b}.
 
 The solution to the constrained minimization problem in (\ref{eq:capon_optimization_criteria_background}) is, by the method of Lagrange multipliers \cite{VanTrees2003}, found to be
 \begin{align}\label{eq:capon_weights}
@@ -274,7 +274,7 @@ Volume rendering of a single volume has a complexity of $O(N_xN_yN_s)$, where $N
 \subsection{Adaptive volume rendering}
 As for adaptive beamforming, adaptive volume rendering means to derive and use information about the data being visualized from the data itself. In the literature on volume rendering this is known as feature enhancement or visibility driven visualization \cite{viola2005, correa2010visibility, marchesin2010}. The common feature of these techniques is how the sample opacity is modulated in order to achieve visibility of relevant structures. If we somehow are able to classify samples as cardiac tissue we can use this information as input to an adaptive volume rendering algorithm, and by that achieve improved visibility of cardiac tissue.
 
-In \textbf{Paper IV} we extend the work by Honigmann \textit{et al.} \cite{Honigmann2003} on a global adaptive OTF by formulating an regional adaptive OTF for visualization of cardiac ultrasound volumes. This regional adaptive OTF is based on estimated statistics of the clutter noise inside the left ventricle (the blood pool). The added complexity of this technique is caused by the statistical estimation, which is basically a second volume rendering (mean and variance projection) that has to be performed before the rendered image is produced.
+In \textbf{Paper IV} we extend the work by Honigmann \textit{et al.} \cite{Honigmann2003} on a global adaptive OTF by formulating a regional adaptive OTF for visualization of cardiac ultrasound volumes. This regional adaptive OTF is based on estimated statistics of the clutter noise inside the left ventricle (the blood pool). The added complexity of this technique is caused by the statistical estimation, which is basically a second volume rendering (mean and variance projection) that has to be performed before the rendered image is produced.
 
 \section{Ultrasound field simulations}\label{sec:field}
 Simulation of ultrasound probes are heavily used by researchers in order to test out new algorithms and probe designs. A simulator for ultrasound probes typically works by approximating the probe surface with discrete points or patches. In software it is then possible to transmit a pulse from a given probe and measure its response in space and time. Figure \ref{fig:hos} shows a snapshot of a simulated pressure field from an unfocused linear array emitting a continuous wave. The image was simulated with the simulator from \textbf{Paper V}. 
