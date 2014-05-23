@@ -459,7 +459,7 @@ where $\boldsymbol{S}, \R$ and $\boldsymbol{T}$ are matrices for scaling, rotati
 Next we map the model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. It is defined as
 
 \begin{align}
-a
+\V &= \mat{T}(0, dy, dz) \cdot \R_\text{x}(\phi_x, 0, 0)
 \end{align}
 
 Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. Its projection matrix is defined as
