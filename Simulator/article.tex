@@ -402,7 +402,12 @@ Automatic target recognition (ATR) is an important component in autonomous under
 
 We have developed a synthetic aperture sonar (SAS) simulator that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound only depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
 
-Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. Most implementations have however prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b} which, similar to our approach, takes advantage of parallel processing at GPUs and uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
+Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b} which, similar to our approach, takes advantage of parallel processing at GPUs and uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
+
+\begin{itemize}
+\item OpenGL does not support scattered writes. OpenCL does.
+\end{itemize}
+
 
 % The ATR algorithms must, however, be sufficiently fast to process the sensor data onboard the AUV in delayed real-time.
 
@@ -424,6 +429,13 @@ Various simulators for high frequency, side-looking sonar imagery have been publ
 \section{Methods}
 
 Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter. This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of projecting vertices, faces and textures defined in a 3D space onto a suitable 2D image plane. This section explains how we set up OpenGL for this task, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
+
+\begin{itemize}
+\item Load arbitrary complex models
+\item Simulate sonar with OpenGL
+\item Speed considerations
+\end{itemize}
+
 
 
 \subsection{Setting up the scene}
@@ -459,14 +471,13 @@ Finally the relevant part of the scene is projected onto the image plane with a 
 0              &  0              &  0              &  1
 \end{matrix}\right)
 \end{align}
-where $l,r,b,t,n$ and $f$ are the left, right, bottom, top, near and far boundaries of the projection plane, respectively. They define the window through which we observe our scene. We want this adapted to perfectly fit the specified image size. This is straightforward for left and right since it matches the $x$-axis
+where $l,r,b$ and $t$ are the left, right, bottom and top boundaries of the projection plane, respectively, and where $n$ and $f$ is the near and far limits of the cube that encompass the scene. We need these parameters set They define the window through which we observe our scene. We want this adapted to perfectly fit the specified image size. This is straightforward for left and right since it matches the $x$-axis
 \begin{align}
 l &= x_\text{min}  &  r &= x_\text{max}
 \end{align}
 For the near and far limits one simply needs to make sure the scene will fit in it
 \begin{align}
-b &=   &  t &= \\
-f &= 0.1   &  n &= 200 
+n &= 0\;\text{m}   &  f &= 300\;\text{m} 
 \end{align}
 How to set the bottom and top bounaries can be inferred from \Fig{camera_top_bottom}. First we define an origin vector that points to the center of the image
 \begin{align}
@@ -496,9 +507,26 @@ The rendered image will appear as if we placed a window at the sonar and looked 
 
 \subsection{OpenCL post-processing}
 
-The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, tell us what parts of the scene that are visible from the sonar. OpenGL can also produce a depth map that reveals the distance to each of image pixels. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL, which allow general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us what parts of the scene that are visible from the sonar. OpenGL can also produce a depth map that reveals the distance to each of image pixels. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+
+\begin{itemize}
+\item Kernel tuning.
+\item Sharing. PBO. Asynchronous.
+\end{itemize}
+
 
 % It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
+
+\subsection{Speed considerations}
+
+Using OpenGL and OpenGL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs. However, initializing the OpenGL and OpenCL context and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+
+The rendering loop that uses OpenGL and OpenCL to form 
+
+\begin{itemize}
+\item Write to file
+\end{itemize}
+
 
 
 \section{Results \& Discussion}
