@@ -442,25 +442,43 @@ Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter. Thi
 
 Before we can render anything with OpenGL we first have to set up the scene. This involves loading the models and then placing them where we want them with the proper orientation. 
 
-Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. Given a model file it outputs the model as a node tree where node contains data such as vertices, facets and textures, all formatted in an OpenGL friendly way.
+Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. It converts the model into a node tree where each node contains data such as vertices, facets and textures, all formatted in an OpenGL friendly way.
 
-The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations is usually formalized like this:
+The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations are usually formalized like this:
 \begin{align*}
 \bmat{x\\y\\0\\1}_\text{image} = \P \cdot \V \cdot \M \cdot \bmat{x\\y\\z\\1}_\text{model},
 \end{align*}
-where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices.
+where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. These will be described next.
 
-The first transform we apply is the model matrix $\M$ which operates on the model's local coordinate system. It is defimed as
+The first transform we apply is the model matrix $\M$ which operates in the model's local coordinate system. It is defined as
 \begin{align}
-\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
+\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \R \cdot \boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
 \end{align}
 where $\boldsymbol{S}, \R$ and $\boldsymbol{T}$ are matrices for scaling, rotation and translation, respectively. These are described in Appendix \ref{transformation_matrices}. 
 
-Next we map the model into world coordinates using the view matrix $\V$. This involves translating the model to its respectful place in the world, and then moving it into the view of the camera. It is defined as
-
+Next we map the model into world coordinates using the view matrix $\V$. This involves positioning and orienting the model relative to the camera. In our case we let the camera be the phase center of the sonar, and define it as the world origin. The transformation take the form of
 \begin{align}
-\V &= \mat{T}(0, dy, dz) \cdot \R_\text{x}(\phi_x, 0, 0)
+\V &= \mat{T}(0, dy, dz) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
+&= 
+\bmat{
+1  &  0  &  0  &  0 \\
+0  &  1  &  0  &  dy \\
+0  &  0  &  1  &  dz \\
+0  &  0  &  0  &  1 \\
+} \cdot
+\bmat{
+1  &  0           &  0           &  0 \\
+0  &  \cos\phi_x  &  -\sin\phi_x &  0 \\
+0  &  \sin\phi_x  &  \cos\phi_x  &  0 \\
+0  &  0           &  0           &  1 \\
+},
 \end{align}
+where
+\begin{align*}
+dy &= \\
+dz &= \\
+\phi_x &=
+\end{align*}
 
 Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. Its projection matrix is defined as
 \begin{align}
