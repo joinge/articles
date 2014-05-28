@@ -24,7 +24,7 @@
 %%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \ifPeerReview
-\documentclass[12pt,journal,draftclsnofoot,onecolumn]{IEEEtran}
+\documentclass[10pt,journal,draftclsnofoot,onecolumn]{IEEEtran}
 % \newcommand\CLASSINPUTbaselinestretch{1.66}     % http://theoval.cmp.uea.ac.uk/~nlct/latex/thesis/node17.html
 \else
 \documentclass[journal]{IEEEtran}
@@ -72,12 +72,12 @@
 % \RequirePackage{amssymb}
 
 \RequirePackage{array}
-% 
-% \ifCLASSOPTIONcompsoc
-%    \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-% \else
-%    \usepackage[caption=false,font=footnotesize]{subfig}
-% \fi
+
+\ifCLASSOPTIONcompsoc
+   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+   \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
 
 % \usepackage{caption}
 \usepackage{subcaption}
@@ -402,7 +402,7 @@ Automatic target recognition (ATR) is an important component in autonomous under
 
 We have developed a synthetic aperture sonar (SAS) simulator that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
 
-Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b} which, similar to our approach, takes advantage of parallel processing at GPUs and uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
+Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
 
 \begin{itemize}
 \item OpenGL does not support scattered writes. OpenCL does.
@@ -444,7 +444,7 @@ Before we can render anything with OpenGL we first have to set up the scene. Thi
 
 Our models are stored in regular 3D model files. The simulator loads these with the Open Asset Import library (\texttt{assimp}). This is a portable open source library that supports loading a wide range of 3D model formats in a uniform manner. It converts the model into a node tree where each node contains data such as vertices, facets and textures, all formatted in an OpenGL friendly way.
 
-The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations are usually formalized as
+The next step is to scale, orient and position the objects in the scene, and finally project this scene onto an image plane. This is achieved by applying a set of transformations to each vertex in the model. In OpenGL, the set of transformations can be formalized as
 \begin{align*}
 \bmat{x\\y\\0\\1}_\text{image} = \P \cdot \V \cdot \M \cdot \bmat{x\\y\\z\\1}_\text{model},
 \end{align*}
@@ -454,16 +454,16 @@ The first transform we apply is the model matrix $\M$, which operates in the mod
 \begin{align}
 \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \R \cdot \boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model},
 \end{align}
-where $\boldsymbol{S}, \R$ and $\boldsymbol{T}$ are matrices for scaling, rotation and translation, respectively. These are described in Appendix \ref{transformation_matrices}. 
+where $\boldsymbol{S}, \R$ and $\boldsymbol{T}$ are matrices\todo{be explicit on dependencies?} for scaling, rotation and translation, respectively. These are provided for reference in Appendix \ref{transformation_matrices}.
 
-Next we map the model into world coordinates using the view matrix $\V$. This involves positioning and orienting the model relative to the camera. In our case we let the camera be the phase center of the sonar, and define it as the world origin. The transformation take the form of
+Next we map the model into world coordinates using the view matrix $\V$. This involves aligning and positioning the model into the view of the camera. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation take the form of
 \begin{align}
-\V &= \mat{T}(0, dy, dz) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
+\V &= \mat{T}(x_\text{c}, y_\text{c}, z_\text{c}) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
 &= 
 \bmat{
-1  &  0  &  0  &  0 \\
-0  &  1  &  0  &  dy \\
-0  &  0  &  1  &  dz \\
+1  &  0  &  0  &  x_\text{c} \\
+0  &  1  &  0  &  y_\text{c} \\
+0  &  0  &  1  &  z_\text{c} \\
 0  &  0  &  0  &  1 \\
 } \cdot
 \bmat{
@@ -473,14 +473,12 @@ Next we map the model into world coordinates using the view matrix $\V$. This in
 0  &  0           &  0           &  1 \\
 },
 \end{align}
-where
+where $(x_\text{c}, y_\text{c}, z_\text{c})$ is the image center coordinates for along track, cross track, and depth, respectively, and $\Phi_x$ is the elevation angle\todo{is this correct?} of the sonar. It is given as
 \begin{align*}
-dy &= \\
-dz &= \\
-\phi_x &= \arctan\left(\frac{y_\text{mean}}{x_\text{mean}}\right)
-\end{align*}
+\phi_x &= \arctan\left(\frac{y_\text{mean}}{-z_\text{mean}}\right).
+\end{align*}\todo{use absolute sign?}
 
-Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. Its projection matrix is defined as
+Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
 \begin{align}
 \P = \left(\begin{matrix}
 \frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
@@ -489,7 +487,8 @@ Finally the relevant part of the scene is projected onto the image plane with a 
 0              &  0              &  0              &  1
 \end{matrix}\right)
 \end{align}
-where $l,r,b$ and $t$ are the left, right, bottom and top boundaries of the projection plane, respectively, and where $n$ and $f$ is the near and far limits of the cube that encompass the scene. We need these parameters set They define the window through which we observe our scene. We want this adapted to perfectly fit the specified image size. This is straightforward for left and right since it matches the $x$-axis
+where $l,r,b$ and $t$ are the left, right, bottom and top boundaries of the projection plane, respectively, and where $n$ and $f$ is the near and far limits of the cube that encompass the scene. These parameters need to be adapted to provide a 2D image that matches the image size, which we specify in along track and cross track coordinates ($x,y$). This is straightforward for left and right since matches the $x$-axis
+% They define the window through which we observe our scene.
 \begin{align}
 l &= x_\text{min}  &  r &= x_\text{max}
 \end{align}
@@ -553,37 +552,35 @@ The rendering loop that uses OpenGL and OpenCL to form
 \setcounter{topnumber}{2}
 
 \begin{figure}[p]\centering%
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
 \graphicsAI[drawing,width=\linewidth]{gfx/data_cylinder_submerged.svg}%
-\caption{SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.}\label{data_cylinder}%
-\end{subfigure}
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\label{data_cylinder}}%
+\subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
 \graphicsAI[drawing,width=\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-\caption{Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.}\label{sim_cylinder}%
-\end{subfigure}
+\label{sim_cylinder}}%
 \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure}
 
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
 \fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
+
 \begin{figure}[p]\centering%
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\subfloat[Best template out of a predefined set. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.]{
 \graphicsAI[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}%
-\caption{Best template out of a predefined set. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.}\label{overlay_cylinder}%
-\end{subfigure}\hspace{\imgspacing}%
-\begin{subfigure}[t]{.5\linewidth-\imgspacing/2}
+\label{overlay_cylinder}}%
+% \hfil%
+\subfloat[Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow segments.]{%
 \graphicsAI[width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-\caption{Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow segments.}\label{overlay_cylinder_adaptive}%
-\end{subfigure}
-\hfill\parbox{\linewidth-0pt}{\small\centering
+\label{overlay_cylinder_adaptive}}%
+\hfill\parbox{\linewidth}{\small\centering
 Segmentation overlay color description:\\[.5\baselineskip]
-\begin{minipage}{.49\linewidth}
+\begin{minipage}{\linewidth}
 \cdesc{800000}{Template highlight and image highlight}
 \cdesc{FF1000}{Template highlight only}
 \cdesc{FFEB00}{Image highlight only}
 \cdesc{83FF7C}{Background pixels}
 \end{minipage}%
-\begin{minipage}{.49\linewidth}
+\begin{minipage}{\linewidth}
 \cdesc{000083}{Template shadow and image shadow}
 \cdesc{0014FF}{Template shadow only}
 \cdesc{00EFFF}{Image shadow only}
@@ -605,6 +602,12 @@ Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i
 This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was partly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, immersion depth and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a generic length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for every 10$^\text{th}$ degree of the aspect angle. We believe these assumptions to be typical for a template library for cylinder mines. 
 
 The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. \ref{overlay_cylinder} for a standard template and in Fig. \ref{overlay_cylinder_adaptive} for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. Note how the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
+
+\begin{itemize}
+\item GPUs low power. Good for integration in AUVs.
+\item Good accuracy even with a real-time constraint in e.g. a AUV.
+\item Improved inertial navigation? 
+\end{itemize}
 
 
 \section{Conclusion}\label{conclusion}
