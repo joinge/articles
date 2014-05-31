@@ -90,24 +90,27 @@ Printed by NTNU-trykk
 
 ~\\
 \newpage
+
+%\begin{otherlanguage}{norwegian}
+
 %\thispagestyle{empty}%
-~\\%
-~\\%
-~\\
+%~\\%
+%~\\%
+%~\\
 \noindent\large 
-\textbf{Akselerering av adaptive algoritmer for ultralydavbildning ved hjelp av programmerbare grafikkprosessorer}
+\textbf{Akselerering av adaptive algoritmer for ultralydavbildning ved hjelp av programmerbare skjermkort}
 %\vspace{0.2cm}\\%
 \\\\%
 \normalsize
-En rivende utvikling innen spillteknologi og tilh\o{}rende programmeringsspr\aa{}k har nylig gjort superdatamaskiner i form av et lite programmerbart grafikkort (GPU) tilgjengelige for forskere. Denne utrolige \o{}kningen i beregningskraft og forbedret programmerbarhet er for \o{}yeblikket med p\aa{} \aa{} endre hvordan ultralydsystemer designes. N\aa{}r forskere utforsker nye algoritmer for ultralydavbildning er det derfor viktig at arkitekturen til parallelle akseleratorer, som en GPU er et eksempel p\aa{}, tas h\o{}yde for. Hvis en ny, kompleks algoritme er tenkt til \aa{} kj\o{}res i sanntid, er det viktig at den kan tilpasses den programmerbare og parallelle prosesseringskjeden i moderne ultralydskannere. 
+De siste årene har det vært en rivende utvikling innen bruken av skjermkort (GPU-er), som egentlig er laget for å kjøre dataspill, til å gjøre numeriske beregninger for naturvitenskapelige anvendelser. Et sistegenerasjons skjermkort har nå like mye beregningskraft som verdens kraftigste datamaskin hadde rundt år 2000. Utfordringen er at problemet som skal løses må bestå av mange uavhengige deler som kan beregnes i parallell.  For ultralydmaskiner har denne utviklingen gjort at algoritmer som tideligere ble trykket i hardware, nå kan programmeres i software og kjøres i sanntid på et rimelig skjermkort. Et ultralydsystem som bruker skjermkort til å gjøre beregninger vil være mye rimeligere, mer fleksibelt og gjøre det lettere å implementere avansert prosessering enn et system hvor alle algoritmer er og må "hugges i stein".
 
-M\aa{}let med denne studien har v\ae{}rt \aa{} utforske hvordan GPUer kan utnyttes til avansert prosessering i et avbildende ultralydsystem. Blant de problemene vi har sett n\ae{}rmere p\aa{} finner man b\aa{}de adaptiv str\aa{}leforming, adaptiv visualisering av volumetrisk ultralyd og ultralydsimuleringer. Felles for disse problemene er at de alle krever parallelprogrammering for at sanntidsprosessering skal oppn\aa{}s.
+Målet med denne studien har vært å utforske hvordan programmerbare skjermkort kan utnyttes til avansert prosessering i et avbildende ultralydsystem. Blant de problemene vi har sett nærmere på finner man både adaptiv bildedanelse (stråleforming), adaptiv visualisering av volumetrisk ultralyd og ultralydsimuleringer. Felles for disse problemene er at de krever parallellprogrammering for at sanntidsprosessering skal oppnås.
 
-I f\o{}rste del av avhandlingen utforskes Capon's adaptive str\aa{}leformings-metode. Metoden implementeres p\aa{} en GPU  for \aa{} muliggj\o{}re sanntidsprosessering for avbildende sonar (\textbf{Artikkel\,I}) og medisinsk ultralydavbildning (\textbf{Artikkel\,II}). Sanntidsprosessering oppn\aa{}s for begge modaliteter. \textbf{Artikkel\,II} presenterer ogs\aa{}, for f\o{}rste gang, videoer hvor b\aa{}de simulerte og \textit{in vivo} medisinsk ultralyddata er prosessert med Capon-str\aa{}leforming. I \textbf{Artikkel\,III} viser vi at Capon-str\aa{}leformeren ikke har skift-invariant oppf\o{}rsel n\aa{}r den anvendes til sanntidsavbildning. Videre foresl\aa{}s det en metode som gir mer shift-invariant avbildning. Skift-invariant avbildning er avgj\o{}rende for at metoden skal kunne tas ibruk i praktisk.
+I første del av avhandlingen utforskes Capons adaptive stråleformingsmetode. Vi starter med å implementere metoden på et skjermkort for sanntidsprosessering av sonar (\textbf{Artikkel\,I}) og medisinsk ultralyd (\textbf{Artikkel\,II}). Sanntidsprosessering oppnås for begge modaliteter. \textbf{Artikkel\,II} presenterer også, for første gang, videoer hvor både simulerte og \textit{in vivo} medisinsk ultralyddata er prosessert med Capon-stråleforming. I \textbf{Artikkel\,III} viser vi at Capon-stråleformeren er følsom for små skift, enten ved at ultralydproben eller objektet man avbilder beveger seg. Videre foreslås det en metode som gjør at stråleformeren ikke lenger er like følsom for slike skift. Dette er viktig å få på plass for at Capon-stråleformeren skal kunne tas i bruk i praksis.
 
-I \textbf{Artikkel\,IV} foresl\aa{}r vi en adaptiv metode for visualisering av volumetriske ultralydbilder av hjertet. Metoden undertrykker st\o{}y som med konvensjonelle metoder hadde skygget for hjertevev. Dette arbeidet viser ogs\aa{} at det med moderne GPUer er mulig \aa{} utf\o{}re avansert visualisering i et ultralydsystem og fortsatt ha sanntidsytelse. 
+I \textbf{Artikkel\,IV} foreslår vi en adaptiv metode for visualisering av volumetriske ultralydbilder av hjertet. Metoden undertrykker støy som med konvensjonelle metoder hadde skygget for hjertevev. Dette arbeidet viser at det med moderne skjermkort er mulig å utføre avansert visualisering i et ultralydsystem og fortsatt ha sanntidsytelse.
 
-I siste del av avhandlingen utforsker vi hvordan GPUer kan utnyttes til \aa{} akselerere ultralydsimuleringer. Resultatet av dette arbeidet ble et simuleringsprogram hvor geometrien til et gitt ultralydarray kan interaktivt tegnes, og hvor det resulterende trykkfeltet simuleres i sanntid.
+I siste del av avhandlingen utforsker vi hvordan skjermkort kan utnyttes til å akselerere ultralydsimuleringer. Resultatet av dette arbeidet ble et simuleringsprogram hvor geometrien til et gitt ultralydarray kan tegnes interaktivt, og hvor det resulterende trykkfeltet simuleres og visualiseres i sanntid.
 
 \vspace{0.3cm}
 \noindent Jon Petter Helgesen \AA{}sen\\
@@ -118,6 +121,8 @@ Finansieringskilde: MI-Lab
 
 \vspace{0.2cm}
 \noindent \emph{Ovennevnte avhandling er funnet verdig til \aa{} forsvares offentlig for graden Philosophiae Doctor (Ph.D.) i medisinsk teknologi. Disputas finner sted ... .}
+
+%\end{otherlanguage}
 
 % ENGLISH ABSTRACT / SUMMARY
 \CustChapter*{Abstract}
