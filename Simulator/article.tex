@@ -405,7 +405,23 @@ We have developed a synthetic aperture sonar (SAS) simulator that avoids this pr
 Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
 
 \begin{itemize}
+\item SWAT (Shallow Water Acoustic Toolset): 
+\item Bell's thesis:
+\item SIGMA:
 \item OpenGL does not support scattered writes. OpenCL does.
+\item 2D template approximation:
+\item Geometric distortions in SSS \cite{Cobra1992}
+\item Sidescan sonar and synthetic aperture sonar. In seafloor coordinates. Maps to orthogonal rendering.
+\item Layover causes ambiguity, different seafloor phenomena can cause the same output image. Lots of cornercases when approximating the model in 2D. Instead use a 3D model and project it to a 2D one. 
+\item Viewer can be used to train an operator for finding non-trivial objects on the seafloor. Input for automated target recognition standard.
+\item OpenGL rendering can have infinite resolution, only limited by the pixel density in the image.
+\end{itemize}
+
+What's new?
+\begin{itemize}
+\item Tuned for speed using GPUs, combining OpenGL and OpenCL to take advantage of existing functionality for computer graphics with the added flexibility of general purpose programming on the GPUs.
+\item Performance to spare: Game-like viewer for the visualization and verification of the rendered scene and corresponding sonar image.
+\item First simulator of its kinds aimed towards improved ATR and ultimately better AUVs.
 \end{itemize}
 
 
@@ -617,6 +633,12 @@ One way to automatically classify objects in SAS images is to compare the imaged
 To obtain the delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator use this framework for most of the scene processing.
 
 A final post-processing step is performed in OpenCL, which allow general purpose GPU programming. It interoperates well with OpenGL and adds a lot of flexibility to the simulation process. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
+
+\begin{itemize}
+\item Motion compensation
+\item 
+\end{itemize}
+
 
 \appendix
 
