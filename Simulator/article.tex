@@ -398,11 +398,23 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 \section{Introduction}
 
-Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the actual configurations of object and seabed. The alternative of using of a static, predetermined template library has a computational complexity that is exponential with the number of parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed. The alternative of using a static, predetermined template library has a computational complexity that is exponential with the number of parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
-We have developed a synthetic aperture sonar (SAS) simulator that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a light source placed at the sonar transmit location. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+To avoid this problem we have developed a very fast side-looking sonar simulator that generates templates adapted to the actual scene. 
 
-Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with more flexibility.
+
+synthetic aperture sonar (SAS)
+
+
+ as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering.
+
+
+
+ The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a cylindrical light source placed at the sonar transmit location. 
+
+We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+
+Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator superimpose images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with greater flexibility.
 
 \begin{itemize}
 \item SWAT (Shallow Water Acoustic Toolset): 
@@ -410,19 +422,45 @@ Various simulators for high frequency, side-looking sonar imagery have been publ
 \item SIGMA:
 \item OpenGL does not support scattered writes. OpenCL does.
 \item 2D template approximation:
-\item Geometric distortions in SSS \cite{Cobra1992}
+\item Geometric distortions in SSS \cite{Cobra1992} Bell
 \item Sidescan sonar and synthetic aperture sonar. In seafloor coordinates. Maps to orthogonal rendering.
-\item Layover causes ambiguity, different seafloor phenomena can cause the same output image. Lots of cornercases when approximating the model in 2D. Instead use a 3D model and project it to a 2D one. 
+\item Layover causes ambiguity, different seafloor phenomena can cause the same output image. Lots of cornercases when approximating the model in 2D. Instead use a 3D model and project it to a 2D one. Easier to operate, models are more general purpose. Less parameters to adjust.
 \item Viewer can be used to train an operator for finding non-trivial objects on the seafloor. Input for automated target recognition standard.
+\item Improved image quality of selected object, reduced data collection cost (price estimate?).
 \item OpenGL rendering can have infinite resolution, only limited by the pixel density in the image.
+\item Accuracy in terms of classification result. Need to embody static effects in a deterministic way. Incoherent synthesis of the image.
+\item Sound speed assumed constant.
+\item High frequency lead to little (define) penetration, lower range and higher resolution. Often modeled accurately with ray tracing techniques.
 \end{itemize}
+
+Model
+\begin{itemize}
+\item Ray solution: Separate amplitude and phase components of the Helmholtz eq. by applying geometric optics approximation. Ok as long as amplitude varies more slowly with position than the phase. Implications: High frequency, because the curvature of a ray over a wavelength must be small, and the fractional change in the sound speed must be small over a wavelength. Further simplification available by Snell's Law. Fast to compute. Not able to handle diffraction, focal points and caustics, and will cause (too) abrupt changes on distinct changes in sea environment. Can be improved upon with fuzzy beam modeling / Gaussian beam tracing.
+\begin{itemize}
+\item Pro: Easy to compute. Visual result. Handles complex bathymetry. Array and model response can be accounted for.
+\item Con: Only works for high frequency and small sound variations. No diffraction, caustics and focus. Infinite energy caustics/sharp variations. Incoherent(?)
+\end{itemize}
+\item Normal modes: Separate amplitude and phase into a range dependent term, and a depth dependent term. Assumes minimal range dependence in sound speed profile and depth. Limited near field accuracy. Acoustic field does not need to be calculated at intermediate ranges. Penetration can be modeled. can be calculated 
+\begin{itemize}
+\item Pro: Ok to compute. Handles penetration. Low frequency, shallow water.
+\item Con: Horizontal stratification. Far field only. 
+\end{itemize}
+\item Parabolic equation: One way propagation. Marching solution. Initial starting solution must be known, often computed with normal mode. Only valid for narrow beams $\pm$20. Able to handle range dependent environments. Computing full field is easy. Computation time is of O(f$^2$), hence mostly useful for low-frequency scenarios. Unable to deal with horizontal refraction (shadow zones from e.g. conical mounts)
+\item Fast field programs / Green's function solutions. Exact full wave solution for acoustic fields in horizontally stratified media. Can handle both compressional and shear waves, and hence both fluid and solid media. Far field assumption. Similar to normal mode techniques.
+\item Finite element: Scene segmented into triangles or rectangles with a size of one tenth of a wavelength, or less. At each node the wavefield can be determined from the wave equation. Computationally limited to low frequencies.
+\item 2D model: Acoustic field in range and depth. Assumes that a wave transmitted in a vertical plane remains in it. Reasonable when the sound speed can be assumed constant in the horizontal plane, and when the seafloor normals are in the vertical range-depth plane (avoid horizontal refraction, or actually reflection).
+\end{itemize}
+
 
 What's new?
 \begin{itemize}
 \item Tuned for speed using GPUs, combining OpenGL and OpenCL to take advantage of existing functionality for computer graphics with the added flexibility of general purpose programming on the GPUs.
 \item Performance to spare: Game-like viewer for the visualization and verification of the rendered scene and corresponding sonar image.
 \item First simulator of its kinds aimed towards improved ATR and ultimately better AUVs.
+\item 3D models are still novel. 
 \end{itemize}
+
+
 
 
 % The ATR algorithms must, however, be sufficiently fast to process the sensor data onboard the AUV in delayed real-time.
@@ -622,7 +660,8 @@ The standard and adaptive templates were then matched to the HISAS image. This i
 \begin{itemize}
 \item GPUs low power. Good for integration in AUVs.
 \item Good accuracy even with a real-time constraint in e.g. a AUV.
-\item Improved inertial navigation? 
+\item Improved inertial navigation?
+\item Aid in understanding the key parts of the SAS image and in discovering potential flaws in the SAS image. Anomalies can be flagged to make SAS more robust?
 \end{itemize}
 
 
