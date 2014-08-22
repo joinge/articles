@@ -398,7 +398,16 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 \section{Introduction}
 
-Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved is to isolate an image segment containing the object of interest, correlate it with a set of template images of the relevant object classes, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed. The alternative of using a static, predetermined template library has a computational complexity that is exponential with the number of parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+
+Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, compare it with a set of template images of the relevant object classes, and assign it to the class of the template with the the best fit.
+
+The challenge is to come up with accurate template images covering the actual configurations of object and seabed.
+
+Estimate 2D template directly
+  -> 
+
+
+The alternative of using of a static, predetermined template library has a computational complexity that is exponential with the number of parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 To avoid this problem we have developed a very fast side-looking sonar simulator that generates templates adapted to the actual scene. 
 
