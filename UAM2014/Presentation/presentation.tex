@@ -1,0 +1,549 @@
+\documentclass[
+    beamer                                       % Document type (non-standard)
+%  , handout
+%   , xelatex                                      % Use the XeLaTeX compiler
+%  , movie
+  ,table,dvipsnames,svgnames
+]{common/mytemplate}
+
+\pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>}
+
+% \mode<handout>{\setbeamercolor{background canvas}{bg=black!5}}
+
+% \RequirePackage[table,dvipsnames,svgnames]{xcolor}
+\definecolor{tabBlue}{HTML}{AACCFF}
+\usepackage{template/beamerthemeUiO}
+% \usepackage{common/oxygentheme}
+% \setbeameroption{show only notes}
+% \setbeameroption{notes on second screen=left}
+
+% \newcommand\remotesource{http://www.joinge.net/compet}
+
+\title{\newline\newline A GPU Sonar Simulator for Automatic Target Recognition}
+\subtitle{}
+\author[]{\textbf{Jo Inge Buskenes}$^{\text{a}}$, Herman Midelfart$^{\text{b}}$, \O{}ivind Midtgaard$^{\text{b}}$}
+\date[Jo Inge Buskenes at UA2014, Rhodes, June\ 2014]{Rhodes, Greece, 2014}
+\institute[Dept.\ of Informatics, University of Oslo]{\bf$^{\text{a}}$Department of Informatics, University of Oslo, Norway\\
+\bf$^{\text{b}}$Norwegian Defence Research Establishment (FFI), Norway}
+% \date{Sist revidert: 27.01.2009}
+
+\definecolor{LightBlue}{rgb}{0.3,0.3,1}
+\definecolor{DarkBlue}{rgb}{0.2,0.2,0.7}
+\setbeamercolor{block title}{bg=DarkBlue,fg=white}%bg=background, fg= foreground
+\setbeamercolor{block body}{bg=gray!20,fg=black}%bg=background, fg= foreground
+\setbeamertemplate{blocks}[rounded]
+
+\RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1) utf8
+\RequirePackage[T1]{fontenc}%                 % Set font encoding
+
+\begin{document}
+
+\begin{frame}
+\vspace*{2\baselineskip}
+  \titlepage
+\end{frame}
+\note{\null{}}
+
+% \AtBeginSection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents %[currentsection,hideallsubsections]
+%   }
+% }
+
+% \AtBeginSubsection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide]
+%   }
+% }
+
+\newcommand<>{\highlighton}[1]{%
+  \alt#2{\structure{#1}}{{#1}}
+}
+
+\newcommand{\icon}[1]{\pgfimage[height=1em]{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Content starts here %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% {
+
+
+
+% \section{Case study}
+% \subsection{Realtime sectorcan imaging}
+% 
+% {
+% \setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/use_case_sectorscan.svg}}%
+% \begin{frame}
+% \vspace{-80pt}\hspace{-25pt}
+% \frametitle{\color{white}Realtime requirements?}
+% \framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
+% \vspace{100pt}\ 
+% % \begin{figure}[H]
+% % \begin{narrow}{-1.6cm}{-1.6cm}
+% % \graphicsAI<1>[drawing,width=\linewidth]{gfx/use_case_sectorscan3.svg}
+% % \end{narrow}
+% % \end{figure}   
+% \end{frame}
+% }
+
+
+
+% \renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Active Sonar}
+% \vspace{-25pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
+% \end{narrow}
+% \end{figure}
+% % \begin{itemize}
+% % \item Each pixel value is estimated by focusing the receiver on that point.
+% % \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Imaging techniques}
+% \vspace{-10pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
+% \end{narrow}
+% \end{figure}
+% A phased array can be used in several imaging modes:
+% \begin{itemize}
+% \item \emph{Sector scan}: Image computed from a single ping
+% \item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+% \item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+% \end{itemize}
+% % \begin{block}{Proposed method: Generic, can be used in all modes}
+% % \vspace{-25pt}
+% % \end{block}
+% \end{frame}
+% }
+
+% \section{}
+% \begin{frame}
+%   \frametitle{Agenda}
+%   \tableofcontents%[%section=1,
+%                    %hidesubsections]
+% \end{frame}
+
+\renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+
+
+
+
+% \begin{frame}
+% \frametitle{Acknowledgements}
+% \framesubtitle{}
+% \vspace{-3pt}
+% \begin{itemize}
+% \item Kongsberg Maritime.
+% \item FFI guys.
+% \end{itemize}
+% \end{frame}
+
+% General system, may be applied to several different datasets
+
+% \section{Introduction}
+% 
+% 
+% \begin{frame}
+% \frametitle{What we do}
+% \framesubtitle{}
+% \vspace{-10pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/applications.svg}
+% \end{narrow}
+% \end{figure}
+% % A phased array can be used in several imaging modes:
+% % \begin{itemize}
+% % \item \emph{Sector scan}: Image computed from a single ping
+% % \item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+% % \item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+% % \end{itemize}
+% % % \begin{block}{Proposed method: Generic, can be used in all modes}
+% % % \vspace{-25pt}
+% % % \end{block}
+% \end{frame}
+% 
+
+% {
+% \setbeamertemplate{background}{\graphicsAI[drawing,width=\paperwidth]{gfx/background.svg}}%
+\begin{frame}
+\frametitle{Simulator features}
+\framesubtitle{}
+\begin{figure}[H]
+\begin{narrow}{-0.6cm}{-0.6cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/specs.svg}
+\end{narrow}
+\end{figure}                                                                                                                                                                                                                                                                                                   
+\end{frame}
+% }
+
+% {
+% \setbeamertemplate{background}{\graphicsAI[drawing,width=\paperwidth]{gfx/background.svg}}%
+\begin{frame}
+\frametitle{\hspace{-.5cm}Synthetic Aperture Sonar (SAS)}
+\framesubtitle{}
+\vspace{-10pt}
+\begin{figure}[H]
+\begin{narrow}{.1cm}{-0.6cm}
+\flushright\hspace{-10pt}\graphicsAI<1>[drawing,width=.92\linewidth]{gfx/rock_formation.svg}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{narrow}{-0.5cm}{-0.5cm}
+\begin{itemize}\small
+\item SAS image of a 25 x 25m wide by 5m high rock formation at 70m depth.
+\item Theoretical resolution of 3-4cm throughout the image.
+\item Data from the HUGIN AUV carrying the HISAS1030 interferometric SAS.
+\end{itemize}
+\end{narrow}
+\end{frame}
+% }
+
+{
+\setbeamertemplate{background}{\graphicsAI[drawing,width=\paperwidth]{gfx/optics_sas_compared.svg}}%
+\begin{frame}
+\frametitle{SAS vs optics}
+\framesubtitle{}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/layover.svg}}%
+\begin{frame}
+\frametitle{Simulating a ranged sonar}
+\framesubtitle{Simple when only considering direct scatter}
+\vspace{8cm}
+\end{frame}
+}
+
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/lambert.svg}}%
+\begin{frame}
+\frametitle{Simulating a ranged sonar}
+\framesubtitle{Scattering strength given by Lambert's law}
+\vspace{8cm}                                                                                                                                                                                                                                                                                               
+\end{frame}
+}
+
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/visible_pixels.svg}}%
+\begin{frame}
+\frametitle{Simulating a ranged sonar}
+\framesubtitle{How to deal with ``hidden pixels''?}
+\vspace{8cm}                                                                                                                                                                                                                                                                                               
+\end{frame}
+}
+
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/scene_photograph.svg}}%
+\begin{frame}
+\frametitle{Simulation}
+\framesubtitle{OpenGL!}
+\vspace{8cm}                                                                                                                                                                                                                                                                                               
+\end{frame}
+}
+
+
+
+
+% % 
+% \begin{frame}
+% \makeatletter%
+% % \special{pdf: put @thispage <</Group << /S /Transparency /I true /CS /DeviceRGB>> >>}%
+% \makeatother%
+% \frametitle{GPUs for image reconstruction}
+% \framesubtitle{}
+% \vspace{-3pt}
+% \begin{figure}[H]
+% \begin{narrow}{0cm}{0cm}
+% \graphicsAI<1>[drawing,width=\linewidth]{gfx/gpus.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
+% \end{narrow}
+% \end{figure}
+% \begin{itemize}
+% \item CPUs: Optimized for running \emph{a few} potentially complex threads, that may have \emph{complex} data dependencies.
+% \item GPUs: Optimized for running \emph{hundreds} of light-weight threads, with \emph{simple} data dependencies. Ideal for graphics!
+% \end{itemize}
+% \end{frame}
+
+% 
+% \section{Implementation on a GPU}
+% 
+\begin{frame}
+\frametitle{Implementation}
+\framesubtitle{Using OpenGL and OpenCL}
+\vspace{-15pt}
+\begin{figure}[H]
+\begin{narrow}{-0.9cm}{-0.9cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/simulator.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\end{frame}
+
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_manta_size.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Looking at the viewer}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_manta_straight.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Looking at the viewer}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_manta_positive_angle.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Looking at the viewer}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_manta_negative_angle.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Looking at the viewer}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_ship.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{A full ship!!!}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_ship_multipath.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{A full ship!!!}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_ship_rough.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{A full ship!!!}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/viewer_ship_holmengraa.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Compared to SSS}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{%
+\graphicsAI[drawing,width=\paperwidth]{gfx/cylinder_submerged_hisas.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{HISAS image of a cylinder}
+\vspace{8cm}
+\end{frame}
+}
+
+% {
+% \setbeamertemplate{background}{%
+% \graphicsAI[drawing,width=\paperwidth]{gfx/background.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{SAS and template image compared}
+\begin{narrow}{-.9cm}{-.9cm}
+\begin{minipage}[t]{0.499\linewidth}\centering
+\graphicsAI<1>[drawing,width=1\linewidth]{gfx/data_cylinder_submerged.svg}\\%
+SAS image
+\end{minipage}%
+\begin{minipage}[t]{0.499\linewidth}\centering
+\graphicsAI<1>[drawing,width=1\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}\\%
+Simulated template
+\end{minipage}
+\end{narrow}
+\end{frame}
+% }
+
+% --initial work
+% --compare to other simulator
+% --journal: 
+% 
+% Normal SAS image compared.
+% 
+% - Most important for ATR: Highlight and shadow.
+% - Probably(?) not needed: Noise, speckle, beampattern, multipath, penetration
+% - OpenGL and OpenCL explained.
+%   * OpenGL to detect visible pixels. Not always trivial.
+%   * Not ray tracing
+%   * Second step ray tracer. Can drop first reflection.
+%   * Monostatic target strength formula Kerr.
+% - Slide on perspective / orthographic. Sectorscan / sidescan / SAS.
+% - Lambertian scattering?
+% - Fix fonts simulator.
+% - High angle, low angle ship.
+% % - Elastic and non-elastic materials.
+% - Submarine
+% - 
+
+
+\newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
+\fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ \parbox[t]{\linewidth-1cm}{#2}\\[.1cm]}}
+% \begin{frame}
+% \frametitle{Results}
+% \framesubtitle{Overlay of segmented SAS image and segmented template image}
+% \begin{narrow}{-.9cm}{-.9cm}
+% \begin{minipage}[c]{0.62\linewidth}\centering
+% \begin{figure}[H]
+% \graphicsAI<1>[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged.svg}
+% \end{figure}%
+% \end{minipage}%
+% \mbox{}\hfill%
+% \begin{minipage}[c]{.35\linewidth}\footnotesize%
+% \begin{figure}
+% \cdesc{800000}{\bf Template highlight and image highlight}
+% \cdesc{FF1000}{Template highlight only}
+% \cdesc{FFEB00}{Image highlight only}
+% \cdesc{83FF7C}{Background pixels}
+% \cdesc{000083}{\bf Template shadow and\newline image shadow}
+% \cdesc{0014FF}{Template shadow only}
+% \cdesc{00EFFF}{Image shadow only}
+% \cdesc{00A7FF}{Template shadow and image highlight}
+% \end{figure}
+% \end{minipage}
+% \begin{minipage}[t]{0.62\linewidth}\centering
+% Best template out of a predefined set%
+% \end{minipage}%
+% \mbox{}\hfill%
+% \begin{minipage}[t]{.35\linewidth}\centering%
+% Overlay color description
+% \end{minipage}
+% \end{narrow}
+% \end{frame}
+
+
+{
+\setbeamertemplate{background}{\graphicsAI[drawing,width=\paperwidth]{gfx/background.svg}}%
+\begin{frame}
+\frametitle{Results}
+\framesubtitle{Overlay of segmented SAS image and segmented template image}
+\begin{narrow}{-.9cm}{-.9cm}
+\begin{minipage}[c]{0.62\linewidth}\centering
+\begin{figure}[H]
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}
+\end{figure}%
+\end{minipage}%
+\mbox{}\hfill%
+\begin{minipage}[c]{.35\linewidth}\footnotesize%
+\begin{figure}
+\cdesc{800000}{\bf Template highlight and image highlight}
+\cdesc{FF1000}{Template highlight only}
+\cdesc{FFEB00}{Image highlight only}
+\cdesc{83FF7C}{Background pixels}
+\cdesc{000083}{\bf Template shadow and\newline image shadow}
+\cdesc{0014FF}{Template shadow only}
+\cdesc{00EFFF}{Image shadow only}
+\cdesc{00A7FF}{Template shadow and image highlight}
+\end{figure}
+\end{minipage}
+\begin{minipage}[t]{0.62\linewidth}\centering
+Adaptive template%
+\end{minipage}%
+\mbox{}\hfill%
+\begin{minipage}[t]{.35\linewidth}\centering%
+Overlay color description
+\end{minipage}
+\end{narrow}
+\end{frame}
+}
+
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/improvements.svg}}%
+\begin{frame}
+\vspace{-10pt}
+\frametitle{Future work}
+\framesubtitle{}
+\vspace{8cm}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/AUVenv.png}}%
+\begin{frame}
+\vspace{-25pt}\frametitle{\color{white}Conclusions}
+\framesubtitle{}
+\vspace{-5pt}\color{white}
+\begin{itemize}
+\item \color{white}Sonar templates generated @ 100+ FPS on a regular GPU, using
+\begin{itemize}
+\item \color{white}OpenGL to capture a ``camera'' version the scene as seen from the sonar, and
+\item \color{white}OpenCL to convert the OpenGL image with corresponding depth information to a ranged sonar-like image.
+\end{itemize}
+\item \color{white}Image quality
+\begin{itemize}
+\item \color{white}Shape and size seems ok.
+\item \color{white}Fishy stuff going on in the transition of highlight/shadow
+\end{itemize}
+\item \color{white}What to improve?
+\end{itemize}
+\vfill
+\textbf{\color{black}Acknowledgements}:
+\begin{itemize}
+\item Thanks to Kongsberg Maritime for making great hardware and to FFI for the assignment of developing the simulator.
+\end{itemize}
+\end{frame}
+}
+
+
+\end{document}
+
