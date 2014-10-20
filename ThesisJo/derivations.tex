@@ -20,8 +20,14 @@ To see how roughness affects the specular reflection we compute the mean reflect
 where $p(\xi)$ is the probability density function of $\xi$. If we assume normal distribution, we get:
 \begin{align}
 <p> &= \int\limits_{-\infty}^{\infty} e^{-j2k\xi\cos\theta} \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}} d\xi \nn
-&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \int\limits_{-\infty}^{\infty} e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}-j2k\xi\cos\theta} d\xi \nn
-&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \int\limits_{-\infty}^{\infty} e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}-j2k\xi\cos\theta} d\xi \nn
+&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \int\limits_{-\infty}^{\infty} e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}-j2k\xi\cos\theta} d\xi &\Big|_{a = \frac{1}{2\sigma^2}}\nn
+&= A \int\limits_{-\infty}^{\infty} e^{-a\xi^2 + b\xi} d\xi \nn
+&= A \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2 + \frac{b^2}{4a}} d\xi \nn
+&= A e^{\frac{b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2} d\xi & \Big|_{y = \xi - \frac{b}{2a}}\nn
+&= A e^{\frac{b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-ay^2} dy & \Big|_{z = \sqrt{a} y}\nn
+&= A e^{\frac{b^2}{4a}}\frac{1}{\sqrt{a}} \int\limits_{-\infty}^{\infty} e^{-z^2} dz \nn
+&= A e^{\frac{b^2}{4a}}\sqrt{\frac{\pi}{a}} \nn
+&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \sqrt{\frac{\pi}{a}} e^{\frac{b^2}{4a}}
 \end{align}
 
 
