@@ -15,28 +15,21 @@ Here $\theta$ is the incidence angle, $k = \frac{2\pi}{\lambda}$ is the wavenumb
 
 To see how roughness affects the specular reflection we compute the mean reflected wave as
 \begin{align}
-<p> &= \int\limits_{-\infty}^{\infty} e^{-j\Delta\varphi(\xi)} p(\xi) d\xi,
+<p> &= V\int\limits_{-\infty}^{\infty} e^{-j\Delta\varphi(\xi)} p(\xi) d\xi,
 \end{align}
 where $p(\xi)$ is the probability density function of $\xi$. If we assume normal distribution, we get:
 \begin{align}
-<p> &= \int\limits_{-\infty}^{\infty} e^{-j2k\xi\cos\theta} \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}} d\xi \nn
-&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \int\limits_{-\infty}^{\infty} e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}-j2k\xi\cos\theta} d\xi &\Big|_{a = \frac{1}{2\sigma^2}}\nn
+<p> &= V\int\limits_{-\infty}^{\infty} e^{-j2k\xi\cos\theta} \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{\xi^2}{2\sigma^2}} d\xi \nn
+&= \frac{V}{\sqrt{2\pi}\sigma} \int\limits_{-\infty}^{\infty} e^{-\frac{\xi^2}{2\sigma^2}-j2k\xi\cos\theta} d\xi &\Big|{\begin{matrix}\scriptscriptstyle\hspace{-0.64cm} a = \frac{1}{2\sigma^2}\\
+\scriptscriptstyle b = -j2k\cos\theta\end{matrix}}\nn
 &= A \int\limits_{-\infty}^{\infty} e^{-a\xi^2 + b\xi} d\xi \nn
-&= A \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2 + \frac{b^2}{4a}} d\xi \nn
-&= A e^{\frac{b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2} d\xi & \Big|_{y = \xi - \frac{b}{2a}}\nn
-&= A e^{\frac{b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-ay^2} dy & \Big|_{z = \sqrt{a} y}\nn
-&= A e^{\frac{b^2}{4a}}\frac{1}{\sqrt{a}} \int\limits_{-\infty}^{\infty} e^{-z^2} dz \nn
-&= A e^{\frac{b^2}{4a}}\sqrt{\frac{\pi}{a}} \nn
-&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \sqrt{\frac{\pi}{a}} e^{\frac{b^2}{4a}}
+&= A \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2 - \frac{b^2}{4a}} d\xi \nn
+&= A e^{\frac{-b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-a(\xi - \frac{b}{2a})^2} d\xi & \Big|_{y = \xi - \frac{b}{2a}}\nn
+&= A e^{\frac{-b^2}{4a}} \int\limits_{-\infty}^{\infty} e^{-ay^2} dy & \Big|_{z = \sqrt{a} y}\nn
+&= A e^{\frac{-b^2}{4a}}\frac{1}{\sqrt{a}} \int\limits_{-\infty}^{\infty} e^{-z^2} dz \nn
+&= A e^{\frac{-b^2}{4a}}\sqrt{\frac{\pi}{a}} \nn
+&= \frac{V}{\sqrt{2\pi}\sigma} \sqrt{\frac{\pi}{\frac{1}{2\sigma^2}}} e^{\frac{-(-j2k\cos\theta)^2}{4\frac{1}{2\sigma^2}}} \nn
+&= V e^{-2k^2\sigma^2\cos^2\theta}
 \end{align}
-
-
-\begin{align}
-p(\xi) = \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}}
-\end{align}
-
-
-\begin{align}
-p(\xi) = \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}}
-\end{align}
+This reflection coefficient is valid when the Rayleigh parameter is small (i.e. small frequency and relief amplitude), and at grazing incidence. Conventional limit of validity is $\frac{\pi}{2}$, which corresponds to $\sigma = \frac{\lambda}{8\cos\theta}$ and a coherent loss of 10.7dB.
 
