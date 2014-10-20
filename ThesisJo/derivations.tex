@@ -3,9 +3,25 @@
 
 \section{Roughness}
 
+For a plane monochromatic wave the Rayleigh roughness parameter is quantified by:
+\begin{align}
+\Delta\varphi = 2k\xi\cos\theta.
+\end{align}
+Here $\theta$ is the incidence angle, $k = \frac{2\pi}{\lambda}$ is the wavenumber of the incoming wave, $\xi$ is the distance from the scattering point to the mean surface plane, and $\Delta\varphi$ is the phase difference.
+
 \begin{figure}[th]
-\graphicsAI[drawing]{gfx/roughness.svg}
+\graphicsAI[drawing,width=\linewidth]{gfx/roughness.svg}
 \end{figure}
+
+To see how roughness affects the specular reflection we compute the mean reflected wave as
+\begin{align}
+<p> &= \int\limits_{-\infty}^{\infty} e^{-j\Delta\varphi(\xi)} p(\xi) d\xi,
+\end{align}
+where $p(\xi)$ is the probability density function of $\xi$. If we assume normal distribution, we get:
+\begin{align}
+<p> &= \int\limits_{-\infty}^{\infty} e^{-j2k\xi\cos\theta} \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}} d\xi \nn
+&= \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}} \int\limits_{-\infty}^{\infty} e^{-j2k\xi\cos\theta} e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}} d\xi \nn
+\end{align}
 
 \begin{align}
 p(\xi) = \frac{1}{\sqrt{2\pi}\sigma_{\!\xi}}e^{-\frac{\xi^2}{2\sigma_{\!\xi}^2}}
