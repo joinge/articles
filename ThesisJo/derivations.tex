@@ -3,16 +3,19 @@
 
 \section{Wave Equation}
 
-\begin{table}[!b]\centering%\normalsize
-\begin{tabular}[c]{l r r r@{}  l}\hline
-\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
-Arithmetic & 1.03 Tflop/s & & &\\
-Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
-Shared memory & & 257 Gfloats/s & 1 &:4 \\
-Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
+The wave equation describes how a wave move as a function of both time and space. Its importance and application is great, so we will spend some time to derive it here. We will treat acoustical waves since they are most relevant to the topic in this thesis, but we could have derived it from electromagnetic waves using Maxwells equations with some boundary conditions.
+
+Define a small volumetric element $dV = dx dy dz$. 
+\begin{wraptable}{r}{8.9cm}%\normalsize
+\begin{tabular}[c]{c c l}\hline
+\rowcolor{tabBlue}\bf Symbol & \bf Unit & \bf Description \\\hline
+$p$ & Pa = N/m$^2$ & Pressure \\
+$\rho$ & kg/m$^3$ & Density \\
+$S$ &  & Entropy \\
+$\vec v$ & m/s & Mass velocity \\
+$\dot m$ & kg/s & Mass flow
 \end{tabular}
-\caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}\label{throughputs}
-\end{table}%
+\end{wraptable}%
 
 \section{Roughness}
 
