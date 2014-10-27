@@ -71,6 +71,8 @@
 
 \newif\ifOPTtwoside       \OPTtwosidefalse
 
+\newif\ifOPTfloatrow      \OPTfloatrowfalse
+
 \newif\ifOPTsecarab       \OPTsecarabtrue
 \newif\ifOPTsubsecarab    \OPTsubsecarabtrue
 \newif\ifOPTsubsubsecarab \OPTsubsubsecarabtrue
@@ -278,6 +280,8 @@
 \DeclareOption{defaultformat}{\OPTdefaultformattrue}
 % \DeclareOption{twoside}{}
 
+\DeclareOption{floatrow}{\typeout{saywhat???}\OPTfloatrowtrue}
+
 \DeclareOption{secalph}{\OPTsecalphtrue\OPTsecarabfalse}
 \DeclareOption{secAlph}{\OPTsecAlphtrue\OPTsecarabfalse}
 \DeclareOption{secroman}{\OPTsecromantrue\OPTsecarabfalse}
@@ -440,12 +444,16 @@
 \RequirePackage{subfigure}
 
 %~~ Floats ~~%
-\RequirePackage{float}                          % Needed for the 'H' 
-                                                % (Fig. placement: htbp - here, top, bottom, page)
-                                                %                  H - here and only here!
 \ifOPTuam\else
    \RequirePackage{ccaption}                       % For customised captions
 \fi
+\ifOPTfloatrow
+  \RequirePackage{floatrow}
+  \floatsetup[table]{capposition=top}
+\else
+  \RequirePackage{float}                        % Needed for the 'H' 
+\fi                                             % (Fig. placement: htbp - here, top, bottom, page)
+                                                %                  H - here and only here!
 \RequirePackage{threeparttable}                 % For table notes
 
 \RequirePackage{multirow}                       % For more options with tables..

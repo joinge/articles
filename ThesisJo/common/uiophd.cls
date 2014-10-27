@@ -15,7 +15,7 @@
 \ProcessOptions \relax
 \RequirePackage[\uiophd@lang]{babel}
 \RequirePackage{emptypage}
-\RequirePackage[T1]{fontenc}
+% \RequirePackage[T1]{fontenc}
 \RequirePackage[a4paper]{geometry}
 \RequirePackage{setspace}
 \AtBeginDocument{\setstretch{1.1}}
