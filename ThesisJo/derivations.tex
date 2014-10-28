@@ -32,13 +32,19 @@ $\dot{\boldsymbol{m}}$ & kg/s & Mass flow
 We begin by defining the net \textbf{mass flow} through a volumetric element $dV = dx\,dy\,dz$:
 %
 \begin{align}
-\frac{\dot m_\text{net}}{dV} = \frac{\partial \rho\,\v}{\partial x} \ux + \frac{\partial \rho\,\v}{\partial y} \uy + \frac{\partial \rho\,\v}{\partial z} \uz = \nabla \cdot (\rho\v):
+\frac{\dot{\boldsymbol{m}}_\text{net}}{dV} = \ux\frac{\partial \rho\,\v}{\partial x} + \uy\frac{\partial \rho\,\v}{\partial y} + \uz\frac{\partial \rho\,\v}{\partial z} = \nabla \cdot (\rho\v).
 \end{align}
 %
-The space and time dependence of the mass density $\rho = \rho(\p,t)$ and particle velocity $\v = \v(\p,t)$ was omitted here for brevity. If the volume of the element is fixed a change in mass must equal a corresponding change in density. This is the law of \textbf{mass conservation}:
+The space and time dependence of the mass density $\rho = \rho(\p,t)$ and particle velocity $\v = \v(\p,t)$ is omitted here and in the following text for brevity. If the volume of the element is fixed a change in mass must equal a corresponding change in density. This is the law of \textbf{mass conservation}:
 %
 \begin{align}
-\frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v)
+\frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v).
+\end{align}
+%
+An additional constraint we may surely apply is the Euler's equation, a modification of Newton's second law:
+%
+\begin{align}
+\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \nabla\v\Big) = -\nabla p.
 \end{align}
 %
 
