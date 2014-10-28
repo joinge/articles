@@ -22,19 +22,25 @@ $p$ & Pa = N/m$^2$ & Pressure \\
 $\rho$ & kg/m$^3$ & Density \\
 $S$ & Nm/K & Entropy \\
 $\vec v$ & m/s & Mass velocity \\
-$\dot m$ & kg/s & Mass flow
+$\dot{\boldsymbol{m}}$ & kg/s & Mass flow
 \end{tabular}}
 
 \end{floatrow}
 \end{figure}
 
 
-We begin by defining the net mass flow in and out of a volumetric element $dV = dx dy dz$:
-
+We begin by defining the net \textbf{mass flow} through a volumetric element $dV = dx\,dy\,dz$:
+%
 \begin{align}
-\dot m_\text{net} = \Big(\frac{\partial \rho\,\v}{\partial x} + \frac{\partial \rho\,\v}{\partial y} + \frac{\partial \rho\,\v}{\partial z} \Big) dV = \nabla \cdot (\rho\v)\, dV
+\frac{\dot m_\text{net}}{dV} = \frac{\partial \rho\,\v}{\partial x} \ux + \frac{\partial \rho\,\v}{\partial y} \uy + \frac{\partial \rho\,\v}{\partial z} \uz = \nabla \cdot (\rho\v):
 \end{align}
-
+%
+The space and time dependence of the mass density $\rho = \rho(\p,t)$ and particle velocity $\v = \v(\p,t)$ was omitted here for brevity. If the volume of the element is fixed a change in mass must equal a corresponding change in density. This is the law of \textbf{mass conservation}:
+%
+\begin{align}
+\frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v)
+\end{align}
+%
 
 
 \section{Roughness}
