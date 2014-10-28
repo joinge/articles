@@ -53,6 +53,8 @@ p = p(\rho) \label{wave_eq_sound_pressure}
 
 With this we have assumed the system to be \emph{loss-less}. In reality a passing sound wave will heat the fluid and add to the entropy, causing additional attenuation of the wave, but we will not be concerned with attenuation in this thesis.
 
+\subsection{Linearization}
+
 Equation (\ref{wave_eq_mass_conservation}), (\ref{wave_eq_euler}) and (\ref{wave_eq_sound_pressure}) are non-linear, but can be linearized by assuming each quantity to be a steady-state, time-independent value plus a fluctuation term:
 %
 \begin{align}
@@ -65,13 +67,36 @@ Taylor expanding (\ref{wave_eq_sound_pressure}) around zero yields:
 p(\rho) = p_0 + \frac{\partial p}{\partial\rho}(\rho-\rho_0) + \frac{1}{2}\frac{\partial^2 p}{\partial\rho^2}(\rho-\rho_0)^2 + \dots\label{wave_eq_sound_taylor_full}
 \end{align}
 %
-and if we can assume the first order to be sufficient we get:
+Assuming a linear relationship between changes in pressure and volume the pressure perturbation term is simply:
 %
 \begin{align}
-p(\rho) = p_0 + \frac{\partial p}{\partial\rho}(\rho-\rho_0)\label{wave_eq_sound_taylor_first}
+p' = \frac{\partial p}{\partial\rho}(\rho-\rho_0) = \frac{\partial p}{\partial\rho}\rho' = c^2\rho'. \label{wave_eq_sound_taylor_first}
 \end{align}
-
-
+%
+When treating the Euler equation the same way we obtain:
+%
+\begin{align}
+-\nabla (p_0 + p') &= (\rho_0 + \rho') \Big(\frac{\partial(\v_0 + \v')}{\partial t} + (\v_0 + \v')\cdot\nabla(\v_0 + \v')\Big) \nn
+-\nabla p' &= (\rho_0 + \rho') \Big(\frac{\partial\v'}{\partial t} + \v'\cdot\nabla\v'\Big) \nn
+\end{align}
+%
+When acceleration mainly depends on time, and the pressure fluctuations are relatively small,
+%
+\begin{align}
+\frac{\partial\v'}{\partial t} >> \v'\cdot\nabla\v' \qquad\qquad\text{and}\qquad\qquad \rho_0 >> \rho',
+\end{align}
+%
+then
+%
+\begin{align}
+-\nabla p' &= \rho_0 \frac{\partial\v'}{\partial t}.
+\end{align}
+%
+Finally, for the mass conservation we have:
+%
+\begin{align}
+\frac{\partial(\rho_0 + \rho')}{\partial t} = -\nabla \cdot ((\rho_0 + \rho')(\v_0 + \v')). \label{wave_eq_mass_conservation}
+\end{align}
 
 
 \section{Roughness}
