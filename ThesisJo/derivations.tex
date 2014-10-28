@@ -36,23 +36,40 @@ We begin by defining the net \textbf{mass flow} through a volumetric element $dV
 The space and time dependence of the mass density $\rho = \rho(\p,t)$ and particle velocity $\v = \v(\p,t)$ is omitted here and in the following text for brevity. If the volume of the element is fixed a change in mass must equal a corresponding change in density. This is the law of \textbf{mass conservation}:
 %
 \begin{align}
-\frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v).
+\frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v). \label{wave_eq_mass_conservation}
 \end{align}
 %
 An additional constraint we may surely apply is the Euler's equation, a modification of Newton's second law the the total acceleration $a$ is is a function of both time and space:
 %
 \begin{align}
-\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \v\cdot\nabla\v\Big) = -\nabla p.
+\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \v\cdot\nabla\v\Big) = -\nabla p. \label{wave_eq_euler}
 \end{align}
 %
-Next, an \textbf{equation of state} is needed to relate a change in density to a change in pressure. We assume our volume element to be isentropic, i.e. that the entropy is constant, or equivalently that total energy of the system is proportional to its temperature. This is true for any system that is reversible and adiabatic, i.e. that when no transfer of matter or heat occurs between the system and its surroundings. In other words, we assume the system to be \emph{loss-less} system. In reality a passing sound wave will heat the fluid and add to the entropy, ultimately leading to additional attenuation of the wave, but we will not deal with this topic in this thesis.
-
-The pressure of the system then just depends on the mass density:
+Next, an \textbf{equation of state} is needed to relate a change in density to a change in pressure. We assume our volume element to be isentropic, i.e. that the entropy is constant, or equivalently that total energy of the system is proportional to its temperature. This is true for any system that is reversible and adiabatic, i.e. that when no transfer of matter or heat occurs between the system and its surroundings. The pressure of the system then just depends on the mass density:
 %
 \begin{align}
-p = p(\rho)
+p = p(\rho) \label{wave_eq_sound_pressure}
 \end{align}
 
+With this we have assumed the system to be \emph{loss-less}. In reality a passing sound wave will heat the fluid and add to the entropy, causing additional attenuation of the wave, but we will not be concerned with attenuation in this thesis.
+
+Equation (\ref{wave_eq_mass_conservation}), (\ref{wave_eq_euler}) and (\ref{wave_eq_sound_pressure}) are non-linear, but can be linearized by assuming each quantity to be a steady-state, time-independent value plus a fluctuation term:
+%
+\begin{align}
+p = p_0 + p'  \qquad\qquad \rho = \rho_0 + \rho' \qquad\qquad \v = \v_0 + \v'
+\end{align}
+%
+Taylor expanding (\ref{wave_eq_sound_pressure}) around zero yields:
+%
+\begin{align}
+p(\rho) = p_0 + \frac{\partial p}{\partial\rho}(\rho-\rho_0) + \frac{1}{2}\frac{\partial^2 p}{\partial\rho^2}(\rho-\rho_0)^2 + \dots\label{wave_eq_sound_taylor_full}
+\end{align}
+%
+and if we can assume the first order to be sufficient we get:
+%
+\begin{align}
+p(\rho) = p_0 + \frac{\partial p}{\partial\rho}(\rho-\rho_0)\label{wave_eq_sound_taylor_first}
+\end{align}
 
 
 
