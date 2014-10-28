@@ -3,9 +3,7 @@
 
 \section{Wave Equation}
 
-
-
-The wave equation describes how a wave move as a function of both time and space. It forms the basis for all mathematical modeling of waves, so we will spend some time to derive it here. We will treat acoustical waves since they are most relevant to the topic in this thesis, but we could have derived it from electromagnetic waves using Maxwells equations with some boundary conditions.
+The wave equation describes how a wave move as a function of both time and space. It forms the basis for all mathematical modeling of waves, so we will spend some time to derive it here. We will treat acoustical waves since they are most relevant to the topic in this thesis, but we could have derived it from electromagnetic waves using Maxwell's equations with some boundary conditions.
 
 \begin{figure}[ht]
 \begin{floatrow}
@@ -41,12 +39,22 @@ The space and time dependence of the mass density $\rho = \rho(\p,t)$ and partic
 \frac{\partial\rho}{\partial t} = -\nabla \cdot (\rho\v).
 \end{align}
 %
-An additional constraint we may surely apply is the Euler's equation, a modification of Newton's second law:
+An additional constraint we may surely apply is the Euler's equation, a modification of Newton's second law the the total acceleration $a$ is is a function of both time and space:
 %
 \begin{align}
-\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \nabla\v\Big) = -\nabla p.
+\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \v\cdot\nabla\v\Big) = -\nabla p.
 \end{align}
 %
+Next, an \textbf{equation of state} is needed to relate a change in density to a change in pressure. We assume our volume element to be isentropic, i.e. that the entropy is constant, or equivalently that total energy of the system is proportional to its temperature. This is true for any system that is reversible and adiabatic, i.e. that when no transfer of matter or heat occurs between the system and its surroundings. In other words, we assume the system to be \emph{loss-less} system. In reality a passing sound wave will heat the fluid and add to the entropy, ultimately leading to additional attenuation of the wave, but we will not deal with this topic in this thesis.
+
+The pressure of the system then just depends on the mass density:
+%
+\begin{align}
+p = p(\rho)
+\end{align}
+
+
+
 
 
 \section{Roughness}
