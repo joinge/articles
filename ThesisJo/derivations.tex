@@ -16,7 +16,7 @@ The wave equation describes how a wave move as a function of both time and space
 \caption{Symbol description}}{%
 \begin{tabular}[c]{c c l}\hline
 \rowcolor{tabBlue}\bf Symbol & \bf Unit & \bf Description \\\hline
-$p$ & Pa = N/m$^2$ & Pressure \\
+$s$ & Pa = N/m$^2$ & Pressure \\
 $\rho$ & kg/m$^3$ & Density \\
 $S$ & Nm/K & Entropy \\
 $\vec v$ & m/s & Mass velocity \\
@@ -42,13 +42,13 @@ The space and time dependence of the mass density $\rho = \rho(\p,t)$ and partic
 An additional constraint we may surely apply is the Euler's equation, a modification of Newton's second law the the total acceleration $a$ is is a function of both time and space:
 %
 \begin{align}
-\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \v\cdot\nabla\v\Big) = -\nabla p. \label{wave_eq_euler}
+\frac{F}{dV} = \frac{m}{dV} a = \rho\Big(\frac{\partial\v}{\partial t} + \v\cdot\nabla\v\Big) = -\nabla s. \label{wave_eq_euler}
 \end{align}
 %
 Next, an \textbf{equation of state} is needed to relate a change in density to a change in pressure. We assume our volume element to be isentropic, i.e. that the entropy is constant, or equivalently that total energy of the system is proportional to its temperature. This is true for any system that is reversible and adiabatic, i.e. that when no transfer of matter or heat occurs between the system and its surroundings. The pressure of the system then just depends on the mass density:
 %
 \begin{align}
-p = p(\rho) \label{wave_eq_sound_pressure}
+s = s(\rho) \label{wave_eq_sound_pressure}
 \end{align}
 
 With this we have assumed the system to be \emph{loss-less}. In reality a passing sound wave will heat the fluid and add to the entropy, causing additional attenuation of the wave, but we will not be concerned with attenuation in this thesis.
@@ -58,26 +58,26 @@ With this we have assumed the system to be \emph{loss-less}. In reality a passin
 Equation (\ref{wave_eq_mass_conservation}), (\ref{wave_eq_euler}) and (\ref{wave_eq_sound_pressure}) are non-linear, but can be linearized by assuming each quantity to be a steady-state, time-independent value plus a fluctuation term:
 %
 \begin{align}
-p = p_0 + p'  \qquad\qquad \rho = \rho_0 + \rho' \qquad\qquad \v = \v_0 + \v'
+s = s_0 + s'  \qquad\qquad \rho = \rho_0 + \rho' \qquad\qquad \v = \v_0 + \v'
 \end{align}
 %
 Taylor expanding (\ref{wave_eq_sound_pressure}) around zero yields:
 %
 \begin{align}
-p(\rho) = p_0 + \frac{\partial p}{\partial\rho}(\rho-\rho_0) + \frac{1}{2}\frac{\partial^2 p}{\partial\rho^2}(\rho-\rho_0)^2 + \dots\label{wave_eq_sound_taylor_full}
+s(\rho) = s_0 + \frac{\partial s}{\partial\rho}(\rho-\rho_0) + \frac{1}{2}\frac{\partial^2 s}{\partial\rho^2}(\rho-\rho_0)^2 + \dots\label{wave_eq_sound_taylor_full}
 \end{align}
 %
 Assuming a linear relationship between changes in pressure and volume the pressure perturbation term is simply:
 %
 \begin{align}
-p' = \frac{\partial p}{\partial\rho}(\rho-\rho_0) = \frac{\partial p}{\partial\rho}\rho' = c^2\rho'. \label{wave_eq_sound_taylor_first}
+s' = \frac{\partial s}{\partial\rho}(\rho-\rho_0) = \frac{\partial s}{\partial\rho}\rho' = c^2\rho'. \label{wave_eq_sound_taylor_first}
 \end{align}
 %
 When treating the Euler equation the same way we obtain:
 %
 \begin{align}
--\nabla (p_0 + p') &= (\rho_0 + \rho') \Big(\frac{\partial(\v_0 + \v')}{\partial t} + (\v_0 + \v')\cdot\nabla(\v_0 + \v')\Big) \nn
--\nabla p' &= (\rho_0 + \rho') \Big(\frac{\partial\v'}{\partial t} + \v'\cdot\nabla\v'\Big) \nn
+-\nabla (s_0 + s') &= (\rho_0 + \rho') \Big(\frac{\partial(\v_0 + \v')}{\partial t} + (\v_0 + \v')\cdot\nabla(\v_0 + \v')\Big) \nn
+-\nabla s' &= (\rho_0 + \rho') \Big(\frac{\partial\v'}{\partial t} + \v'\cdot\nabla\v'\Big) \nn
 \end{align}
 %
 When acceleration mainly depends on time, and the pressure fluctuations are relatively small,
@@ -89,7 +89,7 @@ When acceleration mainly depends on time, and the pressure fluctuations are rela
 then
 %
 \begin{align}
--\nabla p' &= \rho_0 \frac{\partial\v'}{\partial t}.
+-\nabla s' &= \rho_0 \frac{\partial\v'}{\partial t}.
 \end{align}
 %
 Finally, for the mass conservation we have:
@@ -102,12 +102,25 @@ Finally, for the mass conservation we have:
 This assumes that the density is constant inside the volume element.
 
 \begin{align}
-\nabla\cdot(-\nabla p') &= \nabla\cdot\Big(\rho_0 \frac{\partial\v'}{\partial t}\Big) &
+\nabla\cdot(-\nabla s') &= \nabla\cdot\Big(\rho_0 \frac{\partial\v'}{\partial t}\Big) &
 \frac{\partial}{\partial t}\frac{\partial\rho'}{\partial t} &= \frac{\partial}{\partial t}\Big(-\rho_0\nabla \cdot \v'\Big)\nn
--\nabla^2 p' &= \rho_0 \nabla\cdot\frac{\partial\v'}{\partial t} &
-\frac{\partial^2\rho'}{\partial t^2} &= -\rho_0\nabla\cdot\frac{\partial v'}{\partial t}\v'
+-\nabla^2 s' &= \rho_0 \nabla\cdot\frac{\partial\v'}{\partial t} &
+\frac{\partial^2\rho'}{\partial t^2} &= \frac{1}{c^2}\frac{\partial^2 s}{\partial t^2} = -\rho_0\nabla\cdot\frac{\partial \v'}{\partial t}
 \end{align}
-
+%
+and we can now see that
+%
+\begin{align}
+\nabla^2 s' - \frac{1}{c^2}\frac{\partial^2 s'}{\partial t^2} = 0.
+\end{align}
+%
+This is called the homogeneous lossless wave equation, because there is no source term. The inhomogeneous equation can be obtained in a similar way, by altering the linearized continuity equation to:
+%
+\begin{align}
+\frac{\partial(\rho_0 + \rho')}{\partial t} &= -\nabla \cdot \big((\rho_0 + \rho')(\v_0 + \v')\big)\nn
+\frac{\partial\rho'}{\partial t} &= -\rho_0\nabla \cdot \v'. \label{wave_eq_mass_conservation2}
+\end{align}
+%
 
 \section{Roughness}
 
