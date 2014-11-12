@@ -3,7 +3,7 @@
 
 \section{Wave Equation}
 
-The wave equation describes how a wave move as a function of both time and space. It forms the basis for all mathematical modeling of waves, so we will spend some time to derive it here. We will treat acoustical waves since they are most relevant to the topic in this thesis, but we could have derived it from electromagnetic waves using Maxwell's equations with some boundary conditions.
+The wave equation describes how a wave moves as a function of both time and space. It forms the basis for all mathematical modeling of waves, so we will spend some time to derive it here. We will treat acoustical waves since they are most relevant to the topic in this thesis, but we could have derived it from electromagnetic waves using Maxwell's equations with some boundary conditions.
 
 \begin{figure}[ht]
 \begin{floatrow}
@@ -117,8 +117,13 @@ and we can now see that
 This is called the homogeneous lossless wave equation, because there is no source term. The inhomogeneous equation can be obtained in a similar way, by altering the linearized continuity equation to:
 %
 \begin{align}
-\frac{\partial(\rho_0 + \rho')}{\partial t} &= -\nabla \cdot \big((\rho_0 + \rho')(\v_0 + \v')\big)\nn
-\frac{\partial\rho'}{\partial t} &= -\rho_0\nabla \cdot \v'. \label{wave_eq_mass_conservation2}
+\frac{\partial\rho'}{\partial t} &= -\rho_0\nabla \cdot \v' - \rho_0f(\p,t). \label{wave_eq_mass_conservation_source}
+\end{align}
+%
+where $\rho_0f(\p,t)$ is the rate of mass change (in $\left[\frac{\text{kg}}{\text{m}^3\text{s}}\right]$) caused by the source. Following the exact same procedure as before we obtain:
+%
+\begin{align}
+\nabla^2 s' - \frac{1}{c^2}\frac{\partial^2 s'}{\partial t^2} = \rho_0\frac{\partial f(\p,t)}{\partial t}.
 \end{align}
 %
 
