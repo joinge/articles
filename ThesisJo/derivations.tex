@@ -189,9 +189,22 @@ This reflection coefficient is valid when the Rayleigh parameter is small (i.e. 
 Let $\x$ be the data received by an array, pre-steered to some pixel in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer outout $z$ as the weighted sum of the data:
 %
 \begin{align}
-z = \w\H\x = \sumb{m=0}{M-1} w_m^* x_m
+z(\w,\x) = \w\H\x = \sumb{m=0}{M-1} w_m x_m^*
 \end{align}
 %
+Now let us choose a trigonometric window function:
+%
+\begin{align}
+\w = e^{j\theta}\big(\alpha + (1-\alpha)\cos\left(\frac{2\pi n}{N-1}\right)\big)
+\end{align}
+%
+Inserting this yields:
+%
+\begin{align}
+\w\H\x &= \sumb{m=0}{M-1} \Big(\alpha + (1-\alpha)\cos\left(\frac{2\pi n}{N-1}\right)\Big) x_m^*
+\end{align}
+
+
 LCA can then be defined as
 %
 \begin{align}
