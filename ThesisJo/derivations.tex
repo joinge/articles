@@ -186,7 +186,14 @@ This reflection coefficient is valid when the Rayleigh parameter is small (i.e. 
 
 \section{LCA tricks}
 
-
+Let $\x$ be the data received by an array, pre-steered to some pixel in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer outout $z$ as the weighted sum of the data:
+%
 \begin{align}
-\argmin{\w\H\x}{\w} = \sumb{m=0}{M-1} w_m^* x_m
+z = \w\H\x = \sumb{m=0}{M-1} w_m^* x_m
+\end{align}
+%
+LCA can then be defined as
+%
+\begin{align}
+\argmin{\w}\ |z|^2 = \argmin{\w}\ z\,z^* = %\argmin{\w}\ \w\H\x = \sumb{m=0}{M-1} w_m^* x_m
 \end{align}
