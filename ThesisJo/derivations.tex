@@ -234,3 +234,30 @@ where $\a$ is a steering vector and $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is
 \item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
 \end{itemize}%
 
+\subsection{Diagonal loading}
+
+Assume the data to be a combination of signal and noise, $\x = \s + \n$. Then the beamformer output is
+%
+\begin{align}
+z = \w\H\x = \w\H(\s+\n),
+\end{align}
+%
+and the output power becomes
+%
+\begin{align}
+|z|^2 = \w\H\x\x\H\w &= \w\H(\s+\n)(\s+\n)\H\w \nn
+&= \begin{cases}
+\w\H\s\s\H\w + \w\H\s\n\H\w + \w\H\n\s\H\w + \w\H\n\n\H\w &\text{when correlated}\\
+\w\H\s\s\H\w + \w\H\n\n\H\w &\text{when uncorrelated}
+\end{cases}
+\end{align}
+%
+Assuming that the data is predelayed broadside, and that the window is rectangular, we get
+%
+\begin{align}
+|z|^2 = \w\H\x\x\H\w &= \w\H(\s+\n)(\s+\n)\H\w \nn
+&= \begin{cases}
+\w\H\s\s\H\w + \w\H\s\n\H\w + \w\H\n\s\H\w + \w\H\n\n\H\w &\text{when correlated}\\
+\w\H\s\s\H\w + \w\H\n\n\H\w &\text{when uncorrelated}
+\end{cases}
+\end{align}
