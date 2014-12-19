@@ -132,7 +132,7 @@ where $\rho_0f(\p,t)$ is the rate of mass change (in $\left[\frac{\text{kg}}{\te
 Instead of solving the wave equation directly, we will make a qualified guess that the solution takes the form of a complex exponential in both time and space. For rectangular coordinates this can be written as:
 %
 \begin{align}
-s(\p,t) &= A\,e^{j(\omega t - \k\cdot\p)}
+s(\p,t) &= A\,e^{j(\omega t - \k\cdot\p)},
 \end{align}
 %
 Inserting this into the wave equation yields:
@@ -144,12 +144,17 @@ k_x^2 + k_y^2 + k_z^2 &= |\k|^2 = \frac{\omega^2}{c^2} \\
 |\k| &= \frac{\omega}{c}
 \end{align}
 %
-Hence, whenever we can assume the spatial and temporal frequency to be related directly by the sound speed, $|\k| = \frac{\omega}{c}$, then this assuming a complex exponential should be fair.
+This means that when we can assume the spatial and temporal frequency to be related directly by the sound speed, $|\k| = \frac{\omega}{c}$, then assuming a complex exponential to be a valid solution. Another solution of the wave equation is that of a spherical wave:
+%
+\begin{align}
+s(r,t) &= \frac{A}{r}\,e^{j(\omega t - kr)}.
+\end{align}
 
 \section{Absorption}
 
 Our derivation of the wave equation assumed no loss of energy. In practice the wave's energy is abosorbed through viscous losses, heat conduction losses and intermolecular losses. These are strongly dependent on frequency. The wave equation can be adapted to account for absorption by assuming a complex sound speed, which will lead to a solution to the wave equation with a real exponential term. In this thesis we will not concern ourselves 
 
+\newpage
 \section{Roughness}
 
 For a plane monochromatic wave the Rayleigh roughness parameter is quantified by:
@@ -262,6 +267,7 @@ Assuming that the data is predelayed broadside, and that the window is rectangul
 \end{align}
 
 
+\newpage
 \section{Beamforming}
 
 
