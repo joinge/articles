@@ -189,7 +189,7 @@ This reflection coefficient is valid when the Rayleigh parameter is small (i.e. 
 
 
 
-\section{LCA tricks}
+\section{LCA}
 
 Let $\x$ be the data received by an array, pre-steered to some pixel in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer outout $z$ as the weighted sum of the data:
 %
@@ -197,6 +197,13 @@ Let $\x$ be the data received by an array, pre-steered to some pixel in the imag
 z(\w,\x) = \w\H\x = \sumb{m=0}{M-1} w_m x_m^*
 \end{align}
 %
+\begin{align}
+\argmin{p}{E\big\{|z|^2\big\}} = \argmin{p}{|\w_p\H\x|^2} \qquad\text{subject to}\qquad \w\H\a = 1
+\end{align}
+
+
+\subsection{Tricks}
+
 Now let us choose a trigonometric window function:
 %
 \begin{align}
