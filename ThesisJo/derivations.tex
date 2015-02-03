@@ -202,8 +202,20 @@ From a set of $P$ windows the LCA beamformer selects the window $p$ that yield t
 \begin{align}
 \argmin{p}{E\big\{|z|^2\big\}} = \argmin{p}{E\big\{|\w_p\H\X[n]|^2\big\}} \qquad\text{subject to}\qquad \w\H\a = 1
 \end{align}
-
-
+%
+We can estimate $E\big\{|\w_p\H\X[n]|^2\big\}$ as
+%
+\begin{align*}
+\sigma^2_{z_p}[n] = \frac{1}{N_k N_l} \sumb{l=0}{M-L} \sumb{k=-K}{K} | z_p[n+k] |^2
+\end{align*}
+%
+To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
+%
+\begin{align*}
+\sigma^2_{z_p}[x,n] = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
+\end{align*}
+%
+where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
 \subsection{Tricks}
 
 Now let us choose a trigonometric window function:
