@@ -206,7 +206,7 @@ From a set of $P$ windows the LCA beamformer selects the window $p$ that yield t
 We can estimate $E\big\{|\w_p\H\X[n]|^2\big\}$ as
 %
 \begin{align*}
-\sigma^2_{z_p}[n] = \frac{1}{N_k N_l} \sumb{l=0}{M-L} \sumb{k=-K}{K} | z_p[n+k] |^2
+\sigma^2_{z_p}[n] = \frac{1}{N_k N_l} \sumb{l=0}{M-L} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
 \end{align*}
 %
 To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
@@ -216,6 +216,16 @@ To add some extra flexibility, we can also estimate the variance by a weighted c
 \end{align*}
 %
 where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
+
+Kaiser:
+%
+\begin{align*}
+w[n] = \frac{I_0\big( \pi\alpha\sqrt{1-(\frac{2n}{N-1}-1)^2}\big)}{I_0(\pi\alpha)}
+\end{align*}
+%
+where $I_0$ is a zeroth order modified Bessel function of the first kind.
+
+
 \subsection{Tricks}
 
 Now let us choose a trigonometric window function:
