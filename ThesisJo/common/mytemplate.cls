@@ -204,9 +204,8 @@
 \fi
 
 \ifOPTuiophd
-   \ProvidesClass{common/uiophd}[2014/06/30 v 1.03b UiO document class]
-   \DeclareOption{bibtex}{\PassOptionsToClass{bibtex}{\@bdoctype}\OPTbibliographytrue}
-   \DeclareOption{biblatex}{\PassOptionsToClass{biblatex}{\@bdoctype}\OPTbibliographytrue}
+   \DeclareOption{bibtex}{\OPTbibliographytrue}
+   \DeclareOption{biblatex}{\OPTbibliographytrue}
    \DeclareOption{xelatex}{\PassOptionsToClass{xelatex}{\@bdoctype}\OPTxelatextrue}
 \fi
 
@@ -576,6 +575,7 @@
 \fi
 
 \ifOPTuam\else\ifOPTbibliography
+  \RequirePackage[autostyle]{csquotes}
   \RequirePackage[
      backend=biber
    , defernums=true
