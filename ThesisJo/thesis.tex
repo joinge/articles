@@ -1,9 +1,17 @@
 
  
 \documentclass[
-uiophd,
-floatrow
+   uiophd
+ , floatrow
+ , xelatex
+ , glossary                                     % Use a glossary
+ , bibliography                                 % Use a bibliography
 ]{common/mytemplate}
+
+\hypersetup{
+   bookmarksopen=true
+ , bookmarksopenlevel=2
+}
 
 % \usepackage[utf8]{inputenc}         % or whatever you use
 
@@ -36,6 +44,10 @@ floatrow
 
 \usepackage{floatrow}
 
+\makeglossaries
+\input{glossary}
+
+
 \begin{document}
 \frontmatter
 \maketitle
@@ -44,11 +56,23 @@ floatrow
 \mainmatter
 
 
+
+\bibliography{bibliography}
+
 \input{introduction}
 
 \input{litterature_review}
 
 \input{derivations}
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\newpage
+\input{references.bib}
     
 \end{document}
 

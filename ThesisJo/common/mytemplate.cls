@@ -434,7 +434,12 @@
 
 \ifOPTbeamer
 \else                                                % Increases the available colour palette
-  \ifOPTxelatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
+  \ifOPTxelatex
+     \ifOPTuiophd
+     \else
+        \RequirePackage[xetex,final]{graphicx}
+     \fi%      % Adds \includegraphics{} etc.
+  \fi
   \ifOPTlualatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
   \ifOPTxelatex\else\ifOPTlualatex\else%
       \RequirePackage{graphicx}%
