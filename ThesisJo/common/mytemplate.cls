@@ -203,6 +203,13 @@
    \DeclareOption{xelatex}{\OPTxelatextrue}
 \fi
 
+\ifOPTuiophd
+   \ProvidesClass{common/uiophd}[2014/06/30 v 1.03b UiO document class]
+   \DeclareOption{bibtex}{\PassOptionsToClass{bibtex}{\@bdoctype}\OPTbibliographytrue}
+   \DeclareOption{biblatex}{\PassOptionsToClass{biblatex}{\@bdoctype}\OPTbibliographytrue}
+   \DeclareOption{xelatex}{\PassOptionsToClass{xelatex}{\@bdoctype}\OPTxelatextrue}
+\fi
+
 % Options for the report, book and article class
 \ifOPTstdclass
    \DeclareOption{letterpaper}{\PassOptionsToClass{letterpaper}{\@bdoctype}}

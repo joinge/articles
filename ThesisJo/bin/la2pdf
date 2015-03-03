@@ -291,31 +291,54 @@ fi
 
 
 
+IS_BIBTEX=0
+IS_BIBLATEX=0
+
+grep "bibtex" "$TMPDIR/$SETTINGSFILE"
+if [ $? -eq 0 ] ; then
+  IS_BIBTEX=1
+fi
+grep "biblatex" "$TMPDIR/$SETTINGSFILE"
+if [ $? -eq 0 ] ; then
+  IS_BIBLATEX=1
+fi
+echo "Bibtex: ${IS_BIBTEX}  Biblatex: ${IS_BIBLATEX}"
+if [ $IS_BIBTEX -eq 1 ] ; then
+  echo "homo"
+fi
+if [ $IS_BIBLATEX -eq 1 ] ; then
+  echo "yolo"
+fi
+
 # IS_BIBTEX=false
-# IS_BIBLATEX=false
-# 
-# grep "bibtex" "$TMPDIR/$SETTINGSFILE"
-# if [ "$?" = "0" ]; then
-#   IS_BIBTEX=true
-# fi
-# grep "biblatex" "$TMPDIR/$SETTINGSFILE"
-# if [ "$?" = "0" ]; then
-#   IS_BIBLATEX=true
-# fi
+if [ $IS_BIBTEX -eq 1 ] ; then
+  echo ''
+  echo ':) Building bibliography with bibtex..'
+  bibtex ${1}.aux
+
+  if [ $? -ne 0 ] ; then
+    cat $TMPDIR/$GLOSSLOG
+    echo ':( FAILED: bibtex'
+    exit 1
+  fi
+    cat $TMPDIR/$GLOSSLOG
+    echo ':) SUCCESS: bibtex'
+fi
+
 # IS_BIBTEX=false
-# if [ $IS_BIBTEX ]; then
-#   echo ''
-#   echo ':) Building bibliography..'
-#   bibtex ${1}.aux
-# 
-#   if [ $? -ne 0 ]; then
-#     cat $TMPDIR/$GLOSSLOG
-#     echo ':( FAILED: bibtex'
-#     exit 1
-#   fi
-#     cat $TMPDIR/$GLOSSLOG
-#     echo ':) SUCCESS: bibtex'
-# fi
+if [ $IS_BIBLATEX -eq 1 ] ; then
+  echo ''
+  echo ':) Building bibliography with biber..'
+  biber ${1}
+
+  if [ $? -ne 0 ] ; then
+    cat $TMPDIR/$GLOSSLOG
+    echo ':( FAILED: biber'
+    exit 1
+  fi
+    cat $TMPDIR/$GLOSSLOG
+    echo ':) SUCCESS: biber'
+fi
 
 
 # xelatex -interaction=nonstopmode -shell-escape -src-specials ${1}.tex > $TMPDIR/$PDFLALOG 2>> $TMPDIR/$PDFLALOG
@@ -371,7 +394,7 @@ fi
 # fi
 
 FILENAME=$(cat "$TMPDIR/filename.txt")
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ] ; then
   echo ":s $TMPDIR/filename.txt does not exist. Using default."
 #   cp *.pdf ${COMPILEDDIR}/ 2> $TMPDIR/$MOVELOG
   echo ":) PDF moved to ${COMPILEDDIR}/"
@@ -386,7 +409,7 @@ fi
 TIME=$(date +%s)
 # Check to see when the last Git commit was committed.d
 LASTGIT=$(cat "$TMPDIR/lastgit.txt")
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ] ; then
   echo ":s $TMPDIR/lastgit.txt does not exist. Committing changes."
   git commit -a -m "la2pdf commit - $(date +%Y:%m:%d%t%T%t\(%a%_d.%b\))"
 
