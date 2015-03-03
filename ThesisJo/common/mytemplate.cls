@@ -569,7 +569,15 @@
 \fi
 
 \ifOPTuam\else\ifOPTbibliography
-  \RequirePackage[url=false, defernums=true]{biblatex}
+  \RequirePackage[
+     backend=biber
+   , defernums=true
+   , doi=true
+   , eprint=false
+%    , sortlocale=
+   , style=authoryear-icomp
+   , url=false
+   ]{biblatex}
 \fi\fi
 %% Packet for turning/rotating objects
 \RequirePackage{rotating}
