@@ -1,29 +1,22 @@
 \chapter{Background}
 
+MVDR/LCA:
+- Beamforming techniques.
+
+Simulator:
+- Scattering theory
+- Coordinate systems
+
+Common denominator:
+- Image progressing
+- High processing computing
+- GPUs
+
+
 Light fast, sound slow.
-Sound propagate far, light attenuated.
+Sound propagates far, light attenuated.
 
-The aim of this chapter is to review the basic background material on which this thesis is founded. 
-
-\section{Coordinate System}
-
-\begin{figure}[th]
-\graphicsAI[width=\linewidth]{gfx/geometry.svg}
-\caption{The coordinate system used throughout the thesis.}\label{geometry}
-\end{figure}
-
-In this thesis we will relate all geometrical interpretations to the euclidean, spherical coordinate system shown in \Fig{geometry}. When assessing the imaging performance of a sonar its origin will be in the center of the array, but when assessing scenes its origin will be in the center of the image. A unit length vector $\vec u$ can be written as:
-%
-\begin{align*}
-\vec u =
-\begin{bmatrix}
-\sin\theta \cos\phi \\
-\sin\theta \sin\phi \\
-\cos\theta
-\end{bmatrix}
-\end{align*}
-%
-
+The aim of this chapter is to review the basic background material on which this thesis is founded.
 
 \section{Wave Propagation}
 
@@ -48,7 +41,41 @@ The wave equation constrains the magnitude of the wavenumber,
 %
 so only the direction of $\k$ varies.
 
-\section{Synethic Aperture Sonar Simulation}
+\section{Array Processing}
+
+\begin{figure}[th]
+\graphicsAI[width=\linewidth]{gfx/geometry.svg}
+\caption{The coordinate system used throughout the thesis.}\label{geometry}
+\end{figure}
+
+In this thesis we will relate all geometrical interpretations to the euclidean, spherical coordinate system shown in \Fig{geometry}. When assessing the imaging performance of a sonar its origin will be in the center of the array, but when assessing scenes its origin will be in the center of the image. A unit length vector $\vec u$ can be written as:
+%
+\begin{align*}
+\vec u =
+\begin{bmatrix}
+\sin\theta \cos\phi \\
+\sin\theta \sin\phi \\
+\cos\theta
+\end{bmatrix}
+\end{align*}
+%
+
+Monochromatic, plane wave:
+%
+\begin{align}
+\s[n] = \begin{bmatrix}
+         s_0[n] \\ s_1[n] \\ \vdots \\ s_{M-1}[n]
+        \end{bmatrix}
+%       = \begin{bmatrix}
+%          Ae^{j(\Omega n - \k\T\p)
+%         \end{bmatrix}
+\end{align}
+
+
+
+
+
+\section{Synethic Aperture Sonar}
 
 For an autonomous underwater vehicle to reach its full 
 
