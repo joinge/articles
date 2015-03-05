@@ -239,8 +239,15 @@ Now let us choose a trigonometric window function:
 Inserting this yields:
 %
 \begin{align}
-\w\H\x &= \sumb{m=0}{M-1} e^{j\varphi}\Big(\alpha + (1-\alpha)\sin\theta[m]\Big) x_m^* \nn
-&= \sumb{m=0}{M-1} e^{j\varphi}\Big(\alpha + (1-\alpha)\sin\theta[m]\Big) x_m^*
+\w\H\x &= \sumb{m=0}{M-1} e^{j\varphi[m]}\Big(\alpha + (1-\alpha)\sin\theta[m]\Big) x_m^* \nn
+&= \sumb{m=0}{M-1} e^{j\varphi[m]}\alpha x_m^* + \sumb{m=0}{M-1} e^{j\varphi[m]}(1-\alpha)\sin\theta[m] x_m^*
+\end{align}
+%
+Let us assume that the following terms are computed in advance:
+%
+\begin{align}
+a_m = e^{j\varphi[m]}x_m^* \qquad \text{and} \qquad b_m = e^{j\varphi[m]}\sin\theta[m] x_m^* \nn
+&= \sumb{m=0}{M-1} e^{j\varphi[m]}\alpha x_m^* + \sumb{m=0}{M-1} e^{j\varphi[m]}(1-\alpha)\sin\theta[m] x_m^*
 \end{align}
 %
 where $\theta = \frac{2\pi m}{M-1}$. 
