@@ -233,37 +233,34 @@ where $I_0$ is a zeroth order modified Bessel function of the first kind.
 Now let us choose a trigonometric window function:
 %
 \begin{align}
-\w = e^{j\theta[m]}\frac{1}{2\pi\alpha?}\big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\big)
+\w = e^{j\phi_\theta[m]}\frac{1}{2\pi\alpha?}\big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\big)
 \end{align}
 %
-where $\theta = \frac{2\pi m}{M-1}$ and $\varphi[m] = \frac{2\pi}{\lambda}dm\sin\theta$.
-Inserting this yields:
+where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields:
 %
 \begin{align}
-\w\H\x &= \sumb{m=0}{M-1} e^{j\varphi[m]}\Big(\alpha + (1-\alpha)\sin\theta[m]\Big) x_m^* \nn
-&= \sumb{m=0}{M-1} e^{j\varphi[m]}\alpha x_m^* + \sumb{m=0}{M-1} e^{j\varphi[m]}(1-\alpha)\sin\theta[m] x_m^*
-\end{align}
-%
-Let us assume that the following terms are computed in advance:
-%
-\begin{align}
-a = \sumb{m=0}{M-1} e^{j\phi_\varphi[m]}x_m^* \qquad \text{and} \qquad b_m = \sumb{m=0}{M-1} e^{j\varphi[m]}\sin\theta[m]x_m^*
-\end{align}
-%
-where $\theta = \frac{2\pi m}{M-1}$ and $\varphi[m] = \frac{2\pi}{\lambda}dm\sin\theta$.
-
-We now get 
-%
-\begin{align}
-\w\H\x &= \sumb{m=0}{M-1} \alpha a_m + (1-\alpha)b_m \nn
+\w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
+&= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* + (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\sin\left(\frac{2\pi m}{M-1}\right) x_m^* \\
 &= \alpha \a + (1-\alpha)\b
 \end{align}
 %
+where:
+%
 \begin{align}
-|\w\H\x|^2 &= \Big[\alpha \a\T\Big]\Big[(1-\alpha)\b\Big]\Big[\alpha \a\T\Big] \Big[(1-\alpha)\b^*\Big] \nn
+a = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}x_m^* \qquad \text{and} \qquad b_m = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\sin\left(\frac{2\pi m}{M-1}\right)x_m^*
+\end{align}
+%
+where
+%
+\begin{align}
+|\w\H\x|^2 &= \Big| \alpha \a + (1-\alpha)\b \Big|^2
 &= 
 \end{align}
 %
+
+MR time nedre del av rygg:
+Aleris - 0945. 
+Unilabs
 
 
 LCA can then be defined as
