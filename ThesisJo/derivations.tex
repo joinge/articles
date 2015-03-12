@@ -233,7 +233,7 @@ where $I_0$ is a zeroth order modified Bessel function of the first kind.
 Now let us choose a trigonometric window function:
 %
 \begin{align}
-\w = e^{j\phi_\theta[m]}\frac{1}{2\pi\alpha?}\big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\big)
+\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\big)
 \end{align}
 %
 where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields:
@@ -241,16 +241,23 @@ where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
 &= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* + (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\sin\left(\frac{2\pi m}{M-1}\right) x_m^* \\
-&= \alpha \a + (1-\alpha)\b
+&= \alpha \a\T\x + (1-\alpha)\b\T\x
 \end{align}
 %
 where:
 %
 \begin{align}
-a = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}x_m^* \qquad \text{and} \qquad b_m = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\sin\left(\frac{2\pi m}{M-1}\right)x_m^*
+a = \sumb{m=0}{M-1} e^{j\phi_\theta[m]} \qquad \text{and} \qquad b_m = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\sin\left(\frac{2\pi m}{M-1}\right)
 \end{align}
 %
 To attain unity gain in the look direction the weights must sum to one. 
+%
+\begin{align}
+\w\T\1 &= \big(\alpha\a - (1-\alpha)\b\big)\T\1 = 1
+\end{align}
+%
+This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. 
+
 where
 %
 \begin{align}
