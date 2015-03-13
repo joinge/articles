@@ -358,12 +358,19 @@ z[n] = \w\H[n]\x[n]
 
 \subsection{Element}
 
-Element directionality is given by the Fourier transform of the element's window function.
+The frequency response of an element is is given by the Fourier transform of the element's window function.
 %
 \begin{align}
-W(\k) \int\limits_{-\infty}^\infty w(\p) e^{-j\k\dot\p} d\p
+W(\k) = \int\limits_{V} w(\p)\,e^{-j\k\dot\p} dV
 \end{align}
-
+%
+where $\p = \bmat{x & y & z}\T$ and $dV = dx\,dy\,dz$. For a rectangular 2D element spanning the xy-plane, having sides with length $d_x$ and $d_y$, the frequency response becomes:
+%
+\begin{align}
+W_\text{rect}(k_x, k_y) = \frac{\sin\frac{k_x\,d_x}{2}}{\frac{k_x\,d_x}{2}}
+\end{align}
+%
+If we assume a rectangular
 
 
 
