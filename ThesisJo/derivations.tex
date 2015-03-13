@@ -233,13 +233,13 @@ where $I_0$ is a zeroth order modified Bessel function of the first kind.
 Now let us choose a trigonometric window function:
 %
 \begin{align}
-\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\big)
+\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\big)
 \end{align}
 %
 where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields:
 %
 \begin{align}
-\w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha + (1-\alpha)\sin\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
+\w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
 &= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* + (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\sin\left(\frac{2\pi m}{M-1}\right) x_m^* \\
 &= \alpha \a\T\x + (1-\alpha)\b\T\x
 \end{align}
@@ -247,7 +247,20 @@ where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields
 where:
 %
 \begin{align}
-a = \sumb{m=0}{M-1} e^{j\phi_\theta[m]} \qquad \text{and} \qquad b_m = \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\sin\left(\frac{2\pi m}{M-1}\right)
+\a = \begin{bmatrix}
+     1 \\
+     e^{j\frac{2\pi}{\lambda}d\sin\theta} \\
+     e^{j\frac{2\pi}{\lambda}2d\sin\theta} \\
+     \vdots \\
+     e^{j\frac{2\pi}{\lambda}d(M-1)\sin\theta}
+     \end{bmatrix} \qquad \text{and} \qquad
+\b = \begin{bmatrix}
+     0 \\
+     e^{j\frac{2\pi}{\lambda}d\sin\theta}\sin\left(\frac{2\pi m}{M-1}\right) \\
+     e^{j\frac{2\pi}{\lambda}2d\sin\theta}\sin\left(\frac{2\pi m}{M-1}\right) \\
+     \vdots \\
+     0
+     \end{bmatrix}
 \end{align}
 %
 To attain unity gain in the look direction the weights must sum to one. 
@@ -339,5 +352,18 @@ Assuming that the data is predelayed broadside, and that the window is rectangul
 \begin{align}
 z[n] = \w\H[n]\x[n]
 \end{align}
+
+
+
+
+\subsection{Element}
+
+Element directionality is given by the Fourier transform of the element's window function.
+%
+\begin{align}
+W(\k) \int\limits_{-\infty}^\infty w(\p) e^{-j\k\dot\p} d\p
+\end{align}
+
+
 
 
