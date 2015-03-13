@@ -240,7 +240,7 @@ where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
-&= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* + (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\sin\left(\frac{2\pi m}{M-1}\right) x_m^* \\
+&= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* - (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\cos\left(\frac{2\pi m}{M-1}\right) x_m^* \\
 &= \alpha \a\T\x + (1-\alpha)\b\T\x
 \end{align}
 %
@@ -367,10 +367,20 @@ W(\k) = \int\limits_{V} w(\p)\,e^{-j\k\dot\p} dV
 where $\p = \bmat{x & y & z}\T$ and $dV = dx\,dy\,dz$. For a rectangular 2D element spanning the xy-plane, having sides with length $d_x$ and $d_y$, the frequency response becomes:
 %
 \begin{align}
-W_\text{rect}(k_x, k_y) = \frac{\sin\frac{k_x\,d_x}{2}}{\frac{k_x\,d_x}{2}}
+W_\text{rect}(k_x, k_y) = \frac{\sin\frac{k_x\,d_x}{2}}{\frac{k_x\,d_x}{2}}\,\frac{\sin\frac{k_y\,d_y}{2}}{\frac{k_y\,d_y}{2}} = \sinc\frac{k_x\,d_x}{2}\,\sinc\frac{k_y\,d_y}{2}
 \end{align}
 %
 If we assume a rectangular
 
+\subsubsection{Opening angle}
 
+\begin{align}
+W_\text{rect}(k_x) = \frac{\sin\frac{k_x\,d_x}{2}}{\frac{k_x\,d_x}{2}} = \frac{1}{\sqrt{2}}
+\end{align}
+%
+This can be solved for $\frac{k_x\,d_x}{2}$ either by series expansion of $\sin(\dot)$, or numerically to find that $\frac{k_x\,d_x}{2} \approx 1.39$. For HISAS1030, with an opening angle of 25$^\circ$ at 100kHz in both directions, this means the element size must be quadratic with sides:
+%
+\begin{align}
+d = \frac{2*1.39}{k_x} = \frac{2*1.39}{2\pi \frac{f_c}{c}} = \frac{2*1.39*1500}{2\pi 100\text{kHz}} = 
+\end{align}
 
