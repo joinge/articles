@@ -227,6 +227,40 @@ w[n] = \frac{I_0\big( \pi\alpha\sqrt{1-(\frac{2n}{N-1}-1)^2}\big)}{I_0(\pi\alpha
 %
 where $I_0$ is a zeroth order modified Bessel function of the first kind.
 
+\subsection{Oversampling and steering}
+
+Steering wildly is not a good idea.
+
+Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
+
+\begin{itemize}
+\item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
+\item More steering -> Larger variations in amplitude of sources
+\end{itemize}
+
+Idea to steer within a fraction of the rectangular window's mainlobe. 
+
+\begin{align*}
+d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
+\end{align*}
+
+
+HISAS1030:
+\begin{itemize}
+\item 25$^\circ$ opening angle.
+\item M$=32$ elements.
+\item 
+\end{itemize}
+
+- Retain source amplitude
+- Retain speckle statistics
+- Improve resolution
+- Easy to use
+
+
+
+Skifte til 1/4 av bredden 
+
 
 \subsection{Tricks}
 
