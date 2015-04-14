@@ -80,7 +80,7 @@
 \fi
 
 % \usepackage{caption}
-\usepackage{subcaption}
+% \usepackage{subcaption}
 \usepackage{color}
 \usepackage{calc}
 \usepackage{fp}
@@ -588,7 +588,22 @@ An attactive trait of the LCA is its low computational complexity; while the MV 
 % \the\lineheight
 \section{Introduction}
 
-In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the arrays spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
+Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wavefield, but hard to do so spatially. It would require a very large array with a lot of sensors, which is costly, complex and impractical. Alternatively, a larger array can be synthesized from several successive pings recorded by a smaller physical array using a technique called synthetic aperture sonar (SAS). Unfortunately, not many of these systems exist due to the difficulty of navigating with sufficiently high precision under water.
+
+
+It would be more convenient to avoid 
+Hence, if the angular resolution can be improved by  the angular resoliutio
+Since A solution that is more convenient, cost-effective and simple solution would be to 
+
+
+
+than itof to collect information from an extended part of the incoming wave in time it is easier to sample the incoming wavefield both the wavefield is better the angular resolution is usually far inferior to the The quality of active sonar imaging systems are 
+
+Improving the angular resulution of active sonar systems are 
+In general the 
+In modern active sonar imaging systems it is generally harder to obtain sufficient is to transmit and receive wideband acustic pulses using multi-sensor arrays. and process their record the backscattered wavefield using an array of hydrophones.  Through a coherent combination of the sensor data these 
+
+In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
 
 Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a predefined window. However, since the optimal spatial response is likely to change with time, it is often preferred to use beamformers that continously adapt the weights to the dynamic data. This usually involves solving some optimization problem.
 

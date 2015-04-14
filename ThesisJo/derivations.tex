@@ -262,6 +262,46 @@ HISAS1030:
 Skifte til 1/4 av bredden 
 
 
+
+Tommelfingerregel for styring
+- 1/2 av rektangulær for punkter
+- 1/2 Hamming/Kaiser for skarpe transisjoner
+
+- Omtrent samme beta i transisjoner
+- Samme beta i spekkel/highlight
+- Annen beta i skygge
+
+
+Bildeparametre:
+- Oppløsning
+- Kontrast.
+- Dynamisk område.
+- I sonar er spekkel tekstur! Vi kan tillate en undertrykking av den, men ønsker forholdsvis lik spekkelstatistikk.
+- Temporal and spatial shift variance. Et punkt burde avbildes med omtrent samme amplitude uansett hvor det er i bildet.
+- Sensitivitet
+- Steered response.
+- Coherence
+- Qualitative assessment
+
+Hvor mange trenger vi.
+1. Brute force. Tester alle kombinasjoner av
+   - Oversampling
+   - Beta
+   - Styring
+2. Hva det koker ned til.
+   - Oversampling. Virker som om 2*M er en god regel, trenger litt mer om vi tillater mye styring.
+   - Beta. Holder med 3-6. Kan regnes anaAnalytisk
+   - Styring. Desto mer styring, desto mer agressiv beamforming. Burde ikke styre mer enn av vi får litt variasjon av nullpunkt, men med liten skift-invarians i amplitide.
+
+
+
+Sammenlignet med MVDR
+- Hvorfor trenger vi ikke subarray / tidsmidling?
+- MVDR er ``for'' adaptiv. Selv med 1-gain rett frem kan signalet derfra kansellers. Subarray midling hjelper mot dette, men tar ned oppløsningen. LCA har ikke frihet til å velge amplitude/phase kombinasjoner som tillater signalkansellering, og det viser seg at vi da ikke trenger å midle for å oppnå ønsket resultat.
+
+
+
+
 \subsection{Tricks}
 
 Now let us choose a trigonometric window function:
