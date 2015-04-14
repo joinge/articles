@@ -683,6 +683,34 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 % \newpage
 \section{Results and Discussion}
 
+
+% \begin{table}[!b]\centering%\normalsize
+% \begin{tabular}[c]{l r r r@{}  l}\hline
+% \rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
+% Arithmetic & 1.03 Tflop/s & & &\\
+% Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
+% Shared memory & & 257 Gfloats/s & 1 &:4 \\
+% Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
+% \end{tabular}
+% \caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}\label{throughputs}
+% \end{table}%
+
+\newcommand\cc[1]{\multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf #1}}
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{}  r r r}\hline
+\rowcolor{tabBlue} & \cc{Resolution} & \cc{S} & \cc{$\beta$} & \cc{$\varphi^*$} &  \cc{N$_\beta$} & \cc{N$_\varphi$} \\\hline
+& 50\%  & 28 & [0,3] & \hspace{.15cm} 50\% & 2 & 3 \\
+& 50\%  & 28 & [0,6] & \hspace{.15cm} 50\% & 2 & 3 \\
+& 50\%  & 28 & [0,9] & \hspace{.15cm} 50\% & 2 & 3 \\
+& 100\% & 32 &  &:30 \\
+& 150\% & 32 & 1 &:4\\
+\end{tabular}\\
+* Steering is relative to the -3dB width of the window being applied.
+\caption{Qualitative study}\label{parameter_study}
+\end{table}%
+
+
+
 We have tested the beamformers using data aquired by the Kongsberg Maritime HISAS1030 sonar~\cite{han09}, and on simulations of the same sonar with 100 realisations of speckle.
 
 The simulations contained a few highlighted cylindric regions with 2\,m diameter and a constant intensity 15.4\,dB over the average speckle level. We focused on an object centered at 41\,m range and -3 degrees azimuth angle. The images produced by the LCA, MV and unweighted DAS for a single speckle realisation and a mean image of all 100 realisations are shown in \Fig{speckle}. Each image was normalised by their respective speckle level, and the dynamic range was clamped at \{-30,~15\}\,dB. The physical extent of the of the simulated object was superimposed for reference. %\ref{saf09}
