@@ -1,27 +1,54 @@
 
  
 \documentclass[
-uiophd,
-floatrow
+   uiophd
+ , floatrow
+ , xelatex
+ , glossary                                     % Use a glossary
+ , biblatex                                 % Use a bibliography
 ]{common/mytemplate}
+
+\hypersetup{
+   bookmarksopen=true
+ , bookmarksopenlevel=2
+}
 
 % \usepackage[utf8]{inputenc}         % or whatever you use
 
 \title{My title}
 \author{My name}
 
-\newcommand\p{\vec p}
+
+\newcommand*\1{\vec 1}
+\renewcommand*\a{\vec a}
+\newcommand*\eR{\mat{\hat R}}
+\newcommand*\eRi{\hat{\mat R}\;\!^{-1}}
 \renewcommand\k{\vec k}
-\renewcommand\v{\vec v}
-\newcommand\x{\vec x}
-\newcommand\w{\vec w}
+\newcommand*\n{\vec n}
+\newcommand\p{\vec p}
+\newcommand*\R{\mat R}
+\newcommand*\Ri{\R^{-1}}
+\newcommand*\s{\vec s}
 \newcommand\ux{\hat{\boldsymbol{x}}}
 \newcommand\uy{\hat{\boldsymbol{y}}}
 \newcommand\uz{\hat{\boldsymbol{z}}}
-\newcommand\argmin[1]{\underset{#1}{\text{argmin}}}
+\renewcommand\v{\vec v}
+\newcommand\x{\vec x}
+\newcommand\X{\mat X}
+\newcommand\w{\vec w}
+
+\newcommand\argmin[1]{\underset{#1}{\text{argmin}}\ }
+\newcommand\norm[1]{\left\lVert #1 \right\rVert}
 % \newcommand\min[1]{\underset{#1}{\text{min}}}
 
+
 \usepackage{floatrow}
+
+\input{glossary}
+\makeglossaries
+
+\addbibresource{references.bib}
+
 
 \begin{document}
 \frontmatter
@@ -30,12 +57,30 @@ floatrow
 
 \mainmatter
 
+\printglossary
 
+\newpage
 \input{introduction}
 
+\newpage
+\input{background}
+
+\newpage
 \input{litterature_review}
 
+\newpage
 \input{derivations}
+
+\newpage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\newpage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\newpage
+\printbibliography
     
 \end{document}
 

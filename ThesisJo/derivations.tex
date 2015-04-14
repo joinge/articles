@@ -114,13 +114,15 @@ and we can now see that
 \nabla^2 s' - \frac{1}{c^2}\frac{\partial^2 s'}{\partial t^2} = 0.
 \end{align}
 %
-This is called the homogeneous lossless wave equation, because there is no source term. The inhomogeneous equation can be obtained in a similar way, by altering the linearized continuity equation to:
+This is called the homogeneous lossless wave equation, because there is no source term. When our signal $s$ signifies pressure (N/m$^2$), this links time and space by means of mass flow rate (kg/(m$^3$s).
+
+The inhomogeneous equation can be obtained in a similar way by including a source term. If we model the source as an injection of a volume of fluid, we can include it in the linearized continuity equation:
 %
 \begin{align}
 \frac{\partial\rho'}{\partial t} &= -\rho_0\nabla \cdot \v' - \rho_0f(\p,t). \label{wave_eq_mass_conservation_source}
 \end{align}
 %
-where $\rho_0f(\p,t)$ is the rate of mass change (in $\left[\frac{\text{kg}}{\text{m}^3\text{s}}\right]$) caused by the source. Following the exact same procedure as before we obtain:
+where $\rho_0f(\p,t)$ is the rate of mass change (in $\left[\frac{\text{kg}}{\text{m}^3\text{s}}\right]$) caused by the mass injection. Following the exact same procedure as before we obtain:
 %
 \begin{align}
 \nabla^2 s' - \frac{1}{c^2}\frac{\partial^2 s'}{\partial t^2} = \rho_0\frac{\partial f(\p,t)}{\partial t}.
@@ -132,7 +134,7 @@ where $\rho_0f(\p,t)$ is the rate of mass change (in $\left[\frac{\text{kg}}{\te
 Instead of solving the wave equation directly, we will make a qualified guess that the solution takes the form of a complex exponential in both time and space. For rectangular coordinates this can be written as:
 %
 \begin{align}
-s(\p,t) &= A\,e^{j(\omega t - \k\cdot\p)}
+s(\p,t) &= A\,e^{j(\omega t - \k\cdot\p)},
 \end{align}
 %
 Inserting this into the wave equation yields:
@@ -144,12 +146,17 @@ k_x^2 + k_y^2 + k_z^2 &= |\k|^2 = \frac{\omega^2}{c^2} \\
 |\k| &= \frac{\omega}{c}
 \end{align}
 %
-Hence, whenever we can assume the spatial and temporal frequency to be related directly by the sound speed, $|\k| = \frac{\omega}{c}$, then this assuming a complex exponential should be fair.
+This means that when we can assume the spatial and temporal frequency to be related directly by the sound speed, $|\k| = \frac{\omega}{c}$, then assuming a complex exponential to be a valid solution. Another solution of the wave equation is that of a spherical wave:
+%
+\begin{align}
+s(r,t) &= \frac{A}{r}\,e^{j(\omega t - kr)}.
+\end{align}
 
 \section{Absorption}
 
 Our derivation of the wave equation assumed no loss of energy. In practice the wave's energy is abosorbed through viscous losses, heat conduction losses and intermolecular losses. These are strongly dependent on frequency. The wave equation can be adapted to account for absorption by assuming a complex sound speed, which will lead to a solution to the wave equation with a real exponential term. In this thesis we will not concern ourselves 
 
+\newpage
 \section{Roughness}
 
 For a plane monochromatic wave the Rayleigh roughness parameter is quantified by:
@@ -184,14 +191,45 @@ This reflection coefficient is valid when the Rayleigh parameter is small (i.e. 
 
 
 
-\section{LCA tricks}
+\section{LCA}
 
-Let $\x$ be the data received by an array, pre-steered to some pixel in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer outout $z$ as the weighted sum of the data:
+Let $\X[n]$ be the data received by an array, pre-steered to all pixels in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer output $z$ as the weighted sum of the data:
 %
 \begin{align}
-z(\w,\x) = \w\H\x = \sumb{m=0}{M-1} w_m x_m^*
+z[\w,n] = \w\H\X[n] = \sumb{m=0}{M-1} w_m x_m^*[n]
 \end{align}
 %
+From a set of $P$ windows the LCA beamformer selects the window $p$ that yield the least output power:
+%
+\begin{align}
+\argmin{p}{E\big\{|z|^2\big\}} = \argmin{p}{E\big\{|\w_p\H\X[n]|^2\big\}} \qquad\text{subject to}\qquad \w\H\a = 1
+\end{align}
+%
+We can estimate $E\big\{|\w_p\H\X[n]|^2\big\}$ as
+%
+\begin{align*}
+\sigma^2_{z_p}[n] = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
+\end{align*}
+%
+To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
+%
+\begin{align*}
+\sigma^2_{z_p}[x,n] = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
+\end{align*}
+%
+where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
+
+Kaiser:
+%
+\begin{align*}
+w[n] = \frac{I_0\big( \pi\alpha\sqrt{1-(\frac{2n}{N-1}-1)^2}\big)}{I_0(\pi\alpha)}
+\end{align*}
+%
+where $I_0$ is a zeroth order modified Bessel function of the first kind.
+
+
+\subsection{Tricks}
+
 Now let us choose a trigonometric window function:
 %
 \begin{align}
@@ -213,3 +251,62 @@ LCA can then be defined as
 \begin{align}
 \argmin{\w}\ |z|^2 = \argmin{\w}\ z\,z^* = %\argmin{\w}\ \w\H\x = \sumb{m=0}{M-1} w_m^* x_m
 \end{align}
+
+\newpage
+\section{MVDR}
+
+By definition, the beamformer output $z[n]$ can now be expressed as the weighted sum of all the delayed data samples:
+\begin{align}
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
+\end{align}
+where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+
+Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution
+%
+\begin{gather}
+\vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
+\end{gather}
+%
+where $\a$ is a steering vector and $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since we pre-steer our data to every pixel in the image we simplify (\ref{weights}) by substituting $\a$ with a row vector $\1$ that represents broadside phase-steering. To estimate $\R$ we compute a sample covariance matrix $\eR$. In this computation we perform some degree of:
+%
+\begin{itemize}
+\item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985};
+\item \emph{temporal averaging} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009a};
+\item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
+\end{itemize}%
+
+\subsection{Diagonal loading}
+
+Assume the data to be a combination of signal and noise, $\x = \s + \n = e^{j\theta[n]}$. Then the beamformer output is
+%
+\begin{align}
+z = \w\H\x = \w\H(\s+\n),
+\end{align}
+%
+and the output power becomes
+%
+\begin{align}
+|z|^2 = \w\H\x\x\H\w &= \w\H(\s+\n)(\s+\n)\H\w \nn
+&= \begin{cases}
+\w\H\s\s\H\w + \w\H\s\n\H\w + \w\H\n\s\H\w + \w\H\n\n\H\w &\text{when correlated}\\
+\w\H\s\s\H\w + \w\H\n\n\H\w &\text{when uncorrelated}
+\end{cases}
+\end{align}
+%
+Assuming that the data is predelayed broadside, and that the window is rectangular, we may set $\a = \s$ and get
+%
+\begin{align}
+|z|^2 = \w\H\s\s\H\w + \w\H\n\n\H\w
+\end{align}
+
+
+\newpage
+\section{Beamforming}
+
+
+
+\begin{align}
+z[n] = \w\H[n]\x[n]
+\end{align}
+
+

@@ -203,6 +203,12 @@
    \DeclareOption{xelatex}{\OPTxelatextrue}
 \fi
 
+\ifOPTuiophd
+   \DeclareOption{bibtex}{\OPTbibliographytrue}
+   \DeclareOption{biblatex}{\OPTbibliographytrue}
+   \DeclareOption{xelatex}{\PassOptionsToClass{xelatex}{\@bdoctype}\OPTxelatextrue}
+\fi
+
 % Options for the report, book and article class
 \ifOPTstdclass
    \DeclareOption{letterpaper}{\PassOptionsToClass{letterpaper}{\@bdoctype}}
@@ -434,7 +440,12 @@
 
 \ifOPTbeamer
 \else                                                % Increases the available colour palette
-  \ifOPTxelatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
+  \ifOPTxelatex
+     \ifOPTuiophd
+     \else
+        \RequirePackage[xetex,final]{graphicx}
+     \fi%      % Adds \includegraphics{} etc.
+  \fi
   \ifOPTlualatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
   \ifOPTxelatex\else\ifOPTlualatex\else%
       \RequirePackage{graphicx}%
@@ -564,7 +575,16 @@
 \fi
 
 \ifOPTuam\else\ifOPTbibliography
-  \RequirePackage[url=false, defernums=true]{biblatex}
+  \RequirePackage[autostyle]{csquotes}
+  \RequirePackage[
+     backend=biber
+   , defernums=true
+   , doi=true
+   , eprint=false
+%    , sortlocale=
+   , style=authoryear-icomp
+   , url=false
+   ]{biblatex}
 \fi\fi
 %% Packet for turning/rotating objects
 \RequirePackage{rotating}

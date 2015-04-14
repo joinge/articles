@@ -1,9 +1,17 @@
 
+\chapter{Introduction}
+
 The best processing unit we know of is the human mind. Its several billion neurons process information at a staggering rate, and concurrently. As described by this year's nobel price winners, memories of visual objects gets stored in a similar spacial structure in the brain.  
 
 Similar to how the process visual input from our eyes and turn them into the images we perceive, we want turn echo from sonar systems into images of the physical objects the sound was scattered by. 
 
 Want to compare acoustic array to the eyes. Similar, this images from sound should be possible. Brain parallel, and superior. Thus, processing power must be essential to the continued improvement of current sonar systems. But *how* should be additional processing power be used?
+
+\section{Aims of this thesis}
+
+\section{Motivation and scope}
+
+\section{Thesis outline}
 
 
 Signal processing is the art of combining physics, mathematics and computational engineering 
@@ -12,6 +20,7 @@ Wonders happen every day. What our senses reveal our brain make real. This is th
 
 - The wonder of how the brain process images. Great information carrier.
 
+\gls{ASIC}
 
 Electromagnetic radiation - poor range due to attenuation and scattering. Use sound instead. Inferior information carrier. Lower frequency and propagation speed.
 
@@ -31,85 +40,3 @@ SAS: Range and frequency independent resolution.
 Performance:
 - AUV revisit. Better image quality, lower data collection price.
 
-\chapter{Introduction}
-
-
-\section{The Wave Equation}
-
-\begin{align*}
-\nabla^2 f(\p,t) - \frac{1}{c^2(\p)}\frac{\partial^2 f(\p,t)}{\partial t^2} = -s(t) \delta(\p-\p_0)
-\end{align*}
-
-where $\nabla^2$ is the Laplacian operator
-
-\section{Synethic Aperture Sonar Simulation}
-
-For an autonomous underwater vehicle to reach its full 
-
-Most autonomous devices designed today only perform very basic tasks.
-
-One of the areas where very fast where the development of faster and faster processing hardware might play a
-One of the technologies in which graphics processing units might make a welcome addition is in autonomous underwater vehicles. 
-
-This thesis will describe a simulator for synthetic aperture sonar that 
-
-\section{Scattering models}
-
-
-Defining parameters:
-- Roughness
-- Incident angle
-- Frequency
-
-
-Reflection and scattering from surfaces:
-
-Roughness >> wavelength:
-- Roughness > wavelength: Helmholtz-Kirchhoff (physical optics approach) (Hovem). Leads to Huygins priciple.
-- Roughness < wavelength: Rayleigh-Rice (perturbation technique) (Hovem). More accurate at slightly rough surfaces.
-
-Rayleigh. chi = 2 k sigma sin(theta): Rayleigh criterion: Surface is acoustically smooth when chi << 1.
-
-\begin{itemize}
-\item SWAT (Shallow Water Acoustic Toolset): 
-\item Bell's thesis:
-\item SIGMA:
-\item OpenGL does not support scattered writes. OpenCL does.
-\item 2D template approximation:
-\item Geometric distortions in SSS \cite{Cobra1992} Bell
-\item Sidescan sonar and synthetic aperture sonar. In seafloor coordinates. Maps to orthogonal rendering.
-\item Layover causes ambiguity, different seafloor phenomena can cause the same output image. Lots of cornercases when approximating the model in 2D. Instead use a 3D model and project it to a 2D one. Easier to operate, models are more general purpose. Less parameters to adjust.
-\item Viewer can be used to train an operator for finding non-trivial objects on the seafloor. Input for automated target recognition standard.
-\item Improved image quality of selected object, reduced data collection cost (price estimate?).
-\item OpenGL rendering can have infinite resolution, only limited by the pixel density in the image.
-\item Accuracy in terms of classification result. Need to embody static effects in a deterministic way. Incoherent synthesis of the image.
-\item Sound speed assumed constant.
-\item High frequency lead to little (define) penetration, lower range and higher resolution. Often modeled accurately with ray tracing techniques.
-\end{itemize}
-
-Model
-\begin{itemize}
-\item Ray solution: Separate amplitude and phase components of the Helmholtz eq. by applying geometric optics approximation. Ok as long as amplitude varies more slowly with position than the phase. Implications: High frequency, because the curvature of a ray over a wavelength must be small, and the fractional change in the sound speed must be small over a wavelength. Further simplification available by Snell's Law. Fast to compute. Not able to handle diffraction, focal points and caustics, and will cause (too) abrupt changes on distinct changes in sea environment. Can be improved upon with fuzzy beam modeling / Gaussian beam tracing.
-\begin{itemize}
-\item Pro: Easy to compute. Visual result. Handles complex bathymetry. Array and model response can be accounted for.
-\item Con: Only works for high frequency and small sound variations. No diffraction, caustics and focus. Infinite energy caustics/sharp variations. Incoherent(?)
-\end{itemize}
-\item Normal modes: Separate amplitude and phase into a range dependent term, and a depth dependent term. Assumes minimal range dependence in sound speed profile and depth. Limited near field accuracy. Acoustic field does not need to be calculated at intermediate ranges. Penetration can be modeled. can be calculated 
-\begin{itemize}
-\item Pro: Ok to compute. Handles penetration. Low frequency, shallow water.
-\item Con: Horizontal stratification. Far field only. 
-\end{itemize}
-\item Parabolic equation: One way propagation. Marching solution. Initial starting solution must be known, often computed with normal mode. Only valid for narrow beams $\pm$20. Able to handle range dependent environments. Computing full field is easy. Computation time is of O(f$^2$), hence mostly useful for low-frequency scenarios. Unable to deal with horizontal refraction (shadow zones from e.g. conical mounts)
-\item Fast field programs / Green's function solutions. Exact full wave solution for acoustic fields in horizontally stratified media. Can handle both compressional and shear waves, and hence both fluid and solid media. Far field assumption. Similar to normal mode techniques.
-\item Finite element: Scene segmented into triangles or rectangles with a size of one tenth of a wavelength, or less. At each node the wavefield can be determined from the wave equation. Computationally limited to low frequencies.
-\item 2D model: Acoustic field in range and depth. Assumes that a wave transmitted in a vertical plane remains in it. Reasonable when the sound speed can be assumed constant in the horizontal plane, and when the seafloor normals are in the vertical range-depth plane (avoid horizontal refraction, or actually reflection).
-\end{itemize}
-
-
-What's new?
-\begin{itemize}
-\item Tuned for speed using GPUs, combining OpenGL and OpenCL to take advantage of existing functionality for computer graphics with the added flexibility of general purpose programming on the GPUs.
-\item Performance to spare: Game-like viewer for the visualization and verification of the rendered scene and corresponding sonar image.
-\item First simulator of its kinds aimed towards improved ATR and ultimately better AUVs.
-\item 3D models are still novel. 
-\end{itemize}

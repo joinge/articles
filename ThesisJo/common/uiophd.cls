@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
-\ProvidesClass{uiophd}[2014/06/30 v 1.03b UiO document class]
+\ProvidesClass{common/uiophd}[2014/06/30 v 1.03b UiO document class]
 \DeclareOption{10pt}{\ClassWarningNoLine{uiophd}{Do not
         use type size '10pt'}}
 \DeclareOption{11pt}{\ClassWarningNoLine{uiophd}{Do not
