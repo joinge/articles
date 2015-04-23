@@ -588,17 +588,31 @@ An attactive trait of the LCA is its low computational complexity; while the MV 
 % \the\lineheight
 \section{Introduction}
 
-Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wavefield, but hard to get the spatial equivalent. It would require a very large array with a lot of sensors, which is costly, complicated and impractical. An alternative is to synthesize a large array from a small array by coherently combining data from successive pings. This technique is called synthetic aperture sonar (SAS). Unfortunately, it is very challenging to navigate with sufficient precision under water this is a very challenging task due to the difficulty of navigating with sufficiently high precision under water.
+Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wave field, but hard to get the spatial equivalent. It would require a very large array with a lot of sensors, which is costly, complicated and impractical. An alternative is to synthesize a large array from a small array through a coherent combination of data from successive pings, a technique known as synthetic aperture sonar (SAS). Unfortunately, the difficult nature of navigating with high precision under water limits this technique to systems with advanced navigational equipment.
 
-Due to the challenges of solving this issue with hardware, a lot of research is put into improving the image reconstruction algorithms. At the heart of these is a technique called beamforming, which seeks to estimate scattering strength for each pixel location. It does this by applying a suitable set of the estimate the involves applying a suitable set of delays and weights to the sensors to coherently combine the sensors' data using a seeks to where focus is obtained in  the where delays and weights are used on the array's channels to form a coherent combination ly combine 
+Due to the limitations imposed on hardware, a lot of research is put into improving the part of the digital image formation process. A core component here is the beamformer, a spatial band-pass filter used on the wave field to estimate each pixel value. To allow the use of wide-band signals a coarse steering is first applied by delaying the sensor channels, followed by an individual weighting of them. Using complex weights, this implies fine adjustment of both the amplitude and the phase of the spatial filter. While conventional beamformers apply static weight functions, adaptive methods tailor the weights to the wave field.
+
+One of the best studied adaptive methods is the minimum variance distortion-less response (MVDR) beamformer. It solves an optimization problem to come up with a weight set that yields unity gain in the desired direction, while minimizing the effect of noise and interference from other directions. The result is often good looking non-linear image with improved contrast and detail resolution. However, MVDR is inherently neither statistically nor numerically robust, and typically needs to average data in space and time, and regularization. This constrains the solution space of the weights.
+
+We will show that when applied to experimental data, the weights typically chosen by a robustified MVDR yield responses that are typically symmetric and steered within a fraction of the -3dB resolution of the respective window. Then we make Kaiser windows of different types, and with varying degree of steering, that combined discretizes the MVDR solution space. 
+
+The LCA method was first introduced in clinical ultrasound imaging, where it was shown to improve image quality compared to conventional static beamforming methods \cite{Synnevag2007}. 
 
 
-It would be more convenient 
-Hence, if the angular resolution can be improved by  the angular resoliutio
-Since A solution that is more convenient, cost-effective and simple solution would be to 
+MVDR is a fully adaptive method, meaning an optimal set of weights are produced given its optimization problem. Its only constraint is that the weights must sum to one. 
+
+From our work with MVDR it 
 
 
-Reminder: Always hit you equal in war, +/- 2 ranks. Example: If your position on the war map is #20, then pick a target in the range #18-#22. Only exception is for our top 10-15 players, which may use second attack for cleanup.
+ tailor the weights to the incoming wavefield. 
+
+Traditionally beamformers were static, but as processors get more powerful so with the emergence of more processing power 
+
+
+
+\section{Methods}
+
+At heart of the image formation process is a technique called beamforming, which creates a focus point at the pixel of interest. It does this by applying a suitable set of delays and weights to the array elements, such that signals emanating from the pixel location are emphasized constructively, while noise and interference from other directions sum destructively.
 
 
 than itof to collect information from an extended part of the incoming wave in time it is easier to sample the incoming wavefield both the wavefield is better the angular resolution is usually far inferior to the The quality of active sonar imaging systems are 
@@ -1008,9 +1022,9 @@ The authors would like to thank...
 
 
 
-% \bibliographystyle{IEEEtran}
-% \bibliography{references}
-% 
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
 % 
 % \input{bio/jo_inge_buskenes}
 % % \input{bio/jon_petter_aasen}
