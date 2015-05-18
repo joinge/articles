@@ -527,6 +527,7 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
+\color{gray}
 
 The minimum variance distortionless response (NVDR) beamformer is a popular 
 Acoustic imaging systems can often benefit from adapting their behaviour situation at hand. When the data is received with a phased array. 
@@ -542,14 +543,23 @@ Most modern acoustic imaging methods rely on the data from a phased array
 \item Computationally complex O($M^3$) due to inversion of a spatial covariance matrix. LCA is only O($MW$). Even if Capon subspace/beamspace versions exist, they remain more complex than the LCA, and is not as ideally suited for implementation of SIMD hardware (GPUs, DSPs, ...).
 \end{itemize}
 \item LCA is inherently robust, is ``parameter free'' once setup with a well designed window set, and can often be implemented with minor modifications to already existing DAS beamformers.
+
+The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
+
+While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
+
+We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+
+An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
+
 \end{itemize}
 
 \end{abstract}
 
 % Keywords (normally not used for peer reviews)
 \ifPeerReview\else
-\begin{IEEEkeywords}
-Beamforming, adaptive beamforming, sonar, active, complexity.
+\begin{IEEEkeywords}\color{gray}
+Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 \end{IEEEkeywords}
 \fi}
 % \fi
@@ -568,43 +578,23 @@ Beamforming, adaptive beamforming, sonar, active, complexity.
 % Insert page break and insert second title (peer review mode)
 \IEEEpeerreviewmaketitle
 
-
-
-\begin{abstract}
-The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
-
-While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
-
-We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-
-An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
-\end{abstract}%
-%
-\keywords{Beamforming, Capon, Minimum variance, Low Complexity, Sonar}
-
-% \titlepage
-
-\newpage
-% \the\lineheight
 \section{Introduction}
 
 Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wave field, but hard to get the spatial equivalent. It would require a very large array with a lot of sensors, which is costly, complicated and impractical. An alternative is to synthesize a large array from a small array through a coherent combination of data from successive pings, a technique known as synthetic aperture sonar (SAS). Unfortunately, the difficult nature of navigating with high precision under water limits this technique to systems with advanced navigational equipment.
 
-Due to the limitations imposed on hardware, a lot of research is put into improving the part of the digital image formation process. A core component here is the beamformer, a spatial band-pass filter used on the wave field to estimate each pixel value. To allow the use of wide-band signals a coarse steering is first applied by delaying the sensor channels, followed by an individual weighting of them. Using complex weights, this implies fine adjustment of both the amplitude and the phase of the spatial filter. While conventional beamformers apply static weight functions, adaptive methods tailor the weights to the wave field.
+Due to the limitations imposed on hardware, a lot of research is put into improving the part of the digital image formation process. A core component here is the beamformer, a spatial band-pass filter used on the wave field to estimate each pixel value. To allow the use of wide-band signals a coarse steering is first applied by delaying the sensor channels, followed by an individual weighting of them. Using complex weights, this implies fine adjustment of both the amplitude and the phase of the spatial filter. While conventional beamformers apply static weight functions, adaptive methods dynamically tailor the weights to the wave field.
 
-One of the best studied adaptive methods is the minimum variance distortion-less response (MVDR) beamformer. It solves an optimization problem to come up with a weight set that yields unity gain in the desired direction, while minimizing the effect of noise and interference from other directions. The result is often good looking non-linear image with improved contrast and detail resolution. However, MVDR is inherently neither statistically nor numerically robust, and typically needs to average data in space and time, and regularization. This constrains the solution space of the weights.
+One of the best studied adaptive methods is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It 
+
+ solves an optimization problem to come up with a weight set that yields unity gain in the desired direction, while minimizing the effect of noise and interference from other directions. The result is often good looking non-linear image with improved contrast and detail resolution. However, MVDR is neither statistically nor numerically robust by default, and typically needs to average data in space and time, and regularization. This constrains the solution space of the weights.
 
 We will show that when applied to experimental data, the weights typically chosen by a robustified MVDR yield responses that are typically symmetric and steered within a fraction of the -3dB resolution of the respective window. Then we make Kaiser windows of different types, and with varying degree of steering, that combined form a discrete version of the MVDR solution space. 
 
 The LCA method was first introduced by Synnevåg et. al. in clinical ultrasound imaging, who demonstrated its ability to improve image quality compared to conventional static beamforming methods \cite{Synnevag2007}. 
 
 
-MVDR is a fully adaptive method, meaning an optimal set of weights are produced given its optimization problem. Its only constraint is that the weights must sum to one. 
-
 From our work with MVDR it 
 
-
- tailor the weights to the incoming wavefield. 
 
 Traditionally beamformers were static, but as processors get more powerful so with the emergence of more processing power 
 
@@ -614,11 +604,6 @@ Traditionally beamformers were static, but as processors get more powerful so wi
 
 At heart of the image formation process is a technique called beamforming, which creates a focus point at the pixel of interest. It does this by applying a suitable set of delays and weights to the array elements, such that signals emanating from the pixel location are emphasized constructively, while noise and interference from other directions sum destructively.
 
-
-than itof to collect information from an extended part of the incoming wave in time it is easier to sample the incoming wavefield both the wavefield is better the angular resolution is usually far inferior to the The quality of active sonar imaging systems are 
-
-Improving the angular resulution of active sonar systems are 
-In general the 
 In modern active sonar imaging systems it is generally harder to obtain sufficient is to transmit and receive wideband acustic pulses using multi-sensor arrays. and process their record the backscattered wavefield using an array of hydrophones.  Through a coherent combination of the sensor data these 
 
 In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
@@ -628,8 +613,6 @@ Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a p
 The Minimum Variance (MV) beamformer selects the window that minimizes the beamformer's output power~\cite{cap69}. It has recently been investigated for active sonar imaging in e.g.~\cite{saf09}, and in ultrasound imaging in e.g.~\cite{syn07}. We suggest using a Low Complexity Adaptive (LCA) beamformer, which for each pixel applies a set of predefined windows and selects one of them based on the MV criterion. Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
 
 
-% When the wavefield is sampled using an array of sensors, the data from each sensor may be 
-% 
 % Traditional beamformers such as Delay-and-Sum (DAS) apply predefined windows to all incoming data. However, due to the non-stationary nature of sonar data, the optimal window for any given time instant will generally differ from the next. This is where adaptive beamformers thrive, because they compute the optimal window coefficients for the data at each time instant. The choice of optimisation criteria is what mainly differentiates the various adaptive beamformers. The Minimum Variance (MV) beamformer, for instance, selects the set of weights that minimizes the beamformer output power for any given time instant~\cite{cap69}.
 
 
@@ -642,6 +625,72 @@ The MV beamformer computes the window coefficients by estimating and inverting a
 Based on the proposed method by SynnevÃ¥g~\cite{syn11}, we have implemented the LCA beamformer that keeps the minimum variance optimisation criterion but reduces the solution space to a discrete set of predefined windows. This reduces the computational complexity to O($MW$), where $W$ is the number of windows in the set. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$~\cite{kai66}. In addition we apply steering to each of the windows and constrain the window design to ensure unit gain in the look direction.
 
 The following will show that the proposed method performs similarly to or better than the MV method.
+
+
+\subsection{Beamforming}
+
+Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
+
+By definition, the beamformer output $z[n]$ can now be expressed as the weighted sum of all the delayed data samples:
+\begin{align}
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
+\end{align}
+where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+
+Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}. This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution
+\begin{gather}
+\vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
+\end{gather}
+where $\a$ is a steering vector and $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since we pre-steer our data to every pixel in the image we simplify (\ref{weights}) by substituting $\a$ with a row vector $\1$ that represents broadside phase-steering. To estimate $\R$ we compute a sample covariance matrix $\eR$. In this computation we perform some degree of:
+\begin{itemize}
+\item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985};
+\item \emph{temporal averaging} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009a};
+\item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
+\end{itemize}%
+%
+% will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
+%
+Combined, these steps will also ensure a numerically well conditioned $\eR$.
+
+We perform \emph{temporal} and \emph{spatial averaging} first and put the result in an intermediate sample covariance matrix $\breve{\R}$. To do this we need to segment our array into subarrays. If we let $x_l[n]$ represent the data vector from subarray $l$ by
+\begin{gather}
+\x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
+\end{gather}
+then $\breve{\R}$ can be calculated as
+\begin{gather}
+\breve{\R}[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n']\x_l\H[n'] \in\mathbb{C}^{L,L},\label{spatialR}
+\end{gather}
+where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
+
+The final estimate $\eR$ is found by adding a fraction $d$ of the total power of $\breve{\R}[n]$ to its diagonal~\cite{Synnevag2007}:
+\begin{align}
+\eR[n] = \breve{\R}[n] + \I \frac{d}{L} \tr\{\breve{\R}[n]\},\label{finalR}
+\end{align}
+where $\I$ is an identity matrix, $\tr\{\cdot\}$ represents the matrix trace operation, and $\tr\{\breve{\R}[n]\}$ is an estimate of the energy received from this pixel.
+
+Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M,M}$ to $\mathbb{C}^{L,L}$, and hence will produce an $L$-element weight set when substituted into (\ref{z}). This weight set is applied to all the subarrays, before computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weight set to the sum of all the subarrays by
+\begin{align}
+z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
+\end{align}
+% \ifPeerReview
+% \begin{figure}[!t]\centering
+% \includegraphics[width=.8\linewidth]{gfx/buske2\figPostfix.eps}
+% \else
+% \begin{figure}[!t]\centering
+% \includegraphics[width=\linewidth]{gfx/implementation.eps}
+% \fi%
+% \caption{MVDR beamforming. For each pixel in range and azimuth:\newline
+% 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed; \newline
+% 2. the term $\eR^{-1}\1$ is found using a linear equation solver;\newline
+% 3. and the beamformer output $z$ is computed from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
+% \end{figure}
+As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each pixel independently, by:
+\begin{enumerate}
+\item computing the sample covariance matrix $\eR$ in (\ref{finalR});
+\item computing $\eRi\1$ in (\ref{weights});
+\item computing the beamformer output $z$ in (\ref{finalZ}).
+\end{enumerate}
+Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
 
 % \begin{figure}[p]\centering%
