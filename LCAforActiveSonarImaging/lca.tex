@@ -580,17 +580,29 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \section{Introduction}
 
-Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wave field, but hard to get the spatial equivalent. It would require a very large array with a lot of sensors, which is costly, complicated and impractical. An alternative is to synthesize a large array from a small array through a coherent combination of data from successive pings, a technique known as synthetic aperture sonar (SAS). Unfortunately, the difficult nature of navigating with high precision under water limits this technique to systems with advanced navigational equipment.
+One way to improve the performance of imaging devices is to make them more intelligent. 
+To improve the performance of modern imaging devices is becoming increasingly intelligent, they adapt their behaviour to best fit the situation they are in. A regular compact camera for instance, adjusts its shutter opening and speed to 
 
-Due to the limitations imposed on hardware, a lot of research is put into improving the part of the digital image formation process. A core component here is the beamformer, a spatial band-pass filter used on the wave field to estimate each pixel value. A way to do this while allowing wide-band signals is to steer coarsely by applying delays to the sensor channels, followed by an individual weighting of them. Using complex weights, this implies fine adjustment of both the amplitude and the phase of the spatial filter. While conventional beamformers apply static weight functions, adaptive methods dynamically tailor the weights to the wave field.
+The image quality of any imaging device is mostly its by its hardware components, and . 
+\IEEEPARstart{D}{ata-driven} methods have been introduced in various imaging fields over the years in attempts to improve image quality. One such method is the minimum variance distortionless response (MVDR) beamformer. Compared to conventional methods, MVDR is often able to improve image contrast and resolution, as shown in~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}.
+
+Despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and may suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O($M^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
+
+
 
 One of the best studied adaptive methods is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It computes a weight set that minimizes the power of noise and interference solves an optimization problem to come up with a weight set that yields unity gain in the desired direction, while minimizing the effect of noise and interference from other directions. The result is often good looking non-linear image with improved contrast and detail resolution. However, MVDR is neither statistically nor numerically robust by default, and typically needs to average data in space and time, and regularization. This constrains the solution space of the weights.
+
+Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a predefined window. However, since the optimal spatial response is likely to change with time, it is often preferred to use beamformers that continously adapt the weights to the dynamic data. This usually involves solving some optimization problem.
+
+The Minimum Variance (MV) beamformer selects the window that minimizes the beamformer's output power~\cite{cap69}. It has recently been investigated for active sonar imaging in e.g.~\cite{saf09}, and in ultrasound imaging in e.g.~\cite{syn07}. We suggest using a Low Complexity Adaptive (LCA) beamformer, which for each pixel applies a set of predefined windows and selects one of them based on the MV criterion. Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
 
 We will show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. Then we create Kaiser windows of different types, and with varying degree of steering, that combined form a discrete version of the MVDR solution space. 
 
 The LCA method was first introduced by Synnevåg et. al. in clinical ultrasound imaging, who demonstrated its ability to improve image quality compared to conventional static beamforming methods \cite{Synnevag2007}. 
 
-This article is outlined as follows: In Section \ref{methods}, we introduce the concept of adaptive beamforming and provide details on the MVDR and LCA method. Then, in \ref{maptogpu}, we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in Sections \ref{images_and_benchmarks} and \ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
+This article is outlined as follows:
+
+% This article is outlined as follows: In Section \ref{methods}, we introduce the concept of adaptive beamforming and provide details on the MVDR and LCA method. Then, in \ref{maptogpu}, we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in Sections \ref{images_and_benchmarks} and \ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
 % - How much oversampling
 % - How many parameters, how great a span.
@@ -611,13 +623,9 @@ Traditionally beamformers were static, but as processors get more powerful so wi
 
 At heart of the image formation process is a technique called beamforming, which creates a focus point at the pixel of interest. It does this by applying a suitable set of delays and weights to the array elements, such that signals emanating from the pixel location are emphasized constructively, while noise and interference from other directions sum destructively.
 
-In modern active sonar imaging systems it is generally harder to obtain sufficient is to transmit and receive wideband acustic pulses using multi-sensor arrays. and process their record the backscattered wavefield using an array of hydrophones.  Through a coherent combination of the sensor data these 
-
 In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
 
-Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a predefined window. However, since the optimal spatial response is likely to change with time, it is often preferred to use beamformers that continously adapt the weights to the dynamic data. This usually involves solving some optimization problem.
 
-The Minimum Variance (MV) beamformer selects the window that minimizes the beamformer's output power~\cite{cap69}. It has recently been investigated for active sonar imaging in e.g.~\cite{saf09}, and in ultrasound imaging in e.g.~\cite{syn07}. We suggest using a Low Complexity Adaptive (LCA) beamformer, which for each pixel applies a set of predefined windows and selects one of them based on the MV criterion. Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
 
 
 % Traditional beamformers such as Delay-and-Sum (DAS) apply predefined windows to all incoming data. However, due to the non-stationary nature of sonar data, the optimal window for any given time instant will generally differ from the next. This is where adaptive beamformers thrive, because they compute the optimal window coefficients for the data at each time instant. The choice of optimisation criteria is what mainly differentiates the various adaptive beamformers. The Minimum Variance (MV) beamformer, for instance, selects the set of weights that minimizes the beamformer output power for any given time instant~\cite{cap69}.

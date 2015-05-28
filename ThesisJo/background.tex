@@ -81,8 +81,11 @@ A unit length vector $\vec u$ can be written as:
 %
 
 
+\section{Active Sonar}
 
+Most modern active sonar imaging systems are usually far better at resolving details in range than in the angular direction. This is because it is relatively cheap and easy to collect a long and well sampled temporal representation of the incoming wave field, but hard to get the spatial equivalent. It would require a very large array with a lot of sensors, which is costly, complicated and impractical. An alternative is to synthesize a large array from a small array through a coherent combination of data from successive pings, a technique known as synthetic aperture sonar (SAS). Unfortunately, the difficult nature of navigating with high precision under water limits this technique to systems with advanced navigational equipment.
 
+Due to the limitations imposed on hardware, a lot of research is put into improving the part of the digital image formation process. A core component here is the beamformer, a spatial band-pass filter used on the wave field to estimate each pixel value. A way to do this while allowing wide-band signals is to steer coarsely by applying delays to the sensor channels, followed by an individual weighting of them. Using complex weights, this implies fine adjustment of both the amplitude and the phase of the spatial filter. While conventional beamformers apply static weight functions, adaptive methods dynamically tailor the weights to the wave field.
 
 \section{Synethic Aperture Sonar}
 
