@@ -763,7 +763,27 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 
 \section{Experimental Setup}
 
-For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
+For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. The question is how this selection should be With our ovarall goal being a reduction of computational complexity, it The choice of window function does not seem to matter. 
+
+Using Kaiser windows as their extremal values areLimit our study to Kaiser windows
+
+Variables of interest:
+\begin{itemize}
+\item Window function. Mostly symmetrical, in particular in shadow and for the most part in speckle. In highlight regions more varying.
+\end{itemize}
+
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{}  l}\hline
+\rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
+Arithmetic & 1.03 Tflop/s & & &\\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
+Shared memory & & 257 Gfloats/s & 1 &:4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
+\end{tabular}
+\caption{Summary}\label{tab:summary}
+\end{table}%
+
+This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
 
 To make the choice of window less susceptible to pixel value uncertainties, the LCA beamformer was set to apply the most frequently selected window in an 11 pixel range region to the center pixel in that region. In physical terms, this is a region of approximately 20\,cm. The MV beamformer estimated the covariance matrix as described in~\cite{syn07} by averaging over 16 subarrays and 11 range pixels, and applying 3\% diagonal loading.
 
@@ -772,6 +792,9 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 % \newpage
 \section{Results and Discussion}
+
+
+
 
 
 % \begin{table}[!b]\centering%\normalsize
