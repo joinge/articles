@@ -529,30 +529,26 @@ of Informatics, University of Oslo, Norway.}% <-this % stops a space
 \begin{abstract}
 \color{gray}
 
-The minimum variance distortionless response (NVDR) beamformer is a popular 
-Acoustic imaging systems can often benefit from adapting their behaviour situation at hand. When the data is received with a phased array. 
-
-Most modern acoustic imaging methods rely on the data from a phased array 
-
-\begin{itemize}
-\item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
-\item But:
-\begin{itemize}
-\item Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust.
-\item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
-\item Computationally complex O($M^3$) due to inversion of a spatial covariance matrix. LCA is only O($MW$). Even if Capon subspace/beamspace versions exist, they remain more complex than the LCA, and is not as ideally suited for implementation of SIMD hardware (GPUs, DSPs, ...).
-\end{itemize}
-\item LCA is inherently robust, is ``parameter free'' once setup with a well designed window set, and can often be implemented with minor modifications to already existing DAS beamformers.
-
-The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
-
-While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
-
+% 
+% \begin{itemize}
+% \item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
+% \item But:
+% \begin{itemize}
+% \item Active system $\Rightarrow$ noise and signal correlated $\Rightarrow$ adaptive beamformers no longer robust.
+% \item Subarray averaging decorrelate the noise, but in the process we sacrifice resolution.
+% \item Computationally complex O($M^3$) due to inversion of a spatial covariance matrix. LCA is only O($MW$). Even if Capon subspace/beamspace versions exist, they remain more complex than the LCA, and is not as ideally suited for implementation of SIMD hardware (GPUs, DSPs, ...).
+% \end{itemize}
+% \item LCA is inherently robust, is ``parameter free'' once setup with a well designed window set, and can often be implemented with minor modifications to already existing DAS beamformers.
+% 
+% The angular resolution and contrast in active sonar images depend on the beamformer's ability to receive signals from directions of interest, while suppressing noise and interference emanating from other directions. For sonar arrays, this is achieved by applying weights to the array channels.
+% 
+% While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
+% 
 We have implemented a Low Complexity Adaptive (LCA) beamformer, which adaptively selects a window from a predefined set. The set is comprised of windows that are typical solutions found by the Minimum Variance method. The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
+% 
+% An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 
-An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
-
-\end{itemize}
+% \end{itemize}
 
 \end{abstract}
 
@@ -634,6 +630,7 @@ In active sonar array imaging, an acoustic wave is transmitted and the received 
 
 % Adaptive beamformers usually compute the window coefficients by estimating and inverting a spatial covariance matrix. There are two inherent problems to this procedure. First, for improved estimation accuracy the data is either averaged in space or time, and the significance of the covariance matrix can be reduced using a regularisation parameter~\cite{Carl Inge}. These are all attempts to constrain the beamformer to ensure the window coefficience are not over-adapted to the data. Second, inverting the covariance matrix has a computational complexity of O($M^3$)~\cite{Carl Inge}. For larger arrays the computational burden becomes significant, and the question arises whether this processing power can be better utilised. 
 
+
 The MV beamformer computes the window coefficients by estimating and inverting a spatial covariance matrix. For improved estimation accuracy the data is averaged in space or time, or both. In addition, a certain amount of diagonal loading is often added to the covariance matrix before inversion. These actions, while leading to statistical robustness, tend to deteriorate the beamformer's performance. Also, the inversion of the covariance matrix has a computational complexity of O($M^3$), where $M$ is the number of elements. The computational burden makes the MV beamformer for large arrays less attractive, and sometimes even infeasible.
 
 Based on the proposed method by Synnevåg~\cite{syn11}, we have implemented the LCA beamformer that keeps the minimum variance optimisation criterion but reduces the solution space to a discrete set of predefined windows. This reduces the computational complexity to O($MW$), where $W$ is the number of windows in the set. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$~\cite{kai66}. In addition we apply steering to each of the windows and constrain the window design to ensure unit gain in the look direction.
@@ -651,15 +648,15 @@ z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
-Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}.
+Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}:
 
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\x\x\H\w\H[n]\\
 \text{subject to } \w[n]\1 &= 1
 \end{align}
 
+This convex optimization problem has the solution:
 
-This is a convex optimization problem that can be solved using Lagrange multipliers to yield the solution
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
 \end{gather}
@@ -777,10 +774,11 @@ Variables of interest:
 \begin{table}[!b]\centering%\normalsize
 \begin{tabular}[c]{l c c c}\hline
 \rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
-Symmetry  & Moderate & High & High \\
-Mainlobe  & Narrow   & Wide & Moderate \\
-Sidelobes & High     & Low  & Moderate \\
-Steering  & 0$^\circ$ to $\theta_{-3dB}$ &  & 
+Symmetry             & Moderate  & High   & High \\
+Mainlobe width       & Narrow    & Wide   & Moderate \\
+Sidelobe suppression & Low       & High   & Moderate \\
+Steering             & Low       & Up to -3dB width & Moderate \\
+Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 \end{tabular}
 \caption{Summary}\label{tab:summary}
 \end{table}%
