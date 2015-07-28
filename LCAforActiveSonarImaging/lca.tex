@@ -618,6 +618,10 @@ At heart of the image formation process is a technique called beamforming, which
 
 In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
 
+3rd order Maclaurin / Tayler approximation
+\begin{align}
+\phi_\text{-3dB bounds} \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
+\end{align}
 
 
 
@@ -791,17 +795,23 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 % \newpage
 \section{Results and Discussion}
 
-% \begin{figure}[h]\centering%
-% \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows.eps}%
-% \caption{Typical window responses for a robust MVDR. The dashed red line is the response of an unsteered rectangular window on the full array. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. }\label{mvdr_selected_windows}
-% \end{figure}
+\begin{figure*}[htb!]\centering%
+\includegraphics[width=\linewidth]{gfx/mvdr_selected_windows.eps}%
+\caption{Typical window responses for a robust MVDR. The dashed red line is the response of an unsteered rectangular window on the full array. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. }\label{mvdr_selected_windows}
+\end{figure*}
 
 What's up?
 
-% \begin{figure}[h]%\centering%
-% \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.pdf}%
-% \caption{Steering within -3dB for each window}\label{mvdr_selected_windows}
-% \end{figure}
+\begin{figure*}[htb!]%\centering%
+\includegraphics[width=.5\linewidth]{gfx/oversampling_mosaic_bounds.eps}%
+\caption{Steering within -3dB for each window}\label{mvdr_selected_windows}
+\end{figure*}
+
+
+\begin{figure*}[htb!]%\centering%
+\includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.pdf}%
+\caption{Steering within -3dB for each window}\label{mvdr_selected_windows}
+\end{figure*}
 
 
 \begin{itemize}
