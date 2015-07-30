@@ -73,11 +73,11 @@
 
 \RequirePackage{array}
 
-\ifCLASSOPTIONcompsoc
-   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\else
-   \usepackage[caption=false,font=footnotesize]{subfig}
-\fi
+% \ifCLASSOPTIONcompsoc
+%    \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+% \else
+%    \usepackage[caption=false,font=footnotesize]{subfig}
+% \fi
 
 % \usepackage{caption}
 % \usepackage{subcaption}
@@ -140,7 +140,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % % \let\Oldincludegraphics\includegraphics
 % % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
 
-\usepackage[maxfloats=40]{morefloats}
+% \usepackage[maxfloats=40]{morefloats}
 \newcounter{todoidx}
 % \setcounter{todoidx}
 
@@ -713,6 +713,9 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 \end{enumerate}
 Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
+\subsubsection{Kaiser}
+
+α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
 
 % \begin{figure}[p]\centering%
 % \subfloat[Image of a single speckle realisation.]{%
@@ -795,23 +798,30 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 % \newpage
 \section{Results and Discussion}
 
-\begin{figure*}[htb!]\centering%
+\begin{figure*}\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows.eps}%
 \caption{Typical window responses for a robust MVDR. The dashed red line is the response of an unsteered rectangular window on the full array. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. }\label{mvdr_selected_windows}
 \end{figure*}
 
 What's up?
 
-\begin{figure*}[htb!]%\centering%
-\includegraphics[width=.5\linewidth]{gfx/oversampling_mosaic_bounds.eps}%
-\caption{Steering within -3dB for each window}\label{mvdr_selected_windows}
-\end{figure*}
-
-
-\begin{figure*}[htb!]%\centering%
+\begin{figure*}%\centering%
 \includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.pdf}%
-\caption{Steering within -3dB for each window}\label{mvdr_selected_windows}
+\caption{Steering within -3dB for each window}\label{windows_steering}
 \end{figure*}
+
+\newpage
+\begin{figure*}%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
+\end{figure*}
+
+\begin{figure*}%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
+\end{figure*}
+
+
 
 
 \begin{itemize}
