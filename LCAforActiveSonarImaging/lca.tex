@@ -713,6 +713,16 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 \end{enumerate}
 Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
+
+
+
+- Find window function
+- Determine bounds
+- Determine oversampling need
+- Compare image quality
+
+
+
 \subsubsection{Kaiser}
 
 α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
@@ -822,6 +832,10 @@ What's up?
 \end{figure*}
 
 
+\begin{figure*}%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
+\end{figure*}
 
 
 \begin{itemize}
