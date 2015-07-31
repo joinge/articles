@@ -805,8 +805,11 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
-% \newpage
+\newpage
 \section{Results and Discussion}
+
+
+Before we started designing our LCA window database, we wanted to study the window resposes that a robust MVDR typically computes. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading. 
 
 \begin{figure*}\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows.eps}%
@@ -815,26 +818,29 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 What's up?
 
-\begin{figure*}%\centering%
+\begin{figure*}[tbhp!]%\centering%
 \includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.pdf}%
 \caption{Steering within -3dB for each window}\label{windows_steering}
 \end{figure*}
 
 \newpage
-\begin{figure*}%\centering%
+\begin{figure*}[tbhp!]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
 \caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds}
 \end{figure*}
 
-\begin{figure*}%\centering%
+\begin{figure*}[tbhp!]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
 \caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
 \end{figure*}
 
+\newpage
 
-\begin{figure*}%\centering%
+What's wrong here? 
+
+\begin{figure*}[tbhp!]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
 \end{figure*}
 
 
