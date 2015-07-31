@@ -805,18 +805,31 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
-\newpage
-\section{Results and Discussion}
-
-
-Before we started designing our LCA window database, we wanted to study the window resposes that a robust MVDR typically computes. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading. 
-
-\begin{figure*}\centering%
+\begin{figure*}[tbhp!]\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows.eps}%
-\caption{Typical window responses for a robust MVDR. The dashed red line is the response of an unsteered rectangular window on the full array. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. }\label{mvdr_selected_windows}
+\caption{Typical window responses for a robust MVDR. The dashed red line is the response of an unsteered rectangular window on the full array. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. Full opening angle. Parameters. }\label{mvdr_selected_windows}
 \end{figure*}
 
-What's up?
+\newpage
+
+
+
+\section{Results and Discussion}
+
+The results from our LCA studies will be presented in the following order:
+
+\begin{itemize}
+\item \emph{Window function}. Studies of typical MVDR responses for shadow, speckle and highlight regions in an image.
+\item \emph{Window parameters}. 
+\end{itemize}
+
+The following sections with expand and discuss these results further.
+
+\subsection{Window function}
+
+Before we started designing our LCA window database, we wanted to study the window resposes that a robust MVDR typically computes. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
+
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. 
 
 \begin{figure*}[tbhp!]%\centering%
 \includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.pdf}%
@@ -903,6 +916,16 @@ The LCA method performs similar to the MV method, but at a fraction of the compu
 The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios. 
 
 
+\subsection{Summary and order of results}
+
+In short, our findings regarding the optimal window types for LCA is as follows:
+
+\begin{itemize}
+\item \emph{Window function} should be symmetric, . Studying typical MVDR responses for shadow, speckle and highlight regions, we believe it to be insignificant
+\item \emph{Window parameters}. 
+\end{itemize}
+
+The following sections with expand and discuss these results further.
 
 \section{Introduction}
 
