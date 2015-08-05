@@ -640,6 +640,11 @@ Based on the proposed method by Synnevåg~\cite{syn11}, we have implemented the 
 The following will show that the proposed method performs similarly to or better than the MV method.
 
 
+\begin{figure}[tbhp]%\centering%
+\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.pdf}%
+\caption{Steering within -3dB for each window}\label{windows_steering}
+\end{figure}
+
 \subsection{Beamforming}
 
 Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
@@ -723,6 +728,8 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 
 
 
+
+
 \subsubsection{Kaiser}
 
 α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
@@ -776,27 +783,11 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 
 For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. The question is how this selection should be With our ovarall goal being a reduction of computational complexity, it The choice of window function does not seem to matter. 
 
+
+
 Using Kaiser windows as their extremal values areLimit our study to Kaiser windows
 
-Variables of interest:
-\begin{itemize}
-\item Window function. Mostly symmetrical, in particular in shadow and for the most part in speckle. In highlight regions more varying.
-\item Mainlobe width. Wide in shadows, narrow in detailed regions. Adding windows in between these extremal values.
-\item Steering. No steering in shadows, slight steering in speckle and no steering in highlight. Steering more than the -3dB width of the window function has no effect.
-\item Oversampling. From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to 8M.
-\end{itemize}
 
-\begin{table}[!b]\centering%\normalsize
-\begin{tabular}[c]{l c c c}\hline
-\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
-Symmetry             & Moderate  & High   & High \\
-Mainlobe width       & Narrow    & Wide   & Moderate \\
-Sidelobe suppression & Low       & High   & Moderate \\
-Steering             & Low       & Up to -3dB width & Moderate \\
-Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
-\end{tabular}
-\caption{Summary}\label{tab:summary}
-\end{table}%
 
 This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
 
@@ -820,7 +811,7 @@ The results from our LCA studies will be presented in the following order:
 
 \begin{itemize}
 \item \emph{Window function}. A Kaiser window was chosen due to its resemblance to typical MVDR responses for shadow, speckle and highlight regions in an image, as shown in \Fig{mvdr_selected_windows}.
-\item \emph{Window parameters}. The Kaiser window parameter $\beta$ tunes the compromise between resolution and sidelobe suppression. At $\beta=0$ ) and a gaussian curve (
+\item \emph{Window parameters}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression, and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 \end{itemize}
 
 The following sections with expand and discuss these results further.
@@ -831,9 +822,16 @@ Before we started designing our LCA window database, we wanted to study the wind
 
 While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. 
 
+
+\subsection{Window parameters}
+
+
+
+
+
 \begin{figure*}[tbhp!]%\centering%
-\includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.pdf}%
-\caption{Steering within -3dB for each window}\label{windows_steering}
+\includegraphics[width=.2\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
 \end{figure*}
 
 \newpage
@@ -842,11 +840,30 @@ While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvd
 \caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds_beta}
 \end{figure*}
 
+
+Variables of interest:
+
+\begin{itemize}
+\item Window function. Mostly symmetrical, in particular in shadow and for the most part in speckle. In highlight regions more varying.
+\item Mainlobe width. Wide in shadows, narrow in detailed regions. Adding windows in between these extremal values.
+\item Steering. No steering in shadows, slight steering in speckle and no steering in highlight. Steering more than the -3dB width of the window function has no effect.
+\item Oversampling. From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to 8M.
+\end{itemize}
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l c c c}\hline
+\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
+Symmetry             & Moderate  & High   & High \\
+Mainlobe width       & Narrow    & Wide   & Moderate \\
+Sidelobe suppression & Low       & High   & Moderate \\
+Steering             & Low       & Up to -3dB width & Moderate \\
+Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
+\end{tabular}
+\caption{Summary}\label{tab:summary}
+\end{table}%
+
+
 \newpage
-\begin{figure*}[tbhp!]%\centering%
-\includegraphics[width=.5\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds}
-\end{figure*}
+
 
 hmm 
 
