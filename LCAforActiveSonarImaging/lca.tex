@@ -718,19 +718,23 @@ As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each
 \end{enumerate}
 Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
+\begin{itemize}
+\item \emph{Window function}
+\item \emph{Parameter boundaries}
+\item \emph{Number of windows needed}
+\item \emph{Oversampling need}
+\item \emph{Image quality}
+\end{itemize}
 
+\section{Steering a Kaiser window}
 
+\begin{align}
+w[n] = \begin{cases}
+\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2\pi}{N-1}-1\right)^2}\right)}{I_0(\pi\beta)}, & 0\le n\le N-1 \\
+0 & \text{otherwise}
+\end{cases}
+\end{align}
 
-- Find window function
-- Determine bounds
-- Determine oversampling need
-- Compare image quality
-
-
-
-
-
-\subsubsection{Kaiser}
 
 α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
 
@@ -779,19 +783,19 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 % 
 % Based on the proposed method by SynnevÃ¥g~\cite{syn11}, we have implemented a Low Complexity Adaptive (LCA) beamformer that keeps the minimum variance optimisation criteria but reduces the solution space to a discrete set of predefined windows. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$. In addition we apply steering $\varphi$ to each of the windows and and constrain the window design to ensure unit gain in the look direction.
 
-\section{Experimental Setup}
-
-For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. The question is how this selection should be With our ovarall goal being a reduction of computational complexity, it The choice of window function does not seem to matter. 
-
-
-
-Using Kaiser windows as their extremal values areLimit our study to Kaiser windows
-
-
-
-This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
-
-To make the choice of window less susceptible to pixel value uncertainties, the LCA beamformer was set to apply the most frequently selected window in an 11 pixel range region to the center pixel in that region. In physical terms, this is a region of approximately 20\,cm. The MV beamformer estimated the covariance matrix as described in~\cite{syn07} by averaging over 16 subarrays and 11 range pixels, and applying 3\% diagonal loading.
+% \section{Experimental Setup}
+% 
+% For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. The question is how this selection should be With our ovarall goal being a reduction of computational complexity, it The choice of window function does not seem to matter. 
+% 
+% 
+% 
+% Using Kaiser windows as their extremal values areLimit our study to Kaiser windows
+% 
+% 
+% 
+% This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
+% 
+% To make the choice of window less susceptible to pixel value uncertainties, the LCA beamformer was set to apply the most frequently selected window in an 11 pixel range region to the center pixel in that region. In physical terms, this is a region of approximately 20\,cm. The MV beamformer estimated the covariance matrix as described in~\cite{syn07} by averaging over 16 subarrays and 11 range pixels, and applying 3\% diagonal loading.
 
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
@@ -803,11 +807,11 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 \newpage
 
-
-
 \section{Results and Discussion}
 
-We tested the performance of the MVDR and LCA beamformers using data aquired by the HUGIN AUV carrying the 32 element HISAS 1030 sonar from Kongsberg Maritime~\cite{han09}. It operates 100\;kHz, has a bandwidth of 40\;kHz and transmits at a 25$^\circ$ opening angle. Two different scenes will be presented, one of the 1500 dwt oiltanker wreck Holmengraa lying at a slanted seabed at 70\;m depth, and another of a cross tied to an anchor (fig ???).
+To test the performance of the MVDR and LCA beamformers, we have processed data aquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with array length 1.2\;m, 100\;kHz operating frequency, a bandwidth of 40\;kHz and transmits at a 25$^\circ$ opening angle.
+
+Two different scenes will be presented. One of the 1500 dwt oiltanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlit sector. The other scene is of an iron cross connected to a an anchor (fig ???).
 
 A quick summary of the results and the order they will be presented is as follows:
 
@@ -820,7 +824,7 @@ The following sections with expand and discuss these results further.
 
 \subsection{Window function}
 
-Before we started designing our LCA window database, we wanted to study the window resposes that a robust MVDR typically computes. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
+Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
 While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. 
 
@@ -916,19 +920,19 @@ What's wrong here?
 \end{table}%
 
 
-The simulations contained a few highlighted cylindric regions with 2\,m diameter and a constant intensity 15.4\,dB over the average speckle level. We focused on an object centered at 41\,m range and -3 degrees azimuth angle. The images produced by the LCA, MV and unweighted DAS for a single speckle realisation and a mean image of all 100 realisations are shown in \Fig{speckle}. Each image was normalised by their respective speckle level, and the dynamic range was clamped at \{-30,~15\}\,dB. The physical extent of the of the simulated object was superimposed for reference. %\ref{saf09}
-
-In \Fig{speckle} we observe that both the adaptive beamformers produce images with a more clearly defined shadow. The edges are sharper and the shadow more distinct. This is because the adaptive beamformers have better sidelobe suppression, and thus allow less signal energy to leak from the speckle region into the shadow region. The same effects can also be observed laterally around the highlight region of the mean image; DAS is more prone to smear energy into the speckle region than the adaptive beamformers are.
-
-\Fig{cutmean} displays two lateral cuts in the mean image, one through the highlight at 41.1\,m range and one through the shadow at 44.5\,m range. Each cut was computed as the mean of a 40\,cm range band centered at the respective ranges. The transition region between highlight and shadow is shortest for the LCA, which is advantageous since it results in a more accurate representation of the object size. The slightly inferior performance of the MV beamformer is due to the subarray averaging, which makes the effective array smaller~\cite{syn07}.
-
-By studying the LCA performance on the 100 speckle realisations, we found the choice of window to be highly dependent on the phenomena being imaged. In speckle regions LCA favored narrow spatial responses with minor steering, while wide and fully steered responses were often selected in shadow regions. There was also a clear distinction between the responses selected in sidelobe regions and in speckle regions.
-
-% \Fig{hist} illustrates how often a particular window is chosen in general. There are 10 $\phi$'s for each of the 10 $\beta$'s. The first 10 values are rectangular windows. Value 5 is a non-steered rectangular window, and we see that this is most frequently selected. At higher steering angles the windows are rarely selected, and thus we might get better results by tightening our steering boundaries. At value 15 we find inverted Kaiser windows with $\beta = 0.05$, and then $\beta$ is increased in increments of 0.505 for every 10th value. At value 65 the $\beta$ value is 2.025, and these and the remaining windows are hardly selected.
-
-A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}. It is about 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
-
-In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
+% The simulations contained a few highlighted cylindric regions with 2\,m diameter and a constant intensity 15.4\,dB over the average speckle level. We focused on an object centered at 41\,m range and -3 degrees azimuth angle. The images produced by the LCA, MV and unweighted DAS for a single speckle realisation and a mean image of all 100 realisations are shown in \Fig{speckle}. Each image was normalised by their respective speckle level, and the dynamic range was clamped at \{-30,~15\}\,dB. The physical extent of the of the simulated object was superimposed for reference. %\ref{saf09}
+% 
+% In \Fig{speckle} we observe that both the adaptive beamformers produce images with a more clearly defined shadow. The edges are sharper and the shadow more distinct. This is because the adaptive beamformers have better sidelobe suppression, and thus allow less signal energy to leak from the speckle region into the shadow region. The same effects can also be observed laterally around the highlight region of the mean image; DAS is more prone to smear energy into the speckle region than the adaptive beamformers are.
+% 
+% \Fig{cutmean} displays two lateral cuts in the mean image, one through the highlight at 41.1\,m range and one through the shadow at 44.5\,m range. Each cut was computed as the mean of a 40\,cm range band centered at the respective ranges. The transition region between highlight and shadow is shortest for the LCA, which is advantageous since it results in a more accurate representation of the object size. The slightly inferior performance of the MV beamformer is due to the subarray averaging, which makes the effective array smaller~\cite{syn07}.
+% 
+% By studying the LCA performance on the 100 speckle realisations, we found the choice of window to be highly dependent on the phenomena being imaged. In speckle regions LCA favored narrow spatial responses with minor steering, while wide and fully steered responses were often selected in shadow regions. There was also a clear distinction between the responses selected in sidelobe regions and in speckle regions.
+% 
+% % \Fig{hist} illustrates how often a particular window is chosen in general. There are 10 $\phi$'s for each of the 10 $\beta$'s. The first 10 values are rectangular windows. Value 5 is a non-steered rectangular window, and we see that this is most frequently selected. At higher steering angles the windows are rarely selected, and thus we might get better results by tightening our steering boundaries. At value 15 we find inverted Kaiser windows with $\beta = 0.05$, and then $\beta$ is increased in increments of 0.505 for every 10th value. At value 65 the $\beta$ value is 2.025, and these and the remaining windows are hardly selected.
+% 
+% A sidescan image of the 1500 dwt oil tanker wreck Holmengraa is shown in \Fig{holmengraa}. It is about 68\,m long and 9\,m wide, and lies on a slanted seabed at 77\,m depth~\cite{holmengraa}. The sidescan image was created using data from the HISAS 1030 sonar, which is rather unsuited for this purpose because of its large opening angle. This, and the fact that the wreck was imaged at a range of about 105\,m makes the image quality poor, but sufficient to compare our beamformers. 
+% 
+% In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
 
 
 \section{Conclusion}
@@ -952,26 +956,26 @@ The following sections with expand and discuss these results further.
 \section{Introduction}
 
 
-\begin{itemize}
-\item Sell it!
-\item As briefly as possible, introduce beamforming.
-\item Adaptive beamformer's potential lies in its ability to suppress interference power
-\item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
-\begin{itemize}
-\item Noise and signal is correlated. Spatial averaging required. 
-\item Increases variance of speckle (not only in active systems?), spatial compunting \cite{Vignon2009} (US) or time averaging?. Subarray averaging applied here \cite{Synnevag2007} (US) \todo{Is it bad to mix ultrasound/ sonar refs?}
-\end{itemize}
-\item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was that guy in the 80ties?}
-\item Outline: 
-\begin{itemize}
-\item Methods.
-\item See what happens to Capon's response %\cite{Synnevag2007}  when means for robustification are added.
-\item Setup the window set for LCA to match this.
-\item Notice that the LCA performs like Capon, even with a small window database.
-\item Start with Kaiser, see that other window functions also work well.
-\end{itemize}
-\end{itemize}
-\todopar{Out of the blue idea: Weigh CF with LCA? This guy did it with MVDR \cite{Wang2009}. Probably you know already... Okay, back on track.}
+% \begin{itemize}
+% \item Sell it!
+% \item As briefly as possible, introduce beamforming.
+% \item Adaptive beamformer's potential lies in its ability to suppress interference power
+% \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
+% \begin{itemize}
+% \item Noise and signal is correlated. Spatial averaging required. 
+% \item Increases variance of speckle (not only in active systems?), spatial compunting \cite{Vignon2009} (US) or time averaging?. Subarray averaging applied here \cite{Synnevag2007} (US) \todo{Is it bad to mix ultrasound/ sonar refs?}
+% \end{itemize}
+% \item LCA is like DAS, only we test several windows and choose the one that yield the lowest beamformer output power. Ultrasound \cite{Synnevag2008}, active sonar \cite{Buskenes2011}\cite{Blomberg2011}\cite{Blomberg2012}\todo{who was that guy in the 80ties?}
+% \item Outline: 
+% \begin{itemize}
+% \item Methods.
+% \item See what happens to Capon's response %\cite{Synnevag2007}  when means for robustification are added.
+% \item Setup the window set for LCA to match this.
+% \item Notice that the LCA performs like Capon, even with a small window database.
+% \item Start with Kaiser, see that other window functions also work well.
+% \end{itemize}
+% \end{itemize}
+% \todopar{Out of the blue idea: Weigh CF with LCA? This guy did it with MVDR \cite{Wang2009}. Probably you know already... Okay, back on track.}
 
 
 \section{Methods}
