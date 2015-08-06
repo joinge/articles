@@ -798,7 +798,7 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 \begin{figure*}[tbhp!]\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
-\caption{Typical frequency responses for windows computed by a robust MVDR. The image is of the oiltanker Holmengraa, reconstructed from the 32 element HISAS1030 sonar, operated in ssectorscan mode with an oversampling factor of ~10. The window responses was computed from 40x40 pixel groups in the shadow, highlight and speckle region. The dashed red lines at -13dB and -43dB marks the peak sidelobe level of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. Full opening angle. Parameters. }\label{mvdr_selected_windows}
+\caption{Typical frequency responses for windows computed by a robust MVDR. The image is of the oiltanker Holmengraa, data collected from the 32 element HISAS1030 sonar with , operated in ssectorscan mode with an oversampling factor of ~10. The window responses was computed from 40x40 pixel groups in the shadow, highlight and speckle region. The dashed red lines at -13dB and -43dB marks the peak sidelobe level of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. Full opening angle. Parameters. }\label{mvdr_selected_windows}
 \end{figure*}
 
 \newpage
@@ -807,11 +807,13 @@ To make the choice of window less susceptible to pixel value uncertainties, the 
 
 \section{Results and Discussion}
 
-The results from our LCA studies will be presented in the following order:
+We tested the performance of the MVDR and LCA beamformers using data aquired by the HUGIN AUV carrying the 32 element HISAS 1030 sonar from Kongsberg Maritime~\cite{han09}. It operates 100\;kHz, has a bandwidth of 40\;kHz and transmits at a 25$^\circ$ opening angle. Two different scenes will be presented, one of the 1500 dwt oiltanker wreck Holmengraa lying at a slanted seabed at 70\;m depth, and another of a cross tied to an anchor (fig ???).
+
+A quick summary of the results and the order they will be presented is as follows:
 
 \begin{itemize}
-\item \emph{Window function}. A Kaiser window was chosen due to its resemblance to typical MVDR responses for shadow, speckle and highlight regions in an image, as shown in \Fig{mvdr_selected_windows}.
-\item \emph{Window parameters}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression, and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
+\item \emph{Window function}. Frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image is shown in \Fig{mvdr_selected_windows}. The responses tend to be symmetric, minimally steered have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
+\item \emph{Window parameters}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 \end{itemize}
 
 The following sections with expand and discuss these results further.
@@ -825,8 +827,11 @@ While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvd
 
 \subsection{Window parameters}
 
+The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression, and $\phi$ controls the amount of steering. At $\beta=0$ it becomes a rectangular window, and at larger values it approaches a gaussian curve. Typical values are in the range $\beta\in[0,10]$.
 
+$\phi$ controls the amount of steering. 
 
+The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 
 
 \begin{figure*}[tbhp!]%\centering%
@@ -910,9 +915,6 @@ What's wrong here?
 \caption{Qualitative study}\label{parameter_study}
 \end{table}%
 
-
-
-We have tested the beamformers using data aquired by the Kongsberg Maritime HISAS1030 sonar~\cite{han09}, and on simulations of the same sonar with 100 realisations of speckle.
 
 The simulations contained a few highlighted cylindric regions with 2\,m diameter and a constant intensity 15.4\,dB over the average speckle level. We focused on an object centered at 41\,m range and -3 degrees azimuth angle. The images produced by the LCA, MV and unweighted DAS for a single speckle realisation and a mean image of all 100 realisations are shown in \Fig{speckle}. Each image was normalised by their respective speckle level, and the dynamic range was clamped at \{-30,~15\}\,dB. The physical extent of the of the simulated object was superimposed for reference. %\ref{saf09}
 
