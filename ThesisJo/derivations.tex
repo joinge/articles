@@ -473,16 +473,23 @@ Beamformer output
 z[n] = \sumb{n}{} w^*[n]\;x[n]
 \end{align}
 
-Applying a window reduces the signal power because it gets attenuated at both ends. We quantify this effect with the coherent power gain:
-
-\begin{align}
-\sumb{n}{} w^*[n]\;x[n]
-\end{align}
-
 Frequency response of the window
 
 \begin{align}
-W(\Omega) &= \sumb{m}{} w_m[n]\;e^{-j\Omega n}\\
-          &= \sumb{m}{} w_m[n]\;e^{-j\Omega n}
+W(k_x) = \sumb{m}{} w_m\;e^{jk_x \p_x} =
+\begin{cases}
+\frac{\sin\left(\frac{M}{2}k_x d\right)}{\sin\left(\frac{1}{2}k_x d\right)} & \text{rectangular}                                         
+\end{cases}
 \end{align}
+
+Applying a window reduces the signal power because it gets attenuated at both ends. We quantify this effect with the coherent power gain:
+
+\begin{align}
+W(\k) &= \sumb{m}{} w_m\;(s_m+q)\;e^{j\k\cdot\p_m}
+\end{align}
+
+
+
+
+
 
