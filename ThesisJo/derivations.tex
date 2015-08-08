@@ -485,11 +485,18 @@ W(k_x) = \sumb{m}{} w_m\;e^{jk_x \p_x} =
 Applying a window reduces the signal power because it gets attenuated at both ends. We quantify this effect with the coherent power gain:
 
 \begin{align}
-W(\k) &= \sumb{m}{} w_m\;(s_m+q)\;e^{j\k\cdot\p_m}
+W(\k) &= \sumb{m}{} w_m\;e^{j\k\cdot\p_m}
 \end{align}
 
+\begin{align}
+Z(\k) &= \sumb{m}{} w_m\;(s_m+q_m)\;e^{-j\k\cdot\p_m} \nn
+&= \sumb{m}{} w_m\;A\;e^{j\k\cdot\p_m}\;e^{-j\k\cdot\p_m} + \sumb{m}{} w_m\;q_m\;e^{j\k\cdot\p_m} \nn
+&= A \underbrace{\sumb{m}{} w_m}_\text{signal gain} + \sumb{m}{} w_m\;q_m\;e^{j\k\cdot\p_m}
+\end{align}
 
+Worst Case Processing Loss = Prosessing Loss + Scallopping Loss
 
+=> a measure of the worst case reduction in SNR which results from the combination of the window function and the worst case frequency location.
 
 
 
