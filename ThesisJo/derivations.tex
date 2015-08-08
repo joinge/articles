@@ -508,7 +508,7 @@ Z(\k) &= \sumb{m}{} w_m\;(s_m+q_m)\;e^{-j\k\cdot\p_m} \nn
 \end{align}
 
 \begin{align}
-\text{Equivalent Noise Bandwidth} &= \frac{\text{Noise Power}}{\text{Coherent Power Gain}} = \frac{N_0\sumb{m}{}w_m^2}{\big|\sumb{m}{}w_m\big|^2}
+\text{Equivalent Noise Bandwidth} &= \frac{\text{Noise Power}}{\text{Coherent Power Gain}} = \frac{\frac{N_0}{{\color{red}d}}\sumb{m}{}w_m^2}{\big|\sumb{m}{}w_m\big|^2}
 \end{align}
 
 \begin{align}
@@ -516,9 +516,13 @@ Z(\k) &= \sumb{m}{} w_m\;(s_m+q_m)\;e^{-j\k\cdot\p_m} \nn
 \end{align}
 
 \begin{align}
-\text{Scallopping loss} &= \frac{\left|W\left(\frac{\pi}{2OMd}\right)\right|}{W(0)} = \frac{\left|\sumb{m}{}w_m\;e^{-j\k\cdot\p_m}\right|}{\sumb{m}{}w_m}
+\text{Scallopping loss} &= \frac{\left|W\left(\frac{\pi}{2{\color{red}O}Md}\right)\right|}{W(0)} = \frac{\left|\sumb{m}{}w_m\;e^{-j\k\cdot\p_m}\right|}{\sumb{m}{}w_m}
 \end{align}
 
+\begin{align}
+\text{Scallopping loss} &= \text{Prosessing Loss}_\text{dB} + \text{Scallopping Loss}_\text{dB} 
+= 
+\end{align}
 Worst Case Processing Loss = Prosessing Loss + Scallopping Loss
 
 => a measure of the worst case reduction in SNR which results from the combination of the window function and the worst case frequency location.
