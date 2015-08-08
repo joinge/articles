@@ -460,12 +460,28 @@ d = \frac{2*1.39}{k_x} = \frac{2*1.39}{2\pi \frac{f_c}{c}\sin\theta} = \frac{1.3
 %
 This leaves a little space between each sensor since the element spacing is around 3.75cm.
 
+\newpage
 \section{Window Parameters}
 
 Signal model:
 \begin{align}
-s
+x[n] = s[n] + q[n] = Ae^{j\Omega_0n} + q[n]
 \end{align}
 
+Beamformer output
+\begin{align}
+z[n] = \sumb{n}{} w^*[n]\;x[n]
+\end{align}
 
+Applying a window reduces the signal power because it gets attenuated at both ends. We quantify this effect with the coherent power gain:
+
+\begin{align}
+\sumb{n}{} w^*[n]\;x[n]
+\end{align}
+
+Frequency response of the window
+
+\begin{align}
+W(\Omega) = \sumb{n}{} w[n]\;e^{-j\Omega n}
+\end{align}
 
