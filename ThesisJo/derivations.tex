@@ -463,9 +463,9 @@ This leaves a little space between each sensor since the element spacing is arou
 \newpage
 \section{Window Parameters}
 
-Signal model:
+Signal model, monochromatic place wave from broadside with gaussian noise:
 \begin{align}
-x[n] = s[n] + q[n] = Ae^{j\Omega_0n} + q[n]
+x_m[n] = s_m[n] + q[n] = Ae^{j\Omega_0mn} + q[n]
 \end{align}
 
 Beamformer output
@@ -482,6 +482,7 @@ Applying a window reduces the signal power because it gets attenuated at both en
 Frequency response of the window
 
 \begin{align}
-W(\Omega) = \sumb{n}{} w[n]\;e^{-j\Omega n}
+W(\Omega) &= \sumb{m}{} w_m[n]\;e^{-j\Omega n}\\
+          &= \sumb{m}{} w_m[n]\;e^{-j\Omega n}
 \end{align}
 
