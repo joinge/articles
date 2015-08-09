@@ -512,6 +512,10 @@ Z(\k) &= \sumb{m}{} w_m\;(s_m+q_m)\;e^{-j\k\cdot\p_m} \nn
 \end{align}
 
 \begin{align}
+\text{Processing Gain} &= \frac{S_o/N_o}{S_i/N_i} = \frac{A^2\big|\sumb{m}{}w_m\big|^2 \big/ \sigma_q^2\sumb{m}{}w_m^2}{A^2 / \sigma_q^2} = \frac{\big|\sumb{m}{}w_m\big|^2}{\sumb{m}{}w_m^2}
+\end{align}
+
+\begin{align}
 \text{Processing Loss} &= \frac{\text{Coherent Power Gain}}{\text{Equivalent Noise Bandwidth}} = \frac{\big|\sumb{m}{}w_m \big|^2}{\big|\sumb{m}{}w_m \big|^2}
 \end{align}
 
@@ -530,4 +534,20 @@ Worst Case Processing Loss = Prosessing Loss + Scallopping Loss
 
 Narrow ones:
 - Best coherent gain, lowest equivalent noise bandwidth, and most sensitive to steering meaning not needing to steer as much for some effect.
+
+
+Beamforming:
+- Maximize resolution
+- Minimize noise/error, both coherent and incoherent
+- Minimize signal cancellation
+
+Gauss: Miminized time-bandwidth product
+  - 
+  
+Rectangular
+  - 
+Dolph-Cheb: Minimize mainlobe width given sidelobe suppression
+Kaiser: For a restricted energy and time duration, maximize energy in the band of frequencies W.
+
+Adaptive windows perform best in detection of closely separated angles of significantly amplitudes.
 
