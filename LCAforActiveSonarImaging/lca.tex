@@ -726,36 +726,47 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 \item \emph{Image quality}
 \end{itemize}
 
-\section{Steering a Kaiser window}
+\section{Kaiser windows}
 
+As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
+%
 \begin{align}
-w[n] = \begin{cases}
-\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2\pi}{N-1}-1\right)^2}\right)}{I_0(\pi\beta)}, & 0\le n\le N-1 \\
+w_m = \begin{cases}
+\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{m}{M/2}\right)^2}\right)}{I_0(\pi\beta)}, & 0\le |m|\le M/2 \\
 0 & \text{otherwise}
 \end{cases}
 \end{align}
+%
+where $I_0$ is the zeroth order Modified Bessel function of the first kind, defined as:
+%
+\begin{align}
+I_0(x) = \sumb{k=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^k}{k!} \right].
+\end{align}
+%
 
-
-α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
-
-Narrow ones:
-- Best coherent gain, lowest equivalent noise bandwidth, and most sensitive to steering meaning not needing to steer as much for some effect.
-
-
-Beamforming:
-- Maximize resolution
-- Minimize noise/error, both coherent and incoherent
-- Minimize signal cancellation
-
-Gauss: Miminized time-bandwidth product
-  - 
-  
-Rectangular
-  - 
-Dolph-Cheb: Minimize mainlobe width given sidelobe suppression
-Kaiser: For a restricted energy and time duration, maximize energy in the band of frequencies W.
-
-Adaptive windows perform best in detection of closely separated angles of significantly amplitudes.
+As will be demonstrated in upcoming sections, the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from. Therefore we have selected a 
+% 
+% 
+% α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
+% 
+% Narrow ones:
+% - Best coherent gain, lowest equivalent noise bandwidth, and most sensitive to steering meaning not needing to steer as much for some effect.
+% 
+% 
+% Beamforming:
+% - Maximize resolution
+% - Minimize noise/error, both coherent and incoherent
+% - Minimize signal cancellation
+% 
+% Gauss: Miminized time-bandwidth product
+%   - 
+%   
+% Rectangular
+%   - 
+% Dolph-Cheb: Minimize mainlobe width given sidelobe suppression
+% Kaiser: For a restricted energy and time duration, maximize energy in the band of frequencies W.
+% 
+% Adaptive windows perform best in detection of closely separated angles of significantly amplitudes.
 
 
 % \begin{figure}[p]\centering%
