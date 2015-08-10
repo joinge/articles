@@ -577,6 +577,9 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \section{Introduction}
 
+- Why? 
+
+
  
 \IEEEPARstart{A}{daptive} methods detector design is a term methods have been introduced in various imaging fields over the years in attempts to improve image quality. One such method is the minimum variance distortionless response (MVDR) beamformer. Compared to conventional methods, MVDR is often able to improve image contrast and resolution, as shown in~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}.
 
@@ -604,12 +607,12 @@ This article is outlined as follows:
 % - Experiemental data, Holmengraa/cross
 % 
 % - Note on efficiency.
-
-
-From our work with MVDR it 
-
-
-Traditionally beamformers were static, but as processors get more powerful so with the emergence of more processing power 
+% 
+% 
+% From our work with MVDR it 
+% 
+% 
+% Traditionally beamformers were static, but as processors get more powerful so with the emergence of more processing power 
 
 
 
@@ -744,7 +747,7 @@ where $I_0$ is the zeroth order Modified Bessel function of the first kind:
 I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.
 \end{align}
 %
-The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a time-bandwidth product specified with the parameter $\beta$:
+The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given time-bandwidth product specified with the parameter $\beta$:
 %
 \begin{align}
 \beta = \frac{TB}{2},
@@ -753,15 +756,32 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
 Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
+%
 \begin{align}
 \w = \frac{\vec f}{\f\T\1} \quad\quad\text{where}\quad\quad \f =
 \bmat{
 f_0 \\ \vdots \\ f_{M-1}                                                           
 }
 \end{align}
+%
+Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain. 
 
-Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise ratio is constant for a given window, the effect of gaining the coherent signal by also allowing an equivalent incoherent noise gain.  
+\begin{align}
+\w = \frac{\a\f}{\f\T\a} = 
+\end{align}
 
+\begin{align}
+\a = \bmat{
+1 \\
+e^{-j\frac{md}{\lambda}\sin(\phi)} \\
+\vdots\\
+e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
+}
+\end{align}
+
+% \begin{align}
+% \z = \w\H\a 
+% \end{align}
 
 % 
 % Narrow ones:
@@ -785,7 +805,7 @@ Note that the normalization factor $\f\T\1$ is the reciprocal of the window's co
 
 % Adaptive beamformers usually compute the window coefficients by estimating and inverting a spatial covariance matrix. There are two inherent problems to this procedure. First, for improved estimation accuracy the data is either averaged in space or time, and the significance of the covariance matrix can be reduced using a regularisation parameter~\cite{Carl Inge}. These are all attempts to constrain the beamformer to ensure the window coefficience are not over-adapted to the data. Second, inverting the covariance matrix has a computational complexity of O($M^3$)~\cite{Carl Inge}. For larger arrays the computational burden becomes significant, and the question arises whether this processing power can be better utilised. 
 % 
-% Based on the proposed method by SynnevÃ¥g~\cite{syn11}, we have implemented a Low Complexity Adaptive (LCA) beamformer that keeps the minimum variance optimisation criteria but reduces the solution space to a discrete set of predefined windows. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$. In addition we apply steering $\varphi$ to each of the windows and and constrain the window design to ensure unit gain in the look direction.
+% 
 
 % \section{Experimental Setup}
 % 
