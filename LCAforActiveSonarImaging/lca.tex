@@ -740,7 +740,7 @@ w_m = \begin{cases}
 where $I_0$ is the zeroth order Modified Bessel function of the first kind, defined as:
 %
 \begin{align}
-I_0(x) = \sumb{k=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^k}{k!} \right]^2.
+I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.
 \end{align}
 %
 The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0$(degrees), for a given time-bandwidth product specified with the parameter $\beta$, defined as 
@@ -750,6 +750,13 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 \end{align}
 %
 where $T$ is the extent of the window and $B$ is its bandwidth. $\beta$ adjusts the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency.
+
+To ensure unit gain in the direction of interest, each window is normalized to ensure that the weights sum to 1. 
+\begin{align}
+\w = 1
+\end{align}
+
+Note that the normalization factor is reciprocal of the window's coherent gain. 
 
  adjusts This results in
 
