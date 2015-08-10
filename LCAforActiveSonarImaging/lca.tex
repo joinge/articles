@@ -731,39 +731,37 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
 %
 \begin{align}
-w_m = \begin{cases}
+f_m = \begin{cases}
 \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}, & 0\le m\le M-1 \\
-0 & \text{otherwise}
+0 & \text{otherwise},
 \end{cases}
 \end{align}
 %
-where $I_0$ is the zeroth order Modified Bessel function of the first kind, defined as:
+where $I_0$ is the zeroth order Modified Bessel function of the first kind:
 %
 \begin{align}
 I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.
 \end{align}
 %
-The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0$(degrees), for a given time-bandwidth product specified with the parameter $\beta$, defined as 
+The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a time-bandwidth product specified with the parameter $\beta$:
 %
 \begin{align}
 \beta = \frac{TB}{2},
 \end{align}
 %
-where $T$ is the extent of the window and $B$ is its bandwidth. $\beta$ adjusts the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency.
+where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}.
 
-To ensure unit gain in the direction of interest, each window is normalized to ensure that the weights sum to 1. 
+Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
 \begin{align}
-\w = 1
+\w = \frac{\vec f}{\vec f\T\1} \quad\quad\text{where}\quad\quad \vec f =
+\bmat{
+f_0 \\ \vdots \\ f_{M-1}                                                           
+}
 \end{align}
 
-Note that the normalization factor is reciprocal of the window's coherent gain. 
+Note that the normalization factor is the reciprocal of the window's coherent gain. 
 
- adjusts This results in
 
-As will be demonstrated in upcoming sections, the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from. Therefore we have selected a 
-% 
-% 
-% α controls the tradeoff between main-lobe width and side-lobe area.  As α increases, the main lobe of W0(f) increases in width, and the side lobes decrease in amplitude, as illustrated in the figure at right.  α = 0 corresponds to a rectangular window. For large α, the shape of the Kaiser window (in both time and frequency domain) tends to a Gaussian curve.  The Kaiser window is nearly optimal in the sense of its peak's concentration around frequency 0 (Oppenheim et al., 1999).
 % 
 % Narrow ones:
 % - Best coherent gain, lowest equivalent noise bandwidth, and most sensitive to steering meaning not needing to steer as much for some effect.
@@ -783,48 +781,6 @@ As will be demonstrated in upcoming sections, the performance of the LCA beamfor
 % Kaiser: For a restricted energy and time duration, maximize energy in the band of frequencies W.
 % 
 % Adaptive windows perform best in detection of closely separated angles of significantly amplitudes.
-
-
-% \begin{figure}[p]\centering%
-% \subfloat[Image of a single speckle realisation.]{%
-% \includegraphics[width=\linewidth]{gfx/img_das_lca_mv.pdf}%
-% \label{speckleA}}%
-% % \hfil%
-% \subfloat[Mean image of 100 speckle realisations.]{%
-% \includegraphics[width=\linewidth]{gfx/img_das_lca_mv_mean100.pdf}%
-% \label{speckleB}}%
-% \caption{A simulated circular object buried in speckle is imaged from above.}\label{speckle}
-% \end{figure}
-
-% 
-% 
-% \begin{figure}[tp]\centering%
-% \subfigure{%
-% \graphicsAI[width=\linewidth]{gfx/img_das_lca_mv.pdf}}
-% \subfigure{%
-% \graphicsAI[width=\linewidth]{gfx/img_das_lca_mv_mean100.pdf}}%
-% \caption{A simulated circular object buried in speckle is imaged from above.\newline\parbox[t]{1.50cm}{Top:\newline Bottom:}\parbox[t]{6.8cm}{Image of a single speckle realisation.\newline Mean image of 100 speckle realisations.}}\label{speckle}%%
-% \end{figure}%
-% 
-% \begin{figure}[t]\centering%
-% \graphicsAI[width=\linewidth]{gfx/img_mean_cut.pdf}%
-% \caption{Lateral cut in the mean image at range 41.1\,m (highlight) and 44.5\,m (shadow).}\label{cutmean}%
-% \end{figure}
-% % \begin{figure}[t]\centering
-% % % \graphicsAI[drawing,width=\linewidth]{gfx/the_box.svg}\\
-% % \includegraphics[width=\linewidth]{gfx/selected_windows.pdf}
-% % \caption{Selected windows}\label{selected_windows}
-% % \end{figure}
-% % \begin{figure}[t]\centering
-% % \includegraphics[width=\linewidth]{gfx/selected_windows_angle.pdf}
-% % \caption{Selected windows - Colored by angle}\label{selected_windows_angle}
-% % \includegraphics[width=\linewidth]{gfx/selected_windows_sym_angle.pdf}
-% % \caption{Selected windows - Colored symmetrically by angle}\label{selected_windows_sym}
-% % \end{figure}
-% \begin{figure}[t]\centering
-% \graphicsAI[width=\linewidth]{gfx/img_holmengraa.pdf}%
-% \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa.}\label{holmengraa}%
-% \end{figure}
 
 % Adaptive beamformers usually compute the window coefficients by estimating and inverting a spatial covariance matrix. There are two inherent problems to this procedure. First, for improved estimation accuracy the data is either averaged in space or time, and the significance of the covariance matrix can be reduced using a regularisation parameter~\cite{Carl Inge}. These are all attempts to constrain the beamformer to ensure the window coefficience are not over-adapted to the data. Second, inverting the covariance matrix has a computational complexity of O($M^3$)~\cite{Carl Inge}. For larger arrays the computational burden becomes significant, and the question arises whether this processing power can be better utilised. 
 % 
@@ -921,7 +877,7 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 \newpage
 
 
-hmm 
+% the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from.
 
 \newpage
 
