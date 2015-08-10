@@ -732,7 +732,7 @@ As will be demonstrated in upcoming sections, the LCA beamformer works very well
 %
 \begin{align}
 w_m = \begin{cases}
-\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{m}{M/2}\right)^2}\right)}{I_0(\pi\beta)}, & 0\le |m|\le M/2 \\
+\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}, & 0\le m\le M-1 \\
 0 & \text{otherwise}
 \end{cases}
 \end{align}
@@ -740,9 +740,18 @@ w_m = \begin{cases}
 where $I_0$ is the zeroth order Modified Bessel function of the first kind, defined as:
 %
 \begin{align}
-I_0(x) = \sumb{k=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^k}{k!} \right].
+I_0(x) = \sumb{k=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^k}{k!} \right]^2.
 \end{align}
 %
+The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0$(degrees), for a given time-bandwidth product specified with the parameter $\beta$, defined as 
+%
+\begin{align}
+\beta = \frac{TB}{2},
+\end{align}
+%
+where $T$ is the extent of the window and $B$ is its bandwidth. $\beta$ adjusts the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency.
+
+ adjusts This results in
 
 As will be demonstrated in upcoming sections, the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from. Therefore we have selected a 
 % 
