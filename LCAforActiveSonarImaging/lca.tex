@@ -273,6 +273,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\1{\vec 1}
 \newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
+\newcommand*\f{\vec f}
 \renewcommand*\i{\vec i}
 \renewcommand*\k{\vec k}
 \newcommand*\n{\vec n}
@@ -749,17 +750,17 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 \beta = \frac{TB}{2},
 \end{align}
 %
-where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}.
+where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
 Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
 \begin{align}
-\w = \frac{\vec f}{\vec f\T\1} \quad\quad\text{where}\quad\quad \vec f =
+\w = \frac{\vec f}{\f\T\1} \quad\quad\text{where}\quad\quad \f =
 \bmat{
 f_0 \\ \vdots \\ f_{M-1}                                                           
 }
 \end{align}
 
-Note that the normalization factor is the reciprocal of the window's coherent gain. 
+Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise ratio is constant for a given window, the effect of gaining the coherent signal by also allowing an equivalent incoherent noise gain.  
 
 
 % 
