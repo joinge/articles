@@ -585,7 +585,10 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. In comparison, human made sonars inhibit minimal adaptability in the data collection process, but try to make up for it in the post processing of the data. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortionless response (MVDR) beamformer.
 
-Compared to conventional methods, MVDR is often able to improve image contrast and resolution, as shown in~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}.
+MVDR is often able to improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, it is computationally intensive, needs robustification to work well, and should be used on images that are oversampled 10 times in azimuth.
+
+In prior studies we have investigated ways to reduce the complexity of MVDR and accelerate it using graphics computing units (GPUs)~\cite{Buskenes2014,Aasen2013}.
+
 
 Despite its inherent potential, the MVDR beamformer has yet to see widespread adoption in the active sonar field. There may be several reasons for this. For one, the method is not inherently robust, and may suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O($M^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
 
