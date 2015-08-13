@@ -587,20 +587,15 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This is impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid it altogether while achieving similar performance.
 
-This method is called Low Complexity Adaptive (LCA) beamformer and was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tend to create windows that resembles slightly varied versions of conventional ones. 
+This method is called Low Complexity Adaptive (LCA) beamformer and was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
 
-This article investigates a few questions that remain unanswered. One is what window functions LCA should be allowed to choose from. This hardly seems to matter,   Our studies show minimal difference between the traditional windows, so the common and reasonable Kaiser-Harris window where the compromize between What windows should the LCA be allowed to choose from? How many is needed?  by Synnev\aa{}g demonstrated the potential of LCA, 
+In this work we investigate a few questions related to the LCA that remain unanswered. One is what window function we can use, and how many windows we will need. We limit our study to the use of variations of the Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient errors, and can create windows with shapes spanning from rectangular to Gaussian. windows are needed, and what variations of the windows are necessary? 
+
+Another question is what it takes to achieve double the resolution.
+
+ne is what window functions LCA should be allowed to choose from. This hardly seems to matter,   Our studies show minimal difference between the traditional windows, so the common and reasonable Kaiser-Harris window where the compromize between What windows should the LCA be allowed to choose from? How many is needed?  by Synnev\aa{}g demonstrated the potential of LCA, 
 
 Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
-
-
-There may be several reasons for this. For one, the method is not inherently robust, and may suffer from a phenomenon called signal cancellation in active systems~\cite{Widrow1982}. Another reason is that in its original form, the computational complexity is cubic with the number of channels, O($M^3$), while conventional beamformers are at O($M$). This is because a spatial covariance matrix is estimated and inverted for each image pixel.
-
-
-However, MVDR is neither statistically nor numerically robust by default, and typically needs to average data in space and time, and regularization. This constrains the solution space of the weights.
-
-Traditional beamformers such as Delay-and-Sum (DAS) weight the sensors using a predefined window. However, since the optimal spatial response is likely to change with time, it is often preferred to use beamformers that continously adapt the weights to the dynamic data. This usually involves solving some optimization problem.
-
 
 
 We will show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. Then we create Kaiser windows of different types, and with varying degree of steering, that combined form a discrete version of the MVDR solution space. 
