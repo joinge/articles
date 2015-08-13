@@ -589,11 +589,12 @@ In many cases MVDR can improve image contrast and resolution compared to convent
 
 This method is called Low Complexity Adaptive (LCA) beamformer and was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
 
-In this work we investigate a few questions related to the LCA that remain unanswered. One is what window function we can use, and how many windows we will need. We limit our study to the use of variations of the Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient errors, and can create windows with shapes spanning from rectangular to Gaussian. windows are needed, and what variations of the windows are necessary? 
+Synnev\aa{}g used a window set comprised of rectangular, Kaiser and inverted Kaiser functions. Of these only a specific Kaiser window were steered We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
+
+In this work we investigate a few questions related to the LCA that remain unanswered. One is what window function we can use, and how many windows we will need. 
 
 Another question is what it takes to achieve double the resolution.
 
-ne is what window functions LCA should be allowed to choose from. This hardly seems to matter,   Our studies show minimal difference between the traditional windows, so the common and reasonable Kaiser-Harris window where the compromize between What windows should the LCA be allowed to choose from? How many is needed?  by Synnev\aa{}g demonstrated the potential of LCA, 
 
 Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
 
