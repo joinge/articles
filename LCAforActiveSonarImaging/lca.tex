@@ -648,7 +648,7 @@ The following will show that the proposed method performs similarly to or better
 
 \begin{figure}[tbhp]%\centering%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.pdf}%
-\caption{Steering within -3dB for each window}\label{windows_steering}
+\caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
 \subsection{Beamforming}
@@ -791,6 +791,11 @@ oversampled 10 times in azimuth~\cite{Asen2014}.
 \begin{align}
 \phi_\text{-3dB bounds} \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
 \end{align}
+
+There is an upper bound to how much a window should be steered. Since each window's response is constrained to a unit gain in the look direction, each steered window's response is gained as shown in \Fig{window_steering}. moreUnder the constraint of a unit gain in the look direction, the effect of 
+When steering the windows it is desirable to limit the amount of steering 
+
+Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
 
 % \begin{align}
