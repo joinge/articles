@@ -653,8 +653,11 @@ The following will show that the proposed method performs similarly to or better
 
 \subsection{Beamforming}
 
-Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
+Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on.
 
+A beamformer is a spatial filter we apply to backscattered wavefield data to estimate the scatter strength from a particular point or direction. A coarse adjustment is first obtained by applying delays to the sensor channels to negate the difference in travel time from the point of interest, thereby aligning the phase of the signals coming from that source. Next a set of weights, or window, is applied to the sensors to Finally a set of weights  , which in effect achieve this by applying delays and weigths to the sensor channels to coherently combine signals from the direction of interest.
+
+Let the array be an $M$ element uniform linear array, 
 By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
