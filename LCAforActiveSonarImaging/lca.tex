@@ -589,7 +589,7 @@ In many cases MVDR can improve image contrast and resolution compared to convent
 
 This method is called Low Complexity Adaptive (LCA) beamformer and was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
 
-Synnev\aa{}g used a window set comprised of rectangular, Kaiser and inverted Kaiser functions. Of these only a specific Kaiser window were steered We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
+Synnev\aa{}g used a window set comprised of rectangular, Kaiser and inverted Kaiser functions. Of these a specific Kaiser window were micro-steered. We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 
 In this work we investigate a few questions related to the LCA that remain unanswered. One is what window function we can use, and how many windows we will need. 
 
@@ -628,10 +628,6 @@ At heart of the image formation process is a technique called beamforming, which
 
 In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
 
-3rd order Maclaurin / Tayler approximation
-\begin{align}
-\phi_\text{-3dB bounds} \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
-\end{align}
 
 
 
@@ -787,6 +783,15 @@ e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 
 
 oversampled 10 times in azimuth~\cite{Asen2014}.
+
+\subsection{Relative steering}
+
+
+3rd order Maclaurin / Tayler approximation
+\begin{align}
+\phi_\text{-3dB bounds} \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
+\end{align}
+
 
 % \begin{align}
 % \z = \w\H\a 
