@@ -651,13 +651,13 @@ The following will show that the proposed method performs similarly to or better
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
-\subsection{Beamforming}
+\subsection{Receive Beamforming}
 
 Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on.
 
-A beamformer is a spatial filter we apply to backscattered wavefield data to perform e.g. source localization and amplitude estimation. In sonar image reconstruction we desire 
+To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data, commonly called a receive beamformer.  
 
- A coarse adjustment is usually achieved by applying delays to the sensor channels to negate the difference in travel time from the point of interest, and cause the  thereby aligning the phase of the signals coming from that source. Next a set of weights, or window, is applied to the sensors to Finally a set of weights  , which in effect achieve this by applying delays and weigths to the sensor channels to coherently combine signals from the direction of interest.
+A coarse adjustment is usually achieved by applying delays to the sensor channels to negate the difference in travel time from the point of interest, and cause the  thereby aligning the phase of the signals coming from that source. Next a set of weights, or window, is applied to the sensors to Finally a set of weights  , which in effect achieve this by applying delays and weigths to the sensor channels to coherently combine signals from the direction of interest.
 
 Let the array be an $M$ element uniform linear array, 
 By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
