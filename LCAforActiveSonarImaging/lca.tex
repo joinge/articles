@@ -410,9 +410,9 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Human made sonars have little to no adaptibility when data is collected, but some methods have been investigated in the data post processing. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortionless response (MVDR) beamformer~\cite{Capon1969}. It computes the window that is optimal in the sense of suppressing noise as much as possible while under the restriction of  preserving the signal of interest.
 
-In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This is impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid it altogether while achieving similar performance.
+In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid it altogether while achieving similar performance.
 
-This method is called Low Complexity Adaptive (LCA) beamformer and was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
+This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimisation criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
 
 Synnev\aa{}g used a window set comprised of rectangular, Kaiser and inverted Kaiser functions. Of these a specific Kaiser window were micro-steered. We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 
@@ -447,26 +447,26 @@ This article is outlined as follows:
 % Traditionally beamformers were static, but as processors get more powerful so with the emergence of more processing power 
 
 
-
-\section{Methods}
-
-At heart of the image formation process is a technique called beamforming, which creates a focus point at the pixel of interest. It does this by applying a suitable set of delays and weights to the array elements, such that signals emanating from the pixel location are emphasized constructively, while noise and interference from other directions sum destructively.
-
-In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
-
-
-
-
-% Traditional beamformers such as Delay-and-Sum (DAS) apply predefined windows to all incoming data. However, due to the non-stationary nature of sonar data, the optimal window for any given time instant will generally differ from the next. This is where adaptive beamformers thrive, because they compute the optimal window coefficients for the data at each time instant. The choice of optimisation criteria is what mainly differentiates the various adaptive beamformers. The Minimum Variance (MV) beamformer, for instance, selects the set of weights that minimizes the beamformer output power for any given time instant~\cite{cap69}.
-
-
-\section{Background}
-
-The MV beamformer computes the window coefficients by estimating and inverting a spatial covariance matrix. For improved estimation accuracy the data is averaged in space or time, or both. In addition, a certain amount of diagonal loading is often added to the covariance matrix before inversion. These actions, while leading to statistical robustness, tend to deteriorate the beamformer's performance. Also, the inversion of the covariance matrix has a computational complexity of O($M^3$), where $M$ is the number of elements. The computational burden makes the MV beamformer for large arrays less attractive, and sometimes even infeasible.
-
-Based on the proposed method by Synnevåg~\cite{syn11}, we have implemented the LCA beamformer that keeps the minimum variance optimisation criterion but reduces the solution space to a discrete set of predefined windows. This reduces the computational complexity to O($MW$), where $W$ is the number of windows in the set. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$~\cite{kai66}. In addition we apply steering to each of the windows and constrain the window design to ensure unit gain in the look direction.
-
-The following will show that the proposed method performs similarly to or better than the MV method.
+% 
+% \section{Methods}
+% 
+% At heart of the image formation process is a technique called beamforming, which creates a focus point at the pixel of interest. It does this by applying a suitable set of delays and weights to the array elements, such that signals emanating from the pixel location are emphasized constructively, while noise and interference from other directions sum destructively.
+% 
+% In active sonar array imaging, an acoustic wave is transmitted and the received echoes are usually recorded using an array of sensors. Each of these may be independently delayed and weighted such that signals emanating from directions of interest are added constructively, while noise and interference from other directions add destructively. Additionally, a window may be applied to the sensor channels to further adjust the array's spatial response. This process is known as beamforming.% The process of combining the signals from each sensor is known as beamforming.
+% 
+% 
+% 
+% 
+% % Traditional beamformers such as Delay-and-Sum (DAS) apply predefined windows to all incoming data. However, due to the non-stationary nature of sonar data, the optimal window for any given time instant will generally differ from the next. This is where adaptive beamformers thrive, because they compute the optimal window coefficients for the data at each time instant. The choice of optimisation criteria is what mainly differentiates the various adaptive beamformers. The Minimum Variance (MV) beamformer, for instance, selects the set of weights that minimizes the beamformer output power for any given time instant~\cite{cap69}.
+% 
+% 
+% \section{Background}
+% 
+% The MV beamformer computes the window coefficients by estimating and inverting a spatial covariance matrix. For improved estimation accuracy the data is averaged in space or time, or both. In addition, a certain amount of diagonal loading is often added to the covariance matrix before inversion. These actions, while leading to statistical robustness, tend to deteriorate the beamformer's performance. Also, the inversion of the covariance matrix has a computational complexity of O($M^3$), where $M$ is the number of elements. The computational burden makes the MV beamformer for large arrays less attractive, and sometimes even infeasible.
+% 
+% Based on the proposed method by Synnevåg~\cite{syn11}, we have implemented the LCA beamformer that keeps the minimum variance optimisation criterion but reduces the solution space to a discrete set of predefined windows. This reduces the computational complexity to O($MW$), where $W$ is the number of windows in the set. We use the Kaiser window function because it allows us to design a wide range of windows with different mainlobe widths and sidelobe suppression by adjusting the tradeoff parameter $\beta$~\cite{kai66}. In addition we apply steering to each of the windows and constrain the window design to ensure unit gain in the look direction.
+% 
+% The following will show that the proposed method performs similarly to or better than the MV method.
 
 
 \begin{figure}[tbp]%
