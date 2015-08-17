@@ -653,18 +653,26 @@ The following will show that the proposed method performs similarly to or better
 
 \subsection{Receive Beamforming}
 
-Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter. Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on.
 
-To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data, commonly called a receive beamformer.  
 
-A coarse adjustment is usually achieved by applying delays to the sensor channels to negate the difference in travel time from the point of interest, and cause the  thereby aligning the phase of the signals coming from that source. Next a set of weights, or window, is applied to the sensors to Finally a set of weights  , which in effect achieve this by applying delays and weigths to the sensor channels to coherently combine signals from the direction of interest.
+To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently. Assume that the signature of the transmitted signal has been removed by a matched filter.
 
-Let the array be an $M$ element uniform linear array, 
+Let the receiver be an $M$ element uniform linear array. The Assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on.
+
+
 By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+
+
+
+
+ coarse delay adjustment is usually achieved by applying delays to the sensor channels to negate the difference in travel time from the point of interest, and cause the  thereby aligning the phase of the signals coming from that source. Next a set of weights, or window, is applied to the sensors to Finally a set of weights  , which in effect achieve this by applying delays and weigths to the sensor channels to coherently combine signals from the direction of interest.
+
+Let the array be an $M$ element uniform linear array, 
+
 
 Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}:
 
