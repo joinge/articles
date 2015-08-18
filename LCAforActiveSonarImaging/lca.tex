@@ -485,14 +485,16 @@ The beamformer output $z[n]$ can now be expressed as the weighted sum of all the
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Conventional beamformers all have static weights, and by far the most common of these is the delay-and-sum (DAS) beamformer, which does exactly what the name implies.
+where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Conventional beamformers all have static weights, and the reference here is the delay-and-sum (DAS) beamformer, or the backprojection algortithm. As the name implies it delays each pixel into focus, then applies a suitable window, and finally sums the data. 
 
- See section \ref{kaiser_windows}.
+Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}:
+
+See section \ref{kaiser_windows}.
 
 
 With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
-Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}:
+
 
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\x\x\H\w\H[n]\\
