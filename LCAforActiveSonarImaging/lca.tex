@@ -477,7 +477,7 @@ This article is outlined as follows:
 \newpage
 \subsection{Receive Beamforming}
 
-To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently. Assume that the signature of the transmitted signal has been removed by a matched filter.
+To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
 Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ is the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ can be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
 
@@ -485,33 +485,31 @@ The beamformer output $z[n]$ can now be expressed as the weighted sum of all the
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Conventional beamformers all have static weights, and the reference here is the delay-and-sum (DAS) beamformer, or the backprojection algortithm. As the name implies it delays each pixel into focus, then applies a suitable window, and finally sums the data. 
+where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
 
-Various adaptive beamformers target this limitation by allowing the weights to change for each pixel to better fit the dynamic nature of the incoming wavefield. In other words, they attempt to use the \emph{a priori} information present in the data to improve image quality. The MVDR beamformer is one such method. It finds the set of complex weights that minimizes the beamformer's expected output power, while ensuring unity gain in the look direction~\cite{Capon1969}:
+Conventional beamformers all have static weights. The reference here is the delay-and-sum (DAS) beamformer, also know as the backprojection algortithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
-See section \ref{kaiser_windows}.
-
-
-With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
-
-
-
+Adaptive beamformers are generally not so simple. They allow the weights/delays to change to adjust the array response to better fit the incoming wavefield. Of these methods the minimum variance distortionless response (MVDR) beamformer is perhaps the best studied and well known. It seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\a$~\cite{Capon1969}:
+%
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\x\x\H\w\H[n]\\
-\text{subject to } \w[n]\1 &= 1
+\text{subject to } \w[n]\a &= 1
 \end{align}
-
-This convex optimization problem has the solution:
-
+%
+where $\a$ is a steering vector. This is a convex optimization problem with the solution:
+%
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
 \end{gather}
-where $\a$ is a steering vector and $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since we pre-steer our data to every pixel in the image we simplify (\ref{weights}) by substituting $\a$ with a row vector $\1$ that represents broadside phase-steering. To estimate $\R$ we compute a sample covariance matrix $\eR$. In this computation we perform some degree of:
-\begin{itemize}
-\item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985};
-\item \emph{temporal averaging} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009a};
-\item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
-\end{itemize}%
+where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Estimating and inverting this spatial covariance matrix is a non trivial matter. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
+
+See section \ref{kaiser_windows}.
+
+. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
+
+
+
+
 %
 % will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
 %
