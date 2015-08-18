@@ -479,11 +479,15 @@ This article is outlined as follows:
 
 To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently. Assume that the signature of the transmitted signal has been removed by a matched filter.
 
-Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. The data from the $m$th channel $x_m[\theta,n]$, where the azimuth angle $\theta$ and range sample $n$ is the focus point. To simplify notation, we make the dependence on $\theta$ implicit from now on. By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
+Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ is the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ can be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
+
+The beamformer output $z[n]$ can now be expressed as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. 
+where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Conventional beamformers all have static weights, and by far the most common of these is the delay-and-sum (DAS) beamformer, which does exactly what the name implies.
+
+ See section \ref{kaiser_windows}.
 
 
 With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
@@ -531,24 +535,7 @@ Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M
 \begin{align}
 z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
-% \ifPeerReview
-% \begin{figure}[!t]\centering
-% \includegraphics[width=.8\linewidth]{gfx/buske2\figPostfix.eps}
-% \else
-% \begin{figure}[!t]\centering
-% \includegraphics[width=\linewidth]{gfx/implementation.eps}
-% \fi%
-% \caption{MVDR beamforming. For each pixel in range and azimuth:\newline
-% 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed; \newline
-% 2. the term $\eR^{-1}\1$ is found using a linear equation solver;\newline
-% 3. and the beamformer output $z$ is computed from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{weights}). } \label{mvdr_beamforming}
-% \end{figure}
-As summarized in Fig. \ref{mvdr_beamforming}, the MVDR method is applied to each pixel independently, by:
-\begin{enumerate}
-\item computing the sample covariance matrix $\eR$ in (\ref{finalR});
-\item computing $\eRi\1$ in (\ref{weights});
-\item computing the beamformer output $z$ in (\ref{finalZ}).
-\end{enumerate}
+
 Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
 \begin{itemize}
@@ -559,7 +546,7 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 \item \emph{Image quality}
 \end{itemize}
 
-\section{Kaiser windows}
+\section{Kaiser windows}\label{kaiser_windows}
 
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
 %
