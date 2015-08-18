@@ -474,11 +474,12 @@ This article is outlined as follows:
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
+\newpage
 \subsection{Receive Beamforming}
 
 To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently. Assume that the signature of the transmitted signal has been removed by a matched filter.
 
-Let the receiver be an $M$ element uniform linear array. Call the the data from the $m$th channel $x_m[\theta,n]$, where the azimuth angle $\theta$ and range sample $n$ is the focus point. To simplify notation, we make the dependence on $\theta$ implicit from now on. By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
+Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. The data from the $m$th channel $x_m[\theta,n]$, where the azimuth angle $\theta$ and range sample $n$ is the focus point. To simplify notation, we make the dependence on $\theta$ implicit from now on. By definition, the beamformer output $z[n]$ can be expressed as the weighted sum of all the delayed data samples:
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
