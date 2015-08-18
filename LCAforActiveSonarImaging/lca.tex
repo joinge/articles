@@ -489,7 +489,11 @@ where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set
 
 Conventional beamformers all have static weights. The reference here is the delay-and-sum (DAS) beamformer, also know as the backprojection algortithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
-Adaptive beamformers are generally not so simple. They allow the weights/delays to change to adjust the array response to better fit the incoming wavefield. Of these methods the minimum variance distortionless response (MVDR) beamformer is perhaps the best studied and well known. It seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\a$~\cite{Capon1969}:
+Adaptive beamformers are generally not so simple. They allow the weights/delays to change to adjust the array response to better fit the incoming wavefield. Of these methods the minimum variance distortionless response (MVDR) beamformer is perhaps the best studied and well known.
+
+\section{MVDR}
+
+MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\a$~\cite{Capon1969}:
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\x\x\H\w\H[n]\\
@@ -501,7 +505,7 @@ where $\a$ is a steering vector. This is a convex optimization problem with the 
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
 \end{gather}
-where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Estimating and inverting this spatial covariance matrix is a non trivial matter. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
+where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 See section \ref{kaiser_windows}.
 
@@ -509,34 +513,8 @@ See section \ref{kaiser_windows}.
 
 
 
+\section{LCA}
 
-%
-% will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
-%
-Combined, these steps will also ensure a numerically well conditioned $\eR$.
-
-We perform \emph{temporal} and \emph{spatial averaging} first and put the result in an intermediate sample covariance matrix $\breve{\R}$. To do this we need to segment our array into subarrays. If we let $x_l[n]$ represent the data vector from subarray $l$ by
-\begin{gather}
-\x_l[n] = \bmat{x_l[n] & x_{l+1}[n] & \dots & x_{l+L-1}[n]}\T,
-\end{gather}
-then $\breve{\R}$ can be calculated as
-\begin{gather}
-\breve{\R}[n] =  \frac{1}{N_K N_L} \sumb{l=0}{M-L}\sumb{n'=n-K}{n+K} \x_l[n']\x_l\H[n'] \in\mathbb{C}^{L,L},\label{spatialR}
-\end{gather}
-where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays.
-
-The final estimate $\eR$ is found by adding a fraction $d$ of the total power of $\breve{\R}[n]$ to its diagonal~\cite{Synnevag2007}:
-\begin{align}
-\eR[n] = \breve{\R}[n] + \I \frac{d}{L} \tr\{\breve{\R}[n]\},\label{finalR}
-\end{align}
-where $\I$ is an identity matrix, $\tr\{\cdot\}$ represents the matrix trace operation, and $\tr\{\breve{\R}[n]\}$ is an estimate of the energy received from this pixel.
-
-Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M,M}$ to $\mathbb{C}^{L,L}$, and hence will produce an $L$-element weight set when substituted into (\ref{z}). This weight set is applied to all the subarrays, before computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weight set to the sum of all the subarrays by
-\begin{align}
-z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
-\end{align}
-
-Next we will evaluate these steps in terms of arithmetic complexity, and then discuss their mappability to parallel hardware.
 
 \begin{itemize}
 \item \emph{Window function}
@@ -545,6 +523,59 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 \item \emph{Oversampling need}
 \item \emph{Image quality}
 \end{itemize}
+
+Let $\X[n]$ be the data received by an array, pre-steered to all pixels in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer output $z$ as the weighted sum of the data:
+%
+\begin{align}
+z[\w,n] = \w\H\X[n] = \sumb{m=0}{M-1} w_m x_m^*[n]
+\end{align}
+%
+From a set of $P$ windows the LCA beamformer selects the window $p$ that yield the least output power:
+%
+\begin{align}
+\argmin{p}{E\big\{|z|^2\big\}} = \argmin{p}{E\big\{|\w_p\H\X[n]|^2\big\}} \qquad\text{subject to}\qquad \w\H\a = 1
+\end{align}
+%
+We can estimate $E\big\{|\w_p\H\X[n]|^2\big\}$ as
+%
+\begin{align*}
+\sigma^2_{z_p}[n] = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
+\end{align*}
+%
+To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
+%
+\begin{align*}
+\sigma^2_{z_p}[x,n] = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
+\end{align*}
+%
+where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
+
+Kaiser:
+%
+\begin{align*}
+w[n] = \frac{I_0\big( \pi\alpha\sqrt{1-(\frac{2n}{N-1}-1)^2}\big)}{I_0(\pi\alpha)}
+\end{align*}
+%
+where $I_0$ is a zeroth order modified Bessel function of the first kind.
+
+\subsection{Oversampling and steering}
+
+Steering wildly is not a good idea.
+
+Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
+
+\begin{itemize}
+\item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
+\item More steering -> Larger variations in amplitude of sources
+\end{itemize}
+
+Idea to steer within a fraction of the rectangular window's mainlobe. 
+
+\begin{align*}
+d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
+\end{align*}
+
+
 
 \section{Kaiser windows}\label{kaiser_windows}
 
@@ -859,28 +890,7 @@ where
 \begin{align}
 \R[n] = E\{ \x\x\H \}.
 \end{align}
-If $\eR$ is the estimate of $\R$, the solution to the MVDR beamformer is
-\begin{gather*}
-\vec w[n] = \frac{\hat{\mat R}\,\!^{-1}[n]\vec a}{\vec a\H\hat{\mat R}\,\!^{-1}[n]\vec a} = \frac{\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}{\vec a\H\text{\raisebox{1.9pt}{$\vec\chi$}}[n]}
-\end{gather*}
-A robust estimate of $\eR$ is found by
-\begin{itemize}
-\item Spatial averaging to decorrelate noise from signal. \emph{Subarray averaging} used here.
-\item Temporal averaging to ensure valid speckle statistics.
-\item \emph{Diagonal loading} to ensure  numerical stability prior to inversion.
-\item Choice of robustification parameters \cite{Synnevag2007}
-\end{itemize}
 
-Here $\vec a$ is a \emph{steering vector} that if set to $\vec 1$ steers towards broadside, and $\hat{\mat R}$ is an estimate of the spatial covariance matrix, often computed as
-\begin{gather*}
-r_{ij}[n] = \frac{1}{K(2N_{\text{avg}}+1)}\sumb{k=0}{K-1} \sumb{n'=n-N_{\text{avg}}}{n+N_{\text{avg}}} x_{i+k}[n']\,x_{j+k}[n'],
-\end{gather*}
-where $r_{ij}$ is the $(i,j)$'th element of the covariance matrix, $K$ is the number of subarrays, $2N_{\text{avg}}+1$ is the number of samples to perform time averaging over, and $\vec x_i[n']$ is the data recorded by the $i$'th sensor at sample $n'$. 
-
-\emph{Diagonal loading} chosen as \cite{Synnevag2007}
-\begin{align}
-\varepsilon = \Delta \cdot \tr\{\eR[n]\}
-\end{align}
 
 \section{Results}
 
