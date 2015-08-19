@@ -515,7 +515,7 @@ The LCA beamformer interates through a set of $P$ windows and $p$ that yields th
 \begin{align}
 \underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{\beta,\phi}\H\x[n]|^2\big\}\\
 \qquad\text{subject to}\qquad \w\H\a = 1
-\end{align}
+\end{align}\label{lca_criterion}
 %
 We can estimate $E\big\{|\w_p\H\x[n]|^2\big\}$ as
 %
@@ -565,20 +565,13 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 %
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
-Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
-%
-\begin{align}
-\w = \frac{\vec f}{\f\T\1} \quad\quad\text{where}\quad\quad \f =
-\bmat{
-f_0 \\ \vdots \\ f_{M-1}                                                           
-}
-\end{align}
-%
-Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain. 
+\subsection{Steering}
 
 \begin{align}
-\w = \frac{\a\f}{\f\T\a} = 
+\w_{\beta,\phi} = \w\H\diag{(\a)}\\
+\a = \bmat{1\\e^{-j\frac{d}{\lambda}\sin(\phi)}\\\vdots\\e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)} }
 \end{align}
+
 
 \begin{align}
 \a = \bmat{
@@ -589,13 +582,26 @@ e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 }
 \end{align}
 
+Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
+%
+\begin{align}
+\w = \frac{\vec f}{\f\T\1} \quad\quad\text{where}\quad\quad \f =
+\bmat{
+f_0 \\ \vdots \\ f_{M-1}                                                           
+}
+\end{align}
+%
+Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain.
+
+\begin{align}
+\w = \frac{\a\f}{\f\T\a} = 
+\end{align}
+
+
 The steering is subject to an upper steering bound specified, which will be discussed next.
 
 
-\subsection{Relative steering}
-
-
-
+\subsection{Steering bounds}
 
 There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, each steered window's response is gained as shown in \Fig{windows_steering}. This increases the white noise gain and deteriorates the signal to noise ratio. To limit this we placing an upper bound to the steering, taking into account that a wide window can be allowed more steering than a narrow one.
 
@@ -608,8 +614,6 @@ We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it 
 Any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
 \subsection{Oversampling and steering}
-
-Steering wildly is not a good idea.
 
 Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
 
