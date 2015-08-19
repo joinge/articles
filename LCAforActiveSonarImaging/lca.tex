@@ -485,7 +485,7 @@ The beamformer output $z[n]$ can now be expressed as the weighted sum of all the
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
+where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
 
 Conventional beamformers all have static weights. The reference here is the delay-and-sum (DAS) beamformer, also know as the backprojection algortithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
@@ -496,47 +496,28 @@ Adaptive beamformers are generally not so simple. They allow the weights/delays 
 MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\a$~\cite{Capon1969}:
 %
 \begin{align}
-\underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\x\x\H\w\H[n]\\
+\underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\\
 \text{subject to } \w[n]\a &= 1
 \end{align}
 %
-where $\a$ is a steering vector. This is a convex optimization problem with the solution:
+where $\a$ is a steering vector and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
 %
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
 \end{gather}
 where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
-See section \ref{kaiser_windows}.
-
-. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
-
-
 
 \section{LCA}
 
-
-\begin{itemize}
-\item \emph{Window function}
-\item \emph{Parameter boundaries}
-\item \emph{Number of windows needed}
-\item \emph{Oversampling need}
-\item \emph{Image quality}
-\end{itemize}
-
-Let $\X[n]$ be the data received by an array, pre-steered to all pixels in the image, and $\w$ be the window applied to these spatial data. Then we defined the beamformer output $z$ as the weighted sum of the data:
+From a set of $P$ windows the LCA beamformer selects the window $p$ that yields the least output power:
 %
 \begin{align}
-z[\w,n] = \w\H\X[n] = \sumb{m=0}{M-1} w_m x_m^*[n]
+\underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_p\H\x[n]|^2\big\}\\
+\qquad\text{subject to}\qquad \w\H\a = 1
 \end{align}
 %
-From a set of $P$ windows the LCA beamformer selects the window $p$ that yield the least output power:
-%
-\begin{align}
-\argmin{p}{E\big\{|z|^2\big\}} = \argmin{p}{E\big\{|\w_p\H\X[n]|^2\big\}} \qquad\text{subject to}\qquad \w\H\a = 1
-\end{align}
-%
-We can estimate $E\big\{|\w_p\H\X[n]|^2\big\}$ as
+We can estimate $E\big\{|\w_p\H\x[n]|^2\big\}$ as
 %
 \begin{align*}
 \sigma^2_{z_p}[n] = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
@@ -550,31 +531,13 @@ To add some extra flexibility, we can also estimate the variance by a weighted c
 %
 where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
 
-Kaiser:
-%
-\begin{align*}
-w[n] = \frac{I_0\big( \pi\alpha\sqrt{1-(\frac{2n}{N-1}-1)^2}\big)}{I_0(\pi\alpha)}
-\end{align*}
-%
-where $I_0$ is a zeroth order modified Bessel function of the first kind.
-
-\subsection{Oversampling and steering}
-
-Steering wildly is not a good idea.
-
-Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
-
 \begin{itemize}
-\item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
-\item More steering -> Larger variations in amplitude of sources
+\item \emph{Window function}
+\item \emph{Parameter boundaries}
+\item \emph{Number of windows needed}
+\item \emph{Oversampling need}
+\item \emph{Image quality}
 \end{itemize}
-
-Idea to steer within a fraction of the rectangular window's mainlobe. 
-
-\begin{align*}
-d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
-\end{align*}
-
 
 
 \section{Kaiser windows}\label{kaiser_windows}
@@ -643,6 +606,34 @@ We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it 
 \end{align}
 %
 Any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
+
+\subsection{Oversampling and steering}
+
+Steering wildly is not a good idea.
+
+Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
+
+\begin{itemize}
+\item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
+\item More steering -> Larger variations in amplitude of sources
+\end{itemize}
+
+Idea to steer within a fraction of the rectangular window's mainlobe. 
+
+\begin{align*}
+d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
+\end{align*}
+
+\begin{align}
+\w[\beta, \phi] = \text{kaiser}(\beta) = \bmat{
+1 \\
+e^{-j\frac{md}{\lambda}\sin(\phi)} \\
+\vdots\\
+e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
+}
+\end{align}
+
+See section \ref{kaiser_windows}.
 
 
 % Narrow ones:
