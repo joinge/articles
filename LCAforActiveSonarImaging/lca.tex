@@ -469,11 +469,6 @@ This article is outlined as follows:
 % The following will show that the proposed method performs similarly to or better than the MV method.
 
 
-\begin{figure}[tbp]%
-\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.pdf}%
-\caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
-\end{figure}
-
 \newpage
 \subsection{Receive Beamforming}
 
@@ -497,10 +492,10 @@ MVDR seeks to minimize the power of the beamformer, under the constraint of a un
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\\
-\text{subject to } \w[n]\a &= 1
+\text{subject to } \w[n]\a_\phi &= 1
 \end{align}
 %
-where $\a$ is a steering vector and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
+where $\a_\phi$ is a steering vector and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
 %
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
@@ -545,13 +540,20 @@ where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function.
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
 %
 \begin{align}
-f_m = \begin{cases}
-\frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}, & 0\le m\le M-1 \\
-0 & \text{otherwise},
-\end{cases}
+\f[\beta] = \bmat{
+f_0[\beta] \\
+\vdots\\
+f_{M-1}[\beta]
+},
 \end{align}
 %
-where $I_0$ is the zeroth order Modified Bessel function of the first kind:
+where
+%
+\begin{align}
+f_m = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}
+\end{align}
+%
+and $I_0$ is the zeroth order modified Bessel function of the first kind:
 %
 \begin{align}
 I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.
@@ -565,22 +567,28 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 %
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
+\begin{figure}[tbp]%
+\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.pdf}%
+\caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
+\end{figure}
+
 \subsection{Steering}
 
 \begin{align}
-\w_{\beta,\phi} = \w\H\diag{(\a)}\\
-\a = \bmat{1\\e^{-j\frac{d}{\lambda}\sin(\phi)}\\\vdots\\e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)} }
+\w_{\beta,\phi} = \f_\beta\H\diag{(\a_\phi)}\\
 \end{align}
-
-
+%
+where
+%
 \begin{align}
-\a = \bmat{
+\a_\phi = \bmat{
 1 \\
 e^{-j\frac{md}{\lambda}\sin(\phi)} \\
 \vdots\\
 e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 }
 \end{align}
+
 
 Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
 %
