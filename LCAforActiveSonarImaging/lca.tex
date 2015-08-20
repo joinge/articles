@@ -539,18 +539,18 @@ where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function.
 
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
 %
-\begin{align}
-\f[\beta] = \bmat{
-f_0[\beta] \\
+\begin{align*}
+\f_\beta = \bmat{
+f_0(\beta) \\
 \vdots\\
-f_{M-1}[\beta]
-},
-\end{align}
+f_{M-1}(\beta)
+}
+\end{align*}
 %
 where
 %
 \begin{align}
-f_m = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}
+f_m(\beta) = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}
 \end{align}
 %
 and $I_0$ is the zeroth order modified Bessel function of the first kind:
@@ -591,16 +591,13 @@ e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 }.
 \end{align}
 %
-Here $d$ is the element spacing and $\lambda$ is the wavelength. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It is needed to ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain.
-
-The steering is subject to an upper steering bound specified, which will be discussed next.
-
+Here $d$ is the element spacing and $\lambda$ is the wavelength. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
 
 \subsection{Steering bounds}
 
 There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, each steered window's response is gained as shown in \Fig{windows_steering}. This increases the white noise gain and deteriorates the signal to noise ratio. To limit this we placing an upper bound to the steering, taking into account that a wide window can be allowed more steering than a narrow one.
 
-We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. We numerically searched for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values. An explicit expression for was finally obtained with a third degree polynomial fit:
+We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. We performed a numeric search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values. A third degree polynomial fit to these points is:
 %
 \begin{align}
 \phi_\text{-3dB}(\beta) \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
@@ -677,7 +674,11 @@ See section \ref{kaiser_windows}.
 
 \begin{figure*}[tbhp!]\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
-\caption{Typical frequency responses for windows computed by a robust MVDR. The image is of the oiltanker Holmengraa, data collected from the 32 element HISAS1030 sonar with , operated in ssectorscan mode with an oversampling factor of ~10. The window responses was computed from 40x40 pixel groups in the shadow, highlight and speckle region. The dashed red lines at -13dB and -43dB marks the peak sidelobe level of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. Full opening angle. Parameters. }\label{mvdr_selected_windows}
+\caption{Typical frequency responses for windows computed by a robust MVDR.\newline
+Left:\hfill
+\parbox[t]{.95\linewidth}{A sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. Image reconstructed with MVDR with $K=1$ temporal oversampling, $L=16$ subarray size and $d=1\%$ This is a sectorscan image with full opening angle 8 times lateral oversampling.}\newline
+Right:\hfill
+\parbox[t]{.95\linewidth}{The window responses was computed from 40x40 pixel groups in the shadow, highlight and speckle region. The dashed red lines at -13dB and -43dB marks the peak sidelobe level of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight. Full opening angle. Parameters.} }\label{mvdr_selected_windows}
 \end{figure*}
 
 \newpage
