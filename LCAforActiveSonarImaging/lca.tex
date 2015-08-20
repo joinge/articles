@@ -509,7 +509,7 @@ The LCA beamformer interates through a set of $P$ windows and $p$ that yields th
 %
 \begin{align}
 \underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{\beta,\phi}\H\x[n]|^2\big\}\\
-\qquad\text{subject to}\qquad \w\H\a = 1
+\qquad\text{subject to}\qquad \w\H\a = 1\label{eq_lca_constraint}
 \end{align}\label{lca_criterion}
 %
 We can estimate $E\big\{|\w_p\H\x[n]|^2\big\}$ as
@@ -535,7 +535,7 @@ where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function.
 \end{itemize}
 
 
-\section{Window function: Kaiser}\label{kaiser_windows}
+\subsection{Window function: Kaiser}\label{kaiser_windows}
 
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
 %
@@ -574,8 +574,10 @@ where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjustin
 
 \subsection{Steering}
 
+To allow LCA some added flexibility we also create variations of each window that are steered a little to each side.
+%
 \begin{align}
-\w_{\beta,\phi} = \f_\beta\H\diag{(\a_\phi)}\\
+\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\\
 \end{align}
 %
 where
@@ -586,25 +588,10 @@ where
 e^{-j\frac{md}{\lambda}\sin(\phi)} \\
 \vdots\\
 e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
-}
-\end{align}
-
-
-Before we apply the window to the sensor data, we normalize it to ensure unit gain in the direction of interest:
-%
-\begin{align}
-\w = \frac{\vec f}{\f\T\1} \quad\quad\text{where}\quad\quad \f =
-\bmat{
-f_0 \\ \vdots \\ f_{M-1}                                                           
-}
+}.
 \end{align}
 %
-Note that the normalization factor $\f\T\1$ is the reciprocal of the window's coherent gain. Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain.
-
-\begin{align}
-\w = \frac{\a\f}{\f\T\a} = 
-\end{align}
-
+Here $d$ is the element spacing and $\lambda$ is the wavelength. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It is needed to ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise gain is constant for a given window, this normalization also proportionally increases the  incoherent noise gain.
 
 The steering is subject to an upper steering bound specified, which will be discussed next.
 
