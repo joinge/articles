@@ -108,19 +108,19 @@
 
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
-\newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
-pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
-colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-pdftitle={A Fast GPU Sonar Simulator for Automatic Target Recognition},
-pdfsubject={},
-pdfauthor={Jo Inge Buskenes},
-pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
-\ifCLASSINFOpdf
-   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
-\else
-   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
-   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
-\fi
+% \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
+% pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
+% colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
+% pdftitle={A Fast GPU Sonar Simulator for Automatic Target Recognition},
+% pdfsubject={},
+% pdfauthor={Jo Inge Buskenes},
+% pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+% \ifCLASSINFOpdf
+%    \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+% \else
+%    \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
+%    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+% \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % ADDITIONAL PACKAGES %       
@@ -174,7 +174,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \setlength{\parsep}{\parskip}}%
 \item[]}{\end{list}}
 
-\usepackage{float}
+% \usepackage{float}
 
 \ifOnlineColor
    \definecolor{tabBlue}{HTML}{AACCFF}
@@ -313,16 +313,16 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \renewcommand*\t{^T}
 \newcommand*\h{^H}
 
-\usepackage{tikz}
-\usetikzlibrary{shapes,snakes}
+% \usepackage{tikz}
+% \usetikzlibrary{shapes,snakes}
 \usepackage{amsmath,amssymb}
 % \usepackage{datatool}
 % \usepackage{glossaries}
 
-\newenvironment{outline}
-{\begin{itemize}}
-{\end{itemize}}
-
+% \newenvironment{outline}
+% {\begin{itemize}}
+% {\end{itemize}}
+% 
 
 
 \begin{document}
@@ -568,7 +568,7 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
 \begin{figure}[tbp]%
-\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\includegraphics[width=.9\linewidth]{gfx/calc_kaiser_3dB.eps}%
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
