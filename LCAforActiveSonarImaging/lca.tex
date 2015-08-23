@@ -636,34 +636,25 @@ We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it 
 %
 Any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
-\subsection{Oversampling and steering}
-
-Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR a lateral oversampling factor of up to 10 times is often needed to ensure spatial shift-invariance~\cite{Asen2014}.
-
-
-Too much steering, beamformer becomes too agressive. Uncertainty in source amplitude grows.
-
 \begin{itemize}
 \item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
 \item More steering -> Larger variations in amplitude of sources
 \end{itemize}
 
+
+\subsection{Oversampling}
+
+Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR a lateral oversampling factor of up to 10 times is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}.
+
+
 Idea to steer within a fraction of the rectangular window's mainlobe. 
 
-\begin{align*}
-d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
-\end{align*}
-
 \begin{align}
-\w[\beta, \phi] = \text{kaiser}(\beta) = \bmat{
-1 \\
-e^{-j\frac{md}{\lambda}\sin(\phi)} \\
-\vdots\\
-e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
-}
+d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
 \end{align}
 
-See section \ref{kaiser_windows}.
+
+% See section \ref{kaiser_windows}.
 
 
 % Narrow ones:
