@@ -101,7 +101,7 @@
 
 \usepackage{fixltx2e}                           % Fix some twocolumn float problems
 
-\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+% \usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
                                                 % (double column figures on top/bottom)
 
 \usepackage{url}                                % Support for handling and breaking URLs
@@ -502,6 +502,37 @@ where $\a_\phi$ is a steering vector and $\R[n] = E\{\x\x\H\}$ is the spatial co
 \end{gather}
 where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
+\begin{figure}[tbp]%
+\includegraphics[width=.9\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
+\end{figure}
+
+\setcounter{topnumber}{1}
+\setcounter{dbltopnumber}{1}
+
+\begin{figure*}[t]\centering%
+\includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
+\caption{Typical frequency responses for windows computed by a robust MVDR.\newline
+\emph{Left:}\hfill
+\parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. MVDR was run with $K=1$ temporal oversampling, $L=16$ subarray size, $d=1\%$ diagonal loading and 8 times lateral oversampling.}\newline
+\emph{Right:}\hfill
+\parbox[t]{.95\linewidth}{Window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight.} }\label{mvdr_selected_windows}
+\end{figure*}
+
+\begin{figure*}[t]%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds_beta}
+\end{figure*}
+
+\begin{figure*}[t]%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
+\caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds}
+\end{figure*}
+
+\begin{figure*}[t]%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
+\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
+\end{figure*}
 
 \section{LCA}
 
@@ -567,10 +598,7 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 %
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
-\begin{figure}[tbp]%
-\includegraphics[width=.9\linewidth]{gfx/calc_kaiser_3dB.eps}%
-\caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
-\end{figure}
+
 
 \subsection{Steering}
 
@@ -592,6 +620,9 @@ e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 \end{align}
 %
 Here $d$ is the element spacing and $\lambda$ is the wavelength. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
+
+
+
 
 \subsection{Steering bounds}
 
@@ -675,29 +706,7 @@ See section \ref{kaiser_windows}.
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
-\begin{figure*}[t]\centering%
-\includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.eps}%
-\caption{Typical frequency responses for windows computed by a robust MVDR.\newline
-\emph{Left:}\hfill
-\parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. MVDR was run with $K=1$ temporal oversampling, $L=16$ subarray size, $d=1\%$ diagonal loading and 8 times lateral oversampling.}\newline
-\emph{Right:}\hfill
-\parbox[t]{.95\linewidth}{Window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight.} }\label{mvdr_selected_windows}
-\end{figure*}
 
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.eps}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds_beta}
-\end{figure*}
-
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.eps}%
-\caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds}
-\end{figure*}
-
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.eps}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
-\end{figure*}
 
 
 
