@@ -568,7 +568,7 @@ where $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function.
 
 \subsection{Window function: Kaiser}\label{kaiser_windows}
 
-As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. It is defined as:
+As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. Let it be expressed on vector form as:
 %
 \begin{align*}
 \f_\beta = \bmat{
@@ -596,7 +596,7 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 \beta = \frac{TB}{2},
 \end{align}
 %
-where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. At small values the windows approach the response of a rectangular window, and at large values ($>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
+where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes a rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
 
 
@@ -619,16 +619,16 @@ e^{-j\frac{(M-1)d}{\lambda}\sin(\phi)}
 }.
 \end{align}
 %
-Here $d$ is the element spacing and $\lambda$ is the wavelength. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
+Here $d$ is the element spacing, $\lambda$ is the wavelength and $\phi$ is the steering amount. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq_lca_constraint}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
 
 
 
 
 \subsection{Steering bounds}
 
-There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, each steered window's response is gained as shown in \Fig{windows_steering}. This increases the white noise gain and deteriorates the signal to noise ratio. To limit this we placing an upper bound to the steering, taking into account that a wide window can be allowed more steering than a narrow one.
+There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, each steered window's response is gained as shown in \Fig{windows_steering}. This increases the white noise gain and deteriorates the signal-to-noise ratio. To limit this we placing an upper bound to the steering, taking into account that a wide window can be allowed more steering than a narrow one.
 
-We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. We performed a numeric search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values. A third degree polynomial fit to these points is:
+We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
 \begin{align}
 \phi_\text{-3dB}(\beta) \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
