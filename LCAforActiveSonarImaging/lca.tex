@@ -324,6 +324,8 @@
 % {\end{itemize}}
 % 
 
+\newcommand\multimedia[1]{\textbf{{\color{red}[#1]}}}
+
 
 \begin{document}
 
@@ -531,8 +533,9 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
+\caption{LCA images using window sets with varying parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
 \end{figure*}
+
 
 \section{LCA}
 
@@ -722,7 +725,9 @@ The following sections with expand and discuss these results further.
 
 Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. 
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar.
+
+Media file \multimedia{Media Movie 1} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
 
 
 \subsection{Window parameters}
