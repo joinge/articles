@@ -111,16 +111,28 @@
 % \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
 % pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
 % colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-% pdftitle={A Fast GPU Sonar Simulator for Automatic Target Recognition},
+% pdftitle={Optimal Window Design for the Low Complexity Adaptive Beamformer in Active Sonar Imaging},
 % pdfsubject={},
 % pdfauthor={Jo Inge Buskenes},
 % pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
-% \ifCLASSINFOpdf
+\ifCLASSINFOpdf
 %    \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
-% \else
-%    \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
-%    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
-% \fi
+   \usepackage[pdftex,
+    final,                %Keep hyperlink stuff even when in draft mode
+    breaklinks=true,      %Break links when necessary
+    linktocpage=true,     %Enable link to page?
+    linkcolor=black,  %Colour of links to labels within document
+    citecolor=black,      %Colour of links to the biliography
+    filecolor=red,        %Colour of links to local files
+    pagecolor=black,        %Colour of links to other pages withing document
+    urlcolor=Blue,        %Colour of the links to external URLs
+    colorlinks=true,      %??
+    plainpages=false,     %Store roman/arabic numbering differently to avoid
+    bookmarksnumbered ]{hyperref}
+\else
+   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
+   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % ADDITIONAL PACKAGES %       
@@ -324,7 +336,12 @@
 % {\end{itemize}}
 % 
 
-\newcommand\multimedia[1]{\textbf{{\color{red}[#1]}}}
+% \newcommand\multimedia[1]{\textbf{{\color{red}[#1]}}}
+\newcommand\multimedia[2]{\href{#1}{#2}}
+
+\newcommand\mediaPath{gfx/media}
+\newcommand\mediaI{\multimedia{\mediaPath/media1.mp4}{Media Movie 1}}
+\newcommand\mediaII{\multimedia{\mediaPath/media2.mp4}{Media Movie 2}}
 
 
 \begin{document}
@@ -486,7 +503,7 @@ where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set
 
 Conventional beamformers all have static weights. The reference here is the delay-and-sum (DAS) beamformer, also know as the backprojection algortithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
-Adaptive beamformers are generally not so simple. They allow the weights/delays to change to adjust the array response to better fit the incoming wavefield. Of these methods the minimum variance distortionless response (MVDR) beamformer is perhaps the best studied and well known.
+Adaptive beamformers allow the weights and delays to change to adjust the array response to better fit the incoming wavefield. One of the most extensively studied methods here is the minimum variance distortionless response (MVDR) beamformer.
 
 \section{MVDR}
 
@@ -727,7 +744,7 @@ Assuming that a robust MVDR computes the optimal windows in the minimum variance
 
 While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar.
 
-Media file \multimedia{Media Movie 1} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
+\mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
 
 
 \subsection{Window parameters}
