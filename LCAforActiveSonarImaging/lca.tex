@@ -539,15 +539,19 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \parbox[t]{.95\linewidth}{Window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of a rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight.} }\label{mvdr_selected_windows}
 \end{figure*}
 
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
-\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the same cross as shown in \Fig{oversampling_mosaic_bounds}. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds_beta}
-\end{figure*} 
+\setcounter{dbltopnumber}{2}
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
 \caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds}
 \end{figure*}
+
+\begin{figure*}[t]%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
+\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, and the location of the anchor and cut line is overlaid. }\label{oversampling_mosaic_bounds_beta}
+\end{figure*} 
+
+% \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
@@ -669,7 +673,13 @@ Henceforth any steering will be specified relative to this upper bound. With eac
 
 \subsection{Oversampling}
 
-Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR often a factor 10 lateral oversampling is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}. To ensure that no
+Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR often a factor 10 lateral oversampling is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}. To compare apples to apples, we will use the same factor for both LCA and MVDR.
+
+Need $M$ in the image sector. Why???
+
+- Abs -> adds a factor 2
+- log -> infinity?
+- near field -> range and azimuth is coupled
 
 
 Idea to steer within a fraction of the rectangular window's mainlobe. 
@@ -737,7 +747,7 @@ Two different scenes will be presented. One of the 1500 dwt oiltanker wreck Holm
 A quick summary of the results and the order they will be presented is as follows:
 
 \begin{itemize}
-\item \emph{Window function}. Frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image is shown in \Fig{mvdr_selected_windows}. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
+\item \emph{Window function}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
 \item \emph{Window parameters}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 \end{itemize}
 
