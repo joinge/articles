@@ -507,17 +507,17 @@ Adaptive beamformers allow the weights and delays to change to adjust the array 
 
 \section{MVDR}
 
-MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\a$~\cite{Capon1969}:
+MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\phi$~\cite{Capon1969}:
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\\
-\text{subject to } \w[n]\a_\phi &= 1
+\text{subject to } \w[n]\a_\phi &= 1.
 \end{align}
 %
-where $\a_\phi$ is a steering vector and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
+Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
 %
 \begin{gather}
-\vec w[n] = \frac{\Ri[n]\a}{\a\T\Ri[n]\a},\label{weights}
+\vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{weights}
 \end{gather}
 where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. Spatial averaging is needed to avoid signal cancellation~\cite{Kailath1985}, temporal averaging is needed to obtain true speckle statistics~\cite{Synnevag2009a}, and diagonal loading is needed to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
@@ -556,11 +556,11 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \section{LCA}
 
-The LCA beamformer interates through a set of $P$ windows and $p$ that yields the least output power:
+A much less complex alternative to MVDR is the low complexity adaptive (LCA) beamformer. It iterates through a set of $P$ windows and selects the window $p$ that best fulfills the minimum variance criteron:
 %
 \begin{align}
-\underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{\beta,\phi}\H\x[n]|^2\big\}\\
-\qquad\text{subject to}\qquad \w\H\a = 1\label{eq_lca_constraint}
+\underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{p}\H\x[n]|^2\big\}\\
+\qquad\text{subject to}\qquad \w\H\a_\phi = 1\label{eq_lca_constraint}
 \end{align}\label{lca_criterion}
 %
 We can estimate $E\big\{|\w_p\H\x[n]|^2\big\}$ as
@@ -569,7 +569,7 @@ We can estimate $E\big\{|\w_p\H\x[n]|^2\big\}$ as
 \sigma^2_{z_p}[n] = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
 \end{align*}
 %
-To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
+which is the sample covariance averaged over $N_k$=$2*K+1$ temporal samples. To add some extra flexibility, we can also estimate the variance by a weighted combination of local pixels
 %
 \begin{align*}
 \sigma^2_{z_p}[x,n] = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
