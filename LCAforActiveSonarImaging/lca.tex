@@ -541,8 +541,8 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
-\caption{Window parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds_beta}
-\end{figure*}
+\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the same cross as shown in \Fig{oversampling_mosaic_bounds}. Oversampled image, 19x20 windows.}\label{oversampling_mosaic_bounds_beta}
+\end{figure*} 
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
@@ -560,7 +560,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 A much less complex alternative to MVDR is the low complexity adaptive (LCA) beamformer. It iterates through a set of $P$ windows and selects the window $p$ that best fulfills the minimum variance criteron:
 %
 \begin{align}
-\underset{p}{\argmin}\, E\{|z[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{p}\H\x[n]|^2\big\}\nn
+\underset{p}{\argmin}\, E\{|z_p[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{p}\H\x[n]|^2\big\}\nn
 \qquad\text{subject to}\qquad \w\H\a_\phi = 1.\label{eq_lca_definition}
 \end{align}\label{lca_criterion}
 %
@@ -569,16 +569,16 @@ Note how closely LCA is related to the MVDR definition in \eq{eq_mvdr_definition
 In practice, we estimate the beamformer output power as
 %
 \begin{align*}
-E\big\{|z[n]|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
+E\big\{|z_p[n]|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
 \end{align*}
 %
 which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same as we did for MVDR. Our signal is only a few samples long after matched filtering so we have set $K=1$ for both MVDR and LCA.
 
 If extra flexibility is desired, we can also estimate the variance by a weighted combination of local pixels
 %
-\begin{align*}
-\sigma^2_{z_p}[x,n] = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
-\end{align*}
+\begin{align}
+E\big\{|z_p[x,n]|^2\big\} = \frac{1}{N_x N_k} \sumb{x'=x-X}{x+X} \sumb{n=n-K}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2
+\end{align}
 %
 where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
 
@@ -651,7 +651,7 @@ Here $d$ is the element spacing, $\lambda$ is the wavelength and $\phi$ is the s
 
 \subsection{Steering bounds}
 
-There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, the steered window will have increased white noise gain and deteriorated signal-to-noise ratio as shown in \Fig{windows_steering}. To limit this we placing an upper bound to the steering, taking into account that a wide window can be allowed more steering than a narrow one.
+There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, the steered window will have increased white noise gain and deteriorated signal-to-noise ratio as shown in \Fig{windows_steering}. To limit this we placing an upper bound to the steering, realizing that  a wide window will be allowed more steering than a narrow one.
 
 We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
@@ -659,7 +659,7 @@ We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it 
 \phi_\text{-3dB}(\beta) \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
 \end{align}
 %
-Any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
+Henceforth any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
 \begin{itemize}
 \item More steering -> more aggressive suppression of interference at the cost of boosted sidelobes / noise.
@@ -669,7 +669,7 @@ Any steering will be specified relative to this upper bound. With each window st
 
 \subsection{Oversampling}
 
-Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR a lateral oversampling factor of up to 10 times is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}.
+Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR often a factor 10 lateral oversampling is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}. To ensure that no
 
 
 Idea to steer within a fraction of the rectangular window's mainlobe. 
