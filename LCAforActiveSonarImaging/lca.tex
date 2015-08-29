@@ -747,17 +747,23 @@ Two different scenes will be presented. One of the 1500 dwt oiltanker wreck Holm
 A quick summary of the results and the order they will be presented is as follows:
 
 \begin{itemize}
-\item \emph{Window function}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameters}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
+\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
+\item \emph{Window parameter boundaries}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
+\item \emph{Window database size}.
+\item \emph{Performance}.
+\item \emph{Oversampling need}.
 \end{itemize}
 
 The following sections with expand and discuss these results further.
 
 \subsection{Window function}\label{lca_window_function}
 
-Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100m\;depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
+Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
 While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar.
+
+Kaiser
+Unlike the method described by Synne\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
 
 \mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
 
