@@ -101,7 +101,7 @@
 
 \usepackage{fixltx2e}                           % Fix some twocolumn float problems
 
-\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+% \usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
                                                 % (double column figures on top/bottom)
 
 \usepackage{url}                                % Support for handling and breaking URLs
@@ -534,7 +534,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
-\caption{\emph{Determining LCA window type}. Typical frequency responses for windows computed by a robust MVDR.\newline
+\caption{\emph{Determining LCA window type}: Typical frequency responses for windows computed by a robust MVDR.\newline
 \emph{Left:}\hfill
 \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. MVDR was run with $K=1$ temporal oversampling, $L=16$ subarray size, $d=1\%$ diagonal loading and 8 times lateral oversampling.}\protect\\\hspace{\textwidth}
 \emph{Right:}\hfill
@@ -545,7 +545,13 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
-\caption{Window parameter boundaries. LCA images using an oversampled image and a relatively large window database with $N_\beta=20$ window types, each steered $N_\phi=19$. }\label{oversampling_mosaic_bounds}
+\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with rectangular window. While \Fig{mvdr_selected_windows} suggests that an upper bound 
+\newline
+\emph{Upper bound $\beta$:}\hfill
+\parbox[t]{.9\linewidth}{.}\newline
+\emph{Right:}\hfill
+\parbox[t]{.95\linewidth}{.}
+}\label{oversampling_mosaic_bounds}
 \end{figure*}
 
 \begin{figure*}[t]%\centering%
@@ -750,7 +756,7 @@ A quick summary of the results and the order they will be presented is as follow
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-<<<<<<<<<<\item \emph{Window parameter boundaries}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
+\item \emph{Window parameter boundaries}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 \item \emph{Window database size}.
 \item \emph{Performance}.
 \item \emph{Oversampling need}.
@@ -762,7 +768,10 @@ The following sections with expand and discuss these results further.
 
 Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. 
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window.
+
+This correspond to Kaiser windows with $\beta$-values of 0 and 2, respectively.
+\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the cross image. 
 
 Kaiser
 
@@ -774,13 +783,6 @@ Unlike the method described by Synne\aa{}g~\cite{Synnevag2008} we do not let LCA
 \subsection{Window parameters}
 
 The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression, and $\phi$ controls the amount of steering. At $\beta=0$ it becomes a rectangular window, and at larger values it approaches a gaussian curve. Typical values are in the range $\beta\in[0,10]$.
-
-$\phi$ controls the amount of steering. 
-
-The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
-
-
-
 
 
 Variables of interest:
