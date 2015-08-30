@@ -168,7 +168,7 @@
       {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
       \marginpar{%
          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
-         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\scriptsize #1}}}}
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
 
    \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
 \else
@@ -325,6 +325,8 @@
 % \newcommand*\h{\mathtiny{^H}}
 \renewcommand*\t{^T}
 \newcommand*\h{^H}
+
+\newcommand\minus{\scalebox{0.75}[1.0]{$-$}}
 
 % \usepackage{tikz}
 % \usetikzlibrary{shapes,snakes}
@@ -511,7 +513,7 @@ Adaptive beamformers allow the weights and delays to change to adjust the array 
 MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\phi$~\cite{Capon1969}:
 %
 \begin{align}
-\underset{\w[n]}{\argmin}\, E\{|z[n]|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
+\underset{\w[n]}{\argmin}\, E\{\big|z[n]\big|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
 \text{subject to } \w[n]\a_\phi &= 1.\label{eq_mvdr_definition}
 \end{align}
 %
@@ -564,7 +566,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 A much less complex alternative to MVDR is the low complexity adaptive (LCA) beamformer. It iterates through a set of $P$ windows and selects the window $p$ that best fulfills the minimum variance criteron:
 %
 \begin{align}
-\underset{p}{\argmin}\, E\{|z_p[n]|^2\} = \underset{p}{\argmin}\, E\big\{|\w_{p}\H\x[n]|^2\big\}\nn
+\underset{p}{\argmin}\, E\{\big|z_p[n]\big|^2\} = \underset{p}{\argmin}\, E\big\{\big|\w_{p}\H\x[n]\big|^2\big\}\nn
 \qquad\text{subject to}\qquad \w\H\a_\phi = 1.\label{eq_lca_definition}
 \end{align}\label{lca_criterion}
 %
@@ -573,7 +575,7 @@ Note how closely LCA is related to the MVDR definition in \eq{eq_mvdr_definition
 In practice, we estimate the beamformer output power as
 %
 \begin{align*}
-E\big\{|z_p[n]|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} | z_p[n'] |^2
+E\big\{\big|z[n]\big|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \big| z[n'] \big|^2
 \end{align*}
 %
 which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same as we did for MVDR. Our signal is only a few samples long after matched filtering so we have set $K=1$ for both MVDR and LCA.
@@ -581,17 +583,18 @@ which computes the sample power average over $N_k=2K+1$ temporal samples. This i
 If extra flexibility is desired, we can also estimate the variance by a weighted combination of local pixels
 %
 \begin{align}
-E\big\{|z_p[x,n]|^2\big\} = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} w_\text{prf}[x',n']\big| z_p[x',n'] \big|^2\end{align}
+E\big\{\big|z[x,n]\big|^2\big\} = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} w[x',n']\big| z[x',n'] \big|^2
+\end{align}
 %
 where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. \todo{Might want to be careful with this when we steer the windows, or drop it altogether}
-
-\begin{itemize}
-\item \emph{Window function}
-\item \emph{Parameter boundaries}
-\item \emph{Number of windows needed}
-\item \emph{Oversampling need}
-\item \emph{Image quality}
-\end{itemize}
+% 
+% \begin{itemize}
+% \item \emph{Window function}
+% \item \emph{Parameter boundaries}
+% \item \emph{Number of windows needed}
+% \item \emph{Oversampling need}
+% \item \emph{Image quality}
+% \end{itemize}
 
 
 \subsection{Window function: Kaiser}\label{kaiser_windows}
@@ -636,7 +639,7 @@ To allow LCA some added flexibility we also create variations of each window tha
 \w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\\
 \end{align}
 %
-where we define the steering vector $\a_\phi$ as:
+where diag($\a_\phi$) is a diagonal matrix constructed from the steering vector $\a_\phi$:
 %
 \begin{align}
 \a_\phi = \bmat{
@@ -659,7 +662,7 @@ There is an upper bound to the amount of steering we should apply to a window. S
 We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
 \begin{align}
-\phi_\text{-3dB}(\beta) \approx -0.002894\beta^3 + 0.02451\beta^2 + -0.01308\beta + 0.2980
+\phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980
 \end{align}
 %
 Henceforth any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
@@ -747,7 +750,7 @@ A quick summary of the results and the order they will be presented is as follow
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameter boundaries}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
+<<<<<<<<<<\item \emph{Window parameter boundaries}. The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression. At $\beta=0$ it yields a rectangular window, and at and $\phi$ controls the amount of steering.. $\beta=0$ ) and a gaussian curve (
 \item \emph{Window database size}.
 \item \emph{Performance}.
 \item \emph{Oversampling need}.
