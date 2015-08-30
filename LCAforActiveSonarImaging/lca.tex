@@ -534,7 +534,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]\centering%
 \includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
-\caption{\emph{Determining LCA window type}: Typical frequency responses for windows computed by a robust MVDR.\newline
+\caption{\emph{Determining LCA window type}: MVDR images with typical frequency responses chosen for various pixel regions.\newline
 \emph{Left:}\hfill
 \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. MVDR was run with $K=1$ temporal oversampling, $L=16$ subarray size, $d=1\%$ diagonal loading and 8 times lateral oversampling.}\protect\\\hspace{\textwidth}
 \emph{Right:}\hfill
@@ -545,12 +545,12 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
-\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with rectangular window. While \Fig{mvdr_selected_windows} suggests that an upper bound 
+\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the distance from the maximum to the -3dB point of the anchor
 \newline
 \emph{Upper bound $\beta$:}\hfill
-\parbox[t]{.9\linewidth}{.}\newline
-\emph{Right:}\hfill
-\parbox[t]{.95\linewidth}{.}
+\parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests MVDR hardly choose windows with maximum sidelobe level lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
+\emph{Upper bound $\phi$:}\hfill
+\parbox[t]{.89\linewidth}{As we increase the upper bound of the steering $\phi$, we also increase the lateral image resolution. }
 }\label{oversampling_mosaic_bounds}
 \end{figure*}
 
