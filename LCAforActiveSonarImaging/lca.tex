@@ -768,12 +768,12 @@ The following sections with expand and discuss these results further.
 
 Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window. This correspond to Kaiser windows with $\beta$-values of 0 and 2, respectively.
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window. This corresponds to Kaiser windows with $\beta$-values of 0 and 2, respectively.
 
 \Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. 
 
 
-Unlike the method described by Synne\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
+Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
 
 \mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
 
@@ -804,12 +804,9 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 \end{table}%
 
 
-\newpage
-
-
 % the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from.
 
-\newpage
+
 
 What's wrong here? 
 
