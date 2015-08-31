@@ -538,7 +538,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \emph{Left:}\hfill
 \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, using data collected from the 32 element HISAS1030 sonar attached to the HUGIN AUV. MVDR was run with $K=1$ temporal oversampling, $L=16$ subarray size, $d=1\%$ diagonal loading and 8 times lateral oversampling.}\protect\\\hspace{\textwidth}
 \emph{Right:}\hfill
-\parbox[t]{.95\linewidth}{MVDR window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight.} }\label{mvdr_selected_windows}
+\parbox[t]{.95\linewidth}{MVDR window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight to allow the steering there.} }\label{mvdr_selected_windows}
 \end{figure*}
 
 \setcounter{dbltopnumber}{2}
@@ -748,9 +748,9 @@ d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
 \section{Results and Discussion}
 
 
-To test the performance of the MVDR and LCA beamformers, we have processed data aquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with array length 1.2\;m, 100\;kHz operating frequency, a bandwidth of 40\;kHz and 25$^\circ$ opening angle.
+To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with array length 1.2\;m, 100\;kHz operating frequency, a bandwidth of 40\;kHz and 25$^\circ$ opening angle.
 
-Two different scenes will be presented. One of the 1500 dwt oiltanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlit sector. The other scene is of an iron cross connected to a an anchor (fig ???).
+Two different scenes will be presented. One of the 1500 DWT oiltanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross connected to a an anchor (fig ???).
 
 A quick summary of the results and the order they will be presented is as follows:
 
@@ -766,14 +766,12 @@ The following sections with expand and discuss these results further.
 
 \subsection{Window function}\label{lca_window_function}
 
-Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly agressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
+Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 syntetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ of diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window.
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the opening angle of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window. This correspond to Kaiser windows with $\beta$-values of 0 and 2, respectively.
 
-This correspond to Kaiser windows with $\beta$-values of 0 and 2, respectively.
-\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the cross image. 
+\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. 
 
-Kaiser
 
 Unlike the method described by Synne\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
 
