@@ -508,11 +508,11 @@ where $w_m$ is the weight factor assigned to channel $m$. A weight set is common
 
 Conventional beamformers all have static weights. The reference method is the delay-and-sum (DAS) beamformer, also know as the backprojection algorithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
-Adaptive beamformers allow the weights and delays to change to adjust the array response to better fit the incoming wavefield. One of the most extensively studied methods here is the minimum variance distortion-less response (MVDR) beamformer.
+Adaptive beamformers are dynamic and seek to adjust the array response to better fit the incoming wavefield. This may be achieved by allowing either the weights or delays to change, or both. One of the most extensively studied of these methods is the minimum variance distortion-less response (MVDR) beamformer.
 
 \section{MVDR}
 
-MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in the desired direction $\phi$~\cite{Capon1969}:
+MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{\big|z[n]\big|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
@@ -524,7 +524,7 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{weights}
 \end{gather}
-where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}. To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}. To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
@@ -591,7 +591,7 @@ In practice, we estimate the beamformer output power as
 E\big\{\big|z[n]\big|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \big| z[n'] \big|^2
 \end{align*}
 %
-which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same as we did for MVDR. Our signal is only a few samples long after matched filtering so we have set $K=1$ for both MVDR and LCA.
+which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same temporal averaging method we use for MVDR. In our case the matched filtered signal is a just few samples long, hence $K=1$ will be used for both MVDR and LCA throughout this work.
 
 If extra flexibility is desired, we can also estimate the variance by a weighted combination of local pixels
 %
