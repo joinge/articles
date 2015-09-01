@@ -496,15 +496,17 @@ This article is outlined as follows:
 
 To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
-Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ is the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ can be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
+Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ is the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ will be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
 
-The beamformer output $z[n]$ can now be expressed as the weighted sum of all the delayed data samples:
+The output $z[n]$ of a beamformer is defined as the weighted sum of all the delayed data samples:
+%
 \begin{align}
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
 \end{align}
-where $w_m$ is the weight factor assigned to channel $m$. We will refer to a set of weights as a window, but it is also commonly called a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
+%
+where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window or a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
 
-Conventional beamformers all have static weights. The reference here is the delay-and-sum (DAS) beamformer, also know as the backprojection algorithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
+Conventional beamformers all have static weights. The reference method is the delay-and-sum (DAS) beamformer, also know as the backprojection algorithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
 Adaptive beamformers allow the weights and delays to change to adjust the array response to better fit the incoming wavefield. One of the most extensively studied methods here is the minimum variance distortion-less response (MVDR) beamformer.
 
@@ -525,8 +527,13 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}. To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. The steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
-\includegraphics[width=.9\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
+\end{figure}
+
+\begin{figure}[tbp]%
+\includegraphics[width=\linewidth]{gfx/cross.jpg}%
+\caption{The cross and accompanying anchor used to test the beamformers.}\label{windows_steering}
 \end{figure}
 
 \setcounter{topnumber}{1}
@@ -548,7 +555,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the distance from the maximum to the -3dB point of the anchor
 \newline
 \emph{Upper bound $\beta$:}\hfill
-\parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests MVDR hardly choose windows with maximum sidelobe level lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
+\parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR tend to choose windows with levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
 \emph{Upper bound $\phi$:}\hfill
 \parbox[t]{.89\linewidth}{As we increase the upper bound of the steering $\phi$, we also increase the lateral image resolution. }
 }\label{oversampling_mosaic_bounds}
@@ -639,10 +646,10 @@ where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjustin
 
 \subsection{Steering}
 
-To allow LCA some added flexibility we also create variations of each window that are steered a little to each side.
+Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for optimal window. A Kaiser window $\f_\beta$ steered to $\phi$ can be expressed as 
 %
 \begin{align}
-\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\\
+\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}
 \end{align}
 %
 where diag($\a_\phi$) is a diagonal matrix constructed from the steering vector $\a_\phi$:
