@@ -763,8 +763,8 @@ A quick summary of the results and the order they will be presented is as follow
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameter boundaries}. \Fig{mvdr_selected_windows} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
-\item \emph{Window database size}.
+\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+\item \emph{Window database size}. \Fig{oversampling_mosaic}
 \item \emph{Performance}.
 \item \emph{Oversampling need}.
 \end{itemize}
@@ -773,17 +773,16 @@ The following sections with expand and discuss these results further.
 
 \subsection{Window function}\label{lca_window_function}
 
-Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it makes sense to study them. For this we selected a scene of the oil tanker wreck Holmengraa, which lies at a slanted seabed at nearly 100\;m depth. A sectorscan image of a single ping of data collected by the HISAS1030 synthetic aperture sonar is shown in \Fig{mvdr_selected_windows}, along with the window responses MVDR typically chooses in shadow, speckle and highlight regions in this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading.
+Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it seems sensible to create similar ones for LCA. We study this in \Fig{mvdr_selected_windows}, where an MVDR sectorscan image of the Holmengraa wreck is presented, along with the window responses MVDR chose in the shadow, speckle and highlight regions of this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the highlighted sector of the sonar. The peak sidelobe levels are between that of the rectangular and Hamming window. This corresponds to Kaiser windows with $\beta$-values of 0 and 2, respectively.
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The peak sidelobe levels are between that of the rectangular and Hamming window. This corresponds to Kaiser windows with $\beta$-values of 0 and 2, respectively.
 
-\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. 
+\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line and location of the anchor. Observe that in the anchor region only rectangular windows are used, which is the reason for the anchor resolution being measure to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. 
 
 
 Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
 
-\mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$. It demonstrates that at $L$=1 the window responses are rectangular in all areas in the image. At $L$=2 we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with zero locations on similar locations and highlight regions being 
-
+\mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$ and temporal averaging $K$. It demonstrates that at $L=1$ the window responses are rectangular in all areas in the image. At $L=2$ we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with the phase being 0$^\circ$ in the illuminated seafloor sector. Yet MVDR is able to greatly suppress noise, which seems to emphasize the importance varying the zero locations slightly to suppress noise. The media file also shows MVDR can be run with subarray sizes $L\in[M/2,5M/8]$, but only with temporal averaging $K=1$ or above.
 
 \subsection{Window parameter boundaries}
 
