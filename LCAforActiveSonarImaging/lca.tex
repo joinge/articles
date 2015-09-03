@@ -548,7 +548,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \parbox[t]{.95\linewidth}{MVDR window responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the Holmengraa image. The responses are overlayed each other. The dashed red lines at -13dB and -43dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3dB in highlight. The phase varies mostly in highlight to allow the steering there.} }\label{mvdr_selected_windows}
 \end{figure*}
 
-\setcounter{dbltopnumber}{2}
+% \setcounter{dbltopnumber}{2}
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
@@ -786,29 +786,26 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \subsection{Window parameter boundaries}
 
-The Kaiser window parameter $\beta$ adjusts the compromise between resolution and sidelobe suppression, and $\phi$ controls the amount of steering. At $\beta=0$ it becomes a rectangular window, and at larger values it approaches a Gaussian curve. Typical values are in the range $\beta\in[0,10]$.
+\Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+
+\subsection{Window database size}
+
+
+
+\subsection{Oversampling}
+
+From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to $8M$.
+
 
 LCA is largely insensitive to the choice of windows and steering. 
 LCA works well for all the boundaries
 Variables of interest:
 
 \begin{itemize}
-\item Window function. Mostly symmetrical, in particular in shadow and for the most part in speckle. In highlight regions more varying.
 \item Mainlobe width. Wide in shadows, narrow in detailed regions. Adding windows in between these extremal values.
 \item Steering. No steering in shadows, slight steering in speckle and no steering in highlight. Steering more than the -3dB width of the window function has no effect.
 \item Oversampling. From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to $8M$.
 \end{itemize}
-\begin{table}[!b]\centering%\normalsize
-\begin{tabular}[c]{l c c c}\hline
-\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
-Symmetry             & Moderate  & High   & High \\
-Mainlobe width       & Narrow    & Wide   & Moderate \\
-Sidelobe suppression & Low       & High   & Moderate \\
-Steering             & Low       & Up to -3dB width & Moderate \\
-Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
-\end{tabular}
-\caption{Summary}\label{tab:summary}
-\end{table}%
 
 
 % the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from.
@@ -873,6 +870,19 @@ What's wrong here?
 The LCA method performs similar to the MV method, but at a fraction of the computational cost. The key to achieve this success lies in the design of the window set. Windows that yield vagely steered narrow responses are preferred in speckle regions, while wide and steered responses are typically preferred in highlight and shadow regions. A window set of 6 different responses each steered in 5 different directions proved sufficient in our experiment to match the performance of the MV beamformer.
 
 The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios. 
+
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l c c c}\hline
+\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
+Symmetry             & Moderate  & High   & High \\
+Mainlobe width       & Narrow    & Wide   & Moderate \\
+Sidelobe suppression & Low       & High   & Moderate \\
+Steering             & Low       & Up to -3dB width & Moderate \\
+Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
+\end{tabular}
+\caption{Summary}\label{tab:summary}
+\end{table}%
+
 
 
 \subsection{Summary and order of results}
