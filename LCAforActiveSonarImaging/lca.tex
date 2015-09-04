@@ -552,7 +552,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
-\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the distance from the maximum to the -3dB point of the anchor
+\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor. These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
 \newline
 \emph{Upper bound $\beta$:}\hfill
 \parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR tend to choose windows with levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
@@ -643,10 +643,9 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
 
 
-
 \subsection{Steering}
 
-Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for optimal window. A Kaiser window $\f_\beta$ steered to $\phi$ can be expressed as 
+Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for optimal window. A Kaiser window $\f_\beta$ steered to the angle $\phi$ can be expressed as 
 %
 \begin{align}
 \w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}
@@ -672,7 +671,7 @@ The window database we will construct will contain $N_\beta$ Kaiser windows with
 
 There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, the steered window will have increased white noise gain and deteriorated signal-to-noise ratio as shown in \Fig{windows_steering}. To limit this we placing an upper bound to the steering, realizing that  a wide window will be allowed more steering than a narrow one.
 
-We call the upper bound for steering $\phi_{\text{-3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
+We call the upper bound for steering $\phi_{\text{3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
 \begin{align}
 \phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980
@@ -690,11 +689,12 @@ Henceforth any steering will be specified relative to this upper bound. With eac
 
 Adaptive beamformers process each pixel in a different way in an attempt to surpass the conventional limit of resolution and noise suppression. This non-linear processing of the image increases its bandwidth and introduces a need for oversampling. For MVDR often a factor 10 lateral oversampling is often needed to ensure spatial shift-invariance in source amplitude~\cite{Asen2014}. To compare apples to apples, we will use the same factor for both LCA and MVDR.
 
-Need $M$ in the image sector. Why???
+\todo{Need $M$ in the image sector. Why???}
 
-- Abs -> adds a factor 2
-- log -> infinity?
-- near field -> range and azimuth is coupled
+\todo{
+- Abs -> adds a factor 2\\
+- log -> infinity?\\
+- near field -> range and azimuth is coupled}
 
 
 Idea to steer within a fraction of the rectangular window's mainlobe. 
@@ -775,7 +775,16 @@ The following sections with expand and discuss these results further.
 
 Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it seems sensible to create similar ones for LCA. We study this in \Fig{mvdr_selected_windows}, where an MVDR sectorscan image of the Holmengraa wreck is presented, along with the window responses MVDR chose in the shadow, speckle and highlight regions of this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading.
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The peak sidelobe levels are between that of the rectangular and Hamming window. This corresponds to Kaiser windows with $\beta$-values of 0 and 2, respectively.
+While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The peak sidelobe levels are between that of the rectangular and Hamming window.
+
+All the responses in \Fig{mvdr_selected_windows} can be approximated with the Kaiser-Bessel function. By adjusting the window parameter $\beta$ we can adjust the trade-off between mainlobe width and sidelobe level. 
+To generate windows with different mainlobe width and sidelobe level, 
+
+A parametric window like Kaiser-Bessel allow us to create approximately these and the responses in between.
+
+The Kaiser-Bessel windows s with $\beta$-values of 0 and 2 allows us to approximately trade between these two boundaries. \todo{add the advantages here?}
+
+In our studies 
 
 \Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line and location of the anchor. Observe that in the anchor region only rectangular windows are used, which is the reason for the anchor resolution being measure to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. 
 
@@ -786,7 +795,19 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \subsection{Window parameter boundaries}
 
-\Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+Letting LCA choose from Kaiser windows seems like a good choice due to their similarity to the 
+Which Kaiser windows should we include in the windows database? The parameter $\beta$ controls the window shape, and $\phi$ the steering. 
+
+Having chosen to fill the window database with steered Kaiser windows, we should  function While having decided to use steered Kaiser windows, we still  To decide what the ideal boundaries for $\beta$ and $\phi$ should be, we constructed large and equally sized window databases containing windows with different parameter boundaries. The images produced are shown in \Fig{oversampling_mosaic_bounds}. To include and compare with a rectangular weighted DAS, we set the lower boundary to 0 for both parameters.
+
+varied upper boundaries for $\beta$ and $\phi$.
+
+ The upper left image has $\beta=0$ and no steering, and is thus equal to a rectangularly weighted DAS. 
+
+
+We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+
+LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor. These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
 
 \subsection{Window database size}
 
