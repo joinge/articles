@@ -434,22 +434,13 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid it altogether while achieving similar performance.
 
-This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimization criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. 
+This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimization criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. But which windows should LCA choose from?
 
-Synnev\aa{}g used a window set comprised of rectangular, Kaiser and inverted Kaiser functions. Of these a specific Kaiser window were micro-steered. We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed negligible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
+Synnev\aa{}g et. al. used a window set comprised of rectangular, Kaiser and inverted Kaiser functions\footnote{May also be called Kaiser-Harris windows.}. Of these a specific Kaiser window were micro-steered. His database had 12 windows in it, which proved to work well. But just how well did this work compared to MVDR? Can LCA perform even better with more windows, and could it work just as well with even fewer? 
 
+In this work we aim to provide some intuitive understanding of how the window database may be designed. Like Synnev\aa{}g et. al. we limit our study to the use of variations of the parametric Kaiser window, since we observed negligible performance difference to using this function or any of the common trigonometric ones. However, we steer all our windows and not just some, and provide reason why the Kaiser window is a suitable one, what variations of Kaiser we should include, and how much it should be steered.
 
-In this work we investigate a few questions related to the LCA that remain unanswered. One is what window function we can use, and how many windows we will need. 
-
-Another question is what it takes to achieve double the resolution.
-
-
-Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
-
-
-We will show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. Then we create Kaiser windows of different types, and with varying degree of steering, that combined form a discrete version of the MVDR solution space. 
-
-
+In short, our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When mimicking these responses with Kaiser windows, we obtain images with both improved noise suppression and resolution. We resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
 This article is outlined as follows:
 
@@ -532,7 +523,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \end{figure}
 
 \begin{figure}[tbp]%
-\includegraphics[width=\linewidth]{gfx/cross.jpg}%
+\includegraphics[width=\linewidth]{gfx/cross_tagged.png}%
 \caption{The cross and accompanying anchor used to test the beamformers.}\label{cross}
 \end{figure}
 
@@ -785,6 +776,8 @@ A parametric window like Kaiser-Bessel allow us to create approximately these an
 The Kaiser-Bessel windows s with $\beta$-values of 0 and 2 allows us to approximately trade between these two boundaries. \todo{add the advantages here?}
 
 In our studies 
+
+The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 
 \Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line and location of the anchor. Observe that in the anchor region only rectangular windows are used, which is the reason for the anchor resolution being measure to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. 
 
@@ -1123,7 +1116,7 @@ The conclusion goes here.
 We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 
 
-
+Using the LCA beamformer results in increased robustness and improved edge definition compared to the MV and DAS beamformers.
 
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
