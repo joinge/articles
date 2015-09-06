@@ -561,7 +561,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{LCA images using different window database sizes. The window boundaries are the same.}\label{oversampling_mosaic}
+\caption{LCA images using different window database sizes. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\beta=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
 \end{figure*}
 
 
@@ -739,10 +739,6 @@ d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
 
-
-
-
-\newpage
 \section{Results and Discussion}
 
 
@@ -750,7 +746,9 @@ To test the performance of the MVDR and LCA beamformers, we have processed data 
 
 Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross connected to a an anchor (\Fig{cross}).
 
-A quick summary of the results and the order they will be presented is as follows:
+\subsection{Summary}
+
+The results and the order they will be presented is as follows:
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
@@ -804,7 +802,15 @@ LCA images created with a large and equal size window database, but where the up
 
 \subsection{Window database size}
 
+So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}]$. But many windows do we need in these ranges?
 
+In \Fig{oversampling_mosaic} we have compared LCA images made from windows databases of different sizes, but with the same parameter boundaries. We included the results from using a single window ($N_\beta=1$) and steering angle ($N_\phi=1$), which corresponds to a rectangularly weighted DAS.
+
+Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution.
+
+However, using more than  $N_\beta=2$ window types and $N_\beta=3$ steering angles makes minimal
+
+\ref{oversampling_mosaic}
 
 \subsection{Oversampling}
 
