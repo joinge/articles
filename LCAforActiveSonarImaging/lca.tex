@@ -440,7 +440,7 @@ Synnev\aa{}g et. al. used a window set comprised of rectangular, Kaiser and inve
 
 In this work we aim to provide some intuitive understanding of how the window database may be designed. Like Synnev\aa{}g et. al. we limit our study to the use of variations of the parametric Kaiser window, since we observed negligible performance difference to using this function or any of the common trigonometric ones. However, we steer all our windows and not just some, and provide reason why the Kaiser window is a suitable one, what variations of Kaiser we should include, and how much it should be steered.
 
-In short, our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When mimicking these responses with Kaiser windows, we obtain images with both improved noise suppression and resolution. We resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
+Our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When letting LCA choose from Kaiser windows with similar responses, we obtain images with both improved noise suppression and resolution. The resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
 This article is outlined as follows:
 
@@ -554,14 +554,14 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
-\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor. }\label{oversampling_mosaic_bounds_beta}
+\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
 \end{figure*} 
 
 % \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{LCA images using window sets with varying parameter boundaries. Oversampled image, 19x20 windows.}\label{oversampling_mosaic}
+\caption{LCA images using different window database sizes. The window boundaries are the same.}\label{oversampling_mosaic}
 \end{figure*}
 
 
