@@ -744,7 +744,9 @@ d = \frac{\pi\,\theta_\text{open}\,\lambda}{M\,d\,O_s}
 
 To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with array length 1.2\;m, 100\;kHz operating frequency, a bandwidth of 40\;kHz and 25$^\circ$ opening angle.
 
-Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross connected to a an anchor (\Fig{cross}).
+Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross of 1\,m length in both directions, connected to a an anchor with a 13\,cm diameter (\Fig{cross}).
+
+MVDR was run with a fairly aggressive yet stable set of parameters; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading. Temporal averaging of $K=1$ was also used with LCA.
 
 \subsection{Summary}
 
@@ -762,10 +764,13 @@ The following sections with expand and discuss these results further.
 
 \subsection{Window function}\label{lca_window_function}
 
-Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it seems sensible to create similar ones for LCA. We study this in \Fig{mvdr_selected_windows}, where an MVDR sectorscan image of the Holmengraa wreck is presented, along with the window responses MVDR chose in the shadow, speckle and highlight regions of this image. A fairly aggressive yet stable set of parameters for MVDR where used; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading.
+Assuming that a robust MVDR computes the optimal windows in the minimum variance sense, it seems sensible to create similar ones for LCA. We study this in \Fig{mvdr_selected_windows}, where an MVDR sectorscan image of the Holmengraa wreck is presented, along with the window responses MVDR chose in the shadow, speckle and highlight regions of this image. 
 
-While MVDR is free to choose non-symmetric windows, we can observe from \Fig{mvdr_selected_windows} that it prefers symmetric ones. In shadow and speckle the windows are fully symmetric, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The peak sidelobe levels are between that of the rectangular and Hamming window.
+Observe from \Fig{mvdr_selected_windows} that MVDR seems prefers symmetric window responses, even if it is free to choose non-symmetric ones. The symmetry is most predominant in shadow and speckle regions, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The symmetry is a side-effect of robustifying MVDR to handle coherent interference and the low sample support of covariance statistics.
 
+If we look at the peak sidelobe levels of the MVDR windows they are for the most part between -13\,dB and -43\,dB. This corresponds to that of the rectangular and Hamming window, or a Kaiser window with $\beta=0$ and $\beta=2$. Choosing another value for $\beta$ will  This suggests This and symmetry suggests 
+
+Since the responses as similar to those 
 All the responses in \Fig{mvdr_selected_windows} can be approximated with the Kaiser-Bessel function. By adjusting the window parameter $\beta$ we can adjust the trade-off between mainlobe width and sidelobe level. 
 To generate windows with different mainlobe width and sidelobe level, 
 
@@ -784,16 +789,13 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \mediaI{} shows how \Fig{mvdr_selected_windows} changes as a function of the MVDR subarray length $L$ and temporal averaging $K$. It demonstrates that at $L=1$ the window responses are rectangular in all areas in the image. At $L=2$ we can observe that pixels in highlight are processed with windows with slightly varying amplitude responses, but with the phase being 0$^\circ$ in the illuminated seafloor sector. Yet MVDR is able to greatly suppress noise, which seems to emphasize the importance varying the zero locations slightly to suppress noise. The media file also shows MVDR can be run with subarray sizes $L\in[M/2,5M/8]$, but only with temporal averaging $K=1$ or above.
 
-\subsection{Window parameter boundaries}
 
-Letting LCA choose from Kaiser windows seems like a good choice due to their similarity to the 
-Which Kaiser windows should we include in the windows database? The parameter $\beta$ controls the window shape, and $\phi$ the steering. 
 
-Having chosen to fill the window database with steered Kaiser windows, we should  function While having decided to use steered Kaiser windows, we still  To decide what the ideal boundaries for $\beta$ and $\phi$ should be, we constructed large and equally sized window databases containing windows with different parameter boundaries. The images produced are shown in \Fig{oversampling_mosaic_bounds}. To include and compare with a rectangular weighted DAS, we set the lower boundary to 0 for both parameters.
+\subsection{Kaiser parameter boundaries}
 
-varied upper boundaries for $\beta$ and $\phi$.
+What is the best set of Kaiser windows to use with LCA, and how much should they be steered?
 
- The upper left image has $\beta=0$ and no steering, and is thus equal to a rectangularly weighted DAS. 
+To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=\pm0^\circ$, which includes the rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}.
 
 
 We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
@@ -887,7 +889,15 @@ What's wrong here?
 
 \section{Conclusion}
 
-The LCA method performs similar to the MV method, but at a fraction of the computational cost. The key to achieve this success lies in the design of the window set. Windows that yield vagely steered narrow responses are preferred in speckle regions, while wide and steered responses are typically preferred in highlight and shadow regions. A window set of 6 different responses each steered in 5 different directions proved sufficient in our experiment to match the performance of the MV beamformer.
+LCA can be viewed as either a simplification of MVDR, or as an extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and is largely insensitive to the exact set of windows it is run with, as long as they are sensible.
+
+Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We construct a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between. The Kaiser window is optimal in the sense of maximum power near the direction of interest.
+
+% The images produced by LCA appears sharper than those of MVDR, but 
+% 
+% The key to achieve this success lies in the design of the window set. Windows that yield vagely steered narrow responses are preferred in speckle regions, while wide and steered responses are typically preferred in highlight and shadow regions.
+% 
+% A window set of 6 different responses each steered in 5 different directions proved sufficient in our experiment to match the performance of the MV beamformer.
 
 The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios. 
 
