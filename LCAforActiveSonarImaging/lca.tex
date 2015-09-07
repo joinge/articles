@@ -731,7 +731,7 @@ Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Hol
 
 MVDR was run with a fairly aggressive yet stable set of parameters; subarray size $L=16$ and $d=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging.
 
-The results will be presented in the following order: In section \ref{lca_window_function} we discuss typical window responses computed by MVDR (\Fig{mvdr_selected_windows}), and hypothesize  that these can be mimicked by Kaiser windows. In section \ref{lca_kaiser_parameters} we investigate what sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$ should be (\ref{oversampling_mosaic_bounds}). 
+The results will be presented in the following order: In section \ref{lca_window_function} we discuss typical window responses computed by MVDR (\Fig{mvdr_selected_windows}), and hypothesize  that these can be mimicked by Kaiser windows. In section \ref{lca_kaiser_parameters} we investigate what sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$ should be (\Fig{oversampling_mosaic_bounds}). In section \ref{lca_database_size} we discuss how many variations of windows between the just determined boundaries should be (\Fig{oversampling_mosaic_bounds_beta}), and determine max window database size.
 
 \subsection{Window function}\label{lca_window_function}
 
@@ -763,7 +763,7 @@ LCA images created with a large and equal size window database, but where the up
 \end{itemize}
 
 
-\subsection{Window database size}
+\subsection{Window database size}\label{lca_database_size}
 
 So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}]$. But many windows do we need in these ranges?
 
