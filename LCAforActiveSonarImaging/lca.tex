@@ -742,9 +742,9 @@ Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Hol
 
 MVDR was run with a fairly aggressive yet stable set of parameters; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading. Temporal averaging of $K=1$ was also used with LCA.
 
-\subsection{Summary}
-
 The results and the order they will be presented is as follows:
+
+\subsection{Summary}
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
@@ -764,8 +764,7 @@ Observe from \Fig{mvdr_selected_windows} that MVDR seems prefers symmetric windo
 
 If we look at the peak sidelobe levels of the MVDR windows they are for the most part between -13\,dB and -43\,dB. This corresponds to that of the rectangular and Hamming window, or a Kaiser window with $\beta=0$ and $\beta=2$, respectively. Using the Kaiser window in this case makes sense since it is optimal in the sense of having its peak power concentration near the steering angle, and because we can also create any response in between. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 
-\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line and location of the anchor. Observe that in the anchor region only rectangular windows are used, which is the reason for the anchor resolution being measure to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. 
-
+\Fig{oversampling_mosaic_bounds_beta} illustrates which $\beta$-value LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line and location of the anchor. Observe that in the anchor region only rectangular windows are used, which is the reason for the anchor resolution being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. 
 
 Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LCA choose from  inverted Kaiser windows. These have a spatial response with mainlobe width narrower than that of a rectangular window, but at the expense of drastically increased white noise gain. We have found that these windows hardly ever get used on experimental data, in particular steered versions which ever worsened white noise gain. We can infer the same from \Fig{mvdr_selected_windows} by noting that the maximum sidelobe level rarely exceeds the rectangular window level of -13\;dB.
 
@@ -775,9 +774,7 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \subsection{Kaiser parameter $\beta$ and steering $\phi$}
 
-What is the best set of Kaiser windows to use with LCA, and how much should they be steered?
-
-To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=\pm0^\circ$, which includes the rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}.
+What is the best set of Kaiser windows to use with LCA, and how much should they be steered? To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=\pm0^\circ$, which includes the rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}.
 
 We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
 
