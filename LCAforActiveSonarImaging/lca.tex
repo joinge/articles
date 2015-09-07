@@ -673,7 +673,7 @@ Henceforth any steering will be specified relative to this upper bound. With eac
 
 \subsection{Oversampling}
 
-The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth and hence introduces a to oversample it to capture all the details. For MVDR a factor 10 oversampling laterally compared to the Nyquist rate is often needed to ensure  spatially local shift-invariance in source amplitude~\cite{Asen2014}. Since LCA operates with the same optimization criterion, we will be using approximately a factor 8 lateral oversampling for both beamformers. 
+The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a factor 10 oversampling laterally compared to the Nyquist rate is often needed to ensure  spatialhift-invariance in source amplitude~\cite{Asen2014}. Since LCA operates with the same optimization criterion, we will be using approximately a factor 8 lateral oversampling for both beamformers. 
 
 \todo{Need $M$ in the image sector. Why???}
 
@@ -715,22 +715,11 @@ The ultimate goal of adaptive beamformers is to take the information available i
 % 
 % 
 
-% \section{Experimental Setup}
-% 
-% For the LCA to perform well it is important to let it have a diverse selection of windows to choose from. The question is how this selection should be With our ovarall goal being a reduction of computational complexity, it The choice of window function does not seem to matter. 
-% 
-% 
-% 
-% Using Kaiser windows as their extremal values areLimit our study to Kaiser windows
-% 
-% 
 % 
 % This selection is based on observations of the solutions found by the MV beamformer. We obtained good results in our experiments by letting the LCA beamformer select among 5 Kaiser windows with uniformly distributed $\beta$'s in the range $[0.05, 0.5]$ and a rectangular window. Each window was steered in 5 different directions, uniformly distributed within 80\% of the mainlobe width of the rectangular window, which is the most narrow. This adds to a total of 30 windows.
 % 
 % To make the choice of window less susceptible to pixel value uncertainties, the LCA beamformer was set to apply the most frequently selected window in an 11 pixel range region to the center pixel in that region. In physical terms, this is a region of approximately 20\,cm. The MV beamformer estimated the covariance matrix as described in~\cite{syn07} by averaging over 16 subarrays and 11 range pixels, and applying 3\% diagonal loading.
 
-
-% Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
 
 \section{Results and Discussion}
@@ -740,25 +729,13 @@ To test the performance of the MVDR and LCA beamformers, we have processed data 
 
 Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross of 1\,m length in both directions, connected to a an anchor with a 13\,cm diameter (\Fig{cross}).
 
-MVDR was run with a fairly aggressive yet stable set of parameters; subarray size $L=16$, temporal averaging of $K=1$, and $d=1\%$ diagonal loading. Temporal averaging of $K=1$ was also used with LCA.
+MVDR was run with a fairly aggressive yet stable set of parameters; subarray size $L=16$ and $d=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging.
 
-The results and the order they will be presented is as follows:
-
-\subsection{Summary}
-
-\begin{itemize}
-\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
-\item \emph{Window database size}. \Fig{oversampling_mosaic}
-\item \emph{Performance}.
-\item \emph{Oversampling need}.
-\end{itemize}
-
-The following sections with expand and discuss these results further.
+The results will be presented in the following order: In section \ref{lca_window_function} we discuss typical window responses computed by MVDR (\Fig{mvdr_selected_windows}), and hypothesize  that these can be mimicked by Kaiser windows. In section \ref{lca_kaiser_parameters} we investigate what sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$ should be (\ref{oversampling_mosaic_bounds}). 
 
 \subsection{Window function}\label{lca_window_function}
 
-Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create window database for LCA with responses that resembles that of MVDR. We study this in \Fig{mvdr_selected_windows}, where an MVDR sectorscan image of the Holmengraa wreck is presented, along with the window responses MVDR chose in the shadow, speckle and highlight regions of this image. 
+Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create window database for LCA with responses that resembles that of MVDR. The typical responses MVDR creates for shadow, speckle and highlight regions of a sectorscan Holmengraa image is shown in \Fig{mvdr_selected_windows}.
 
 Observe from \Fig{mvdr_selected_windows} that MVDR seems prefers symmetric window responses, even if it is free to choose non-symmetric ones. The symmetry is most predominant in shadow and speckle regions, while in highlight the windows are approximately symmetric within the illuminated\todo{valid term?} sector of the seafloor. The symmetry is a side-effect of robustifying MVDR to handle coherent interference and the low sample support of covariance statistics.
 
@@ -772,7 +749,7 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 
 
-\subsection{Kaiser parameter $\beta$ and steering $\phi$}
+\subsection{Kaiser parameter $\beta$ and steering $\phi$}\label{lca_kaiser_parameters}
 
 What is the best set of Kaiser windows to use with LCA, and how much should they be steered? To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=\pm0^\circ$, which includes the rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}.
 
@@ -813,33 +790,24 @@ Variables of interest:
 \item Oversampling. From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to $8M$.
 \end{itemize}
 
+\subsection{Computational complexity}
+
+% Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
+
 
 % the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from.
 
 
-
-What's wrong here? 
-
-
+\subsection{Summary}
 
 \begin{itemize}
-\item Oversampling tests. Both Holmengraa and cross.
-\item Mosaic indicating the number of windows needed.
-\item 
+\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
+\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+\item \emph{Window database size}. \Fig{oversampling_mosaic}
+\item \emph{Performance}.
+\item \emph{Oversampling need}.
 \end{itemize}
 
-
-
-% \begin{table}[!b]\centering%\normalsize
-% \begin{tabular}[c]{l r r r@{}  l}\hline
-% \rowcolor{tabBlue} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
-% Arithmetic & 1.03 Tflop/s & & &\\
-% Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
-% Shared memory & & 257 Gfloats/s & 1 &:4 \\
-% Registers & & $>$1.5 Tfloats/s & $>$3 &:2~\cite{Vasilyy}
-% \end{tabular}
-% \caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}\label{throughputs}
-% \end{table}%
 
 % \newcommand\cc[1]{\multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf #1}}
 % \begin{table}[!b]\centering%\normalsize
