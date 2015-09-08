@@ -73,11 +73,11 @@
 
 \RequirePackage{array}
 
-% \ifCLASSOPTIONcompsoc
-%    \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-% \else
-%    \usepackage[caption=false,font=footnotesize]{subfig}
-% \fi
+\ifCLASSOPTIONcompsoc
+   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+   \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
 
 % \usepackage{caption}
 % \usepackage{subcaption}
@@ -551,19 +551,30 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 }\label{oversampling_mosaic_bounds}
 \end{figure*}
 
-\setcounter{dbltopnumber}{2}
+% \setcounter{dbltopnumber}{2}
 
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
-\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
-\end{figure*} 
+\begin{figure*}[t]\centering
+\subfloat[$\beta$-values of the Kaiser window chosen for each image pixel.  Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%%
+\label{oversampling_mosaic_bounds_beta}}
+\hfil
+\subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. ]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
+\label{oversampling_mosaic_bounds_phi}}
+\caption{Kaiser windows chosen for each pixel in the image. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor, cut line and main scatter locations of the cross is marked in red.}
+\label{fig_sim}
+\end{figure*}
 
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
-\caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
-\end{figure*} 
 
-% \setcounter{dbltopnumber}{1}
+% \begin{figure*}[t]%\centering%
+% \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%
+% \caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
+% \end{figure*} 
+% 
+% \begin{figure*}[t]%\centering%
+% \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
+% \caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
+% \end{figure*} 
+
+% % \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
