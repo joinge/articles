@@ -784,16 +784,9 @@ In \Fig{oversampling_mosaic} we have compared LCA images made from windows datab
 Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. We can observe a major improvement going to $N_\beta=2$ and $N_\phi=3$, but minimal improvement by adding yet more windows.
 
 
+\subsection{Image quality}
 
-LCA is largely insensitive to the choice of windows and steering. 
-LCA works well for all the boundaries
-Variables of interest:
-
-\begin{itemize}
-\item Mainlobe width. Wide in shadows, narrow in detailed regions. Adding windows in between these extremal values.
-\item Steering. No steering in shadows, slight steering in speckle and no steering in highlight. Steering more than the -3dB width of the window function has no effect.
-\item Oversampling. From our observations one should have at least twice the number of beams as channels. Image is more visually pleasing and appears more detailed up to $8M$.
-\end{itemize}
+TODO. Add image of DAS vs. MVDR vs. LCA Kaiser vs. LCA Trig
 
 \subsection{Computational complexity}
 
@@ -853,6 +846,11 @@ In comparison, LCA is of O($M N_w$), and extremely well suited for GPUs. Each pi
 LCA can be viewed as either a simplification of MVDR, or as an extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and is largely insensitive to the exact set of windows it is run with, as long as they are sensible.
 
 Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We construct a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between. The Kaiser window is optimal in the sense of maximum power near the direction of interest.
+
+% 
+% LCA is largely insensitive to the choice of windows and steering. 
+% LCA works well for all the boundaries
+% Variables of interest:
 
 % We limit our study to the use of variations of the parametric Kaiser-Harris window, since we observed neglible performance difference to using this function or any of the common trigonometric ones. The Kaiser windows are easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian.
 % 
@@ -935,7 +933,7 @@ Now let us choose a trigonometric window function:
 \w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\big)
 \end{align}
 %
-where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields:
+where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. Inserting this into the beamformer equation yields:
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
@@ -943,23 +941,16 @@ where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$. Inserting this yields
 &= \alpha \a\T\x + (1-\alpha)\b\T\x
 \end{align}
 %
-where $\a_\phi$ is the steering vector defined in (\ref{steering_vector}), and 
+where $\a$ is the steering vector defined in (\ref{steering_vector}), and 
 %
 \begin{align}
-\a = \begin{bmatrix}
-     1 \\
-     e^{j\frac{2\pi}{\lambda}d\sin\theta} \\
-     e^{j\frac{2\pi}{\lambda}2d\sin\theta} \\
-     \vdots \\
-     e^{j\frac{2\pi}{\lambda}d(M-1)\sin\theta}
-     \end{bmatrix} \qquad \text{and} \qquad
-\b = \begin{bmatrix}
-     0 \\
-     e^{j\frac{2\pi}{\lambda}d\sin\theta}\sin\left(\frac{2\pi m}{M-1}\right) \\
-     e^{j\frac{2\pi}{\lambda}2d\sin\theta}\sin\left(\frac{2\pi m}{M-1}\right) \\
-     \vdots \\
-     0
-     \end{bmatrix}\a
+\b = \text{diag}(\a)\begin{bmatrix}
+     1 &
+     \cos\left(\frac{2\pi}{M-1}\right) &
+     \cos\left(\frac{2\pi 2}{M-1}\right) &
+     \hdots &
+     1
+     \end{bmatrix}\T.
 \end{align}
 %
 To attain unity gain in the look direction the weights must sum to one. 
@@ -968,9 +959,9 @@ To attain unity gain in the look direction the weights must sum to one.
 \w\T\1 &= \big(\alpha\a - (1-\alpha)\b\big)\T\1 = 1
 \end{align}
 %
-This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. 
+This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. Hence, as long as we normalize $\a$ and $\b$ the unity gain constraint is preserved.
 
-where
+Now let $a=\a\T x$ and $b=\b\T x$. The beamformer output can then be written as:
 %
 \begin{align}
 |\w\H\x|^2 &= \Big| \alpha a + (1-\alpha)b \Big|^2 \nn
@@ -980,20 +971,21 @@ where
 &= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^* \nn
 \end{align}
 %
+Differentiating this with respect to $\alpha$ yields:
+%
 \begin{align}
 \frac{\partial}{\partial\alpha} |\w\H\x|^2 
 &= 2\alpha (aa^* - (ab^* + a^*b) - bb^*) + ab^* + a^*b = 0
 \end{align}
 %
+which has the solution:
+%
 \begin{align}
 \alpha &= \frac{ab^* + a^*b}{2(aa^* - (ab^* + a^*b) - bb^*)}
 \end{align}
-
-LCA can then be defined as
 %
-\begin{align}
-\argmin{\w}\ |z|^2 = \argmin{\w}\ z\,z^* = %\argmin{\w}\ \w\H\x = \sumb{m=0}{M-1} w_m^* x_m
-\end{align}
+In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the LCA's computational complexity would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal.
+
 
 % use section* for acknowledgement
 \ifCLASSOPTIONcompsoc
