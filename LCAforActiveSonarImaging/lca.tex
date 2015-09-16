@@ -699,7 +699,7 @@ Henceforth any steering will be specified relative to this upper bound. With eac
 
 \subsection{Oversampling}
 
-The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a factor 10 oversampling laterally compared to the Nyquist rate is often needed to ensure  spatial shift-invariance in source amplitude~\cite{Asen2014}.
+The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth and introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a lateral oversampling factor of 10 compared to the Nyquist rate is often needed to ensure minimal spatial shift-variance in source amplitude~\cite{Asen2014}.
 
 Since LCA operates with the same optimization criterion, we will be using approximately a factor 8 lateral oversampling for both beamformers. The images appear more visually pleasing and detailed up to 8, but we consider an absolute minimum to be 2. In \mediaII{} we demonstrate this with LCA images changing as a function of a lateral oversampling factor. The displayed images are all upinterpolated to the same size, but the detail level varies. 
 % 
@@ -936,24 +936,23 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 
 \renewcommand\b{\vec b}
 
-Now let us choose a trigonometric window function:
+Throughout this article we have used LCA with variations of the Kaiser window function. However, we could instead have used a trigonometric window function:
 %
 \begin{align}
-\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\big)
+\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\big)\label{trig_window_function}
 \end{align}
 %
-where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. Inserting this into the beamformer equation yields:
+where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. For this window there is an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the window function (\ref{trig_window_function}) into the beamformer equation (\ref{z}):
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
-&= \alpha\sumb{m=0}{M-1} e^{j\phi_\theta[m]} x_m^* - (1-\alpha)\sumb{m=0}{M-1} e^{j\varphi[m]}\cos\left(\frac{2\pi m}{M-1}\right) x_m^* \nn
 &= \alpha \a\T\x + (1-\alpha)\b\T\x
 \end{align}
 %
 where $\a$ is the steering vector defined in (\ref{steering_vector}), and 
 %
 \begin{align}
-\b = \text{diag}(\a)\begin{bmatrix}
+\b = \text{diag}(\a)\cdot\begin{bmatrix}
      1 &
      \cos\left(\frac{2\pi}{M-1}\right) &
      \cos\left(\frac{2\pi 2}{M-1}\right) &
@@ -962,13 +961,13 @@ where $\a$ is the steering vector defined in (\ref{steering_vector}), and
      \end{bmatrix}\T.
 \end{align}
 %
-To attain unity gain in the look direction the weights must sum to one. 
+To attain unity gain in the look direction the weights must sum to one:
 %
 \begin{align}
 \w\T\1 &= \big(\alpha\a - (1-\alpha)\b\big)\T\1 = 1
 \end{align}
 %
-This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. Hence, as long as we normalize $\a$ and $\b$ the unity gain constraint is preserved.
+This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. Hence, we can preserve the unity gain constraint as long as we normalize $\a$ and $\b$.
 
 Now let $a=\a\T x$ and $b=\b\T x$. The beamformer output can then be written as:
 %
@@ -980,7 +979,7 @@ Now let $a=\a\T x$ and $b=\b\T x$. The beamformer output can then be written as:
 &= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^* \nn
 \end{align}
 %
-Differentiating this with respect to $\alpha$ yields:
+This is a convex function with a single minimum, which we obtain by differentiating with respect to $\alpha$ and setting equal to 0:
 %
 \begin{align}
 \frac{\partial}{\partial\alpha} |\w\H\x|^2 
@@ -993,7 +992,7 @@ which has the solution:
 \alpha &= \frac{ab^* + a^*b}{2(aa^* - (ab^* + a^*b) - bb^*)}
 \end{align}
 %
-In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the LCA's computational complexity would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal.
+In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal in the minimum variance sense.
 
 
 % use section* for acknowledgement
