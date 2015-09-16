@@ -352,7 +352,7 @@
 \title{Low Complexity Adaptive Beamformer\\ for Active Sonar Imaging}
 
 \author{Jo~Inge~Buskenes, %
-        Roy~Edgar~Hansen,%
+        Roy~Edgar~Hansen, %
         Andreas~Austeng%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
 of Informatics, University of Oslo, Norway.}% <-this % stops a space
@@ -432,13 +432,13 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Human made sonars have little to no adaptability when data is collected, but some methods have been investigated in the data post processing. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It computes the window that is optimal in the sense of suppressing noise as much as possible while under the restriction of  preserving the signal of interest.
 
-In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid it altogether while achieving similar performance.
+In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid using MVDR altogether while achieving similar performance.
 
 This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimization criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. But which windows should LCA choose from?
 
 Synnev\aa{}g et. al. used a window set comprised of rectangular, Kaiser and inverted Kaiser functions\footnote{May also be called Kaiser-Harris windows.}. Of these a specific Kaiser window were micro-steered. His database had 12 windows in it, which proved to work well. But just how well did this work compared to MVDR? Can LCA perform even better with more windows, and could it work just as well with even fewer? 
 
-In this work we aim to provide some intuitive understanding of how the window database may be designed. Like Synnev\aa{}g et. al. we limit our study to the use of variations of the parametric Kaiser window, since we observed negligible performance difference to using this function or any of the common trigonometric ones. However, we steer all our windows and not just some, and provide reason why the Kaiser window is a suitable one, what variations of Kaiser we should include, and how much it should be steered.
+In this work apply the LCA method to active sonar imaging, and aim to provide some intuitive understanding of how the window database may be designed. Like Synnev\aa{}g et. al. we limit our study to the use of variations of the parametric Kaiser window, since we observed negligible performance difference to using this function or any of the common trigonometric ones. However, we steer all our windows and not just some, and provide reason why the Kaiser window is a suitable one, what variations of Kaiser we should include, and how much it should be steered. 
 
 Our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When letting LCA choose from Kaiser windows with similar responses, we obtain images with both improved noise suppression and resolution. The resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
@@ -557,10 +557,19 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a a narrow response ($\beta=0$) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%%
 \label{oversampling_mosaic_bounds_beta}}
 \hfil
-\subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA prefers selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{oversampling_mosaic_bounds}.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
+\subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{oversampling_mosaic_bounds}.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
 \label{oversampling_mosaic_bounds_phi}}
 \caption{Kaiser windows chosen for each pixel in the image. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor, cut line and main scatter locations of the cross is marked in red.}
 \label{fig_sim}
+\end{figure*}
+
+\begin{figure*}[t]\centering
+\subfloat[]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
+\label{oversampling_mosaic_bounds_beta}}
+\hfil
+\subfloat[]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
+\label{oversampling_mosaic_bounds_phi}}
+\caption{}\label{fig_sim}
 \end{figure*}
 
 
@@ -768,7 +777,7 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \subsection{Kaiser parameter $\beta$ and steering $\phi$}\label{lca_kaiser_parameters}
 
-What is the best set of Kaiser windows to use with LCA, and how much should they be steered? To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=0^\circ$, which includes the symmetric rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the -3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A forth order polynomial fit was used in this computation. This measure is also called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is $\Delta = \text{FWHM}/0.89$~\cite{Harris1978}.
+What is the best set of Kaiser windows to use with LCA, and how much should they be steered? To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=0^\circ$, which includes the symmetric rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the -3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A forth order polynomial fit was used in this computation. This measure is also commonly called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is approximately $\Delta \approx \text{FWHM}/0.89$~\cite{Harris1978}.
 
 The images in \Fig{oversampling_mosaic_bounds} much improved sidelobe suppression with a an upper for bound for $\beta$ of 2, but it improved further as this bound was adjusted up to 5. No noticeable difference were observed for higher values than 5. The images also demonstrate that increasing the steering $\phi$ improves the resolution of the strong scatterers. For this sonar the Rayleigh resolution is $\Delta=0.0125$ radians (0.72$^\circ$), thus a point scatterer imaged at 19\,m with a rectangular DAS would have a lateral FWHM of $0.125\cdot19\,\text{m}\cdot0.89=21\,\text{cm}$. This is close to the FWHM of the anchor in the DAS image in \Fig{oversampling_mosaic_bounds}. As we increase steering to either 50\% or 100\% of the -3dB width, the FWHM drops to 73\% or 53\% to that of the rectangular window, respectively.
 
