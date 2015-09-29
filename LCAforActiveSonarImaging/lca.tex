@@ -564,12 +564,12 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \end{figure*}
 
 \begin{figure*}[t]\centering
-\subfloat[]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
+\subfloat[LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
 \label{beamformer_comparison_cross}}
-\caption{}\label{fig_sim}
 \hfil
-\subfloat[]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
+\subfloat[Image of Holmengraa. All the adaptive beamformers offer improvement compared to DAS. The shadows are deeper, the edges better refined and the detail level is higher.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
 \label{beamformer_comparison_holmengraa}}
+\caption{Image quality: Comparing DAS with MVDR and LCA with Kaiser and trigonometric windows.}\label{image_quality}
 \end{figure*}
 
 
@@ -667,7 +667,7 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 \beta = \frac{TB}{2},
 \end{align}
 %
-where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$. 
+where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$.
 
 
 \subsection{Steering}
@@ -705,6 +705,12 @@ We call the upper bound for steering $\phi_{\text{3dB}}(\beta)$, and define it a
 \end{align}
 %
 Henceforth any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
+
+\subsection{Using trigonometric windows instead of Kaiser}
+
+\begin{align}
+\phi_\text{3dB}(\beta) \approx \minus{}2.214\beta^3 + 6.084\beta^2 - 5.710\beta + 2.136
+\end{align}
 
 
 \subsection{Oversampling}
@@ -768,9 +774,9 @@ The results will be presented in the following order: In section \ref{lca_window
 
 \subsection{LCA window function}\label{lca_window_function}
 
-Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create window database for LCA with with responses similar to the ones MVDR computes. We study this in \Fig{mvdr_selected_windows}, where the typical responses MVDR creates for shadow, speckle and highlight regions in the Holmengraa scene is presented.
+Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create window database for LCA with with responses similar to the ones MVDR computes. We study this in \Fig{mvdr_selected_windows}, where we present the typical responses that MVDR creates for shadow, speckle and highlight regions of the Holmengraa scene.
 
-Observe from \Fig{mvdr_selected_windows} that MVDR seems prefers symmetric window responses, even if it is free to choose non-symmetric ones. The symmetry is most predominant in shadow and speckle regions, while in highlight the windows are approximately symmetric within the illuminated sector of the seafloor. We have observed this symmetry to be a side-effect of the averaging steps needed to build the sample covariance matrix, which is key to allow  MVDR to run in near snapshot mode in an active system. The peak sidelobe levels of the MVDR windows they are mostly between -13\,dB and -43\,dB. This corresponds to that of the rectangular and Hamming window, or a Kaiser window with $\beta=0$ and $\beta=2$, respectively.
+Observe from \Fig{mvdr_selected_windows} that MVDR seems to prefer symmetric window responses, even if it is free to choose non-symmetric ones. The symmetry is most predominant in shadow and speckle regions, while in highlight the windows are approximately symmetric within the illuminated sector of the seafloor. We have observed this symmetry to be a side-effect of the averaging steps needed to build the sample covariance matrix, which is required to allow MVDR to run in near snapshot mode in an active system. The peak sidelobe levels of the MVDR windows are mostly between -13\,dB and -43\,dB. This corresponds to that of the rectangular and Hamming window, or a Kaiser window with $\beta=0$ and $\beta=2$, respectively.
 
 From this we hypothesize that LCA should work even if it only selects from various Kaiser windows. If they span a decent range of $\beta$-values, and some steering variations is applied to each, we should have responses that resembles those in \Fig{mvdr_selected_windows}. The Kaiser window is easy to compute, is fairly insensitive to coefficient inaccuracies, and can create windows with shapes spanning from rectangular to Gaussian. It is also optimal in the sense of having its peak power concentration near the steering angle.
 
@@ -800,7 +806,11 @@ Observe that sampling the $\beta$-range more finely increases the sidelobe suppr
 
 \subsection{Image quality}
 
-TODO. Add image of DAS vs. MVDR vs. LCA Kaiser vs. LCA Trig
+We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. \Fig{beamformer_comparison_cross} are of the cross, were we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR.
+
+
+ \Fig{beamformer_comparison_holmengraa}
+
 
 \subsection{Computational complexity}
 
