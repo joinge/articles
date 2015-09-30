@@ -1000,13 +1000,13 @@ Unity gain in the look direction is ensured as long as the weights sum to one:
 \w\T\1 &= \big(\alpha\a_\phi - (1-\alpha)\b_\phi\big)\T\1 = 1.
 \end{align}
 %
-This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. Hence, we can preserve the unity gain constraint as long as we normalize $\a$ and $\b$.
+This is true for any value of $\alpha$ if $\a_\phi\T\1 = 1$ and $\b_\phi\T\1 = 1$. Hence, we can preserve the unity gain constraint as long as we normalize $\a$ and $\b$.
 
 Now let $a=\a\T\x$ and $b=\b\T\x$. The beamformer output can then be written as:
 %
 \begin{align}
 |\w\H\x|^2 &= \Big| \alpha a - (1-\alpha)b \Big|^2 \nn
-&= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^*
+&= \alpha^2 (aa^* + ab^* + a^*b - bb^*) - \alpha(ab^* + a^*b + 2bb^*) + bb^*
 \end{align}
 %
 This is a convex function with a single minimum, which we find by differentiating with respect to $\alpha$ and setting equal to 0:
