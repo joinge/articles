@@ -969,21 +969,17 @@ The authors would like to thank...
 
 \renewcommand\b{\vec b}
 
-Throughout this article we have used LCA with variations of the Kaiser window function defined in (\ref{kaiser_window_element}), steered in . However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function:
-
-\ref{trig_window_function} \ref{steering_window}
-
+Throughout this article we have used LCA with variations of the Kaiser window function defined in (\ref{kaiser_window_element}), steered as described in (\ref{steered_window}). However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function defined in (\ref{trig_window_function} ):
 %
 \begin{align}
-f_m(\alpha) = e^{j\phi_\theta[m]}\Big[\alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\Big]\label{trig_window_function}
+f_m(\alpha) = e^{j\theta_\phi[m]}\Big[\alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\Big]\label{trig_window_function}
 \end{align}
 %
-(\ref{steering_vector})
-where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. For this window there is an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the window function (\ref{trig_window_function}) into the beamformer equation (\ref{z}):
+where $\theta_\phi[m] = \frac{2\pi dm}{\lambda}\sin\phi$ is the $m$th component of the steering vector defined in (\ref{steering_vector}). For this window there is an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the window function (\ref{trig_window_function}) into the beamformer equation (\ref{z}):
 %
 \begin{align}
-\w\H\x &= \sumb{m=0}{M-1} e^{j\phi_\theta[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
-&= \alpha \a\T\x + (1-\alpha)\b\T\x
+\w\H\x &= \sumb{m=0}{M-1} e^{j\theta_\phi[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
+&= \alpha \a\T\x - (1-\alpha)\b\T\x
 \end{align}
 %
 where $\a$ is the steering vector defined in (\ref{steering_vector}), and 
