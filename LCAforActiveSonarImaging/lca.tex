@@ -675,7 +675,7 @@ where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjustin
 Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for optimal window. A Kaiser window $\f_\beta$ steered to the angle $\phi$ can be expressed as 
 %
 \begin{align}
-\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}
+\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\label{steered_window}
 \end{align}
 %
 where diag($\a_\phi$) is a diagonal matrix constructed from the steering vector $\a_\phi$:
@@ -694,22 +694,30 @@ Here $d$ is the element spacing, $\lambda$ is the wavelength and $\phi$ is the s
 The window database we will construct will contain $N_\beta$ Kaiser windows with unique $\beta$-values, each being steered in $N_\phi$ different directions. This gives us $N_w = N_\beta N_\phi$ unique windows.
 
 
-\subsection{Steering bounds}
+\subsection{Steering bounds}\label{steering_bounds}
 
 There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, the steered window will have increased white noise gain and deteriorated signal-to-noise ratio as shown in \Fig{windows_steering}. To limit this we placing an upper bound to the steering, realizing that  a wide window will be allowed more steering than a narrow one.
 
 We call the upper bound for steering $\phi_{\text{3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
 \begin{align}
-\phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980
+\phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980\label{steering_kaiser_3dB}
 \end{align}
 %
 Henceforth any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
-\subsection{Using trigonometric windows instead of Kaiser}
+\subsection{Trigonometric windows}
 
+While we focus on using LCA with Kaiser windows, we will for completeness compare the performance with that of using trigonometric windows. This is defined as:
+%
 \begin{align}
-\phi_\text{3dB}(\beta) \approx \minus{}2.214\beta^3 + 6.084\beta^2 - 5.710\beta + 2.136
+f_m(\alpha) = \alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\label{trig_window_function}
+\end{align}
+%
+where we apply the contraint $\alpha\in[0.5,1]$ to avoid windows with negative coefficients. Steering is applied as in (\ref{steered_window}), and the $\alpha$-value that halves the 3\,dB distance is found using the method described in section \ref{steering_bounds}:
+%
+\begin{align}
+\phi_\text{3dB}(\alpha) \approx \minus{}2.214\beta^3 + 6.084\beta^2 - 5.710\beta + 2.136.
 \end{align}
 
 
@@ -952,9 +960,12 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 \renewcommand\b{\vec b}
 
 Throughout this article we have used LCA with variations of the Kaiser window function. However, we could instead have used a trigonometric window function:
+
+\ref{trig_window_function} \ref{steering_bounds}
+
 %
 \begin{align}
-\w = e^{j\phi_\theta[m]}\big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\big)\label{trig_window_function}
+f_m(\alpha) = e^{j\phi_\theta[m]}\Big[\alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\Big]\label{trig_window_function}
 \end{align}
 %
 where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. For this window there is an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the window function (\ref{trig_window_function}) into the beamformer equation (\ref{z}):
