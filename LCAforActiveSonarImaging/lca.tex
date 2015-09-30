@@ -1014,13 +1014,14 @@ This is a convex function with a single minimum, which we find by differentiatin
 %
 \begin{align}
 \frac{\partial}{\partial\alpha} |\w\H\x|^2 
-&= 2\alpha (aa^* + ab^* + a^*b + bb^*) - (ab^* + a^*b + 2bb^*) = 0,
+&= 2\alpha (aa^* + ab^* + a^*b + bb^*) \nn
+&- (ab^* + a^*b + 2bb^*) = 0,
 \end{align}
 %
 which has the solution:
 %
 \begin{align}
-\alpha &= \frac{ab^* + a^*b}{2(aa^* - (ab^* + a^*b) - bb^*)}.
+\alpha &= \frac{ab^* + a^*b + 2bb^*}{2(aa^* + ab^* + a^*b + bb^*)}.
 \end{align}
 %
 In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal in the minimum variance sense.
