@@ -641,24 +641,24 @@ where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{
 
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. We will express it in vector form as:
 %
-\begin{align*}
+\begin{align}
 \f_\beta = \bmat{
 f_0(\beta) \\
 \vdots\\
 f_{M-1}(\beta)
-}
-\end{align*}
+}\label{kaiser_window_vector}
+\end{align}
 %
 where
 %
 \begin{align}
-f_m(\beta) = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}
+f_m(\beta) = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}\label{kaiser_window_element}
 \end{align}
 %
 and $I_0$ is the zeroth order modified Bessel function of the first kind:
 %
 \begin{align}
-I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.
+I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.\label{modified_bessel_first_kind}
 \end{align}
 %
 The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given time-bandwidth product specified with the parameter $\beta$:
@@ -911,6 +911,16 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 \end{table}%
 
 
+% use section* for acknowledgement
+\ifCLASSOPTIONcompsoc
+  \section*{Acknowledgments}
+\else
+  \section*{Acknowledgment}
+\fi
+
+
+The authors would like to thank...
+
 % \begin{itemize}
 % \item Adaptive beamformer's potential lies in its ability to suppress interference power
 % \item Why adaptive beamformers struggle in active sonar systems. Correlated noise, robustification kills the adaptive potential. Quite computationally intensive. Constraints must be applied in one way or another - parameters must be tuned.
@@ -959,15 +969,16 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 
 \renewcommand\b{\vec b}
 
-Throughout this article we have used LCA with variations of the Kaiser window function. However, we could instead have used a trigonometric window function:
+Throughout this article we have used LCA with variations of the Kaiser window function defined in (\ref{kaiser_window_element}), steered in . However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function:
 
-\ref{trig_window_function} \ref{steering_bounds}
+\ref{trig_window_function} \ref{steering_window}
 
 %
 \begin{align}
 f_m(\alpha) = e^{j\phi_\theta[m]}\Big[\alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\Big]\label{trig_window_function}
 \end{align}
 %
+(\ref{steering_vector})
 where $\phi_\theta[m] = \frac{2\pi}{\lambda}dm\sin\theta$ is the steering angle. For this window there is an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the window function (\ref{trig_window_function}) into the beamformer equation (\ref{z}):
 %
 \begin{align}
@@ -1005,31 +1016,23 @@ Now let $a=\a\T x$ and $b=\b\T x$. The beamformer output can then be written as:
 &= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^* \nn
 \end{align}
 %
-This is a convex function with a single minimum, which we obtain by differentiating with respect to $\alpha$ and setting equal to 0:
+This is a convex function with a single minimum, which we find by differentiating with respect to $\alpha$ and setting equal to 0:
 %
 \begin{align}
 \frac{\partial}{\partial\alpha} |\w\H\x|^2 
-&= 2\alpha (aa^* - (ab^* + a^*b) - bb^*) + ab^* + a^*b = 0
+&= 2\alpha (aa^* - (ab^* + a^*b) - bb^*) + ab^* + a^*b = 0,
 \end{align}
 %
 which has the solution:
 %
 \begin{align}
-\alpha &= \frac{ab^* + a^*b}{2(aa^* - (ab^* + a^*b) - bb^*)}
+\alpha &= \frac{ab^* + a^*b}{2(aa^* - (ab^* + a^*b) - bb^*)}.
 \end{align}
 %
 In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal in the minimum variance sense.
 
 
-% use section* for acknowledgement
-\ifCLASSOPTIONcompsoc
-  \section*{Acknowledgments}
-\else
-  \section*{Acknowledgment}
-\fi
 
-
-The authors would like to thank...
 
 
 % Can use something like this to put references on a page
