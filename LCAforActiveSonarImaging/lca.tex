@@ -979,13 +979,13 @@ where $\theta_\phi[m] = \frac{2\pi dm}{\lambda}\sin\phi$ is the $m$th component 
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} e^{j\theta_\phi[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
-&= \alpha \a\T\x - (1-\alpha)\b\T\x
+&= \alpha \a_\phi\T\x - (1-\alpha)\b_\phi\T\x
 \end{align}
 %
-where $\a$ is the steering vector defined in (\ref{steering_vector}), and 
+where $\a_\phi$ is the steering vector defined in (\ref{steering_vector}), and 
 %
 \begin{align}
-\b = \text{diag}(\a)\cdot\begin{bmatrix}
+\b_\phi = \text{diag}(\a_\phi)\cdot\begin{bmatrix}
      1 &
      \cos\left(\frac{2\pi}{M-1}\right) &
      \cos\left(\frac{2\pi 2}{M-1}\right) &
@@ -994,22 +994,19 @@ where $\a$ is the steering vector defined in (\ref{steering_vector}), and
      \end{bmatrix}\T.
 \end{align}
 %
-To attain unity gain in the look direction the weights must sum to one:
+Unity gain in the look direction is ensured as long as the weights sum to one:
 %
 \begin{align}
-\w\T\1 &= \big(\alpha\a - (1-\alpha)\b\big)\T\1 = 1
+\w\T\1 &= \big(\alpha\a_\phi - (1-\alpha)\b_\phi\big)\T\1 = 1.
 \end{align}
 %
 This is true for any value of $\alpha$ if $\a\T\1 = 1$ and $\b\T\1 = 1$. Hence, we can preserve the unity gain constraint as long as we normalize $\a$ and $\b$.
 
-Now let $a=\a\T x$ and $b=\b\T x$. The beamformer output can then be written as:
+Now let $a=\a\T\x$ and $b=\b\T\x$. The beamformer output can then be written as:
 %
 \begin{align}
-|\w\H\x|^2 &= \Big| \alpha a + (1-\alpha)b \Big|^2 \nn
-&= \Big[\alpha a + (1-\alpha)b\Big] \Big[\alpha a^* + (1-\alpha)b^*\Big] \nn
-&= \alpha^2 aa^* + \alpha a(1-\alpha)b^* + \alpha a^*(1-\alpha)b + (1-\alpha)^2bb^* \nn
-&= \alpha^2 aa^* + \alpha(1-\alpha)(ab^* + a^*b) + (1-\alpha)^2bb^* \nn
-&= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^* \nn
+|\w\H\x|^2 &= \Big| \alpha a - (1-\alpha)b \Big|^2 \nn
+&= \alpha^2 (aa^* - (ab^* + a^*b) - bb^*) + \alpha(ab^* + a^*b) + bb^*
 \end{align}
 %
 This is a convex function with a single minimum, which we find by differentiating with respect to $\alpha$ and setting equal to 0:
