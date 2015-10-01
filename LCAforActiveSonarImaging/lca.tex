@@ -525,7 +525,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/cross_tagged.png}%
-\caption{One of the objects used to test the beamformers is a 1\,m long cross attached to an anchor with a diameter of approximately 13\,cm.}\label{cross}
+\caption{One of the objects used to test the beamformers is a 1\,m long cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons Bundeswehr, Maritime Technology and Research (WTD 71).}\label{cross}
 \end{figure}
 
 \setcounter{topnumber}{1}
@@ -673,7 +673,7 @@ where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjustin
 
 \subsection{Steering}
 
-Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for optimal window. A Kaiser window $\f_\beta$ steered to the angle $\phi$ can be expressed as 
+Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for an optimal window. A Kaiser window $\f_\beta$ steered to the angle $\phi$ can be expressed as 
 %
 \begin{align}
 \w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\label{steered_window}
@@ -775,7 +775,7 @@ Since LCA operates with the same optimization criterion, we will be using approx
 
 To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with 1.2\;m array length, 100\;kHz operating frequency, 40\;kHz bandwidth and 25$^\circ$ opening angle on transmission.
 
-Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. The other scene is of an iron cross of 1\,m length in both directions, connected to a an anchor with a 13\,cm diameter (\Fig{cross}). Both scenes is imaged in sectorscan mode.
+Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an iron cross of 1\,m length in both directions, connected to a an anchor with a 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons Bundeswehr, Maritime Technology and Research (WTD 71). Both scenes is imaged in sectorscan mode.
 
 In the image reconstruction we have run MVDR with subarray length $L=16$ and $d=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters. 
 
@@ -832,15 +832,7 @@ In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GP
 % the performance of the LCA beamformer is surprisingly similar regardless of what windows it is allowed to choose from.
 
 
-\subsection{Summary}
 
-\begin{itemize}
-\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
-\item \emph{Window database size}. \Fig{oversampling_mosaic}
-\item \emph{Performance}.
-\item \emph{Oversampling need}.
-\end{itemize}
 
 
 % \newcommand\cc[1]{\multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf #1}}
@@ -875,9 +867,31 @@ In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GP
 
 \section{Conclusion}
 
-LCA can be viewed as either a simplification of MVDR, or as an extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and is largely insensitive to the exact set of windows it is run with, as long as they are sensible.
+\begin{table}[!b]\centering%\normalsize
+\begin{tabular}[c]{l c c c}\hline
+\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
+Symmetry             & Moderate  & High   & High \\
+Mainlobe width       & Narrow    & Wide   & Moderate \\
+Sidelobe suppression & Low       & High   & Moderate \\
+Steering             & Low       & Up to -3dB width & Moderate \\
+Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
+\end{tabular}
+\caption{Summary}\label{tab:summary}
+\end{table}%
 
-Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We construct a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between. The Kaiser window is optimal in the sense of maximum power near the direction of interest.
+LCA iterates through a set of windows in search of the one that minimizes beamformer output power. It can be viewed as either a reduced window solution space version of  MVDR, or as an extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and insensitive to the particular set of windows it selects from, supported by the observation that LCA can be used with either Kaiser or trigonometric windows and produce near identical images.
+
+Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We constructed a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between.
+
+\subsection{Summary}
+
+\begin{itemize}
+\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
+\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+\item \emph{Window database size}. \Fig{oversampling_mosaic}
+\item \emph{Performance}.
+\item \emph{Oversampling need}.
+\end{itemize}
 
 % 
 % LCA is largely insensitive to the choice of windows and steering. 
@@ -898,28 +912,8 @@ Using experimental data we have demonstrated that when MVDR is made robust we co
 
 The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios. 
 
-\begin{table}[!b]\centering%\normalsize
-\begin{tabular}[c]{l c c c}\hline
-\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
-Symmetry             & Moderate  & High   & High \\
-Mainlobe width       & Narrow    & Wide   & Moderate \\
-Sidelobe suppression & Low       & High   & Moderate \\
-Steering             & Low       & Up to -3dB width & Moderate \\
-Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
-\end{tabular}
-\caption{Summary}\label{tab:summary}
-\end{table}%
 
 
-% use section* for acknowledgement
-\ifCLASSOPTIONcompsoc
-  \section*{Acknowledgments}
-\else
-  \section*{Acknowledgment}
-\fi
-
-
-The authors would like to thank...
 
 % \begin{itemize}
 % \item Adaptive beamformer's potential lies in its ability to suppress interference power
@@ -1020,6 +1014,15 @@ which has the solution:
 %
 In this computation there are only 4 and 7 unique complex additions and multiplications, respectively. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The solution for $\alpha$ would also yield the optimal beamformer output in the minimum variance sense.
 
+
+% use section* for acknowledgement
+\ifCLASSOPTIONcompsoc
+  \section*{Acknowledgments}
+\else
+  \section*{Acknowledgment}
+\fi
+
+The authors would like to thank Kongsberg Maritime, the Norwegian Defence Research Establishment (FFI), and Bundeswehr Technical Center for Ships and Naval Weapons Bundeswehr (WTD 71) for the equipment and effort needed to acquire data of the cross and Holmengraa, as well as for allowing us to use it.
 
 
 % Can use something like this to put references on a page
