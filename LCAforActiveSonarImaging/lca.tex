@@ -972,11 +972,11 @@ The authors would like to thank...
 Throughout this article we have used LCA with the Kaiser window function. However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function. For this window we can obtain an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the trigonometric function (\ref{trig_window_function}), with applied steering (\ref{steering_vector}), into the beamformer equation (\ref{z}):
 %
 \begin{align}
-\w\H\x &= \sumb{m=0}{M-1} e^{j\theta_\phi[m]}\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
+\w\H\x &= \sumb{m=0}{M-1} [\a_\phi]_m\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
 &= \alpha \a_\phi\T\x - (1-\alpha)\b_\phi\T\x
 \end{align}
 %
-where $\theta_\phi[m] = \frac{2\pi dm}{\lambda}\sin\phi$ is the $m$th component of the steering vector $\a_\phi$ defined in (\ref{steering_vector}), and 
+where $[\a_\phi]_m$ is the $m$th component of the steering vector $\a_\phi$ defined in (\ref{steering_vector}), and 
 %
 \begin{align}
 \b_\phi = \text{diag}(\a_\phi)\cdot\begin{bmatrix}
@@ -994,7 +994,7 @@ Unity gain in the look direction is ensured as long as the weights sum to one:
 \w\T\1 &= \big(\alpha\a_\phi - (1-\alpha)\b_\phi\big)\T\1 = 1.
 \end{align}
 %
-This is true for any value of $\alpha$ if $\a_\phi\T\1 = 1$ and $\b_\phi\T\1 = 1$. Hence, we can preserve the unity gain constraint as long as we normalize $\a_\phi$ and $\b_\phi$.
+This is true for any value of $\alpha$ if $\a_\phi\T\1 = 1$ and $\b_\phi\T\1 = 1$. Hence, we  preserve the unity gain constraint as long as we normalize $\a_\phi$ and $\b_\phi$.
 
 Now let $a=\a_\phi\T\x$ and $b=\b_\phi\T\x$. The beamformer output can then be written as:
 %
@@ -1018,7 +1018,7 @@ which has the solution:
 \alpha &= \frac{ab^* + a^*b + 2bb^*}{2(aa^* + ab^* + a^*b + bb^*)}.
 \end{align}
 %
-In this computation there are only 4 unique additions and multiplications. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($8MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal in the minimum variance sense.
+In this computation there are only 4 and 7 unique complex additions and multiplications, respectively. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($11MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The value for $\alpha$ would also be the optimal in the minimum variance sense.
 
 
 
