@@ -431,9 +431,9 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 % - Brief summary results
 % - Brief conclusions 
 
-\IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Human made sonars have little to no adaptability when data is collected, but some methods have been investigated in the data post processing. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It computes the window that is optimal in the sense of suppressing noise as much as possible while under the restriction of  preserving the signal of interest.
+\IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Human made sonars have little to no adaptability when data is collected, but some methods have been investigated in the data post processing. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's response to minimize the influence of noise and interference in the final image, while preserving the signal of interest.
 
-In many cases MVDR can improve image contrast and resolution compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but there is a way to avoid using MVDR altogether while achieving similar performance.
+In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, the computational complexity of conventional beamformers are linear with the number of channels, O($M$), while MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}, but we also a way to avoid using MVDR altogether while achieving similar performance.
 
 This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g et. al. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one that is best able to suppress noise. Since it uses the same optimization criterion as MVDR, it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. But which windows should LCA choose from?
 
@@ -525,7 +525,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/cross_tagged.png}%
-\caption{One of the objects used to test the beamformers is a 1\,m long cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons Bundeswehr, Maritime Technology and Research (WTD 71).}\label{cross}
+\caption{One of the objects used to test the beamformers is a 1\,m long cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).}\label{cross}
 \end{figure}
 
 \setcounter{topnumber}{1}
@@ -806,7 +806,7 @@ The LCA images in \Fig{oversampling_mosaic_bounds} demonstrate the effect of adj
 
 \subsection{Window database size}\label{lca_database_size}
 
-So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}]$. But how many windows do we need in these ranges?
+So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, each steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}(\beta)]$. But how many windows do we need in these ranges?
 
 In \Fig{oversampling_mosaic} we have compared LCA images made from windows databases of different sizes, but with the same parameter boundaries. We included the results from using a single window ($N_\beta=1$) and steering angle ($N_\phi=1$), which corresponds to a rectangularly weighted DAS.
 
@@ -815,9 +815,9 @@ Observe that sampling the $\beta$-range more finely increases the sidelobe suppr
 
 \subsection{Image quality}
 
-We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two selected lateral cuts are presented in the left plot. The images and these cuts show that there is minimal difference to using Kaiser windows compared to trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
+We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and these cuts show that there is minimal difference to using Kaiser windows compared to trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
 
-In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weidted DAS, MVDR and LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. Also here it is nearly impossible to observe any difference to using Kaiser or trigonometric windows with LCA.
+In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weighted DAS, by MVDR and by LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. The LCA image produced with Kaiser windows appear identical to that from trigonometric windows.
 
 
 \subsection{Computational complexity}
