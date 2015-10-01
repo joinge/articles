@@ -564,11 +564,16 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 \label{fig_sim}
 \end{figure*}
 
+\begin{figure*}[t]%\centering%
+\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
+\caption{LCA images using different window database sizes. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\beta=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
+\end{figure*}
+
 \begin{figure*}[t]\centering
 \subfloat[LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
 \label{beamformer_comparison_cross}}
 \hfil
-\subfloat[Image of Holmengraa. All the adaptive beamformers offer improvement compared to DAS. The shadows are deeper, the edges better refined and the detail level is higher.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
+\subfloat[Image of Holmengraa. All the adaptive beamformers offer improvement compared to DAS. The shadows are deeper, the edges better defined and the detail level is higher.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
 \label{beamformer_comparison_holmengraa}}
 \caption{Image quality: Comparing DAS with MVDR and LCA with Kaiser and trigonometric windows.}\label{image_quality}
 \end{figure*}
@@ -584,12 +589,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 % \caption{$\beta$-values of the windows LCA selects for each image pixel. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor and cut line is marked in red. Note how LCA prefers a rectangular window ($\beta=0$) on the anchor.}\label{oversampling_mosaic_bounds_beta}
 % \end{figure*} 
 
-% % \setcounter{dbltopnumber}{1}
-
-\begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{LCA images using different window database sizes. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\beta=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
-\end{figure*}
+% % \setcounter{dbltopnumber}{1
 
 % \begin{figure*}[t]%\centering%
 % \includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
@@ -815,17 +815,16 @@ Observe that sampling the $\beta$-range more finely increases the sidelobe suppr
 
 \subsection{Image quality}
 
-We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. \Fig{beamformer_comparison_cross} are of the cross, were we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR.
+We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two selected lateral cuts are presented in the left plot. The images and these cuts show that there is minimal difference to using Kaiser windows compared to trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
 
-
- \Fig{beamformer_comparison_holmengraa}
+In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weidted DAS, MVDR and LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. Also here it is nearly impossible to observe any difference to using Kaiser or trigonometric windows with LCA.
 
 
 \subsection{Computational complexity}
 
 The computational complexity of MVDR is generally considered to be of O($M^3$). However, the implementation we are using is optimized so that building the spatial covariance matrix is of O($N_kN_L,L^2$), and inverting it is of O($L^3$). We describe this implementation in \cite{Buskenes2014}, and a beamspace version in \cite{Asen2013}, where we optimize if for a graphics processing unit (GPU) for nearly two orders of magnitude speed increase compared to a straightforward C implementation. However, MVDR is not ideal for GPUs due to the complex data dependencies present in the covariance computation, and at best we only managed to utilize 10\% of the GPUs potential.
 
-In comparison, LCA is of O($M N_w$), and extremely well suited for GPUs. Each pixel depends on only a small subset of data, and the windows can be precomputed and stored in GPU cache for near immediate access. Furthermore, since we have observed LCA to perform similarly using other parametric window variants, the complexity can be reduced to near DAS.
+In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GPUs. Each pixel depends on only a small subset of data, and the windows can be precomputed and stored in GPU cache for near immediate access. If we use a trigonometric window function we solve for the window parameter analytically as described in appendix \ref{reducing_lca_complexity}. This reduces the complexity to O($M N_\phi$), and the only remaining LCA parameter is the steering amount.
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
@@ -966,7 +965,7 @@ The authors would like to thank...
 
 \appendices
 
-\section{Reducing LCA complexity}
+\section{Reducing LCA complexity}\label{reducing_lca_complexity}
 
 \renewcommand\b{\vec b}
 
@@ -1020,8 +1019,6 @@ which has the solution:
 \end{align}
 %
 In this computation there are only 4 and 7 unique complex additions and multiplications, respectively. If we used this to analytically solve for $\alpha$, but perform the search for $\phi$, the computational complexity of LCA would be of O($MN_\phi)$ instead of O($MN_\alpha N_\phi)$. The solution for $\alpha$ would also yield the optimal beamformer output in the minimum variance sense.
-
-
 
 
 
