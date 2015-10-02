@@ -356,7 +356,7 @@
         Roy~Edgar~Hansen, %
         Andreas~Austeng%
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department of Informatics, University of Oslo, Norway.}%
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem R.E.Hansen is also with The Norwegian Defense Research Establishment (FFI), Norway.}% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem R.~E.~Hansen is also with the Norwegian Defense Research Establishment (FFI), Norway.}% <-this % stops a space
 
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
@@ -443,7 +443,7 @@ In this work apply the LCA method to active sonar imaging, and aim to provide so
 
 Our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When letting LCA choose from Kaiser windows with similar responses, we obtain images with both improved noise suppression and resolution. The resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
-This article is outlined as follows: In section \ref{beamforming} we introduce beamforming, \ref{mvdr} MVDR \ref{lca} LCA \ref{} \ref{} \ref{}
+This article is outlined as follows: In Section \ref{sec:beamforming} we introduce beamforming, followed by background on the MVDR beamformer in Section \ref{sec:mvdr}. In \ref{sec:lca} we provide complete background on the LCA method, by presenting the Kaiser window function in \ref{sec:lca_kaiser_windows}, the method for steering it in \ref{sec:lca_steering} as well as a note on maximum steering amount in \ref{sec:lca_steering_bounds}, and a mention of the alternative trigonometric window function in \ref{sec:lca_trigonometric} and sampling considerations in \ref{sec:lca_oversampling}. 
 
 % This article is outlined as follows: In Section \ref{methods}, we introduce the concept of adaptive beamforming and provide details on the MVDR and LCA method. Then, in \ref{maptogpu}, we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in Sections \ref{images_and_benchmarks} and \ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
@@ -484,7 +484,7 @@ This article is outlined as follows: In section \ref{beamforming} we introduce b
 
 
 \newpage
-\subsection{Receive Beamforming}\label{beamforming}
+\section{Receive Beamforming}\label{sec:beamforming}
 
 To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
@@ -493,7 +493,7 @@ Assume that the wavefield has been sampled by an $M$ element uniform linear arra
 The output $z[n]$ of a beamformer is defined as the weighted sum of all the delayed data samples:
 %
 \begin{align}
-z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{z}
+z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{eq:beamformer_output}
 \end{align}
 %
 where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window or a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
@@ -502,19 +502,19 @@ Conventional beamformers all have static weights. The reference method is the de
 
 Adaptive beamformers are dynamic and seek to adjust the array response to better fit the incoming wavefield. This may be achieved by allowing either the weights or delays to change, or both. One of the most extensively studied of these methods is the minimum variance distortion-less response (MVDR) beamformer.
 
-\section{MVDR}\label{mvdr}
+\section{MVDR}\label{sec:mvdr}
 
 MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{\big|z[n]\big|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
-\text{subject to } \w[n]\a_\phi &= 1.\label{eq_mvdr_definition}
+\text{subject to } \w[n]\a_\phi &= 1.\label{eq:mvdr_definition}
 \end{align}
 %
 Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix. This is a convex optimization problem with the solution:
 %
 \begin{gather}
-\vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{weights}
+\vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{eq:mvdr_weights}
 \end{gather}
 where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}. To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
@@ -602,16 +602,16 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 % \end{figure*}
 
 
-\section{LCA}\label{lca}
+\section{LCA}\label{sec:lca}
 
 A much less complex alternative to MVDR is the low complexity adaptive (LCA) beamformer. It iterates through a set of $P$ windows and selects the window $p$ that best fulfills the minimum variance criterion:
 %
 \begin{align}
 \underset{p}{\argmin}\, E\{\big|z_p[n]\big|^2\} = \underset{p}{\argmin}\, E\big\{\big|\w_{p}\H\x[n]\big|^2\big\}\nn
-\qquad\text{subject to}\qquad \w\H\a_\phi = 1.\label{eq_lca_definition}
+\qquad\text{subject to}\qquad \w\H\a_\phi = 1.\label{eq:lca_definition}
 \end{align}\label{lca_criterion}
 %
-Note how closely LCA is related to the MVDR definition in \eq{eq_mvdr_definition}. The optimization criterion and constraint is the same, but LCA has a finite and discrete solution space for the weights. As will be demonstrated in section \ref{lca_window_function}, LCA will perform similarly to MVDR because a robustified MVDR implementation seems to be constrained to window functions similar to the ones we let LCA choose from.
+Note how closely LCA is related to the MVDR definition in \eq{eq:mvdr_definition}. The optimization criterion and constraint is the same, but LCA has a finite and discrete solution space for the weights. As will be demonstrated in section \ref{sec:results_lca_window_function}, LCA will perform similarly to MVDR because a robustified MVDR implementation seems to be constrained to window functions similar to the ones we let LCA choose from.
 
 In practice, we estimate the beamformer output power as
 %
@@ -638,7 +638,7 @@ where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{
 % \end{itemize}
 
 
-\subsection{Window function: Kaiser}\label{kaiser_windows}
+\subsection{Window function: Kaiser}\label{sec:lca_kaiser_windows}
 
 As will be demonstrated in upcoming sections, the LCA beamformer works very well with windows generated from the Kaiser-Bessel function. We will express it in vector form as:
 %
@@ -647,19 +647,19 @@ As will be demonstrated in upcoming sections, the LCA beamformer works very well
 f_0(\beta) \\
 \vdots\\
 f_{M-1}(\beta)
-}\label{kaiser_window_vector}
+}\label{eq:kaiser_window_vector}
 \end{align}
 %
 where
 %
 \begin{align}
-f_m(\beta) = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}\label{kaiser_window_element}
+f_m(\beta) = \frac{I_0\left(\pi\beta\sqrt{1-\left(\frac{2m}{M-1}-1\right)^2}\right)}{I_0(\pi\beta)}\label{eq:kaiser_window_element}
 \end{align}
 %
 and $I_0$ is the zeroth order modified Bessel function of the first kind:
 %
 \begin{align}
-I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.\label{modified_bessel_first_kind}
+I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.\label{eq:modified_bessel_first_kind}
 \end{align}
 %
 The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given time-bandwidth product specified with the parameter $\beta$:
@@ -671,12 +671,12 @@ The Kaiser-Bessel window is near optimal in the sense of having its peak energy 
 where $T$ is the extent of the window in time and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$.
 
 
-\subsection{Steering}
+\subsection{Steering}\label{sec:lca_steering}
 
 Adding slightly steered versions of each window to the window database gives LCA greater flexibility in searching for an optimal window. A Kaiser window $\f_\beta$ steered to the angle $\phi$ can be expressed as 
 %
 \begin{align}
-\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\label{steered_window}
+\w_{\beta,\phi} = \frac{\f_\beta\H\diag{(\a_\phi)}}{\f_\beta\H\a_\phi}\label{eq:steered_window}
 \end{align}
 %
 where diag($\a_\phi$) is a diagonal matrix constructed from the steering vector $\a_\phi$:
@@ -687,42 +687,42 @@ where diag($\a_\phi$) is a diagonal matrix constructed from the steering vector 
 e^{-j\frac{2\pi d}{\lambda}\sin(\phi)} \\
 \vdots\\
 e^{-j\frac{2\pi (M-1)d}{\lambda}\sin(\phi)}
-}.\label{steering_vector}
+}.\label{eq:steering_vector}
 \end{align}
 %
-Here $d$ is the element spacing, $\lambda$ is the wavelength and $\phi$ is the steering amount. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq_lca_definition}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
+Here $d$ is the element spacing, $\lambda$ is the wavelength and $\phi$ is the steering amount. The normalization factor $\f_\beta\H\a_\phi$ is the reciprocal of the window's coherent gain. It ensures unit gain in the direction of interest as required by (\ref{eq:lca_definition}). Since the signal-to-noise ratio is constant for a specific window (same $\beta$-value), this normalization also proportionally increases the incoherent noise gain.
 
 The window database we will construct will contain $N_\beta$ Kaiser windows with unique $\beta$-values, each being steered in $N_\phi$ different directions. This gives us $N_w = N_\beta N_\phi$ unique windows.
 
 
-\subsection{Steering bounds}\label{steering_bounds}
+\subsection{Steering bounds}\label{sec:lca_steering_bounds}
 
 There is an upper bound to the amount of steering we should apply to a window. Since each window's response is constrained to a unit gain in the look direction, the steered window will have increased white noise gain and deteriorated signal-to-noise ratio as shown in \Fig{windows_steering}. To limit this we placing an upper bound to the steering, realizing that  a wide window will be allowed more steering than a narrow one.
 
 We call the upper bound for steering $\phi_{\text{3dB}}(\beta)$, and define it as the steering angle needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. Using a numerical search for the steering angle $\phi$ that fulfilled this criterion for a wide range of $\beta$-values, we obtained a third degree polynomial fit to these points:
 %
 \begin{align}
-\phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980\label{steering_kaiser_3dB}
+\phi_\text{3dB}(\beta) \approx \minus{}0.002894\beta^3 + 0.02451\beta^2 - 0.01308\beta + 0.2980\label{eq:steering_kaiser_3dB}
 \end{align}
 %
 Henceforth any steering will be specified relative to this upper bound. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.
 
-\subsection{Trigonometric windows}
+\subsection{Trigonometric windows}\label{sec:lca_trigonometric}
 
 While we focus on using LCA with Kaiser windows, we will for completeness compare the performance with that of using trigonometric windows. This is defined as:
 %
 \begin{align}
-f_m(\alpha) = \alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\label{trig_window_function}
+f_m(\alpha) = \alpha - (1-\alpha)\cos\Big(\frac{2\pi m}{M-1}\Big)\label{eq:trig_window_function}
 \end{align}
 %
-where we apply the contraint $\alpha\in[0.5,1]$ to avoid windows with negative coefficients. Steering is applied as in (\ref{steered_window}), and the $\alpha$-value that halves the 3\,dB distance is found using the method described in section \ref{steering_bounds}:
+where we apply the contraint $\alpha\in[0.5,1]$ to avoid windows with negative coefficients. Steering is applied as in (\ref{eq:steered_window}), and the $\alpha$-value that halves the 3\,dB distance is found using the method described in section \ref{sec:lca_steering_bounds}:
 %
 \begin{align}
 \phi_\text{3dB}(\alpha) \approx \minus{}2.214\beta^3 + 6.084\beta^2 - 5.710\beta + 2.136.
 \end{align}
 
 
-\subsection{Oversampling}
+\subsection{Oversampling}\label{sec:lca_oversampling}
 
 The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth and introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a lateral oversampling factor of 10 compared to the Nyquist rate is often needed to ensure minimal spatial shift-variance in source amplitude~\cite{Asen2014}.
 
@@ -770,7 +770,7 @@ Since LCA operates with the same optimization criterion, we will be using approx
 
 
 
-\section{Results and Discussion}\label{results_discussion}
+\section{Results and Discussion}\label{sec:results_discussion}
 
 
 To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with 1.2\;m array length, 100\;kHz operating frequency, 40\;kHz bandwidth and 25$^\circ$ opening angle on transmission.
@@ -779,9 +779,9 @@ Two different scenes will be presented. One of the 1500 DWT oil tanker wreck Hol
 
 In the image reconstruction we have run MVDR with subarray length $L=16$ and $d=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters. 
 
-The results will be presented in the following order: In section \ref{lca_window_function} we discuss typical window responses computed by MVDR (\Fig{mvdr_selected_windows}), and hypothesize  that these can be mimicked by Kaiser windows. In section \ref{lca_kaiser_parameters} we investigate what sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$ should be (\Fig{oversampling_mosaic_bounds}). In section \ref{lca_database_size} we discuss how many window variations is needed for LCA to perform well (\Fig{oversampling_mosaic}). 
+The results will be presented in the following order: In section \ref{sec:results_lca_window_function} we discuss typical window responses computed by MVDR (\Fig{mvdr_selected_windows}), and hypothesize  that these can be mimicked by Kaiser windows. In section \ref{sec:results_window_parameters} we investigate what sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$ should be (\Fig{oversampling_mosaic_bounds}). In section \ref{sec:results_database_size} we discuss how many window variations is needed for LCA to perform well (\Fig{oversampling_mosaic}). 
 
-\subsection{LCA window function}\label{lca_window_function}
+\subsection{LCA window function}\label{sec:results_lca_window_function}
 
 Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create window database for LCA with with responses similar to the ones MVDR computes. We study this in \Fig{mvdr_selected_windows}, where we present the typical responses that MVDR creates for shadow, speckle and highlight regions of the Holmengraa scene.
 
@@ -795,7 +795,7 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 
 
-\subsection{Kaiser parameter $\beta$ and steering $\phi$}\label{lca_kaiser_parameters}
+\subsection{Kaiser parameter $\beta$ and steering $\phi$}\label{sec:results_window_parameters}
 
 What is the best set of Kaiser windows to use with LCA, and how much should they be steered? To investigate this we constructed large and equally sized window databases containing windows with varied upper boundaries for $\beta$ and $\phi$. As lower boundaries we chose $\beta=0$ and $\phi=0^\circ$, which includes the symmetric rectangularly weighted DAS image. The images produced are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the -3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A forth order polynomial fit was used in this computation. This measure is also commonly called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is approximately $\Delta \approx \text{FWHM}/0.89$~\cite{Harris1978}.
 
@@ -804,7 +804,7 @@ The LCA images in \Fig{oversampling_mosaic_bounds} demonstrate the effect of adj
 \Fig{oversampling_mosaic_bounds_beta} and \Fig{oversampling_mosaic_bounds_phi} illustrates which $\beta$ and $\phi$ values LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line, location of the anchor and strong scatter points on the cross. Observe that in the anchor region only narrow responses ($\beta=0$) are used, which is the reason for the anchor FWHM being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. On other scatterers with strong nearby lateral interference LCA prefers wider windows to suppress the interference. When allowed LCA always choose windows steered away from the sources, and should not be allowed to select windows that are steered more than the 3\,dB width of the window. We observed image oscillations when exceeding this bound. 
 
 
-\subsection{Window database size}\label{lca_database_size}
+\subsection{Window database size}\label{sec:results_database_size}
 
 So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, each steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}(\beta)]$. But how many windows do we need in these ranges?
 
@@ -813,18 +813,18 @@ In \Fig{oversampling_mosaic} we have compared LCA images made from windows datab
 Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. We can observe a major improvement going to $N_\beta=2$ and $N_\phi=3$, but minimal improvement by adding yet more windows.
 
 
-\subsection{Image quality}
+\subsection{Image quality}\label{sec:results_image_quality}
 
 We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and these cuts show that there is minimal difference to using Kaiser windows compared to trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
 
 In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weighted DAS, by MVDR and by LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. The LCA image produced with Kaiser windows appear identical to that from trigonometric windows.
 
 
-\subsection{Computational complexity}
+\subsection{Computational complexity}\label{sec:results_complexity}
 
 The computational complexity of MVDR is generally considered to be of O($M^3$). However, the implementation we are using is optimized so that building the spatial covariance matrix is of O($N_kN_L,L^2$), and inverting it is of O($L^3$). We describe this implementation in \cite{Buskenes2014}, and a beamspace version in \cite{Asen2013}, where we optimize if for a graphics processing unit (GPU) for nearly two orders of magnitude speed increase compared to a straightforward C implementation. However, MVDR is not ideal for GPUs due to the complex data dependencies present in the covariance computation, and at best we only managed to utilize 10\% of the GPUs potential.
 
-In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GPUs. Each pixel depends on only a small subset of data, and the windows can be precomputed and stored in GPU cache for near immediate access. If we use a trigonometric window function we solve for the window parameter analytically as described in appendix \ref{reducing_lca_complexity}. This reduces the complexity to O($M N_\phi$), and the only remaining LCA parameter is the steering amount.
+In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GPUs. Each pixel depends on only a small subset of data, and the windows can be precomputed and stored in GPU cache for near immediate access. If we use a trigonometric window function we solve for the window parameter analytically as described in appendix \ref{sec:reducing_lca_complexity}. This reduces the complexity to O($M N_\phi$), and the only remaining LCA parameter is the steering amount.
 
 % Furthermore, the algorithm maps well to single-instruction-multiple-data (SIMD) hardware such as graphics processing units (GPUs). We show that even a modest amount of optimisation work has resulted in a factor 10 speed-up of this algorithm when implemented on a GPU as opposed to on a CPU.
 
@@ -865,7 +865,7 @@ In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GP
 % In the Holmengraa image we note again that the LCA produces a cleaner shadow and better edge definition. The MV method performed almost identically to LCA in this case, and was omitted.
 
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 
 \begin{table}[!b]\centering%\normalsize
 \begin{tabular}[c]{l c c c}\hline
@@ -885,7 +885,7 @@ We have observed that when MVDR is constrained to work in an active system it te
 
 Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We constructed a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between.
 
-\subsection{Summary}
+\subsection{Summary}\label{sec:summary}
 
 \begin{itemize}
 \item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
@@ -961,18 +961,18 @@ The tendency of the LCA to perform similarly to the MV beamformer seems to indic
 
 \appendices
 
-\section{Reducing LCA complexity}\label{reducing_lca_complexity}
+\section{Reducing LCA complexity}\label{sec:reducing_lca_complexity}
 
 \renewcommand\b{\vec b}
 
-Throughout this article we have used LCA with the Kaiser window function. However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function. For this window we can obtain an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the trigonometric function (\ref{trig_window_function}), with applied steering (\ref{steering_vector}), into the beamformer equation (\ref{z}):
+Throughout this article we have used LCA with the Kaiser window function. However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function. For this window we can obtain an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. To derive it, we start by inserting the trigonometric function (\ref{eq:trig_window_function}), with applied steering (\ref{eq:steering_vector}), into the beamformer equation (\ref{eq:beamformer_output}):
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} [\a_\phi]_m\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
 &= \alpha \a_\phi\T\x - (1-\alpha)\b_\phi\T\x
 \end{align}
 %
-where $[\a_\phi]_m$ is the $m$th component of the steering vector $\a_\phi$ defined in (\ref{steering_vector}), and 
+where $[\a_\phi]_m$ is the $m$th component of the steering vector $\a_\phi$ defined in (\ref{eq:steering_vector}), and 
 %
 \begin{align}
 \b_\phi = \text{diag}(\a_\phi)\cdot\begin{bmatrix}
