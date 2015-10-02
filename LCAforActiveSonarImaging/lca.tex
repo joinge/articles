@@ -355,8 +355,8 @@
 \author{Jo~Inge~Buskenes, %
         Roy~Edgar~Hansen, %
         Andreas~Austeng%
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department
-of Informatics, University of Oslo, Norway.}% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem All authors are with the Department of Informatics, University of Oslo, Norway.}%
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem R.E.Hansen is also with The Norwegian Defense Research Establishment (FFI), Norway.}% <-this % stops a space
 
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
@@ -443,7 +443,7 @@ In this work apply the LCA method to active sonar imaging, and aim to provide so
 
 Our findings show that when applied to experimental data, the weights chosen by a robustified MVDR yield responses that tend to be symmetric and steered within a fraction of the -3dB resolution of the respective window. When letting LCA choose from Kaiser windows with similar responses, we obtain images with both improved noise suppression and resolution. The resolution gain can be made predictable and depending on the amount of steering we apply to the windows. Overall, the image quality produced by LCA is comparable to MVDR, and sometimes even better. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
-This article is outlined as follows:
+This article is outlined as follows: In section \ref{beamforming} we introduce beamforming, \ref{mvdr} MVDR \ref{lca} LCA \ref{} \ref{} \ref{}
 
 % This article is outlined as follows: In Section \ref{methods}, we introduce the concept of adaptive beamforming and provide details on the MVDR and LCA method. Then, in \ref{maptogpu}, we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in Sections \ref{images_and_benchmarks} and \ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
@@ -484,7 +484,7 @@ This article is outlined as follows:
 
 
 \newpage
-\subsection{Receive Beamforming}
+\subsection{Receive Beamforming}\label{beamforming}
 
 To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
@@ -502,7 +502,7 @@ Conventional beamformers all have static weights. The reference method is the de
 
 Adaptive beamformers are dynamic and seek to adjust the array response to better fit the incoming wavefield. This may be achieved by allowing either the weights or delays to change, or both. One of the most extensively studied of these methods is the minimum variance distortion-less response (MVDR) beamformer.
 
-\section{MVDR}
+\section{MVDR}\label{mvdr}
 
 MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
 %
@@ -602,7 +602,7 @@ where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix
 % \end{figure*}
 
 
-\section{LCA}
+\section{LCA}\label{lca}
 
 A much less complex alternative to MVDR is the low complexity adaptive (LCA) beamformer. It iterates through a set of $P$ windows and selects the window $p$ that best fulfills the minimum variance criterion:
 %
@@ -1024,7 +1024,7 @@ In this computation there are only 4 and 7 unique complex additions and multipli
   \section*{Acknowledgment}
 \fi
 
-The authors would like to thank Kongsberg Maritime, the Norwegian Defence Research Establishment (FFI), and Bundeswehr Technical Center for Ships and Naval Weapons Bundeswehr (WTD 71) for the equipment and effort needed to acquire data of the cross and Holmengraa, as well as for allowing us to use it.
+The authors would like to thank Kongsberg Maritime, the Norwegian Defence Research Establishment (FFI), and Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71), for the equipment and effort needed to acquire data of the cross and Holmengraa, as well as for allowing us to use it.
 
 
 % Can use something like this to put references on a page
