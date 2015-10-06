@@ -393,12 +393,9 @@
 % 
 We have implemented and studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR tries to find the optimal solution by estimating and inverting a spatial covariance matrix, while LCA iterates through a predefined set of sensor weights (or window) and selects the closest to optimal one.
 
-We show that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming, or Kaiser windows with $\beta\in[0,2]$, respectively. We let LCA select from a set of Kaiser windows in this range, and add some variations of steering to each window. When up to their -3dB width.  
+We show that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this range, and add some steered variations of each. The amount of steering is limited to roughly half the response's -3\,dB width.
 
-each with a little steering added.  
-
-
- We find that when Steering to -3\,dB width of the window. This lead to a predictable resolution gain of . design LCA's window database with windows that resembles  constrained to work in active sonar imaging the typical window responses LCA is allowed to choose from windows that are typical solutions found by the minimum variance distortionless response (MVDR) method. 
+Using experimental data we find that LCA and MVDR produces nearly identical images of large scenes. On point targets LCA is able to double the resolution compared to DAS, of provide half that of MVDR. This performance is achieved with a total of 6 windows; the unsteered rectangular and Kaiser window with $\beta=5$, and left and right steered versions out to the steering limit. Adding a few extra windows makes the image slightly smoother. 
 
 The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
 % 
@@ -410,7 +407,7 @@ The LCA beamformer was tested using simulated and experimental data from the Kon
 
 % Keywords (normally not used for peer reviews)
 \ifPeerReview\else
-\begin{IEEEkeywords}\color{gray}
+\begin{IEEEkeywords}
 Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 \end{IEEEkeywords}
 \fi}
