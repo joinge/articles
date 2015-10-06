@@ -391,14 +391,12 @@
 % 
 % While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
 % 
-We have implemented and studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR tries to find the optimal solution by estimating and inverting a spatial covariance matrix, while LCA iterates through a predefined set of sensor weights (or window) and selects the closest to optimal one.
+We have studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR tries to find the optimal solution by estimating and inverting a spatial covariance matrix, while LCA iterates through a predefined set of sensor weights (or window) and selects the closest to optimal one.
 
-We show that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this range, and add some steered variations of each. The amount of steering is limited to roughly half the response's -3\,dB width.
+We show that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this range, and add some steered variations of each. The amount of steering is limited to roughly half the response's -3\,dB width. Using experimental data from the Kongsberg Maritime HISAS 1030 sonar we find that LCA and MVDR produce nearly identical images of large scenes, both being superior to DAS. On point targets LCA is able to double the resolution compared to DAS, or provide half that of MVDR. This performance is achieved with a total of 6 windows; the unsteered rectangular and Kaiser window with $\beta=5$, and left and right steered versions out to the steering limit. Going to 15 windows yield a slightly smoother image, but past this the difference is minimal. We show that LCA creates near identical images using Kaiser or trigonometric windows.
 
-Using experimental data we find that LCA and MVDR produces nearly identical images of large scenes. On point targets LCA is able to double the resolution compared to DAS, of provide half that of MVDR. This performance is achieved with a total of 6 windows; the unsteered rectangular and Kaiser window with $\beta=5$, and left and right steered versions out to the steering limit. Adding a few extra windows makes the image slightly smoother. 
+All our observations point to LCA being very easy to manage. It simply works, and is surprisingly insensitive to the exact type of window function, steering amount, or number of windows. It can also be very efficiently implemented and run on any scene without the need for parameter adjustments.
 
-The LCA beamformer was tested using simulated and experimental data from the Kongsberg Maritime HISAS 1030 sonar. On a simulated scene with speckle, highlight and shadow, the beamformer offered better lateral edge definition compared to the MV beamformer, and speckle intensity and shape comparable to DAS and MV beamformers. These results were verified by the experimental data.
-% 
 % An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 
 % \end{itemize}
@@ -437,7 +435,7 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 
 \IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Human made sonars have little to no adaptability when data is collected, but some methods have been investigated in the data post processing. Perhaps the most studied adaptive method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's response to minimize the influence of noise and interference in the final image.
 
-In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}. However, while MVDR relies on estimating and inverting a spatial covariance matrix, there exist a method that avoid this altogether.
+In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This makes MVDR impracticable and sometimes infeasible. We have shown in previous studies that MVDR's complexity can be reduced, as well as accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014,Asen2013}. However, while MVDR relies on estimating and inverting a spatial covariance matrix, there exist a method that avoid this altogether.\todo{samme avsnitt?}
 
 This method is called the Low Complexity Adaptive (LCA) beamformer. It was first proposed by Synnev\aa{}g in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar results to MVDR. It does this by applying a set of predefined windows and selects the one provide the best noise suppression. It uses the same optimization criterion as MVDR, so it may be considered a version of MVDR with a reduced window solution space. As we will demonstrate, this works well because a robust MVDR design tends to create windows that resembles slightly varied versions of conventional ones. But which windows should LCA choose from?
 
@@ -884,19 +882,9 @@ Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
 
 LCA iterates through a set of windows in search of the one that minimizes the noise and interference power in each image pixel. It can be viewed as either a reduced solution space version of MVDR, or as an multi-taper extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and insensitive to the particular set of windows it selects from, supported by the observation that LCA can be used with either Kaiser or trigonometric windows and produce near identical images.
 
-We have observed that when MVDR is constrained to work in an active system it tends to create near symmetric responses with maximum sidelobe levels between that of the rectangular and Hamming window, or Kaiser windows with $\beta=0$ and $\beta=2$, respectively. 
+When using LCA with Kaiser windows we made their responses similar to those typically chosen by a robust MVDR in key areas in the image. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we set $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
 
-Using experimental data we have demonstrated that when MVDR is made robust we constrain the solution space of the window coefficients it can choose from into mostly symmetric responses that varies between the rectangular and Hamming. We constructed a window database using the parametric Kaiser function, which easily allows us to create responses similar to these and those in between.
-
-\subsection{Summary}\label{sec:summary}
-
-\begin{itemize}
-\item \emph{Window type}. \Fig{mvdr_selected_windows} show frequency responses of typical windows chosen by MVDR in shadow, speckle and highlight regions in an image. The responses tend to be symmetric, minimally steered and have slightly varying mainlobe width and sidelobe suppression. We use Kaiser windows to mimic these responses.
-\item \emph{Window parameter boundaries}. \Fig{oversampling_mosaic_bounds} show LCA images made with the same sized window database, but containing windows with varied upper boundaries for $\beta$ and $\phi$. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we choose $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
-\item \emph{Window database size}. \Fig{oversampling_mosaic}
-\item \emph{Performance}.
-\item \emph{Oversampling need}.
-\end{itemize}
+The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios.
 
 % 
 % LCA is largely insensitive to the choice of windows and steering. 
@@ -915,7 +903,7 @@ Using experimental data we have demonstrated that when MVDR is made robust we co
 % 
 % A window set of 6 different responses each steered in 5 different directions proved sufficient in our experiment to match the performance of the MV beamformer.
 
-The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios. 
+
 
 
 
