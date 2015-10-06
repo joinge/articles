@@ -376,8 +376,6 @@
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-\color{gray}
-
 % 
 % \begin{itemize}
 % \item Dynamic weights $\Rightarrow$ greater contrast/resolution potential
@@ -393,9 +391,11 @@
 % 
 % While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
 % 
-We have implemented and studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. Both LCA and MVDR attempt to minimize the power of noise and interference in the image, but while MVDR tries to find the optimal solution by estimating and inverting a spatial covariance matrix, LCA iterates through a predefined set of sensor weights (or window) and selects the closest to optimal one.
+We have implemented and studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR tries to find the optimal solution by estimating and inverting a spatial covariance matrix, while LCA iterates through a predefined set of sensor weights (or window) and selects the closest to optimal one.
 
-We demonstrate that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming, or Kaiser windows with $\beta\in[0,2]$, respectively. We design the LCA window database with variations of Kaiser windows in this range, and add some steered versions of each. 
+We show that a robust MVDR implementation typically creates responses ranging between that of the rectangular and Hamming, or Kaiser windows with $\beta\in[0,2]$, respectively. We let LCA select from a set of Kaiser windows in this range, and add some variations of steering to each window. When up to their -3dB width.  
+
+each with a little steering added.  
 
 
  We find that when Steering to -3\,dB width of the window. This lead to a predictable resolution gain of . design LCA's window database with windows that resembles  constrained to work in active sonar imaging the typical window responses LCA is allowed to choose from windows that are typical solutions found by the minimum variance distortionless response (MVDR) method. 
