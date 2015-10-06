@@ -487,7 +487,7 @@ This article is outlined as follows: In Section \ref{sec:beamforming} we offer a
 
 \section{Receive Beamforming}\label{sec:beamforming}
 
-To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply a delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
+To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
 Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ is the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ will be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
 
@@ -505,7 +505,7 @@ Adaptive beamformers are dynamic and seek to adjust the array response to better
 
 \section{MVDR}\label{sec:mvdr}
 
-MVDR seeks to minimize the power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
+MVDR seeks to minimize the output power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{\big|z[n]\big|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
@@ -517,7 +517,7 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{eq:mvdr_weights}
 \end{gather}
-where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}. To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}. For true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}. Finally, to improve robustness to parameter errors we apply $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
