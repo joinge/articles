@@ -798,23 +798,21 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 To determine a suitable range for the Kaiser parameter $\beta$ and steering $\phi$, we constructed large and equally sized window databases containing Kaiser windows with varied upper boundaries for $\beta$ and $\phi$. The lower boundaries were chosen as $\beta=0$ and $\phi=0^\circ$, which includes the rectangularly weighted DAS image. The resulting images are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the \minus{}3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A forth order polynomial fit was used in this computation. This measure is also commonly called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is approximately $\Delta \approx \text{FWHM}/0.89$~\cite{Harris1978}.
 
-The LCA images in \Fig{oversampling_mosaic_bounds} demonstrate the effect of adjusting the upper bound of $\beta$ and $\phi$. As suggested by \Fig{mvdr_selected_windows} we attempted first to use $\beta\in[0,2]$. While this resulted in much improved sidelobe suppression, there was also a slight improvement up to $\beta\in[0,5]$. This is likely needed to compensate for the increased sidelobe levels caused by steering. No noticeable difference were observed for higher values than 5. The images also demonstrate that increasing the steering $\phi$ improves the resolution of the strong scatterers. For this sonar the Rayleigh resolution is $\Delta=0.0125$ radians (0.72$^\circ$), thus a point scatterer imaged at 19\,m with a rectangular DAS would have a lateral $\text{FWHM}\approx0.125\cdot19\,\text{m}\cdot0.89=21\,\text{cm}$. This is close to the FWHM of the anchor in the DAS image in \Fig{oversampling_mosaic_bounds}, which means that the acoustic fingerprint of the anchor is similar to a point source. This suggests the anchor reflections to be specular and that we view its rounded side. As we increase steering to either 50\% or 100\% of the -3dB width, the FWHM drops to 73\% or 53\% to that of the rectangular window, respectively.
+The LCA images in \Fig{oversampling_mosaic_bounds} demonstrate the effect of adjusting the upper bound of $\beta$ and $\phi$. As suggested by \Fig{mvdr_selected_windows} we first attempted to use $\beta\in[0,2]$. While this significantly improved sidelobe suppression, a slight further improvement was observed up to $\beta\in[0,5]$. This can likely be explained by the need to compensate for the increased sidelobe levels caused by steering. No noticeable difference were observed for higher values than $\beta=5$. The images also demonstrate that increasing the upper bound for steering $\phi$ improves the resolution of the strong scatterers. For this sonar the Rayleigh resolution is $\Delta\approx0.0125$ radians (0.72$^\circ$), so a point scatterer imaged at 19\,m range with a rectangular DAS would have a lateral $\text{FWHM}\approx0.125\cdot19\,\text{m}\cdot0.89=21\,\text{cm}$. This is close to the FWHM of the anchor in the DAS image in \Fig{oversampling_mosaic_bounds}, which means that the acoustic fingerprint of the anchor is similar to a point source. This suggests the anchor reflections to be specular and that we view its rounded side. As we increase steering to either 50\% or 100\% of the -3dB width, the FWHM drops to 73\% or 53\% to that of the rectangular window, respectively.
 
-\Fig{oversampling_mosaic_bounds_beta} and \Fig{oversampling_mosaic_bounds_phi} illustrates which $\beta$ and $\phi$ values LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line, location of the anchor and strong scatter points on the cross. Observe that in the anchor region only narrow responses ($\beta=0$) are used, which is the reason for the anchor FWHM being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. On other scatterers with strong nearby lateral interference LCA prefers wider windows to suppress the interference. When allowed LCA always choose windows steered away from the sources, and should not be allowed to select windows that are steered more than the 3\,dB width of the window. We observed image oscillations when exceeding this bound. 
+\Fig{oversampling_mosaic_bounds_beta} and \Fig{oversampling_mosaic_bounds_phi} illustrates which $\beta$ and $\phi$ values LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line, location of the anchor and strong scatters on the cross. Observe that in the anchor region only narrow responses ($\beta=0$) are used, which is the reason for the anchor FWHM being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. On other scatterers with strong nearby lateral interference LCA prefers wider windows to suppress the interference. When allowed LCA prefers to steer windows away from the sources, but never exceed the $\phi_\text{3dB}(\beta)$ limit. When exceeding this bound we observed oscillation artifacts in the image.
 
 
 \subsection{Window database size}\label{sec:results_database_size}
 
-So far we have determined it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, each steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}(\beta)]$. But how many windows do we need in these ranges?
-
-In \Fig{oversampling_mosaic} we have compared LCA images made from windows databases of different sizes, but with the same parameter boundaries. We included the results from using a single window ($N_\beta=1$) and steering angle ($N_\phi=1$), which corresponds to a rectangularly weighted DAS.
+So far we have found it reasonable to use Kaiser windows in the range $\beta\in[0,5]$, each steered within the range $|\phi|\in[0,\phi_\mathrm{3dB}(\beta)]$. What remains is to determine the number of windows needed. We study this in \Fig{oversampling_mosaic}, where we compared LCA images made from windows databases of different sizes, but with the same parameter boundaries. We included the results from using a single window ($N_\beta=1$) and steering angle ($N_\phi=1$), which corresponds to an unsteered rectangularly weighted DAS.
 
 Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. We can observe a major improvement going to $N_\beta=2$ and $N_\phi=3$, but minimal improvement by adding yet more windows.
 
 
 \subsection{Image quality}\label{sec:results_image_quality}
 
-We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and these cuts show that there is minimal difference to using Kaiser windows compared to trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
+We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and their corresponding cuts are near identical for the LCA version with Kaiser windows and the one with trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
 
 In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weighted DAS, by MVDR and by LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. The LCA image produced with Kaiser windows appear identical to that from trigonometric windows.
 
@@ -866,21 +864,21 @@ In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GP
 
 \section{Conclusion}\label{sec:conclusion}
 
-\begin{table}[!b]\centering%\normalsize
-\begin{tabular}[c]{l c c c}\hline
-\rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
-Symmetry             & Moderate  & High   & High \\
-Mainlobe width       & Narrow    & Wide   & Moderate \\
-Sidelobe suppression & Low       & High   & Moderate \\
-Steering             & Low       & Up to -3dB width & Moderate \\
-Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
-\end{tabular}
-\caption{Summary}\label{tab:summary}
-\end{table}%
+% \begin{table}[!b]\centering%\normalsize
+% \begin{tabular}[c]{l c c c}\hline
+% \rowcolor{tabBlue} & \bf Highlight & \bf Shadow & \bf Speckle  \\\hline
+% Symmetry             & Moderate  & High   & High \\
+% Mainlobe width       & Narrow    & Wide   & Moderate \\
+% Sidelobe suppression & Low       & High   & Moderate \\
+% Steering             & Low       & Up to -3dB width & Moderate \\
+% Oversampling         & 2x-8x     & 2x-8x  & 2x-8x
+% \end{tabular}
+% \caption{Summary}\label{tab:summary}
+% \end{table}%
 
 LCA iterates through a set of windows in search of the one that minimizes the noise and interference power in each image pixel. It can be viewed as either a reduced solution space version of MVDR, or as an multi-taper extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and insensitive to the particular set of windows it selects from, supported by the observation that LCA can be used with either Kaiser or trigonometric windows and produce near identical images.
 
-When using LCA with Kaiser windows we made their responses similar to those typically chosen by a robust MVDR in key areas in the image. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the -3dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we set $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+When using LCA with Kaiser windows we made their responses similar to those typically chosen by a robust MVDR in key areas in the image. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the \minus{}3\,dB width, which leads to a resolution of 73\% or 54\% of the rectangular window, respectively. As lower boundaries we set $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
 
 The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios.
 
