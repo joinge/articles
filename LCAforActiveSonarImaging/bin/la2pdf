@@ -31,12 +31,12 @@ fi
 
 # Running latex twice:
 echo ':) Starting latex..'
-pdflatex -synctex=1 -interaction=nonstopmode ${1}.tex
+pdflatex -synctex=1 -interaction=nonstopmode -enable-write18  ${1}.tex
 if [ $? -ne 0 ]; then
   echo ':( FAILED: latex'
   exit 1
 fi
-pdflatex -synctex=1 -interaction=nonstopmode ${1}.tex
+pdflatex -synctex=1 -interaction=nonstopmode -enable-write18 ${1}.tex
 if [ $? -ne 0 ]; then
    echo ':(  FAILED: latex'
    exit 1

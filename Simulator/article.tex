@@ -1,3 +1,4 @@
+
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,39 +101,26 @@
 
 \usepackage{fixltx2e}                           % Fix some twocolumn float problems
 
-% \usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
                                                 % (double column figures on top/bottom)
 
 \usepackage{url}                                % Support for handling and breaking URLs
 
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
-% \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
-% pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
-% colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-% pdftitle={Optimal Window Design for the Low Complexity Adaptive Beamformer in Active Sonar Imaging},
-% pdfsubject={},
-% pdfauthor={Jo Inge Buskenes},
-% pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
-% \ifCLASSINFOpdf
-% %    \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
-%    \usepackage[pdftex,
-%     final,                %Keep hyperlink stuff even when in draft mode
-%     breaklinks=true,      %Break links when necessary
-%     linktocpage=true,     %Enable link to page?
-%     linkcolor=black,  %Colour of links to labels within document
-%     citecolor=black,      %Colour of links to the biliography
-%     filecolor=red,        %Colour of links to local files
-%     pagecolor=black,        %Colour of links to other pages withing document
-%     urlcolor=Blue,        %Colour of the links to external URLs
-%     colorlinks=true,      %??
-%     plainpages=false,     %Store roman/arabic numbering differently to avoid
-%     bookmarksnumbered ]{hyperref}
-% 
-% \else
-%    \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
-%    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
-% \fi
+\newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
+pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
+colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
+pdftitle={A Fast GPU Sonar Simulator for Automatic Target Recognition},
+pdfsubject={},
+pdfauthor={Jo Inge Buskenes},
+pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+\ifCLASSINFOpdf
+   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+\else
+   \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
+   \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % ADDITIONAL PACKAGES %       
@@ -152,7 +140,7 @@
 % % \let\Oldincludegraphics\includegraphics
 % % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
 
-% \usepackage[maxfloats=40]{morefloats}
+\usepackage[maxfloats=40]{morefloats}
 \newcounter{todoidx}
 % \setcounter{todoidx}
 
@@ -168,7 +156,7 @@
       {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
       \marginpar{%
          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
-         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\scriptsize #1}}}}
 
    \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
 \else
@@ -186,7 +174,7 @@
 \setlength{\parsep}{\parskip}}%
 \item[]}{\end{list}}
 
-% \usepackage{float}
+\usepackage{float}
 
 \ifOnlineColor
    \definecolor{tabBlue}{HTML}{AACCFF}
@@ -205,7 +193,6 @@
 % \DeclareMathOperator*{\argmin}{\text{arg}\;\text{min}}
 
 \newcommand\Fig[1]{Fig.~\ref{#1}}
-\newcommand\eq[1]{(\ref{#1})}
 
 \newcommand\Grey[1]{{\color{Grey}#1}}
 \newcommand\Red[1]{{\color{Red}#1}}
@@ -286,7 +273,6 @@
 \newcommand\1{\vec 1}
 \newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
-\newcommand*\f{\vec f}
 \renewcommand*\i{\vec i}
 \renewcommand*\k{\vec k}
 \newcommand*\n{\vec n}
@@ -312,8 +298,6 @@
 \newcommand*\Xd{\X_{\!\Delta}}
 \newcommand*\Y{\mat Y}
 
-\renewcommand\argmin{\text{argmin}}
-
 
 \renewcommand*\P{\mat P}
 \newcommand*\V{\mat V}
@@ -326,11 +310,16 @@
 \renewcommand*\t{^T}
 \newcommand*\h{^H}
 
-\newcommand\minus{\scalebox{0.75}[1.0]{$-$}}
-
-% \usepackage{tikz}
-% \usetikzlibrary{shapes,snakes}
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
 \usepackage{amsmath,amssymb}
+% \usepackage{datatool}
+% \usepackage{glossaries}
+
+\newenvironment{outline}
+{\begin{itemize}}
+{\end{itemize}}
+
 
 % correct bad hyphenation here
 % \hyphenation{op-tical net-works semi-conduc-tor}
@@ -491,7 +480,7 @@ What's new?
 % By coincidence our implementation is not so different from the SIGMAS+ simulator developed at the NATO Undersea Research Centre (NURC)~\cite{Coiras2009a, Coiras2009b}. They both take advantage of OpenGL to render a 2D image from 3D models, are designed for side-looking sonar, and assume a Lambertian scattering model. However, while SIGMAS+ is geared more towards realistically looking sonar images, and include effects such as noise, we do not. Also, their simulator sums images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image full flexibility. 
 
 
-\begin{figure}[tbp]\centering%
+\begin{figure}[t]\centering%
 \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
 \caption{Simulator specifications.}\label{specs}%
 \end{figure}
@@ -628,7 +617,7 @@ The rendering loop that uses OpenGL and OpenCL to form
 
 What's going on?
 
-\begin{figure*}[h]\centering%
+\begin{figure*}[t]\centering%
 \subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
 \graphicsAI[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
 \label{data_cylinder}}%
@@ -645,7 +634,7 @@ What's going on?
 
 BS!!!
 
-\begin{figure*}[!tb]\centering%
+\begin{figure*}[t]\centering%
 
 \subfloat[Best template out of a predefined set. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.]{
 \graphicsAI[drawing,width=.5\linewidth]{gfx/overlay_cylinder_submerged.svg}\label{overlay_cylinder}%
@@ -653,23 +642,23 @@ BS!!!
 \hfil%
 \subfloat[Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow segments.]{%
 \graphicsAI[width=.5\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-}\caption{Segmented simulation image overlaid the segmented SAS image. Segmentation overlay color description:\newline
-% \hfill
+}\caption[LoF entry]{Segmented simulation image overlaid the segmented SAS image. Segmentation overlay color description:\parbox{1cm}{\small\centering 1}}%
+% % \hfill
 % \parbox{1cm}{\small\centering
 % \newline\centering\newline %\\[.5\baselineskip]
-% \begin{minipage}{.35\linewidth}
+\begin{minipage}{.35\linewidth}
 % \cdesc{800000}{Template highlight and image highlight}
 % \cdesc{FF1000}{Template highlight only}
 % \cdesc{FFEB00}{Image highlight only}
 % \cdesc{83FF7C}{Background pixels}
-% \end{minipage}%
+\end{minipage}%
 % \begin{minipage}{.35\linewidth}
 % \cdesc{000083}{Template shadow and image shadow}
 % \cdesc{0014FF}{Template shadow only}
 % \cdesc{00EFFF}{Image shadow only}
 % \cdesc{00A7FF}{Template shadow and image highlight}
 % \end{minipage}
-}\label{overlay_cylinder_adaptive}%
+% }\label{overlay_cylinder_adaptive}%
 % % \vspace{\baselineskip}
 \caption{Segmented simulation image overlaid the segmented SAS image.}
 \end{figure*}
