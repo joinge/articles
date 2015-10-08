@@ -617,7 +617,7 @@ The rendering loop that uses OpenGL and OpenCL to form
 
 What's going on?
 
-\begin{figure*}[t]\centering%
+\begin{figure*}[!tbp]\centering%
 \subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
 \graphicsAI[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
 \label{data_cylinder}}%
@@ -627,40 +627,38 @@ What's going on?
 \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 \end{figure*}
 
-% \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
-% \fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
+\newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
+\fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
 
-\newcommand\cdesc[2]{#2}
+% \newcommand\cdesc[2]{#2}
 
-BS!!!
-
-\begin{figure*}[t]\centering%
-
+\begin{figure*}[!tbp]\centering%
 \subfloat[Best template out of a predefined set. Inaccurate cylinder length, alignment and immersion depth. The segmented shadow and highlight regions are misaligned.]{
-\graphicsAI[drawing,width=.5\linewidth]{gfx/overlay_cylinder_submerged.svg}\label{overlay_cylinder}%
+\graphicsAI[drawing,width=.48\linewidth]{gfx/overlay_cylinder_submerged.svg}\label{overlay_cylinder}%
 }%
-\hfil%
+\hfill%
 \subfloat[Adapted template. Template simulated with adapted parameters. Good fit in both highlight and shadow segments.]{%
-\graphicsAI[width=.5\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
-}\caption[LoF entry]{Segmented simulation image overlaid the segmented SAS image. Segmentation overlay color description:\parbox{1cm}{\small\centering 1}}%
-% % \hfill
-% \parbox{1cm}{\small\centering
+\graphicsAI[width=.48\linewidth]{gfx/overlay_cylinder_submerged_adaptive.svg}%
+}\caption[LoF entry]{\raggedright Simulation image overlaid the segmented SAS image. Segmentation overlay color description:
+
+\parbox{\linewidth}{\small\centering\vspace{.5\baselineskip}
 % \newline\centering\newline %\\[.5\baselineskip]
-\begin{minipage}{.35\linewidth}
-% \cdesc{800000}{Template highlight and image highlight}
-% \cdesc{FF1000}{Template highlight only}
-% \cdesc{FFEB00}{Image highlight only}
-% \cdesc{83FF7C}{Background pixels}
+\begin{minipage}{.4\linewidth}
+\cdesc{800000}{Template highlight and image highlight}
+\cdesc{FF1000}{Template highlight only}
+\cdesc{FFEB00}{Image highlight only}
+\cdesc{83FF7C}{Background pixels}
 \end{minipage}%
-% \begin{minipage}{.35\linewidth}
-% \cdesc{000083}{Template shadow and image shadow}
-% \cdesc{0014FF}{Template shadow only}
-% \cdesc{00EFFF}{Image shadow only}
-% \cdesc{00A7FF}{Template shadow and image highlight}
-% \end{minipage}
+\begin{minipage}{.4\linewidth}
+\cdesc{000083}{Template shadow and image shadow}
+\cdesc{0014FF}{Template shadow only}
+\cdesc{00EFFF}{Image shadow only}
+\cdesc{00A7FF}{Template shadow and image highlight}
+\end{minipage}
+}}
 % }\label{overlay_cylinder_adaptive}%
 % % \vspace{\baselineskip}
-\caption{Segmented simulation image overlaid the segmented SAS image.}
+% \caption{Segmented simulation image overlaid the segmented SAS image.}
 \end{figure*}
 
 % Whenever conventional computer graphics processing can be used to 
