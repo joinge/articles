@@ -560,14 +560,17 @@ Adaptive windows perform best in detection of closely separated angles of signif
 \subsection[Proof d/dw\^{}H w\^{}HRw = 2Rw]{Proof: $\frac{\partial}{\partial\w\H} \w\H\R\w = 2\R\w$}
 
 \begin{align}
-\w\H\R\w &= \sumb{i=0}{N}w_i^* \sumb{j=0}{N}  R_{ij} w_j \\
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \\
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j
+\w\H\R\w &= \sumb{i=0}{N}w_i^* \sumb{j=0}{N}  R_{ij} w_j \nn
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \nn
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j + w_k\sumb{i=0}{N}w_i^* R_{ik} \nn
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j + w_k^*\sumb{i=0}{N}w_i R_{ik}^* \nn
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + 2w_k^*\sumb{i=0}{N} R_{ki} w_i
 \end{align}
 %
 Partial differentiation with respect to $\w\H$ then yields:
 %
 \begin{align}
 \frac{\partial}{\partial w_k^*}\;\w\H\R\w
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \nn
 &= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j
 \end{align}
