@@ -554,3 +554,20 @@ Kaiser: For a restricted energy and time duration, maximize energy in the band o
 
 Adaptive windows perform best in detection of closely separated angles of significantly amplitudes.
 
+
+\section{Mathematical Proofs}
+
+\subsection[Proof d/dw\^{}H w\^{}HRw = 2Rw]{Proof: $\frac{\partial}{\partial\w\H} \w\H\R\w = 2\R\w$}
+
+\begin{align}
+\w\H\R\w &= \sumb{i=0}{N}w_i^* \sumb{j=0}{N}  R_{ij} w_j \\
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \\
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j
+\end{align}
+%
+Partial differentiation with respect to $\w\H$ then yields:
+%
+\begin{align}
+\frac{\partial}{\partial w_k^*}\;\w\H\R\w
+&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j
+\end{align}
