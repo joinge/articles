@@ -559,18 +559,34 @@ Adaptive windows perform best in detection of closely separated angles of signif
 
 \subsection[Proof d/dw\^{}H w\^{}HRw = 2Rw]{Proof: $\frac{\partial}{\partial\w\H} \w\H\R\w = 2\R\w$}
 
+To prove this relation we will write the matrix operations out on index form, and 
+%
 \begin{align}
-\w\H\R\w &= \sumb{i=0}{N}w_i^* \sumb{j=0}{N}  R_{ij} w_j \nn
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \nn
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j + w_k\sumb{i=0}{N}w_i^* R_{ik} \nn
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j + w_k^*\sumb{i=0}{N}w_i R_{ik}^* \nn
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{\substack{j=0\\j\ne k}}{N} R_{ij} w_j + 2w_k^*\sumb{i=0}{N} R_{ki} w_i
+\w\H\R\w &= \sumb{i=1}{N}w_i^* \sumb{j=1}{N}  R_{ij} w_j \nn
+&= \sumb{\substack{i=1\\i\ne k}}{N} w_i^* \sumb{j=1}{N} R_{ij} w_j + w_k^*\sumb{j=1}{N} R_{kj} w_j \nn
+&= \sumb{\substack{i=1\\i\ne k}}{N} w_i^* \sumb{\substack{j=1\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=1}{N} R_{kj} w_j + w_k\sumb{i=1}{N}w_i^* R_{ik} \nn
+&= \sumb{\substack{i=1\\i\ne k}}{N} w_i^* \sumb{\substack{j=1\\j\ne k}}{N} R_{ij} w_j + w_k^*\sumb{j=1}{N} R_{kj} w_j + w_k^*\sumb{i=1}{N}w_i R_{ik}^* \nn
+&\overset{R_{ij}=R_{ji}^*}{=} \sumb{\substack{i=1\\i\ne k}}{N} w_i^* \sumb{\substack{j=1\\j\ne k}}{N} R_{ij} w_j + 2w_k^*\sumb{i=1}{N} R_{ki} w_i
 \end{align}
 %
-Partial differentiation with respect to $\w\H$ then yields:
+Partial differentiation with respect to $w_k^*$ then gives:
 %
 \begin{align}
 \frac{\partial}{\partial w_k^*}\;\w\H\R\w
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j \nn
-&= \sumb{\substack{i=0\\i\ne k}}{N} w_i^* \sumb{j=0}{N} R_{ij} w_j + w_k^*\sumb{j=0}{N} R_{kj} w_j
+&= 2\sumb{i=1}{N} R_{kj} w_i
+\end{align}
+%
+Hence, when we apply the partial differentiation as a row operation we get:
+%
+\begin{align}
+\frac{\partial}{\partial \w^H}\;\w\H\R\w
+&= \bmat{
+\frac{\partial}{\partial w_1^*}\;\w\H\R\w \\
+\frac{\partial}{\partial w_2^*}\;\w\H\R\w \\ \vdots \\
+\frac{\partial}{\partial w_M^*}\;\w\H\R\w}
+= \bmat{
+2\sum_{i=1}^{N} R_{1j} w_j\\
+2\sum_{i=1}^{N} R_{2j} w_j\\ \vdots \\
+2\sum_{i=1}^{N} R_{Nj} w_j}
+= 2\R\w
 \end{align}
