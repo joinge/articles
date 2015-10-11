@@ -387,15 +387,28 @@ By definition, the beamformer output $z[n]$ can now be expressed as the weighted
 \begin{align}
 E\big\{||\w\H\x||^2\big\}
 &= E\big\{\big(\w\H\x\big)\big(\w\H\x\big)^*\big\} \nn
-&= \w\H E\big\{\x\x\H\big\}\w\H \nn
-&= \w\H\R\w\H
+&= \w\H E\big\{\x\x\H\big\}\w \nn
+&= \w\H\R\w
 \end{align}
 %
 When solving these convex optimization problems we can make use Lagrange multipliers.
 %
 \begin{align}
-\frac{\partial}{\partial\w\H} \Big( \w\H\R\w\H + \lambda(\w\H\a - 1)\big) = 0
+\frac{\partial}{\partial\w} \Big( \w\H\R\w + \lambda(\w\H\a - 1)\big) = \R\w + \lambda\a = 0
 \end{align}
+%
+Solving for $\w$ gives
+%
+\begin{align}
+\w = -\lambda\Ri\a 
+\end{align}
+%
+Substituting this into the constraint equation gives
+%
+\begin{align}
+((-\lambda\Ri\a)\H\a
+\end{align}
+
 
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
 
