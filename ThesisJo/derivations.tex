@@ -385,19 +385,16 @@ By definition, the beamformer output $z[n]$ can now be expressed as the weighted
 \end{align}
 %
 \begin{align}
-\argmin{\w}{E\big\{||\w\H\x||^2\big\}} 
-&= \argmin{\w}{E\big\{\big(\w\H\x\big)\big(\w\H\x\big)^*\big\}} \nn
-&= \argmin{\w}{\w\H E\big\{\x\x\H\big\}\w\H} \nn
-&= \argmin{\w}{\w\H\R\w\H}
+E\big\{||\w\H\x||^2\big\}
+&= E\big\{\big(\w\H\x\big)\big(\w\H\x\big)^*\big\} \nn
+&= \w\H E\big\{\x\x\H\big\}\w\H \nn
+&= \w\H\R\w\H
 \end{align}
 %
 When solving these convex optimization problems we can make use Lagrange multipliers.
 %
 \begin{align}
-\argmin{\w}{E\big\{||\w\H\x||^2\big\}} 
-&= \argmin{\w}{E\big\{\big(\w\H\x\big)\big(\w\H\x\big)^*\big\}} \nn
-&= \argmin{\w}{\w\H E\big\{\x\x\H\big\}\w\H} \nn
-&= \argmin{\w}{\w\H\R\w\H}
+\frac{\partial}{\partial\w\H} \Big( \w\H\R\w\H + \lambda(\w\H\a - 1)\big) = 0
 \end{align}
 
 where $w_m$ is the weight factor assigned to channel $m$. With static weights this would be referred to as the conventional delay-and-sum (DAS) beamformer. A large variety of weighting functions exists here for trading lateral resolution for improved noise suppression (contrast), but one always ends up with a compromise between the two~\cite{Harris1978}.
