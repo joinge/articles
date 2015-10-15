@@ -508,19 +508,19 @@ Adaptive beamformers are dynamic and seek to adjust the array response to better
 
 \section{MVDR}\label{sec:mvdr}
 
-MVDR seeks to minimize the output power of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}:
+MVDR seeks to minimize the output variance of the beamformer, under the constraint of a unity gain in some desired direction $\phi$~\cite{Capon1969}. With the assumption of zero mean data this can be formulated as: 
 %
 \begin{align}
 \underset{\w[n]}{\argmin}\, E\{\big|z[n]\big|^2\} &= \underset{\w[n]}{\argmin}\, \w[n]\R[n]\w\H[n]\nn
 \text{subject to } \w^H[n]\a_\phi &= 1.\label{eq:mvdr_definition}
 \end{align}
 %
-Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, and $\R[n] = E\{\x\x\H\}$ is the spatial covariance matrix for the full array. This is a convex optimization problem with the solution:
+Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, and $\R[n] = E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. This is a convex optimization problem with the solution:
 %
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi}.\label{eq:mvdr_weights}
 \end{gather}
-. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add {\large$\epsilon$} percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add {\large$\epsilon$} percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
@@ -624,15 +624,15 @@ In practice, we estimate the beamformer output power as
 E\big\{\big|z[n]\big|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \big| z[n'] \big|^2
 \end{align*}
 %
-which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same temporal averaging method we use for MVDR. In our case the matched filtered signal is a just few samples long, hence $K=1$ will be used for both MVDR and LCA throughout this work.
+which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same temporal averaging method we use for MVDR. In our case the bandwidth of our matched filtered signal is a just few samples long, hence $K=1$ will be used for both MVDR and LCA throughout this work.
 
-\todo{Drop this paragraph altogether?}If extra flexibility is desired, we can also estimate the variance by a weighted combination of local pixels
+Since pixels are correlated laterally, we can include a weighted combination of these as well to improve the variance estimation:
 %
 \begin{align}
 E\big\{\big|z[x,n]\big|^2\big\} = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} w[x',n']\big| z[x',n'] \big|^2
 \end{align}
 %
-where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. 
+where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. However, we observed no visual improvement doing this, and the effect of micro-steered windows is hard to predict. Henceforth no lateral averaging will be applied.
 % 
 % \begin{itemize}
 % \item \emph{Window function}
@@ -667,13 +667,13 @@ and $I_0$ is the zeroth order modified Bessel function of the first kind:
 I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.\label{eq:modified_bessel_first_kind}
 \end{align}
 %
-The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given time-bandwidth product specified with the parameter $\beta$:
+The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given space-bandwidth product specified with the parameter $\beta$:
 %
 \begin{align}
 \beta = \frac{TB}{2},
 \end{align}
 %
-where $T$ is the extent of the window in time\todo{Should perhaps say space-bandwidth product?} and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced\todo{better word?} sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$.
+where $T$ in our case is the spatial extent of the window and $B$ is its bandwidth. Adjusting $\beta$ changes the trade-off between mainlobe width and sidelobe level. When $\beta=0$ the window becomes rectangular, while at large values ($\beta>5$) the window converges to a Gaussian both in time and frequency. This class of windows is generally considered well suited for separating closely spaced sources with amplitudes of a high dynamic range~\cite{Harris1978}, they are easy to make, and they are optimal for any value of $\beta$.
 
 
 \subsection{Steering}\label{sec:lca_steering}
