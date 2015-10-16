@@ -346,8 +346,8 @@
 % \newcommand\mediaPath{gfx/media}
 \newcommand\mediaPath{http://folk.uio.no/joibu/media/2015_JOE_LCA}
 
-\newcommand\mediaI{\multimedia{\mediaPath/media1.mp4}{Media Movie 1}}
-\newcommand\mediaII{\multimedia{\mediaPath/media2.mp4}{Media Movie 2}}
+\newcommand\mediaI{\multimedia{\mediaPath/media1.mp4}{Media Movie~1}}
+\newcommand\mediaII{\multimedia{\mediaPath/media2.mp4}{Media Movie~2}}
 
 
 \begin{document}
@@ -444,7 +444,7 @@ A much faster and simpler alternative to MVDR is the Low Complexity Adaptive (LC
 
 Synnev\aa{}g \emph{et al}. suggested using a window set comprised of rectangular, Kaiser (or Kaiser-Harris) and inverted Kaiser functions. In total he made LCA choose from 12 unique windows, 6 of which were micro-steered variants of a fairly wide Kaiser window, and with the rectangular window included. This was motivated by the desire to use wide windows with maximum sidelobe suppression near the receiver, and narrow windows at greater depths for maximum sensitivity and depth penetration. While achieving good results, it was not made clear how how many windows LCA needs, or how they ideally should be steered. Also, it is not apparent how LCA performs in sonar systems where the transmit beam is unfocused.
 
-In this study apply LCA to active sonar imaging. We use variations of the parametric Kaiser window, but also compare it to the trigonometric window function. We extend Synnev\aa{}g's work by steering all our windows and not just some, and demonstrate how LCA's performance is affected by type and number of windows included. Our results are obtained using experimental data from the 32 element Kongsberg Maritime HISAS 1030 synthetic aperture sonar (SAS), which operates at 100\,kHz with with a transmit angle of 23$^\circ$. 
+In this study apply LCA to active sonar imaging. We use variations of the parametric Kaiser window, but also compare it to the trigonometric window function. We extend Synnev\aa{}g's work by steering all our windows and not just some, and demonstrate how LCA's performance is affected by type and number of windows included. Our results are obtained using experimental data from the 32 element Kongsberg Maritime HISAS 1030 synthetic aperture sonar (SAS), which operates at 100\,kHz with an element opening angle of 23$^\circ$. 
 
 Our results show that MVDR computes weights with responses that tend to be symmetric and steered within a fraction of the window's -\,3dB resolution. When letting LCA choose from Kaiser windows with similar responses, we obtain images with improved noise suppression and resolution. The resolution gain is made predictable by limiting the maximum steering to a fraction of the window's -3\,dB width. Overall, LCA produces images that are similar to MVDR, but with a resolution in between that of DAS and MVDR. LCA is also inherently robust, easy to implement and fairly easy to understand.
 
@@ -490,7 +490,7 @@ This article is outlined as follows: In Section \ref{sec:beamforming} we offer a
 
 \section{Receive Beamforming}\label{sec:beamforming}
 
-To form a sonar image we need to estimate source locations and amplitudes. For this purpose we apply a spatial bandpass filter to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
+A sonar image is formed by estimate source locations and amplitudes. For this purpose a spatial bandpass filter is applied to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
 Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ are the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ will be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
 
@@ -548,7 +548,7 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 
 \begin{figure*}[t]%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
-\caption{\emph{Determining Kaiser parameter boundaries}: LCA images created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor. These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
+\caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the cross and anchor created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
 \newline
 \emph{Upper bound $\beta$:}\hfill
 \parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR tend to choose windows with levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
@@ -727,7 +727,7 @@ where we apply the contraint $\alpha\in[0.5,1]$ to avoid windows with negative c
 
 \subsection{Oversampling}\label{sec:lca_oversampling}
 
-The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, noise suppression, or both. This non-linear processing increases the image bandwidth and introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a lateral oversampling factor of 10 compared to the Nyquist rate is often needed to ensure minimal spatial shift-variance in source amplitude~\cite{Asen2014}.
+The ultimate goal of adaptive beamformers is to take the information available in the wavefield and use it to either improve image resolution, sidelobe suppression, or preferably both. This non-linear processing increases the image bandwidth and introduces a need for a sampling rate higher than the Nyquist rate. For MVDR a lateral oversampling factor of 10 compared to the Nyquist rate is often needed to ensure minimal spatial shift-variance in source amplitude~\cite{Asen2014}.
 
 Since LCA operates with the same optimization criterion as MVDR, we will be using approximately a factor 8 lateral oversampling for both beamformers. The images appear more visually pleasing and detailed up to 8. We consider an absolute minimum to be 2, due to the non-linear nature of delaying pixels that isn't strictly in the far field, and of displaying the absolute value of the pixels on a decibel scale. In \mediaI{} we visualize the effect of changing the lateral oversampling factor on a set of LCA images. Upon display the images are all bilinearly upinterpolated to the same size. 
 % 
@@ -775,7 +775,7 @@ Since LCA operates with the same optimization criterion as MVDR, we will be usin
 
 \section{Results and Discussion}\label{sec:results_discussion}
 
-To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2009}. It is a high resolution synthetic aperture sonar with 1.2\;m array length, 100\;kHz operating frequency, 40\;kHz bandwidth and 25$^\circ$ opening angle on transmission.
+To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2011}. It is a high resolution synthetic aperture sonar with 1.2\;m array length, 100\;kHz operating frequency, 30\;kHz bandwidth and 23$^\circ$ receiver element beamwidth.
 
 Two different scenes will be studied. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an 1\,m by 1\,m iron cross, connected to a an anchor with 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71). Both scenes are imaged in sectorscan mode.
 
@@ -1014,7 +1014,7 @@ In this computation there are only 4 and 7 unique complex additions and multipli
   \section*{Acknowledgment}
 \fi
 
-The authors would like to thank Kongsberg Maritime, the Norwegian Defence Research Establishment (FFI), and Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71), for the equipment and effort needed to acquire data of the cross and Holmengraa, as well as for allowing us to use it.
+The authors would like to thank Kongsberg Maritime, the Norwegian Defence Research Establishment (FFI), and Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71), Germany, for the equipment and effort needed to acquire data of the resolution test cross and Holmengraa, as well as for allowing us to use it.
 
 
 % Can use something like this to put references on a page
