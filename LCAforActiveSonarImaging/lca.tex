@@ -3,7 +3,7 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewfalse              % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewtrue              % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifOnlineColor\OnlineColortrue            % Compile online color version?
 
@@ -12,6 +12,8 @@
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
 \newif\ifTODO\TODOtrue                        % Use todo notes?
+
+\newif\ifBuildBibliography\BuildBibliographytrue  % Whether to include the references.bib file or use inline references.
 
 \ifOnlineColor
    \newcommand\figPostfix{_online}              % Colored images online
@@ -352,7 +354,7 @@
 
 \begin{document}
 
-\title{Low Complexity Adaptive Beamformer\\ for Active Sonar Imaging}
+\title{Low Complexity Adaptive Sonar Imaging}
 
 \author{Jo~Inge~Buskenes, %
         Roy~Edgar~Hansen, %
@@ -395,9 +397,9 @@
 % 
 We have studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR seeks the optimal solution by estimating and inverting the array's spatial covariance matrix, while LCA selects the best performer from a predefined set of sensor windows.
 
-We show that a robust MVDR implementation typically creates windows spanning between the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this span, and add some steered variations of each. We limit the steering to roughly half the -3\,dB width of the window's amplitude response. Using experimental data from the Kongsberg Maritime HISAS 1030 sonar we find that LCA and MVDR produce nearly identical images of large scenes, both being superior to DAS. On point targets LCA is able to double the resolution compared to DAS, or provide half that of MVDR. This performance is achieved with a total of 6 windows; the rectangular and Kaiser window with $\beta=5$, in unsteered version, and left and right steered to the steering limit. Slightly smoother images are produced if the window count is increased to 15, but past this we observe minimal difference. Finally we show that LCA work just as well if Kaiser windows are substituted with trigonometric ones.
+We show that a robust MVDR implementation typically creates windows spanning between the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this span, and add some steered variations of each. We limit the steering to roughly half the -3\,dB width of the window's amplitude response. Using experimental data from the Kongsberg Maritime HISAS 1030 sonar we find that LCA and MVDR produce nearly identical images of large scenes, both being superior to DAS. On point targets LCA is able to double the resolution compared to DAS, or provide half that of MVDR. This performance is achieved with a total of 6 windows; the rectangular and Kaiser window with $\beta=5$, in unsteered version, and left and right steered to the steering limit. Slightly smoother images are produced if the window count is increased to 15, but past this we observe minimal difference. Finally we show that LCA works just as well if Kaiser windows are substituted with trigonometric ones.
 
-All our observations and experiences point to LCA being very easy to manage. It simply works, and is surprisingly insensitive to the exact type of window function, steering amount, or number of windows. It can be efficiently implemented on parallel hardware, and handles any scene without the need for parameter adjustments.
+All our observations and experiences point to LCA being very easy to understand and manage. It simply works, and is surprisingly insensitive to the exact type of window function, steering amount, or number of windows. It can be efficiently implemented on parallel hardware, and handles any scene without the need for parameter adjustments.
 
 % An attactive trait of the LCA is its low computational complexity; while the MV beamformer is of O($M^3$), the LCA method is of O($MW$), with $M$ being the number of channels and $W$ the number of windows. We made the LCA perform like the MV method using a well designed set of 30 windows. Hence, unless the array is very small, the proposed method will perform like the MV beamformer or better, and at a fraction of the computational cost.
 
@@ -436,19 +438,19 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 % - Brief summary results
 % - Brief conclusions 
 
-\IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Active human made sonars have little to no adaptability on transmit, but several adaptive methods have been investigated post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's response to minimize the influence of noise and interference in the final image.
+\IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Active human made sonars have little to no adaptability on transmit, but several adaptive methods have been investigated to post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's spatial response to minimize the influence of noise and interference in the final image.
 
-In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This is because MVDR relies on estimating and inverting a covariance matrix. In sonar systems with less than 32 channels the complexity can be reduced and the implementation accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014}. For larger systems the inversion step dominates the computation. This can be dealt with by approximating the full covariance matrix with a small one using space reduction techniques such as beamspace processing~\cite{Asen2013}, or the closely related principal component analysis (PCA) method~\cite{Kim2014}. Another method is to assume spatial stationarity to form more easily invertible Toepliz matrices~\cite{Asl2012}. However, at best the mentioned methods are able to reduce the complexity to O($M^2$).
+In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This is because MVDR relies on estimating and inverting a covariance matrix. In sonar systems with less than 32 channels the complexity can be reduced and the implementation accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014}. For larger systems the inversion step dominates the computation. This can be dealt with by approximating the full covariance matrix with a small one using space reduction techniques such as beamspace processing~\cite{Asen2013}, or the closely related principal component analysis (PCA) method~\cite{Kim2014}. Another alternative is to assume spatial stationarity to form more easily invertible Toepliz matrices~\cite{Asl2012}. However, the  mentioned methods are still relatively slow compared to DAS.
 
-A much faster and simpler alternative to MVDR is the Low Complexity Adaptive (LCA) beamformer. Based on an idea by Vignon~\cite{Vignon2008}, it was first introduced by Synnev\aa{}g \emph{et al}. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar image quality to MVDR in systems with focused transmit beams. LCA applies a set of predefined windows, or tapers, and selects the one offering the best sidelobe suppression. It relies on the same optimization criterion as MVDR, thus may be considered a version of MVDR with a reduced window solution space. Alternatively, it may be viewed as a multi-taper technique. One such method is described by Stankwitz \emph{et al}. in radar imaging~\cite{Stankwitz1995}, where the best out of 2 or 3 windows are selected. However, LCA is different in that it typically selects from more windows and allow micro-steered variations of them. This gives LCA an adaptive freedom that is somewhere in between that of traditional multi-taper techniques and MVDR.
+A much faster and simpler alternative to MVDR is the Low Complexity Adaptive (LCA) beamformer. Based on an idea by Vignon~\cite{Vignon2008}, it was first introduced by Synnev\aa{}g \emph{et al}. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar image quality to MVDR in systems with focused transmit beams. LCA applies a set of predefined windows, or apodization weights, and selects the one offering the best sidelobe suppression. It relies on the same optimization criterion as MVDR, thus may be considered a version of MVDR with a reduced window solution space. Alternatively, it may be viewed as a multi-apodization technique. One such method is described by Stankwitz \emph{et al}. in radar imaging~\cite{Stankwitz1995}, where the best out of 2 or 3 windows are selected. However, LCA is different in that it typically selects from a larger pool of windows and allows micro-steered variations of them. This gives LCA an adaptive freedom that is somewhere in between that of traditional multi-apodization techniques and MVDR.
 
 Synnev\aa{}g \emph{et al}. suggested using a window set comprised of rectangular, Kaiser (or Kaiser-Harris) and inverted Kaiser functions. In total he made LCA choose from 12 unique windows, 6 of which were micro-steered variants of a fairly wide Kaiser window, and with the rectangular window included. This was motivated by the desire to use wide windows with maximum sidelobe suppression near the receiver, and narrow windows at greater depths for maximum sensitivity and depth penetration. While achieving good results, it was not made clear how how many windows LCA needs, or how they ideally should be steered. Also, it is not apparent how LCA performs in sonar systems where the transmit beam is unfocused.
 
-In this study apply LCA to active sonar imaging. We use variations of the parametric Kaiser window, but also compare it to the trigonometric window function. We extend Synnev\aa{}g's work by steering all our windows and not just some, and demonstrate how LCA's performance is affected by type and number of windows included. Our results are obtained using experimental data from the 32 element Kongsberg Maritime HISAS 1030 synthetic aperture sonar (SAS), which operates at 100\,kHz with an element beamwidth of 23$^\circ$. 
+In this study we apply LCA to active sonar imaging. We use variations of the parametric Kaiser window, but also compare it to the trigonometric window function. We extend Synnev\aa{}g's work by steering all our windows and not just some, and demonstrate how LCA's performance is affected by type and number of windows included. Our results are obtained using experimental data from the 32 element Kongsberg Maritime HISAS 1030 synthetic aperture sonar (SAS), which operates at 100\,kHz with an element beamwidth of 23$^\circ$. 
 
-Our results show that MVDR computes weights with responses that tend to be symmetric and steered within a fraction of the window's -\,3dB resolution. When letting LCA choose from Kaiser windows with similar responses, we obtain images with improved noise suppression and resolution. The resolution gain is made predictable by limiting the maximum steering to a fraction of the window's -3\,dB width. Overall, LCA produces images that are similar to MVDR, but with a resolution in between that of DAS and MVDR. LCA is also inherently robust, easy to implement and fairly easy to understand.
+Our results show that MVDR, when adapted to work in active sonar imaging, computes weights with responses that tend to be symmetric and steered within a fraction of the window's -\,3dB resolution. When letting LCA choose from Kaiser windows with similar responses, we obtain images with improved noise suppression and resolution. The resolution gain is made predictable by limiting the maximum steering to a fraction of the window's -3\,dB width. Overall, LCA produces images that are similar to MVDR, but with a resolution in between that of DAS and MVDR. LCA is also inherently robust, easy to implement, and fairly easy to understand.
 
-This article is outlined as follows: In Section \ref{sec:beamforming} we offer a gentle introduction to beamforming. Then we move on to adaptive beamforming and describe the MVDR and LCA methods \ref{sec:mvdr} and \ref{sec:lca}, respectively. We use LCA with the Kaiser window which we describe in \ref{sec:lca_kaiser_windows}, explain how we steer it in \ref{sec:lca_steering}, and by how much in \ref{sec:lca_steering_bounds}. Finally we add some remarks on using the trigonometric window instead of Kaiser in \ref{sec:lca_trigonometric}, and of of sampling considerations in \ref{sec:lca_oversampling}. Results and discussion are provided in Section \ref{sec:results_discussion}, where we study MVDR's windows to find suitable LCA ones in \ref{sec:results_lca_window_function}, assess the range of window types and steering in \ref{sec:results_window_parameters}, determine the number of windows needed in \ref{sec:results_database_size}, and add a note on computational complexity in \ref{sec:results_complexity}. Finally we conclude in \ref{sec:conclusion}.
+This article is outlined as follows: In Section \ref{sec:beamforming} we offer a gentle introduction to beamforming. Then we move on to adaptive beamforming and describe the MVDR and LCA methods \ref{sec:mvdr} and \ref{sec:lca}, respectively. We use LCA with the Kaiser window which we describe in \ref{sec:lca_kaiser_windows}, explain how we steer it in \ref{sec:lca_steering}, and by how much in \ref{sec:lca_steering_bounds}. Finally we add some remarks on using the trigonometric window instead of Kaiser in \ref{sec:lca_trigonometric}, and of of sampling considerations in \ref{sec:lca_oversampling}. Results and discussion are provided in Section \ref{sec:results_discussion}, where we study MVDR's windows to find suitable LCA ones in \ref{sec:results_lca_window_function}, assess the range of window types and steering in \ref{sec:results_window_parameters}, determine the number of windows needed in \ref{sec:results_database_size}, and add a note on computational complexity in \ref{sec:results_complexity}. A conclusion is provided in \ref{sec:conclusion}.
 
 % This article is outlined as follows: In Section \ref{methods}, we introduce the concept of adaptive beamforming and provide details on the MVDR and LCA method. Then, in \ref{maptogpu}, we investigate the complexity issue, discuss means for reducing arithmetic complexity, and detail an implementation that makes efficient use of the GPU's parallel resources. The final design is assessed in Sections \ref{images_and_benchmarks} and \ref{discussion}, where we provide benchmarks, comparisons with similar CPU implementations, and measures of how efficiently our implementation makes use of the GPU's resources.
 
@@ -490,7 +492,7 @@ This article is outlined as follows: In Section \ref{sec:beamforming} we offer a
 
 \section{Receive Beamforming}\label{sec:beamforming}
 
-A sonar image is formed by estimate source locations and amplitudes. For this purpose a spatial bandpass filter is applied to the backscattered wavefield data. The filter is called an array processor, or receive beamformer. The basic principle is to apply delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
+A sonar image is formed by estimating source locations and amplitudes. For this purpose a spatial bandpass filter is applied to the backscattered wavefield data. The filter is called an array processor or receive beamformer. The basic principle is to apply delay and weights to the sensor channels before summing them up, chosen such that signals from the location of interest are summed coherently, while other sources sum incoherently.
 
 Assume that the wavefield has been sampled by an $M$ element uniform linear array, and that the signal signature has been removed by a matched filter. Let $x_m[\theta,n]$ be the delayed data from the $m$th channel, where the $\theta$ and $n$ are the azimuth angle and range sample of the focus point, respectively. Each angle $\theta$ will be processed independently, so to simplify notation we will assume the dependence on $\theta$ to be implicit from now on. 
 
@@ -500,7 +502,7 @@ The output $z[n]$ of a beamformer is defined as the weighted sum of all the dela
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{eq:beamformer_output}
 \end{align}
 %
-where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window or a taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
+where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window, apodization or taper function. Applying a window that trails off towards the edges improves noise suppression at the cost of reduced resolution~\cite{Harris1978}. Real windows lead to symmetric responses, while complex weights allow asymmetric responses.
 
 Conventional beamformers all have static weights. The reference method is the delay-and-sum (DAS) beamformer, also know as the backprojection algorithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented on parallel hardware.
 
@@ -522,14 +524,22 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \end{gather}
 The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add {\large$\epsilon$} percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
-\begin{figure}[tbp]%
+\begin{figure}[tbp]\centering%
+\ifPeerReview%
+\includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\else%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\fi%
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
-\begin{figure}[tbp]%
+\begin{figure}[tbp]\centering%
+\ifPeerReview%
+\includegraphics[width=.5\linewidth]{gfx/cross_tagged.png}%
+\else%
 \includegraphics[width=\linewidth]{gfx/cross_tagged.png}%
-\caption{One of the objects used to test the beamformers is a 1\,m by 1\,m cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).}\label{cross}
+\fi%
+\caption{One of the objects used to test the beamformers is a 1\,m by 1\,m resolution test cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).}\label{cross}
 \end{figure}
 
 
@@ -548,7 +558,7 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 
 \begin{figure*}[t]%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
-\caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the cross and anchor created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
+\caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
 \newline
 \emph{Upper bound $\beta$:}\hfill
 \parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR tend to choose windows with levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
@@ -571,11 +581,11 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 
 \begin{figure*}[t]%\centering%
 \includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
-\caption{\emph{LCA images using different window database sizes}. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\beta=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
+\caption{\emph{LCA images using different window database sizes}. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\phi=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
 \end{figure*}
 
 \begin{figure*}[t]\centering
-\subfloat[\emph{Image quality of approximate point scatterers found in the cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
+\subfloat[\emph{Image quality of approximate point scatterers found in the resolution test cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
 \label{beamformer_comparison_cross}}
 \hfil
 \subfloat[\emph{Image quality of the full sector Holmengraa scene}. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
@@ -618,10 +628,10 @@ A much less complex alternative to MVDR is the low complexity adaptive (LCA) bea
 %
 Note how closely LCA is related to the MVDR definition in \eq{eq:mvdr_definition}. The optimization criterion and constraint is the same, but LCA has a finite and discrete solution space for the weights. As will be demonstrated in section \ref{sec:results_lca_window_function}, LCA will perform similarly to MVDR because a robustified MVDR implementation seems to be constrained to window functions similar to the ones we let LCA choose from.
 
-In practice, we estimate the beamformer output power as
+In practice, we estimate the beamformer output power by computing a sample power average $s_z^2$:
 %
 \begin{align*}
-E\big\{\big|z[n]\big|^2\big\} = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \big| z[n'] \big|^2
+E\big\{\big|z[n]\big|^2\big\} \approx s_z^2 = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \big| z[n'] \big|^2
 \end{align*}
 %
 which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same temporal averaging method we use for MVDR. In our case the bandwidth of our matched filtered signal is a just few samples long, hence $K=1$ will be used for both MVDR and LCA throughout this work.
@@ -629,10 +639,10 @@ which computes the sample power average over $N_k=2K+1$ temporal samples. This i
 Since pixels are correlated laterally, we can include a weighted combination of these as well to improve the variance estimation:
 %
 \begin{align}
-E\big\{\big|z[x,n]\big|^2\big\} = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} w[x',n']\big| z[x',n'] \big|^2
+s_z^2 = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} \omega[x',n']\big| z[x',n'] \big|^2
 \end{align}
 %
-where $N_x = 2X+1$ is the number of azimuth lines to average over, and $w_\text{prf}[x',n']$ is a normalized 2 dimensional weight function. However, we observed no visual improvement doing this, and the effect of micro-steered windows is hard to predict. Henceforth no lateral averaging will be applied.
+where $N_x = 2X+1$ is the number of azimuth lines to average over, and $\omega[x',n']$ is a normalized 2 dimensional weight function. However, we observed no visual improvement doing this, and the effect of micro-steered windows is hard to predict. Henceforth no lateral averaging will be applied.
 % 
 % \begin{itemize}
 % \item \emph{Window function}
@@ -667,7 +677,7 @@ and $I_0$ is the zeroth order modified Bessel function of the first kind:
 I_0(x) = \sumb{a=0}{\infty} \left[ \frac{\left(\frac{x}{2}\right)^a}{a!} \right]^2.\label{eq:modified_bessel_first_kind}
 \end{align}
 %
-The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given space-bandwidth product specified with the parameter $\beta$:
+The Kaiser-Bessel window is near optimal in the sense of having its peak energy concentration around $\theta=0^\circ$, for a given space-bandwidth product related to the Kaiser parameter $\beta$ as:
 %
 \begin{align}
 \beta = \frac{TB}{2},
@@ -777,7 +787,7 @@ Since LCA operates with the same optimization criterion as MVDR, we will be usin
 
 To test the performance of the MVDR and LCA beamformers, we have processed data acquired by the Kongsberg Maritime HUGIN AUV carrying their 32 element HISAS1030 sonar~\cite{Hansen2011}. It is a high resolution synthetic aperture sonar with 1.2\;m array length, 100\;kHz operating frequency, 30\;kHz bandwidth and 23$^\circ$ receiver element beamwidth.
 
-Two different scenes will be studied. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an 1\,m by 1\,m iron cross, connected to a an anchor with 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71). Both scenes are imaged in sectorscan mode.
+Two different scenes will be studied. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an 1\,m by 1\,m iron resolution test cross, connected to a an anchor with 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71). Both scenes are imaged in sectorscan mode.
 
 In the image reconstruction we have run MVDR with subarray length $L=16$ and $\text{\large$\epsilon$}=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters~\cite{Synnevag2009a}.
 
@@ -785,7 +795,7 @@ The results will be presented in the following order: In section \ref{sec:result
 
 \subsection{LCA window function}\label{sec:results_lca_window_function}
 
-Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create a window database for LCA with with responses similar to the ones that MVDR computes. We study this in \Fig{mvdr_selected_windows}, where we present the typical amplitude and phase responses that MVDR creates for shadow, speckle and highlight regions of the Holmengraa scene.
+Assuming that a robust MVDR is the reference method we want LCA to perform similarly to, it seems sensible to create a window database for LCA with spatial responses similar to the ones that MVDR computes. We study this in \Fig{mvdr_selected_windows}, where we present the typical amplitude and phase responses that MVDR creates for shadow, speckle and highlight regions of the Holmengraa scene.
 
 Observe from \Fig{mvdr_selected_windows} that MVDR seems to prefer symmetric window responses, even if it is free to choose non-symmetric ones. The symmetry is most predominant in shadow and speckle regions, while in highlight the windows are approximately symmetric within the illuminated sector of the seafloor. We have observed this symmetry to be a side-effect of the averaging steps needed to build the sample covariance matrix, which are required for MVDR to operate in near snapshot mode in an active system. The peak sidelobe levels of the MVDR windows are mostly between \minus{}13\,dB and \minus{}43\,dB. This corresponds to that of an unsteered rectangular and Hamming window, or an unsteered Kaiser window with $\beta=0$ and $\beta=2$, respectively.
 
@@ -799,11 +809,11 @@ Unlike the method described by Synnev\aa{}g~\cite{Synnevag2008} we do not let LC
 
 \subsection{Kaiser parameter $\beta$ and steering $\phi$}\label{sec:results_window_parameters}
 
-To determine a suitable range for the Kaiser parameter $\beta$ and steering $\phi$, we constructed large and equally sized window databases containing Kaiser windows with varied upper boundaries for $\beta$ and $\phi$. The lower boundaries were chosen as $\beta=0$ and $\phi=0^\circ$, which includes the rectangularly weighted DAS image. The resulting images are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the \minus{}3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A forth order polynomial fit was used in this computation. This measure is also commonly called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is approximately $\Delta \approx \text{FWHM}/0.89$~\cite{Harris1978}.
+To determine a suitable range for the Kaiser parameter $\beta$ and steering $\phi$, we constructed large and equally sized window databases containing Kaiser windows with varied upper boundaries for $\beta$ and $\phi$. The lower boundaries were chosen as $\beta=0$ and $\phi=0^\circ$, which includes the rectangularly weighted DAS image. The resulting images are shown in \Fig{oversampling_mosaic_bounds}. In each image we computed the lateral distance $\Delta x$ between the \minus{}3dB points of the anchor, with the reference $\Delta x_\text{ref}$ being the rectangularly weighted DAS image. A fourth order polynomial fit was used in this computation. This measure is also commonly called the full width half maximum (FWHM). In the case of a imaging a point scatter, it is closely related to the resolution of of the system. For a rectangular window, for instance, the system resolution is approximately $\Delta \approx \text{FWHM}/0.89$~\cite{Harris1978}.
 
 The LCA images in \Fig{oversampling_mosaic_bounds} demonstrate the effect of adjusting the upper bound of $\beta$ and $\phi$. As suggested by \Fig{mvdr_selected_windows} we first attempted to use $\beta\in[0,2]$. While this significantly improved sidelobe suppression, a slight further improvement was observed up to $\beta\in[0,5]$. This can likely be explained by the need to compensate for the increased sidelobe levels caused by steering. No noticeable difference were observed for higher values than $\beta=5$. The images also demonstrate that increasing the upper bound for steering $\phi$ improves the resolution of the strong scatterers. For this sonar the Rayleigh resolution is $\Delta\approx0.0125$ radians (0.72$^\circ$), so a point scatterer imaged at 19\,m range with a rectangular DAS would have a lateral $\text{FWHM}\approx0.125\cdot19\,\text{m}\cdot0.89=21\,\text{cm}$. This is close to the FWHM of the anchor in the DAS image in \Fig{oversampling_mosaic_bounds}, which means that the acoustic fingerprint of the anchor is similar to a point source. This suggests the anchor reflections to be specular and that we view its rounded side. As we increase steering to either 50\% or 100\% of the -3dB width, the FWHM drops to 73\% or 53\% to that of the rectangular window, respectively.
 
-\Fig{oversampling_mosaic_bounds_beta} and \Fig{oversampling_mosaic_bounds_phi} illustrates which $\beta$ and $\phi$ values LCA prefers for different regions in the image of the cross. Red marker lines are used to pinpoint the cut line, location of the anchor and strong scatters on the cross. Observe that in the anchor region only narrow responses ($\beta=0$) are used, which is the reason for the anchor FWHM being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. On other scatterers with strong nearby lateral interference LCA prefers wider windows to suppress the interference. When allowed LCA prefers to steer windows away from the sources, but never exceed the $\phi_\text{3dB}(\beta)$ limit. When exceeding this bound we observed oscillation artifacts in the image.
+\Fig{oversampling_mosaic_bounds_beta} and \Fig{oversampling_mosaic_bounds_phi} illustrates which $\beta$ and $\phi$ values LCA prefers for different regions in the image of the resolution test cross. Red marker lines are used to pinpoint the cut line, location of the anchor and strong scatters on the cross. Observe that in the anchor region only narrow responses ($\beta=0$) are used, which is the reason for the anchor FWHM being measured to the same value regardless of the upper bound of $\beta$ in \Fig{oversampling_mosaic_bounds}. On other scatterers with strong nearby lateral interference LCA prefers wider windows to suppress the interference. When allowed LCA prefers to steer windows away from the sources, but never exceed the $\phi_\text{3dB}(\beta)$ limit. When exceeding this bound we observed oscillation artifacts in the image.
 
 
 \subsection{Window database size}\label{sec:results_database_size}
@@ -815,7 +825,7 @@ Observe that sampling the $\beta$-range more finely increases the sidelobe suppr
 
 \subsection{Image quality}\label{sec:results_image_quality}
 
-We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and their corresponding cuts are near identical for the LCA version with Kaiser windows and the one with trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
+We compare LCA image quality to that of DAS and MVDR in \Fig{image_quality}. In \Fig{beamformer_comparison_cross} we display the images computed by LCA using Kaiser windows, LCA using trigonometric windows, and MVDR. Two lateral image cuts through all images are presented in the left plot. The images and their corresponding cuts are nearly identical for the LCA version with Kaiser windows and the one with trigonometric windows. Compared to DAS the LCA produces targets with an FWHM that lies in between that of DAS and MVDR.
 
 In \Fig{beamformer_comparison_holmengraa} we show full sector images of the Holmengraa wreck. We compare the images produced by a Hamming weighted DAS, by MVDR and by LCA with Kaiser or trigonometric windows. All the adaptive beamformers produce a sharper and less noisy image than DAS, but the difference between LCA and MVDR is minimal. The LCA image produced with Kaiser windows appear identical to that from trigonometric windows.
 
@@ -879,12 +889,18 @@ In comparison, LCA is of O($M N_\beta N_\phi$), and extremely well suited for GP
 % \caption{Summary}\label{tab:summary}
 % \end{table}%
 
-LCA iterates through a set of windows in search of the one that minimizes the noise and interference power in each image pixel. It can be viewed as either a reduced solution space version of MVDR, or as an multi-taper extension to DAS. It creates images similar to MVDR, but at a fraction of the computational cost. It is also inherently robust and insensitive to the particular set of windows it selects from, supported by the observation that LCA can be used with either Kaiser or trigonometric windows and produce near identical images.
+LCA seeks to improve image resolution and contrast by minimizing the power of noise and interference in each image pixel. This is the same optimization criterion as MVDR uses, but instead of computing an optimal array window like MVDR does, it selects the best window out of a predefined set. Hence, it can be viewed as either a reduced and discrete window space version of MVDR, or as an advanced multi-apodization technique. What we have studied in this paper is which windows we should ideally let LCA choose from.
 
-When using LCA with Kaiser windows we made their responses similar to those typically chosen by a robust MVDR in key areas in the image. We suggest an upper bound for $\beta$ between 2 and 5, where 5 is slightly better at suppressing sidelobes. For $\phi$ we suggest to steer either to 50\% or 100\% of the \minus{}3\,dB width, which leads to a resolution of 73\% or 53\% of the rectangular window, respectively. As lower boundaries we set $\beta=0$ to always include a rectangular window, and $\phi=0$ to always include the centered window.
+We have found the LCA to be surprisingly insensitive to the exact window function it is used with, supported by the observation that near identical images were produced whether we used Kaiser or trigonometric windows. However, it needs to be able to select between wide and narrow window responses, since the wide ones offer the best sidelobe suppression and the narrow ones offer the best sensitivity. We achieved good results using 2-3 Kaiser windows in the range $\beta\in[0,5]$, and observed minimal difference when adding more windows or adjusting the upper bound of $\beta$. For the steering angle we suggest a value in the range $\phi\in[0,\pm\delta\phi_\text{3dB}(\beta)]$, where $\phi_\text{3dB}(\beta)$ is the bandwidth of the respective window, and $\delta$ is a scaling parameters. Setting $\delta$ to either 50\% or 100\% reduces the lateral point target size to 73\% or 53\% compared to the rectangular window, respectively. Hence, it can be used to control aggressiveness and resolution gain of LCA.
 
-The tendency of the LCA to perform similarly to the MV beamformer seems to indicate that a full solution space is rarely needed in real world scenarios.
+In summary, LCA is an attractive alternative to other adaptive beamformers due to being very fast, simple to understand, practically parameter-free, inherently robust, and able produce images similar to that of MVDR. Contrary to MVDR, it has a low computational complexity and can be easily and efficiently accelerated using GPUs. Since LCA performs just as well if we used trigonometric windows instead of Kaiser, we can even compute the optimal window parameter analytically for any given steering angle, and avoid the search over the window parameter entirely.
 
+% The tendency of LCA to produce images of similar quality as MVDR seems to indicate that a full solution space is rarely needed in real world scenarios.
+
+
+%  It initially very is also very fast, and is very well suited for acceleration using  very fast, easy to implement even on parallel hardware,
+
+% Its computational complexity is only of O($N_wM$), and its data parallel nature makes it very well suited for acceleration using e.g. GPUs. compared to MVDR's O($M^3$).
 % 
 % LCA is largely insensitive to the choice of windows and steering. 
 % LCA works well for all the boundaries
@@ -1023,10 +1039,139 @@ The authors would like to thank Kongsberg Maritime, the Norwegian Defence Resear
   \newpage
 \fi
 
-\bibliographystyle{IEEEtran}
-\bibliography{references}
-% 
-% 
+\ifBuildBibliography
+   \bibliographystyle{IEEEtran}
+   \bibliography{references}
+
+\else
+
+% Generated by IEEEtran.bst, version: 1.13 (2008/09/30)
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{#1}
+\csname url@samestyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
+\providecommand{\BIBentryALTinterwordstretchfactor}{4}
+\providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand{\BIBforeignlanguage}[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+\providecommand{\BIBdecl}{\relax}
+\BIBdecl
+
+\bibitem{Capon1969}
+J.~Capon, ``{High-resolution frequency-wavenumber spectrum analysis},''
+  \emph{Proceedings of the IEEE}, vol.~57, no.~8, pp. 1408--1418, 1969.
+
+\bibitem{Blomberg2013}
+A.~E.~A. Blomberg, A.~Austeng, R.~E. Hansen, and S.~A.~V. Synnes, ``{Improving
+  Sonar Performance in Shallow Water Using Adaptive Beamforming},'' \emph{IEEE
+  Journal of Oceanic Engineering}, vol.~38, no.~2, pp. 297--307, Apr. 2013.
+
+\bibitem{Blomberg2012a}
+A.~E.~A. Blomberg, A.~Austeng, and R.~E. Hansen, ``{Adaptive Beamforming
+  Applied to a Cylindrical Sonar Array Using an Interpolated Array
+  Transformation},'' \emph{IEEE Journal of Oceanic Engineering}, vol.~37,
+  no.~1, pp. 25--34, Jan. 2012.
+
+\bibitem{Lo2004}
+K.~Lo, ``{Adaptive Array Processing for Wide-Band Active Sonars},'' \emph{IEEE
+  Journal of Oceanic Engineering}, vol.~29, no.~3, pp. 837--846, Jul. 2004.
+
+\bibitem{Buskenes2014}
+J.~I. Buskenes, J.~P. Asen, C.-I.~C. Nilsen, and A.~Austeng, ``{An Optimized
+  GPU Implementation of the MVDR Beamformer for Active Sonar Imaging},''
+  \emph{IEEE Journal of Oceanic Engineering}, pp. 1--13, 2014.
+
+\bibitem{Asen2013}
+J.~P. \AA{}sen, J.~I. Buskenes, C.-I. {Colombo Nilsen}, A.~Austeng, and
+  S.~Holm, ``{Implementing capon beamforming on a GPU for real-time cardiac
+  ultrasound imaging.}'' \emph{IEEE transactions on ultrasonics,
+  ferroelectrics, and frequency control}, vol.~61, no.~1, pp. 76--85, Jan.
+  2014.
+
+\bibitem{Kim2014}
+K.~Kim, S.~Park, J.~Kim, S.-B. Park, and M.~Bae, ``{A fast minimum variance
+  beamforming method using principal component analysis},'' \emph{IEEE
+  Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}, vol.~61,
+  no.~6, pp. 930--945, Jun. 2014.
+
+\bibitem{Asl2012}
+B.~M. Asl and A.~Mahloojifar, ``{A low-complexity adaptive beamformer for
+  ultrasound imaging using structured covariance matrix},'' \emph{IEEE
+  Transactions on Ultrasonics, Ferroelectrics and Frequency Control}, vol.~59,
+  no.~4, pp. 660--667, Apr. 2012.
+
+\bibitem{Vignon2008}
+F.~Vignon and M.~R. Burcher, ``{Capon beamforming in medical ultrasound imaging
+  with focused beams.}'' \emph{IEEE transactions on ultrasonics,
+  ferroelectrics, and frequency control}, vol.~55, no.~3, pp. 619--28, Mar.
+  2008.
+
+\bibitem{Synnevag2008}
+J.-F. Synnev\aa{}g, S.~Holm, and A.~Austeng, ``{A low complexity data-dependent
+  beamformer},'' in \emph{2008 IEEE Ultrasonics Symposium}, no.~2.\hskip 1em
+  plus 0.5em minus 0.4em\relax IEEE, Nov. 2008, pp. 1084--1087.
+
+\bibitem{Stankwitz1995}
+H.~Stankwitz, R.~Dallaire, and J.~Fienup, ``{Nonlinear apodization for sidelobe
+  control in SAR imagery},'' \emph{IEEE Transactions on Aerospace and
+  Electronic Systems}, vol.~31, no.~1, pp. 267--279, Jan. 1995.
+
+\bibitem{Harris1978}
+F.~Harris, ``{On the use of windows for harmonic analysis with the discrete
+  Fourier transform},'' \emph{Proceedings of the IEEE}, vol.~66, no.~1, pp.
+  51--83, 1978.
+
+\bibitem{Kailath1985}
+T.~Kailath and T.-J. Shan, ``{Adaptive beamforming for coherent signals and
+  interference},'' \emph{IEEE Transactions on Acoustics, Speech, and Signal
+  Processing}, vol.~33, no.~3, pp. 527--536, Jun. 1985.
+
+\bibitem{Synnevag2009a}
+J.-F. Synnev\aa{}g, A.~Austeng, and S.~Holm, ``{Benefits of minimum-variance
+  beamforming in medical ultrasound imaging},'' \emph{IEEE Transactions on
+  Ultrasonics, Ferroelectrics and Frequency Control}, vol.~56, no.~9, pp.
+  1868--1879, Sep. 2009.
+
+\bibitem{Cox1987}
+H.~Cox, R.~Zeskind, and M.~Owen, ``{Robust adaptive beamforming},'' \emph{IEEE
+  Transactions on Acoustics, Speech, and Signal Processing}, vol.~35, no.~10,
+  pp. 1365--1376, Oct. 1987.
+
+\bibitem{Maksym1979}
+J.~N. Maksym, ``{A robust formulation of an optimum cross-spectral beamformer
+  for line arrays},'' \emph{The Journal of the Acoustical Society of America},
+  vol.~65, no.~4, p. 971, 1979.
+
+\bibitem{Asen2014}
+J.~P. \AA{}sen, A.~Austeng, and S.~Holm, ``{Capon beamforming and moving
+  objects--an analysis of lateral shift-invariance.}'' \emph{IEEE transactions
+  on ultrasonics, ferroelectrics, and frequency control}, vol.~61, no.~7, pp.
+  1152--60, Jul. 2014.
+
+\bibitem{Hansen2011}
+R.~E. Hansen, H.~J. Callow, T.~O. Sabo, and S.~A.~V. Synnes, ``{Challenges in
+  Seafloor Imaging and Mapping With Synthetic Aperture Sonar},'' \emph{IEEE
+  Transactions on Geoscience and Remote Sensing}, vol.~49, no.~10, pp.
+  3677--3687, Oct. 2011.
+
+\bibitem{holmengraa}
+{Article of Holmengraa on dykkepedia.com}.
+
+\end{thebibliography}
+
+\fi
+
 \input{bio/jo_inge_buskenes}
 \input{bio/roy_edgar_hansen}
 \input{bio/andreas_austeng}
