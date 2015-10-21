@@ -3,7 +3,7 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewfalse              % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewtrue              % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifOnlineColor\OnlineColortrue            % Compile online color version?
 
@@ -13,7 +13,7 @@
                                                 % Place floats at end of document?
 \newif\ifTODO\TODOtrue                        % Use todo notes?
 
-\newif\ifBuildBibliography\BuildBibliographytrue  % Whether to include the references.bib file or use inline references.
+\newif\ifBuildBibliography\BuildBibliographyfalse  % Whether to include the references.bib file or use inline references.
 
 \ifOnlineColor
    \newcommand\figPostfix{_online}              % Colored images online
@@ -971,7 +971,7 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 
 \renewcommand\b{\vec b}
 
-Throughout this article we have used LCA with the Kaiser window function. However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function. For this window we can obtain an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. The derivation generalizes the one described for a non-steered window in~\cite{Stoica2005} to also apply for the steered (complex) window. We start by inserting the trigonometric function (\ref{eq:trig_window_function}), with applied steering (\ref{eq:steering_vector}), into the beamformer equation (\ref{eq:beamformer_output}):
+Throughout this article we have used LCA with the Kaiser window function. However, as shown in \Fig{image_quality} we can obtain similar performance using the trigonometric window function. For this window we can obtain an analytic solution for the optimal value of $\alpha$ in the minimum variance sense. The following derivation generalizes that of the non-steered (real) window described in e.g.~\cite{Stoica2005} to also apply for the steered (complex) window. We start by inserting the trigonometric function (\ref{eq:trig_window_function}), with applied steering (\ref{eq:steering_vector}), into the beamformer equation (\ref{eq:beamformer_output}):
 %
 \begin{align}
 \w\H\x &= \sumb{m=0}{M-1} [\a_\phi]_m\Big(\alpha - (1-\alpha)\cos\left(\frac{2\pi m}{M-1}\right)\Big) x_m^* \nn
@@ -1127,6 +1127,13 @@ H.~Stankwitz, R.~Dallaire, and J.~Fienup, ``{Nonlinear apodization for sidelobe
   control in SAR imagery},'' \emph{IEEE Transactions on Aerospace and
   Electronic Systems}, vol.~31, no.~1, pp. 267--279, Jan. 1995.
 
+\bibitem{Buskenes2011}
+J.~I. Buskenes, C.-I.~C. Nilsen, and A.~Austeng, ``{A Low Complexity Adaptive
+  Beamformer for Active Sonar Imaging},'' in \emph{Proceedings of the
+  Underwater Acoustic Measurements: Technologies \& Results}.\hskip 1em plus
+  0.5em minus 0.4em\relax Underwater Acoustic Measurements: Technologies \&
+  Results, 2011.
+
 \bibitem{Harris1978}
 F.~Harris, ``{On the use of windows for harmonic analysis with the discrete
   Fourier transform},'' \emph{Proceedings of the IEEE}, vol.~66, no.~1, pp.
@@ -1167,6 +1174,11 @@ R.~E. Hansen, H.~J. Callow, T.~O. Sabo, and S.~A.~V. Synnes, ``{Challenges in
 
 \bibitem{holmengraa}
 {Article of Holmengraa on dykkepedia.com}.
+
+\bibitem{Stoica2005}
+P.~Stoica and R.~L. Moses, ``{Nonparametric Methods},'' in \emph{Spectral
+  Analysis of Signals}.\hskip 1em plus 0.5em minus 0.4em\relax Prentice Hall,
+  2005, ch.~2, pp. 23--89.
 
 \end{thebibliography}
 
