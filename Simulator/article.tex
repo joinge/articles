@@ -339,6 +339,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 
 % \graphicspath{submission/final/gfx/}
 
+
 \begin{document}
 
 
@@ -394,9 +395,27 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 % Insert page break and insert second title (peer review mode)
 \IEEEpeerreviewmaketitle
 
-\maketitle
 
 \section{Introduction}
+
+\setcounter{totalnumber}{1}
+\setcounter{topnumber}{1}
+\setcounter{dbltopnumber}{1}
+
+\begin{figure*}[t]\centering%
+\graphicsAI[width=.5\linewidth]{gfx/scene_coordinate_system.svg}%
+\caption{Simulator principle.}\label{simulator_coordinate_system}%
+\end{figure*}
+
+% \begin{figure}[t!]\centering%
+% \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
+% \caption{Simulator specifications.}\label{specs}%
+% \end{figure}
+
+\begin{figure*}[t]\centering%
+\graphicsAI[drawing,width=.5\linewidth]{gfx/simulator.svg}%
+\caption{Simulator concept.}\label{buildup}%
+\end{figure*}
 
 
 One of the major shortcomings of autonomous underwater vehicles (AUVs) is their lack of intelligence. When encountering an interesting object, an AUV mounted with a sonar imaging system should be able to tell that this object might be worth closer examination, and act accordingly. This is challenging as what we deem as interesting is often something that stand out form the background, i.e. it relies on previous knowledge. It would also need to process this information is near real-time to act in an efficient manner.
@@ -425,24 +444,8 @@ We assume rough, isotropic surfaces reflecting sound energy equally in all direc
 
 Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator superimpose images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with greater flexibility.
 
-\setcounter{totalnumber}{1}
-\setcounter{topnumber}{1}
-\setcounter{dbltopnumber}{1}
 
-\begin{figure*}[t!]\centering%
-\graphicsAI[width=\linewidth]{gfx/scene_coordinate_system.svg}%
-\caption{Simulator principle.}\label{simulator_principe}%
-\end{figure*}
 
-% \begin{figure}[t!]\centering%
-% \graphicsAI[drawing,width=\linewidth]{gfx/specs.svg}%
-% \caption{Simulator specifications.}\label{specs}%
-% \end{figure}
-
-\begin{figure*}[t!]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}%
-\caption{Simulator concept.}\label{buildup}%
-\end{figure*}
 
 \section{Methods}
 
