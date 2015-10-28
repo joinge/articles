@@ -1,4 +1,4 @@
-
+\synctex=1
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -12,6 +12,8 @@
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
 \newif\ifTODO\TODOtrue                        % Use todo notes?
+
+\newif\ifBuildBibliography\BuildBibliographyfalse  % Whether to include the references.bib file or use inline references.
 
 \ifOnlineColor
    \newcommand\figPostfix{_online}              % Colored images online
@@ -101,22 +103,35 @@
 
 \usepackage{fixltx2e}                           % Fix some twocolumn float problems
 
-\usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+% \usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
                                                 % (double column figures on top/bottom)
 
 \usepackage{url}                                % Support for handling and breaking URLs
 
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
-\newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
-pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
-colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
-pdftitle={A Fast GPU Sonar Simulator for Automatic Target Recognition},
-pdfsubject={},
-pdfauthor={Jo Inge Buskenes},
-pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+% \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
+% pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
+% colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
+% pdftitle={Optimal Window Design for the Low Complexity Adaptive Beamformer in Active Sonar Imaging},
+% pdfsubject={},
+% pdfauthor={Jo Inge Buskenes},
+% pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \ifCLASSINFOpdf
-   \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+%    \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+   \usepackage[pdftex,
+    final,                %Keep hyperlink stuff even when in draft mode
+    breaklinks=true,      %Break links when necessary
+    linktocpage=true,     %Enable link to page?
+    linkcolor=black,  %Colour of links to labels within document
+    citecolor=black,      %Colour of links to the biliography
+    filecolor=red,        %Colour of links to local files
+    pagecolor=black,        %Colour of links to other pages withing document
+    urlcolor=Blue,        %Colour of the links to external URLs
+    colorlinks=true,      %??
+    plainpages=false,     %Store roman/arabic numbering differently to avoid
+    bookmarksnumbered ]{hyperref}
+
 \else
    \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}
    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
@@ -140,7 +155,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % % \let\Oldincludegraphics\includegraphics
 % % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
 
-\usepackage[maxfloats=40]{morefloats}
+% \usepackage[maxfloats=40]{morefloats}
 \newcounter{todoidx}
 % \setcounter{todoidx}
 
@@ -156,7 +171,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
       {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
       \marginpar{%
          {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
-         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\scriptsize #1}}}}
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
 
    \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
 \else
@@ -174,7 +189,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \setlength{\parsep}{\parskip}}%
 \item[]}{\end{list}}
 
-\usepackage{float}
+% \usepackage{float}
 
 \ifOnlineColor
    \definecolor{tabBlue}{HTML}{AACCFF}
@@ -193,6 +208,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 % \DeclareMathOperator*{\argmin}{\text{arg}\;\text{min}}
 
 \newcommand\Fig[1]{Fig.~\ref{#1}}
+\newcommand\eq[1]{(\ref{#1})}
 
 \newcommand\Grey[1]{{\color{Grey}#1}}
 \newcommand\Red[1]{{\color{Red}#1}}
@@ -273,6 +289,7 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand\1{\vec 1}
 \newcommand\I{\mat I}
 \renewcommand*\a{\vec a}
+\newcommand*\f{\vec f}
 \renewcommand*\i{\vec i}
 \renewcommand*\k{\vec k}
 \newcommand*\n{\vec n}
@@ -298,6 +315,8 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \newcommand*\Xd{\X_{\!\Delta}}
 \newcommand*\Y{\mat Y}
 
+\renewcommand\argmin{\text{argmin}}
+
 
 \renewcommand*\P{\mat P}
 \newcommand*\V{\mat V}
@@ -310,34 +329,17 @@ pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
 \renewcommand*\t{^T}
 \newcommand*\h{^H}
 
-\usepackage{tikz}
-\usetikzlibrary{shapes,snakes}
+\newcommand\minus{\scalebox{0.75}[1.0]{$-$}}
+
+% \usepackage{tikz}
+% \usetikzlibrary{shapes,snakes}
 \usepackage{amsmath,amssymb}
 % \usepackage{datatool}
 % \usepackage{glossaries}
 
-\newenvironment{outline}
-{\begin{itemize}}
-{\end{itemize}}
-
-
-% correct bad hyphenation here
-% \hyphenation{op-tical net-works semi-conduc-tor}
-
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% GLOSSARY %
-%%%%%%%%%%%%                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% \makeglossaries
-% \input{../../Library/glossary}
-
-%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% DOCUMENT START %
-%%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% \usepackage{yfonts}
-
-% \graphicspath{submission/final/gfx/}
+% \newenvironment{outline}
+% {\begin{itemize}}
+% {\end{itemize}}
 
 
 \begin{document}
@@ -403,7 +405,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]\centering%
-\graphicsAI[width=.5\linewidth]{gfx/scene_coordinate_system.svg}%
+\graphicsAI[width=\linewidth]{gfx/scene_coordinate_system.svg}%
 \caption{Simulator principle.}\label{simulator_coordinate_system}%
 \end{figure*}
 
@@ -413,7 +415,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 % \end{figure}
 
 \begin{figure*}[t]\centering%
-\graphicsAI[drawing,width=.5\linewidth]{gfx/simulator.svg}%
+\graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}%
 \caption{Simulator concept.}\label{buildup}%
 \end{figure*}
 
@@ -663,7 +665,7 @@ We place, resize and orient objects in an euclidean 3D space using suitable tran
 Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\R$
 There is nothing special to these matrices, but we supply them here for completeness.
 
-We implement rotations in a 3D euclidean space by combining matrices that rotate around each of the three respective dimensions.. For rotation by an angle $\phi_x$ clockwise around the $x$-axis we have
+We implement rotations in a 3D euclidean space by combining matrices that rotate around each of the three respective dimensions. For rotation by an angle $\phi_x$ clockwise around the $x$-axis we have
 \begin{align}
 \R_x(\phi_x) &= \bmat{
 1  &  0           &  0           &  0 \\
