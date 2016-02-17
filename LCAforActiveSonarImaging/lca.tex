@@ -397,9 +397,9 @@
 % 
 % While classical beamformers use predefined windows, adaptive beamformers estimate the optimal window by analytical evaluation of the data. The minimum variance (MV) beamformer, for instance, calculates the set of weights that minimises the variance of the beamformer's output. 
 % 
-We have studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image by adapting the array's weights, MVDR seeks an optimal solution by computing the spatial statistics of the wavefield, while LCA simply selects the best window out of a predefined set. 
+We have studied the low complexity adaptive (LCA) beamformer in active sonar imaging. LCA can be viewed as either a simplification of the minimum variance distortionless response (MVDR) beamformer, or as an adaptive extension to the delay and sum (DAS) beamformer. While both LCA and MVDR attempt to minimize the power of noise and interference in the image, MVDR achieves this by computing optimal array weights from the spatial statistics of the wavefield, while LCA selects the best performing weights out of a predefined set.
 
-We show that a robust MVDR implementation typically creates windows spanning between the rectangular and Hamming. We let LCA select from a set of Kaiser windows with responses in this span, and add some steered variations of each. We limit the steering to roughly half the -3\,dB width of the window's amplitude response. Using experimental data from the Kongsberg Maritime HISAS 1030 sonar we find that LCA and MVDR produce nearly identical images of large scenes, both being superior to DAS. On point targets LCA is able to double the resolution compared to DAS, or provide half that of MVDR. This performance is achieved with a total of 6 windows; the rectangular and Kaiser window with $\beta=5$, in unsteered version, and left and right steered to the steering limit. Slightly smoother images are produced if the window count is increased to 15, but past this we observe minimal difference. Finally we show that LCA works just as well if Kaiser windows are substituted with trigonometric ones.
+To build confidence in the LCA method we show that a robust MVDR implementation typically creates weights spanning between the rectangular and Hamming window function. We let LCA select from a set of Kaiser windows with responses in this span, and add some steered variations of each. We limit the steering to roughly half the -3\,dB width of the window's amplitude response. Using experimental data from the Kongsberg Maritime HISAS 1030 sonar we find that LCA and MVDR produce nearly identical images of large scenes, both being superior to DAS. On point targets LCA is able to double the resolution compared to DAS, or provide half that of MVDR. This performance is achieved with a total of 6 windows; the rectangular and Kaiser window with $\beta=5$, in unsteered version, and left and right steered to the steering limit. Slightly smoother images are produced if the window count is increased to 15, but past this we observe minimal difference. Finally we show that LCA works just as well if Kaiser windows are substituted with trigonometric ones.
 
 All our observations and experiences point to LCA being very easy to understand and manage. It simply works, and is surprisingly insensitive to the exact type of window function, steering amount, or number of windows. It can be efficiently implemented on parallel hardware, and handles any scene without the need for parameter adjustments.
 
@@ -440,7 +440,24 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 % - Brief summary results
 % - Brief conclusions 
 
-\IEEEPARstart{T}{he} best adaptive sonars are found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. Active human made sonars have little to no adaptability on transmit, but several methods have been investigated to adaptively post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's spatial response to minimize the influence of noise and interference in the final image.
+% The promise is already demonstrated in nature.
+
+The sonar systems of the future 
+
+Future sonar systems 
+
+Great promise in adaptivity
+
+The greatest untapped 
+
+The sonars of the future might benefit greatly from adaptivity.
+
+
+Future sonars will likely be 
+
+
+
+\IEEEPARstart{A}{daptive} sonars holds great promise. This promise is allured to in nature by for instance bats, which use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. No man made sonar can currenly match this feat, because it is hard to determine what the correct action is for an arbitrary situation, and too slow to process all the information required to typically slow to process all the information needed to act correctly the situation in time, and non trivial to determine exactly how it should adapt. In current active sonars there is little to no adaptability on transmit, several methods have been investigated to adaptively post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's spatial response to minimize the influence of noise and interference in the final image.
 
 In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This is because MVDR relies on estimating and inverting a covariance matrix. In sonar systems with less than 32 channels the complexity can be reduced and the implementation accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014}. For larger systems the inversion step dominates the computation. This can be dealt with by approximating the full covariance matrix with a small one using space reduction techniques such as beamspace processing~\cite{Asen2013}, or the closely related principal component analysis (PCA) method~\cite{Kim2014}. Another alternative is to assume spatial stationarity to form more easily invertible Toepliz matrices~\cite{Asl2012}. However, the  mentioned methods are still relatively slow compared to DAS.
 
