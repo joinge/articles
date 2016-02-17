@@ -57,12 +57,10 @@
 \ifCLASSINFOpdf
    \usepackage[dvips]{graphicx}                 % Might not work. Use 'latex' instead of 
    \ifFlatArchive\else                          % 'pdflatex'
-      \graphicspath{./gfx/}
    \fi
 \else
    \usepackage[dvips]{graphicx}
    \ifFlatArchive\else
-      \graphicspath{./gfx/}
    \fi
 \fi
 
@@ -342,6 +340,10 @@
 % {\end{itemize}}
 % 
 
+\ifPeerReview
+\graphicspath{./submission/submit1}
+\fi
+
 % \newcommand\multimedia[1]{\textbf{{\color{red}[#1]}}}
 \newcommand\multimedia[2]{\href{#1}{#2}}
 
@@ -526,18 +528,18 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 
 \begin{figure}[tbp]\centering%
 \ifPeerReview%
-\includegraphics[width=.5\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\includegraphics[width=.5\linewidth]{gfx/buske1_online.eps}%
 \else%
-\includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
+\includegraphics[width=\linewidth]{gfx/buske1_online.eps}%
 \fi%
 \caption{Each Kaiser window is steered in the interval $\phi=[0, \phi_{\text{-3dB}}(\beta)]$. The angle $\phi_{\text{-3dB}}(\beta)$ is the amount of steering needed for the steered response to have a -3dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of $\beta$, and we also effectively constrain the white noise gain of the beamformer.}\label{windows_steering}
 \end{figure}
 
 \begin{figure}[tbp]\centering%
 \ifPeerReview%
-\includegraphics[width=.5\linewidth]{gfx/cross_tagged.png}%
+\includegraphics[width=.5\linewidth]{gfx/buske2_online.png}%
 \else%
-\includegraphics[width=\linewidth]{gfx/cross_tagged.png}%
+\includegraphics[width=\linewidth]{gfx/buske2_online.png}%
 \fi%
 \caption{One of the objects used to test the beamformers is a 1\,m by 1\,m resolution test cross attached to an anchor with a diameter of approximately 13\,cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).}\label{cross}
 \end{figure}
@@ -547,7 +549,7 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]\centering%
-\includegraphics[width=\linewidth]{gfx/mvdr_selected_windows_holmengraa.pdf}%
+\includegraphics[width=\linewidth]{gfx/buske3_online.pdf}%
 \caption{\emph{Determining LCA window type}: MVDR image with typical frequency responses for windows used in various pixel regions.\newline
 \emph{Left:}\hfill
 \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, with the pixel groups are indicated with red boxes.}\protect\\\hspace{\textwidth}
@@ -557,7 +559,7 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 
 
 \begin{figure*}[t]%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds.pdf}%
+\includegraphics[width=\textwidth]{gfx/buske4_online.pdf}%
 \caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large and equal size window database, but where the upper bounds for $\beta$ and $\phi$ is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two -3dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
 \newline
 \emph{Upper bound $\beta$:}\hfill
@@ -570,25 +572,25 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 % \setcounter{dbltopnumber}{2}
 
 \begin{figure*}[t]\centering
-\subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a a narrow response ($\beta=0$) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_beta.pdf}%%
+\subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a a narrow response ($\beta=0$) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.]{\includegraphics[width=\textwidth]{gfx/buske5a_online.pdf}%%
 \label{oversampling_mosaic_bounds_beta}}
 \hfil
-\subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{oversampling_mosaic_bounds}.]{\includegraphics[width=\textwidth]{gfx/oversampling_mosaic_bounds_lca_windows_phi.pdf}%
+\subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{oversampling_mosaic_bounds}.]{\includegraphics[width=\textwidth]{gfx/buske5b_online.pdf}%
 \label{oversampling_mosaic_bounds_phi}}
 \caption{Kaiser windows chosen for each pixel in the image. The underlying image is the one shown in \Fig{oversampling_mosaic_bounds}, with the same parameters. The location of the anchor, cut line and main scatter locations of the cross is marked in red.}
 \label{fig_sim}
 \end{figure*}
 
 \begin{figure*}[t]%\centering%
-\includegraphics[width=\textwidth]{gfx/oversampling_mosaic.pdf}%
+\includegraphics[width=\textwidth]{gfx/buske6_online.pdf}%
 \caption{\emph{LCA images using different window database sizes}. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the $\beta$-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than  $N_\beta=2$ window types and $N_\phi=3$ steering angles makes minimal difference.}\label{oversampling_mosaic}
 \end{figure*}
 
 \begin{figure*}[t]\centering
-\subfloat[\emph{Image quality of approximate point scatterers found in the resolution test cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_cross.pdf}%
+\subfloat[\emph{Image quality of approximate point scatterers found in the resolution test cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/buske7a_online.pdf}%
 \label{beamformer_comparison_cross}}
 \hfil
-\subfloat[\emph{Image quality of the full sector Holmengraa scene}. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.]{\includegraphics[width=\textwidth]{gfx/beamformer_comparison_holmengraa.pdf}%%
+\subfloat[\emph{Image quality of the full sector Holmengraa scene}. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.]{\includegraphics[width=\textwidth]{gfx/buske7b_online.pdf}%%
 \label{beamformer_comparison_holmengraa}}
 \caption{Comparing image quality of DAS, MVDR and LCA with Kaiser or trigonometric windows.}\label{image_quality}
 \end{figure*}
