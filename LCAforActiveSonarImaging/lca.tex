@@ -441,29 +441,50 @@ Beamforming, adaptive beamforming, MVDR, LCA, sonar, active, complexity.
 % - Brief conclusions 
 
 % The promise is already demonstrated in nature.
+% 
+% The sonar systems of the future 
+% 
+% Future sonar systems 
+% 
+% Great promise in adaptivity
+% 
+% The greatest untapped 
+% 
+% The sonars of the future might benefit greatly from adaptivity.
+% 
+% 
+% Future sonars will likely be 
 
-The sonar systems of the future 
+% To make a sonar truly perform better, we need to make it smarter. 
+% 
+% \IEEEPARstart{F}{uture} sonar systems will merit a much more sophisticated level of adaptivity. 
+% 
+% \IEEEPARstart{T}{he} next generation sonar systems will be adaptive.
+% 
+% Making sonars adaptive is the way to take them into the future. 
+% 
+% The virtue of future sonar systems will be sophisticated adaptivity. 
+% 
+% Intelligent
+% 
+% Reactive
+% 
+% Observe, process, adapt, act. 
+% 
+% Adaptivity - sense, process, respond
+% 
+% Faster, smarter
+% 
+% The best sonars in nature are adaptive. 
+% Nature allures us to be this bold because 
 
-Future sonar systems 
+\IEEEPARstart{T}{he} best sonars in existence is perhaps found in nature. Bats, for instance, use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. No man made sonar can currenly match this feat, much due to the challenge of processing and adapting to a complex environment fast enough. While human made sonars have little to no adaptivity on transmit, several methods have been investigated to adaptively post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's spatial response to minimize the influence of noise and interference in the final image.
 
-Great promise in adaptivity
-
-The greatest untapped 
-
-The sonars of the future might benefit greatly from adaptivity.
-
-
-Future sonars will likely be 
-
-
-
-\IEEEPARstart{A}{daptive} sonars holds great promise. This promise is allured to in nature by for instance bats, which use a high frequency sonar to detect, identify and track prey with amazing precision in caves amongst a myriad of other bats. No man made sonar can currenly match this feat, because it is hard to determine what the correct action is for an arbitrary situation, and too slow to process all the information required to typically slow to process all the information needed to act correctly the situation in time, and non trivial to determine exactly how it should adapt. In current active sonars there is little to no adaptability on transmit, several methods have been investigated to adaptively post process the received data. Perhaps the best studied method for reconstructing a sonar image is the minimum variance distortion-less response (MVDR) beamformer~\cite{Capon1969}. It adapts the sonar array's spatial response to minimize the influence of noise and interference in the final image.
-
-In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This is because MVDR relies on estimating and inverting a covariance matrix. In sonar systems with less than 32 channels the complexity can be reduced and the implementation accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014}. For larger systems the inversion step dominates the computation. This can be dealt with by approximating the full covariance matrix with a small one using space reduction techniques such as beamspace processing~\cite{Asen2013}, or the closely related principal component analysis (PCA) method~\cite{Kim2014}. Another alternative is to assume spatial stationarity to form more easily invertible Toepliz matrices~\cite{Asl2012}. However, the  mentioned methods are still relatively slow compared to DAS.
+In many cases MVDR can improve the contrast and resolution of active sonar images compared to conventional static methods~\cite{Blomberg2013,Blomberg2012a,Lo2004}. However, while the computational complexity of conventional beamformers are linear with the number of channels, O($M$), MVDR is at O($M^3$). This is because MVDR relies on estimating and inverting a covariance matrix. The estimation step dominates the computation in sonar systems with less than 32 channels, but here computational complexity can be reduced and the implementation accelerated significantly using graphics computing units (GPUs)~\cite{Buskenes2014}. For larger systems the inversion step dominates. This can be dealt with by approximating the full covariance matrix with a small one using space reduction techniques such as beamspace processing~\cite{Asen2013}, or the closely related principal component analysis (PCA) method~\cite{Kim2014}. Another alternative is to assume spatial stationarity to form more easily invertible Toepliz matrices~\cite{Asl2012}. However, the mentioned methods are still relatively slow compared to DAS.
 
 A much faster and simpler alternative to MVDR is the Low Complexity Adaptive (LCA) beamformer. Based on an idea by Vignon~\cite{Vignon2008}, it was first introduced by Synnev\aa{}g \emph{et al}. in clinical medical imaging~\cite{Synnevag2008}, who demonstrated its ability to obtain very similar image quality to MVDR in systems with focused transmit beams. LCA applies a set of predefined windows, or apodization weights, and selects the one offering the best sidelobe suppression. It relies on the same optimization criterion as MVDR, thus may be considered a version of MVDR with a reduced window solution space. Alternatively, it may be viewed as a multi-apodization technique. One such method is described by Stankwitz \emph{et al}. in radar imaging~\cite{Stankwitz1995}, where the best out of 2 or 3 windows are selected. However, LCA is different in that it typically selects from a larger pool of windows and allows micro-steered variations of them. This gives LCA an adaptive freedom that is somewhere in between that of traditional multi-apodization techniques and MVDR.
 
-Synnev\aa{}g \emph{et al}. suggested using a window set comprised of rectangular, Kaiser (or Kaiser-Harris) and inverted Kaiser functions. In total he made LCA choose from 12 unique windows, 6 of which were micro-steered variants of a fairly wide Kaiser window, and with the rectangular window included. This was motivated by the desire to use wide windows with maximum sidelobe suppression near the receiver, and narrow windows at greater depths for maximum sensitivity and depth penetration. While achieving good results, it was not made clear how many windows LCA needs, or how they ideally should be steered. Also, it is not apparent how LCA performs in sonar systems where the transmit beam is unfocused.
+Synnev\aa{}g \emph{et al}. suggested using a window set comprised of rectangular, Kaiser (or Kaiser-Harris) and inverted Kaiser functions. In total he made LCA choose from 12 unique windows, 6 of which were micro-steered variants of a fairly wide Kaiser window, and with the rectangular window included. Micro-steering is means to phase-shift the array's elements to finetune the azimuth angle the array is steered towards. This was motivated by the desire to use wide windows with maximum sidelobe suppression near the receiver, and narrow windows at greater depths for maximum sensitivity and depth penetration. While achieving good results, it was not made clear how many windows LCA needs, or how they ideally should be steered. Also, it is not apparent how LCA performs in sonar systems where the transmit beam is unfocused.
 
 In this study we expand our previous work of applying LCA to active sonar imaging~\cite{Buskenes2011}. We use variations of the parametric Kaiser window, but also compare it to the trigonometric window function. We extend Synnev\aa{}g's work by steering all our windows and not just some, and demonstrate how LCA's performance is affected by the type and number of windows included. Our results are obtained using experimental data from the 32 element Kongsberg Maritime HISAS 1030 synthetic aperture sonar (SAS), which operates at 100\,kHz with an element beamwidth of 23$^\circ$. 
 
