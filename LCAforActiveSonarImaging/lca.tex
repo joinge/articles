@@ -596,7 +596,7 @@ The problem lies in estimating and inverting this spatial covariance matrix. We 
 \emph{Left:}\hfill
 \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, with the pixel groups are indicated with red boxes.}\protect\\\hspace{\textwidth}
 \emph{Right:}\hfill
-\parbox[t]{.95\linewidth}{MVDR window amplitude and phase responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the image. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.} }\label{mvdr_selected_windows}
+\parbox[t]{.95\linewidth}{MVDR window amplitude and phase responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the image. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.} }\label{mvdr_selected_windows}
 \end{figure*}
 
 
@@ -686,7 +686,7 @@ If the pixels are correlated laterally, we can include a weighted combination of
 s_z^2 = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} \omega[x',n']\big| z[x',n'] \big|^2
 \end{align}
 %
-where $N_x = 2X+1$ is the number of azimuth lines to average over, and $\omega[x',n']$ is a normalized 2 dimensional weight function. Since we oversample slightly laterally when we delay each pixel (see Section \ref{sec:lca_oversampling}), we thought the lateral correlation to be sufficient to benefit from this. However, we observed no visual improvement applying this averaging in our case. Also, since the effect of phase-steering windows is hard to predict. Henceforth no lateral averaging will be applied.
+where $N_x = 2X+1$ is the number of azimuth lines to average over, and $\omega[x',n']$ is a normalized 2 dimensional weight function. Since we oversample slightly laterally when we delay each pixel (see Section \ref{sec:lca_oversampling}), we thought the lateral correlation to be sufficient to benefit from this. However, we observed no visual improvement from applying this technique, and decided not to use it.
 % 
 % \begin{itemize}
 % \item \emph{Window function}
