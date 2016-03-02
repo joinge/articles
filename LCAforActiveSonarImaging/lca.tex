@@ -546,7 +546,7 @@ The output $z[n]$ of a beamformer is defined as the weighted sum of all the dela
 z[n] = \w\H[n]\x[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]},\label{eq:beamformer_output}
 \end{align}
 %
-where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window, apodization or taper function. If the window real its response is symmetric. Applying a real window that trails off towards the edges creates a response with lower sidelobe levels and wider mainlobe, which translates into improved noise suppression at the cost of reduced resolution, respectively~\cite{Harris1978}.
+where $w_m$ is the weight factor assigned to channel $m$. A weight set is commonly called a window, apodization or taper function. When the window is real its response is symmetric. Applying a real window that trails off towards the edges creates a response with lower sidelobe levels and wider mainlobe, which translates into improved noise suppression at the cost of reduced resolution, respectively~\cite{Harris1978}.
 
 Conventional beamformers all have static and usually real weights. The reference method is the delay-and-sum (DAS) beamformer, also know as the backprojection algorithm. It delays each pixel into focus, then applies a suitable window, and finally sums the data. The virtue of DAS is its simplicity, robustness to parameter errors, linear processing of the image and the ease of which it can be implemented in parallel hardware.
 
@@ -680,13 +680,13 @@ E\big\{\big|z[n]\big|^2\big\} \approx s_z^2 = \frac{1}{N_k} \sumb{n'=n-K}{n+K} \
 %
 which computes the sample power average over $N_k=2K+1$ temporal samples. This is the same temporal averaging method we use for MVDR. In our case the bandwidth of our matched filtered signal is a just few samples long, hence $K=1$ will be used for both MVDR and LCA throughout this work.
 
-Since pixels are correlated laterally, we can include a weighted combination of these as well to improve the variance estimation:
+If the pixels are correlated laterally, we can include a weighted combination of these as well to improve the variance estimation:
 %
 \begin{align}
 s_z^2 = \frac{1}{N_x N_k} \sumb{\nmat{\scriptstyle x'=\\[-2mm]\scriptstyle x-X}}{x+X} \sumb{\nmat{\scriptstyle n'=\\[-2mm]\scriptstyle n-K}}{n+K} \omega[x',n']\big| z[x',n'] \big|^2
 \end{align}
 %
-where $N_x = 2X+1$ is the number of azimuth lines to average over, and $\omega[x',n']$ is a normalized 2 dimensional weight function. However, we observed no visual improvement doing this, and the effect of phase-steered windows is hard to predict. Henceforth no lateral averaging will be applied.
+where $N_x = 2X+1$ is the number of azimuth lines to average over, and $\omega[x',n']$ is a normalized 2 dimensional weight function. Since we oversample slightly laterally when we delay each pixel (see Section \ref{sec:lca_oversampling}), we thought the lateral correlation to be sufficient to benefit from this. However, we observed no visual improvement applying this averaging in our case. Also, since the effect of phase-steering windows is hard to predict. Henceforth no lateral averaging will be applied.
 % 
 % \begin{itemize}
 % \item \emph{Window function}
