@@ -3,7 +3,7 @@
 % CONDITIONALS %
 %%%%%%%%%%%%%%%%                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifPeerReview\PeerReviewfalse              % Whether to create the PeerReview version or
+\newif\ifPeerReview\PeerReviewtrue              % Whether to create the PeerReview version or
                                                 % Journal version
 \newif\ifOnlineColor\OnlineColortrue            % Compile online color version?
 
@@ -1005,9 +1005,13 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 
 \section{Steering angle}\label{appendix:steering_angles}
 
-\begin{figure}[t]%\centering%
+\begin{figure}[t]
+\ifPeerReview\centering%
+\includegraphics[width=.5\linewidth]{gfx/buske8_online.eps}%
+\else%
 \includegraphics[width=\linewidth]{gfx/buske8_online.eps}%
-\caption{\emph{Steering angle needed to cut the \protect\minus{}3\,dB distance of the Kaiser window's spatial response in half}. The needed amount of steering depends on the number of channels $M$, the element spacing relative to the wavelength $\frac{d}{\lambda}$, and the Kaiser parameter $\beta$. }\label{steering_angle_3dB}
+\fi%
+\caption{\emph{Steering angle needed to cut the \protect\minus{}3\,dB distance of the Kaiser window's spatial response in half}. The needed amount of steering depends on the number of channels $M$, the element spacing relative to the wavelength $\frac{d}{\lambda}$, and the Kaiser parameter $\beta$. Note how the angle scales near proportionally with $\frac{d}{\lambda}$. }\label{steering_angle_3dB}
 \end{figure}
 %
 One of the goals of this article was to characterize the windows used by the MVDR method, and then identify a subset of these that were suitable for use with the LCA method. We determined that the Kaiser function could fit the role of producing the relevant windows. The spatial response of a steered Kaiser window depends on the number of channels $M$, the element spacing relative to the wavelength $\frac{d}{\lambda}$, the Kaiser parameter $\beta$, and the amount of steering $\phi$.
@@ -1075,7 +1079,7 @@ In this computation there are only 4 and 7 unique complex additions and multipli
 
 \section{Multimedia Files and Source Code}\label{app:source_code}
 
-This article is accompanied by some multimedia files and source code for determining the steering angles for LCA's windows. It is located at:
+This article is accompanied by some multimedia files and source code for determining the steering angles for LCA's windows. They are located at:
 
 \url{\articlePath}
 
@@ -1179,11 +1183,6 @@ F.~Vignon and M.~R. Burcher, ``{Capon beamforming in medical ultrasound imaging
 J.-F. Synnev\aa{}g, A.~Austeng, and S.~Holm, ``{A low-complexity data-dependent
   beamformer},'' \emph{IEEE Transactions on Ultrasonics, Ferroelectrics and
   Frequency Control}, vol.~58, no.~2, pp. 281--289, feb 2011.
-
-\bibitem{Synnevag2008}
-J.-F. Synnev\aa{}g, S.~Holm, and A.~Austeng, ``{A low complexity data-dependent
-  beamformer},'' in \emph{2008 IEEE Ultrasonics Symposium}, no.~2.\hskip 1em
-  plus 0.5em minus 0.4em\relax IEEE, Nov. 2008, pp. 1084--1087.
 
 \bibitem{Stankwitz1995}
 H.~Stankwitz, R.~Dallaire, and J.~Fienup, ``{Nonlinear apodization for sidelobe
