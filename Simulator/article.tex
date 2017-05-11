@@ -414,17 +414,36 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \caption{Simulator concept.}\label{buildup}%
 \end{figure*}
 
-\IEEEPARstart{O}{ne} of the greatest visions in science is that of artificial intelligence. If we could make machines not only do what we say, but also able to adapt their behaviour to handle the unexpected, the possibilities are perhaps only limited by our imagination. An apparent area of use is devices designed to sense and act without aid, such as autonomous underwater vehicles (AUVs). When an AUV with a sonar imaging system encounter an interesting object, it would be very beneficial if adapted its behavior to examine the object further. This is challenging as it would need to learn in what ways the interesting objects differ from the background, i.e. it relies on previous knowledge. It would also need to process this information is near real-time to act in an efficient manner.
+% \IEEEPARstart{W}{hen} 
+% Autonomous underwater vehicles (AUVs). When an AUV with a sonar imaging system encounter an interesting object, it would be very beneficial if adapted its behavior to examine the object further. This is challenging as it would need to learn in what ways the interesting objects differ from the background, i.e. it relies on previous knowledge. It would also need to process this information is near real-time to act in an efficient manner.
 
 % - Adapt simulation to its behaviour, see if they still match.
 
+\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are becoming increasingly important in human underwater endeavors. When equipped with a synthetic aperture sonar (SAS), they can e.g. be used to map the seafloor, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or hunt for mines and biohazard waste. Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to improve imaging performance.
+ 
 % Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, compare it with a set of template images of the relevant object classes, and assign it to the class of the template with the the best fit.
 
-The detection process is well described in the field of automatic target recognition (ATR). The classical approach involves isolating an object of interest, extracting parameters from it and feeding those into a classifier. However, it is hard to find parameters that describe the objects uniquely, in particular due to the ambiguities arising from interpreting a 3D world from its 2D projection. An alternative approach is to use template matching, where the image segment is compared to a set of template images covering the relevant object classes, and assigned to the class of the template yielding the the best fit. The challenge here is to come up with accurate template images covering the actual configurations of object and seabed, especially if a static template library is used, which will lead to a computational complexity that is exponential with the number of model parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+In conventional ATR an object of interest is first isolated, its properties attempted estimated, and a classifier used to determine what object class these properties belong to. The challenge is finding unique and intrinsic object properties, such as its type, shape and size, and to do so independently of extrinsic properties such as its alignment, burial depth, degeneration level or view angle. While SAS provide images with state of the art resolution and dynamic range, they still only represent an ambiguous acoustical 2D projection of the 3D object, littered with a highly coherent noise floor. 
 
-We have developed a synthetic aperture sonar (SAS) simulator that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and object class into OpenGL and positions the camera at the sonar location. The scene is highlighted using a light tube that extends to infinity along the AUV's axis of probagation. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. The OpenGL rendering produces an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+An alternative approach is to use template matching, where the isolated image segment is compared to a set of template images covering the relevant object classes, and assigned to the class of the template with the best fit. Since the templates are computed from 3D models, this reduces the issue of image ambiguity. However, a challenge is finding a set of templates that represent the actual configurations of object and seafloor, Another issue is that the size of precomputed library of templates grows exponentially with the number of parameters needed. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
-The alternative of using of a static, predetermined template library has a computational complexity that is exponential with the number of parameters. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+
+% We avoid the problems of conventional template matching by computing the templates on-the-fly as part of the classification process, thereby not needing a precomputed set of templates at all. 
+%  that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process.
+% Classification process
+
+We tackle the problems of conventional template matching by performing:
+%
+\begin{itemize}
+\item \emph{Adaptive template matching}; where a template is selected based on object and seafloor parameters estimated from the SAS image~\cite{Midelfart2010}, and
+\item \emph{Real-time template simulation}; where a template is created tailored to the estimated parameters, improving its accuracy and avoiding the need of a precomputed template library.
+\end{itemize}
+%
+
+The methods presented herein will focus on the template simulator, but some details will also be given on adaptive template matching for completeness. More details on this technique can be found in~\cite{Midelfart2010}.
+
+
+ This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and object class into OpenGL and positions the camera at the sonar location. The scene is highlighted using a light tube that extends to infinity along the AUV's axis of probagation. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. The OpenGL rendering produces an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
 
 as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering.
 
@@ -455,9 +474,10 @@ Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter.  Th
 \item Speed considerations
 \end{itemize}
 
+Models are not ROCCAN (???)
 
 
-\subsection{Setting up the scene}
+\subsection{Loading the scene}
 
 Our models are stored in regular 3D model files. The simulator begins by loading these into a tree of nodes, each representing a vertex in the model with corresponding facet and texture information. Then the vertices are placed into a virtual scene in OpenGL, and a camera set up to capture the part of the scene corresponding to the image. When OpenGL renders the image, it first computes which vertex contributes to which pixel in the image, then computes the intensity and color of the pixel based on the node's facet, texture and scattering model. The code that operates on vertices are called a vertex shader, and the code that operates on pixels are called a fragment shader.
 
@@ -568,10 +588,45 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 
 \subsection{Template matching}
 
+1. Segmentation
+2. Parameter estimation
+   Available: Range, altitude, resolution => Input to both standard and adaptive. In standard the best fit out of a predefined template database is selected, then resampled to correct resolution.
+   Additional for adaptive, parameters that modify object model: Target aspect angle, seafloor slope, object length and height.
+
+   Target aspect angle computed with Radon Transform, seafloor under object modeled as plane with a slope estimated from bathymetric data, length estimated from longest part of highlight region, and height estimated from the shape of the shadow. The burial depth is n
+
+
+   
+3. 
+
+   Details: \ref{Midelfart2010}.
+
+Let $S(x,y)$ be the isolated part of the
+
+Matching the isolated image segment with the template take the form of
+
+\begin{align}
+c_{h,i} = \underset{x',y'}{\text{argmax}} \sum\limits_{\forall x}\sum\limits_{\forall y} \big| H(x,y) - T(x-x',y-y') \big|
+\end{align}
+
+\begin{align}
+c_i = \frac{c_{h,i} + c_{s,i}}{2}
+\end{align}
+
+And the final template used is the one with the greatest correlation coefficient
+
+\begin{align}
+\underset{T_i(x,y)}{\text{argmax}} C_i\sum\limits_{\forall x}\sum\limits_{\forall y}  S(x,y) T(x-x',y-y')
+\end{align}
+
+Then assign object to class $i$.
+
+
 To narrow down the search space of possible templates we derive some reliable statistics of the seafloor and object from the SAS image. While FFISim accepts an arbitrarily complex seabed, we find that modeling it as a plane wave with the right tilt works well. The object is more difficult. For instance, we estimate its length and height from the shape of its shadow, but this fails if the object is notably immersed into the seabed at one end. 
 
 After the a template is created we decompose it into its highlight and shadow component, and compute a correlation score between these and the corresponding areas in the SAS image. Then the two scores are summed and normalized to form the final correlation score of the template.
 
+We tag the template matchers as either semi- or fully adaptive. The former refers to using the best matching SIGMAS+ generated template out of a precomputed set of templates, while the latter refers to the proposed method of using FFISim to generate templates on the-the-fly. \todo{Should be more precise. How many templates? Parameter span? How finely were the parameters sampled?} 
 
 % It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
 
@@ -651,13 +706,8 @@ Write to file
 \section{Results \& Discussion}
 
 \begin{figure*}[!tbp]\centering%
-\graphicsAI[width=\linewidth]{gfx/fig_images_sonar_tagged.svg}\label{fig_image_sonar}%
-\caption{SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Most of the 1000+ detected objects this run are similar to these.}
-\end{figure*}
-
-\begin{figure*}[!tbp]\centering%
-\graphicsAI[width=\linewidth]{gfx/fig_images_simulator.pdf}\label{fig_image_simulation}%
-\caption{SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Most of the 1000+ detected objects this run are similar to these.}
+\graphicsAI[width=\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}\label{fig_images_sonar_simulation}%
+\caption{Selected objects. Top row show SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Center row show the best match from a conventional template matcher, and bottom row show the adaptive template matcher. The contour of the SAS object is indicated with red lines. Note that the adaptive technique produce templates with a better fit to the highlight, but that this does not necessarily lead to a better match against the shadow.}
 \end{figure*}
 
 \begin{figure*}[!tbp]\centering%
@@ -691,20 +741,28 @@ Write to file
 
 The performance of our simulator and template matching techniques where measured using experimental data from an interferometric HISAS1030 synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$\circ$, and is capable of generating synthetic images with a theoretical resolution of 3-4\,cm in both dimensions. The version of HUGIN used also carries an camera that is used for optical inspection of interesting objects.
 
-We present data from three different HUGIN runs from the Jesus Bay in Norway. The first two are taken a couple days apart in January 2009, the last in June 2012. There are roughly 3000 detections in each, most representing by cylinder shaped objects such as barrels, pipe mines and torpedoes. Therefore, the standard template library were created with SIGMAS+ using a basic  cylinder model with a set of geometrical properties commonly found in the scene\todo{Should be more precise. How many templates? How finely were the parameters sampled?}. For a fair comparison, FFISim was restricted to the same cylinder model as well.
+We present data from three different HUGIN runs from the Jesus Bay in Norway. The first two are taken a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. The detections represent mostly cylinder shaped objects such as barrels, pipe mines and torpedoes. Therefore, all templates were based on a basic cylinder model.
 
-In \Fig{fig_image_sonar} we display SAS images of three typical objects in the 2012 run. All are cylindric; the length two first being estimated to roughly 3\,m and the last 5\,m, likely representing cylinder mines and a torpedo, respectively. 
+
+
+
+The two template matchers can be visually inspected in \Fig{fig_images_sonar_simulator_tagged}. 
+
+The classification performance is quantified with receiver operating characteristics (ROC) curves from all runs in \Fig{fig_roc_curves}. The 2009 runs proves a greater challenge than that from 2012, with 5 and 3 false positive detections at FPR=20\% in the January 6. and 8. run, respectively. This came as no surprise due to the 2009 runs containing fish trawler tracks and having poorer highlight and shadow quality than the run from 2012. However, for FPR<20\% the adaptive techniques outperform the static template library. For e.g. a mine counter measures (MCM) operation, this is the only region of interest because only a few objects out of the 3000 detections will be visually inspected up close.
+
+- Stm stimulated with length matching test cylinder. Perfect score against this.
+- Atm - not given to improve score. Shadow and highlight both need to match, and overfitting could lead to reduced performance.
+
+In \Fig{fig_images_sonar_simulator_tagged} we compare the SAS image to the templates generated by the conventional and adaptive template matcher. Three typical objects from the 2012 were chosen, all being cylindric. The length two first being estimated to roughly 3\,m and the last 5\,m, likely representing cylinder mines and a torpedo, respectively. 
+
+Selected objects. Top row show SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Center row show the best match from a conventional template matcher, and bottom row show the adaptive template matcher. The contour of the SAS object is indicated with red lines. Note that the adaptive technique produce templates with a better fit to the highlight, but that this does not necessarily lead to a better match against the shadow.
 
 Rotation around ground range axis: -4,-2,0,2,4 degrees.
 
 Like the majority of objects in the Jesus Bay they are all cylinders with a length of a few meters. The same objects are simulated in \Fig{fig_image_simulation}, one with SIGMAS and the two other with FFISim. Each of these simulations were based on 
 
 
-The classification performance is quantified with receiver operating characteristics (ROC) curves from all runs in \Fig{fig_roc_curves}. As expected, the 2009 runs proves a greater challenge than that from 2012, with 5 and 3 false positive detections at FPR=20\% in the January 6. and 8. run, respectively. This can partly be explained by incorrect estimation of orientation for a few objects in close proximity to fish trawler tracks, and partly by poor quality in highlight, shadow, or both. However, for FPR<20\% the adaptive techniques do much better than the static template library. For e.g. a mine counter measures (MCM) operation, this is the only region of interest because only a few objects out of the 3000 detections will be visually inspected up close.
 
-
-- Stm stimulated with length matching test cylinder. Perfect score against this.
-- Atm - not given to improve score. Shadow and highlight both need to match, and overfitting could lead to reduced performance.
 
 
 Good statistics drawn from the image -> adaptive better. Poor statistics -> hit and miss.
