@@ -266,8 +266,10 @@ elif [ "$CAP_FILETYPE" = "PS" ]; then
     echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "EPS" ]; then
-  echo "Running: epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf"
-  epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf
+  if [ $PATHLOCFILE/$FILENAME.$FILETYPE -nt $PATHLOCFILE/$FILENAME.pdf ]; then
+   echo "Running: epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf"
+   epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf
+  fi
 
 #   mv $FILENAME.pdf $PATHLOCFILE/
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
