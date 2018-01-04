@@ -3,6 +3,12 @@
 TMPDIR='./tmp'
 GRAPHICSDIR='./gfx'
 GITINTERVAL=$(( 30*60 ))
+TEXFILE_INPUT=$1
+TEXFILE=${TEXFILE_INPUT%*.tex}
+
+echo "**********"
+echo "* la2pdf *"
+echo "**********"
 
 cd $TMPDIR
 if [ $? -ne 0 ]; then
@@ -29,54 +35,57 @@ echo ">> $GRAPHICSDIR already exists. Performing no further actions."
 cd ..
 fi
 
-# Running latex twice:
-echo ':) Starting latex..'
-pdflatex -synctex=1 -interaction=nonstopmode -enable-write18 ${1}.tex
-if [ $? -ne 0 ]; then
-  echo ':( FAILED: latex'
-  exit 1
-fi
-pdflatex -synctex=1 -interaction=nonstopmode -enable-write18 ${1}.tex
-if [ $? -ne 0 ]; then
-   echo ':(  FAILED: latex'
-   exit 1
-fi
-echo ':)  SUCCESS: latex'
-
-# # Converting from DVI to PDF:
-# echo ':)  Starting dvipdfmx..'
-# dvipdfmx ${1}.dvi
+latexmk -xelatex --synctex=1 -interaction=nonstopmode -file-line-error --shell-escape ${TEXFILE}.tex
+# 
+# 
+# # Running latex twice:
+# echo ':) Starting latex..'
+# xelatex -synctex=1 -interaction=nonstopmode -enable-write18 ${TEXFILE}.tex
 # if [ $? -ne 0 ]; then
-#   echo ':(  FAILED: dvipdfmx'
+#   echo ':( FAILED: latex'
 #   exit 1
 # fi
-# echo ':)  SUCCESS: dvipdfmx'
-  
-  
-# Run bibtex:
-# sed s/'\\aa '/'\{\\aa\}'/g
-
-echo "$(grep '\\bibdata' ${1}.aux)"
-BIBPATH=$(grep '\\bibdata' ${1}.aux | sed -e s/'\\bibdata{\([a-zA-ZæøåÆØÅ\/\.]*\)}'/'\1'/g)
-echo $BIBPATH
-# sed -i s/'\\aa\s*'/'å'/g $BIBPATH.bib
-# sed -i s/'\\ae\s*'/'æ'/g $BIBPATH.bib
-# sed -i s/'\\o\s*'/'ø'/g $BIBPATH.bib
-# sed -i s/'\\aa\s*'/'\\\aa{\}'/g $BIBPATH.bib
-# sed -i s/'\\ae\s*'/'\\ae\{\}'/g $BIBPATH.bib
-# sed -i s/'\\o\s*'/'\\o\{\}'/g $BIBPATH.bib
-# sed -i s/'\\aa\s*'/'\{\\aa\}'/g $BIBPATH.bib
-# sed -i s/'\\ae\s*'/'\{\\ae\}'/g $BIBPATH.bib
-# sed -i s/'\\o\s*'/'\{\\o\}'/g $BIBPATH.bib
-
-echo ':) Building bibliography..'
-bibtex ${1}.aux
-
-if [ $? -ne 0 ]; then
-   echo ':( FAILED: bibtex'
-   exit 1
-fi
-echo ':) SUCCESS: bibtex'
+# xelatex -synctex=1 -interaction=nonstopmode -enable-write18 ${TEXFILE}.tex
+# if [ $? -ne 0 ]; then
+#    echo ':(  FAILED: latex'
+#    exit 1
+# fi
+# echo ':)  SUCCESS: latex'
+# 
+# # # Converting from DVI to PDF:
+# # echo ':)  Starting dvipdfmx..'
+# # dvipdfmx ${TEXFILE}.dvi
+# # if [ $? -ne 0 ]; then
+# #   echo ':(  FAILED: dvipdfmx'
+# #   exit 1
+# # fi
+# # echo ':)  SUCCESS: dvipdfmx'
+#   
+#   
+# # Run bibtex:
+# # sed s/'\\aa '/'\{\\aa\}'/g
+# 
+# echo "$(grep '\\bibdata' ${TEXFILE}.aux)"
+# BIBPATH=$(grep '\\bibdata' ${TEXFILE}.aux | sed -e s/'\\bibdata{\([a-zA-ZæøåÆØÅ\/\.]*\)}'/'\1'/g)
+# echo $BIBPATH
+# # sed -i s/'\\aa\s*'/'å'/g $BIBPATH.bib
+# # sed -i s/'\\ae\s*'/'æ'/g $BIBPATH.bib
+# # sed -i s/'\\o\s*'/'ø'/g $BIBPATH.bib
+# # sed -i s/'\\aa\s*'/'\\\aa{\}'/g $BIBPATH.bib
+# # sed -i s/'\\ae\s*'/'\\ae\{\}'/g $BIBPATH.bib
+# # sed -i s/'\\o\s*'/'\\o\{\}'/g $BIBPATH.bib
+# # sed -i s/'\\aa\s*'/'\{\\aa\}'/g $BIBPATH.bib
+# # sed -i s/'\\ae\s*'/'\{\\ae\}'/g $BIBPATH.bib
+# # sed -i s/'\\o\s*'/'\{\\o\}'/g $BIBPATH.bib
+# 
+# echo ':) Building bibliography..'
+# bibtex ${TEXFILE}.aux
+# 
+# if [ $? -ne 0 ]; then
+#    echo ':( FAILED: bibtex'
+#    exit 1
+# fi
+# echo ':) SUCCESS: bibtex'
 
 
 # Commit changes if it's about time to do so:
@@ -107,16 +116,16 @@ fi
 
 # echo ":) Cleaning up. Moving files to $TMPDIR"
 #   mv *.aux          $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.dvi       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.glg       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.glo       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.gls       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.ist       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   cp ${1}.log       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.out       $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.ps        $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}-pics.pdf  $TMPDIR 2>> $TMPDIR/$MOVELOG
-#   mv ${1}.toc       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.dvi       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.glg       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.glo       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.gls       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.ist       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   cp ${TEXFILE}.log       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.out       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.ps        $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}-pics.pdf  $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${TEXFILE}.toc       $TMPDIR 2>> $TMPDIR/$MOVELOG
 # echo ":) Done."
 # echo ""
 
@@ -145,35 +154,35 @@ fi
 # printLATEXLOG
 # echo 'ï¿½~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ï¿½'
 
-if [ "$FILENAMEPRESENT" = "Yes" ]; then
-  VAR=$(ps -ef | grep $PDFVIEWER | grep $FILENAME)
-
-  if [ "$VAR" = "" ]; then
-    echo ":) No $PDFVIEWER session with ${FILENAME}.pdf opened detected. Opening PDF file."
-    nohup $PDFVIEWER  $COMPILEDDIR/${FILENAME}.pdf > $TMPDIR/nohup.log &
-  else
-    #sleep 0.5s
-    echo 'Sleeping 1s prior to updating file'
-    sleep 1s  #Note: It might be necessary to change this when document becomes large.
-    touch $COMPILEDDIR/${FILENAME}.pdf #Okular fails to automatically reload without this
-  fi
-else
-  VAR=$(ps -ef | grep $PDFVIEWER | grep ${1})
-
-  if [ "$VAR" = "" ]; then
-    echo ":) No $PDFVIEWER session with ${1}.pdf opened detected. Opening PDF file."
-#     nohup $PDFVIEWER  $COMPILEDDIR/${1}.pdf > $TMPDIR/nohup.log &
-  else
-    #sleep 0.5s
-    echo 'Sleeping 1s prior to updating file'
+# if [ "$FILENAMEPRESENT" = "Yes" ]; then
+#   VAR=$(ps -ef | grep $PDFVIEWER | grep $FILENAME)
+# 
+#   if [ "$VAR" = "" ]; then
+#     echo ":) No $PDFVIEWER session with ${FILENAME}.pdf opened detected. Opening PDF file."
+#     nohup $PDFVIEWER  $COMPILEDDIR/${FILENAME}.pdf > $TMPDIR/nohup.log &
+#   else
+#     #sleep 0.5s
+#     echo 'Sleeping 1s prior to updating file'
 #     sleep 1s  #Note: It might be necessary to change this when document becomes large.
-    touch $COMPILEDDIR/${1}.pdf #Okular fails to automatically reload without this
-  fi
-#   echo "touching ${1}"
-#   sleep 2s  #Note: It might be necessary to change this when document becomes large.
-#   touch $COMPILEDDIR/${1}.pdf #Okular fails to automatically reload without this
-
-#   cp ${1}.pdf $COMPILEDDIR/${1}.pdf 
-fi
+#     touch $COMPILEDDIR/${FILENAME}.pdf #Okular fails to automatically reload without this
+#   fi
+# else
+#   VAR=$(ps -ef | grep $PDFVIEWER | grep ${TEXFILE})
+# 
+#   if [ "$VAR" = "" ]; then
+#     echo ":) No $PDFVIEWER session with ${TEXFILE}.pdf opened detected. Opening PDF file."
+# #     nohup $PDFVIEWER  $COMPILEDDIR/${TEXFILE}.pdf > $TMPDIR/nohup.log &
+#   else
+#     #sleep 0.5s
+#     echo 'Sleeping 1s prior to updating file'
+# #     sleep 1s  #Note: It might be necessary to change this when document becomes large.
+#     touch $COMPILEDDIR/${TEXFILE}.pdf #Okular fails to automatically reload without this
+#   fi
+# #   echo "touching ${TEXFILE}"
+# #   sleep 2s  #Note: It might be necessary to change this when document becomes large.
+# #   touch $COMPILEDDIR/${TEXFILE}.pdf #Okular fails to automatically reload without this
+# 
+# #   cp ${TEXFILE}.pdf $COMPILEDDIR/${TEXFILE}.pdf 
+# fi
 
 exit 0

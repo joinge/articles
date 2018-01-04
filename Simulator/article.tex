@@ -201,7 +201,8 @@
 % MACROS %       
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newcommand\graphicsAI[2][]{%
+\let\oldincludegraphics\includegraphics
+\renewcommand\includegraphics[2][]{%
   \immediate\write18{./bin/laFigure #2 #1}%
   \input{result}}%
   
@@ -405,12 +406,12 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{dbltopnumber}{1}
 
 \begin{figure*}[t]\centering%
-\graphicsAI[width=\linewidth]{gfx/scene_coordinate_system.svg}%
+\includegraphics[width=\linewidth]{gfx/scene_coordinate_system.svg}%
 \caption{Simulator principle. A model of the seafloor and object is first loaded into OpenGL, and an orthogonal camera view set up to match the desired image region on the seafloor. Then the scene is rendered and an intensity image and a depth map is created. The intensity image along with the depth information is finally combined to form a sonar like image. This is our template.}\label{simulator_coordinate_system}%
 \end{figure*}
 
 \begin{figure*}[t]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/simulator.svg}%
+\includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
 \caption{Simulator concept.}\label{buildup}%
 \end{figure*}
 
@@ -484,7 +485,7 @@ Our models are stored in regular 3D model files. The simulator begins by loading
 The mapping of the vertices from object coordinates to image coordinates happen through a set of transformations:
 %
 \begin{align*}
-\bmat{x\\y\\0\\1}_\text{image} = \P \cdot \V \cdot \M \cdot \bmat{x\\y\\z\\1}_\text{object},
+\bmat{x\\y\\0\\1}_\text{image} = \boldsymbol{P} \cdot \boldsymbol{V} \cdot \boldsymbol{M} \cdot \bmat{x\\y\\z\\1}_\text{object},
 \end{align*}
 %
 where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. These will be described next.
@@ -492,10 +493,10 @@ where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image
 The first transform we apply is the model matrix $\M$, which operates in the model's local coordinate system. It is defined as
 %
 \begin{align}
-\M = \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \R \cdot \boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model},
+\M = \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model},
 \end{align}
 %
-where $\boldsymbol{S}, \R$ and $\boldsymbol{T}$ are matrices\todo{be explicit on dependencies?} for scaling, rotation and translation, respectively. These are provided for reference in Appendix \ref{transformation_matrices}.
+where $\boldsymbol{S}$, $\boldsymbol{R}$ and $\boldsymbol{T}$ are matrices\todo{be explicit on dependencies?} for scaling, rotation and translation, respectively. These are provided for reference in Appendix \ref{transformation_matrices}.
 
 Next we map the model into world coordinates using the view matrix $\V$. This involves aligning the camera to precisely fit the image region. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation then take the form of
 %
@@ -565,7 +566,7 @@ To find the nearest and farthest point in the image that will be part of the pro
 \end{align}
 
 \begin{figure}[t]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/opengl_part.svg}%
+\includegraphics[drawing,width=\linewidth]{gfx/opengl_part.svg}%
 \caption{Setting camera top and bottom boundaries.}\label{camera_top_bottom}%
 \end{figure}
 
@@ -706,17 +707,17 @@ Write to file
 \section{Results \& Discussion}
 
 \begin{figure*}[!tbp]\centering%
-\graphicsAI[width=\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}\label{fig_images_sonar_simulation}%
+\includegraphics[width=\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}\label{fig_images_sonar_simulation}%
 \caption{Selected objects. Top row show SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Center row show the best match from a conventional template matcher, and bottom row show the adaptive template matcher. The contour of the SAS object is indicated with red lines. Note that the adaptive technique produce templates with a better fit to the highlight, but that this does not necessarily lead to a better match against the shadow.}
 \end{figure*}
 
 \begin{figure*}[!tbp]\centering%
-\graphicsAI[width=\linewidth]{gfx/fig_rocs.pdf}\label{fig_roc_curves}%
+\includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}\label{fig_roc_curves}%
 \caption{Receiver operating characteristics (ROC) curves.}
 \end{figure*}
 
 \begin{figure*}[!tbp]\centering%
-\graphicsAI[width=\linewidth]{gfx/fig_overlay.pdf}%
+\includegraphics[width=\linewidth]{gfx/fig_overlay.pdf}%
 % \parbox{\linewidth}{\small\centering\vspace{.5\baselineskip}
 % \newline\centering\newline %\\[.5\baselineskip]
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
@@ -804,10 +805,10 @@ The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of
 
 % \begin{figure*}[!tbp]\centering%
 % \subfloat[SAS images of 2 cylinders and a torpedo.]{%
-% \graphicsAI[width=0.5\linewidth]{gfx/fig_images_sonar_simulation.pdf}%
+% \includegraphics[width=0.5\linewidth]{gfx/fig_images_sonar_simulation.pdf}%
 % \label{fig_sonar_simulation}}%
 % \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
-% \graphicsAI[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
+% \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
 % \label{sim_cylinder}}%
 % \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 % \end{figure*}
@@ -815,10 +816,10 @@ The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of
 % 
 % \begin{figure*}[!tbp]\centering%
 % \subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
-% \graphicsAI[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
+% \includegraphics[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
 % \label{data_cylinder}}%
 % \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
-% \graphicsAI[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
+% \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
 % \label{sim_cylinder}}%
 % \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 % \end{figure*}

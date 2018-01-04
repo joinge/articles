@@ -86,12 +86,12 @@ ROOTDIR=$(pwd)
 FILENAMETMP=${1%.*}
 FILENAME=${FILENAMETMP##*/}
 FILETYPE=${1##*.}
-MYPATH=${1%/*}
+FILEPATH=${1%/*}
 
 # echo $FILENAMETMP
-# echo $FILENAME
-# echo $FILETYPE
-# echo $MYPATH
+echo ":) Filename: $FILENAME"
+echo ":) Filetype: $FILETYPE"
+echo ":) Filepath: $FILEPATH"
 
 CAP_FILETYPE=$(echo $FILETYPE | tr "[:lower:]" "[:upper:]")
 # echo $CAP_FILETYPE
@@ -108,13 +108,7 @@ if [ $? -ne 0 ]; then
   if [ $? -ne 0 ]; then
     echo ":( Unable to locate $SRCDIR. Aborting"
     exit 1
-#   else
-#     echo ":) Entered $SRCDIR."
-#     CURRENTDIR=$SRCDIR
   fi
-# else
-#   echo ":) Entered $GRAPHICSDIR."
-#   CURRENTDIR=$GRAPHICSDIR
 fi
 cd ..
 
@@ -137,7 +131,7 @@ cd ..
 #     fi
 #   fi
 # else
-  LOCFILE=gfx #$1 #$ABSPATH
+  LOCFILE=$FILEPATH #gfx #$1 #$ABSPATH
 # fi
 
 echo ":) Found 1 or more instances of $FILENAME.$FILETYPE" 
@@ -257,35 +251,35 @@ if [ "$CAP_FILETYPE" = "SVG" ]; then #
 #   mv "$FILENAME.pdf" $PATHLOCFILE/
 #   mv "$FILENAME-crop.pdf" $PATHLOCFILE/
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-#     echo "\includegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME-crop.pdf}" > $ROOTDIR/$RESULTFILE
-echo "\includegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
+#     echo "\oldincludegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME-crop.pdf}" > $ROOTDIR/$RESULTFILE
+echo "\oldincludegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
   else
-#     echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME-crop.pdf}" > $ROOTDIR/$RESULTFILE
-echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
+#     echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME-crop.pdf}" > $ROOTDIR/$RESULTFILE
+echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "PS" ]; then
   ps2eps  $PATHLOCFILE/$FILENAME.$FILETYPE
   mv $FILENAME.eps $PATHLOCFILE/
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-    echo "\includegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
   else
-    echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "EPS" ]; then
-  echo "Running: epstopdf $PATHLOCFILE/$FILENAME.$FILETYPE"
-  epstopdf --nodebug --outfile=$PATHLOCFILE/$FILENAME.pdf $PATHLOCFILE/$FILENAME.$FILETYPE
+  echo "Running: epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf"
+  epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf
 
 #   mv $FILENAME.pdf $PATHLOCFILE/
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-    echo "\includegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
   else
-    echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.pdf}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "PDF" ]; then
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-    echo "\includegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[width=\linewidth]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   else
-    echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "PNG" ]; then
 echo ' '
@@ -305,15 +299,15 @@ echo  "IMGSIZE=\$(getimagesize $PATHLOCFILE/$FILENAME.$FILETYPE)"
   echo "$DPM "
   echo "$4"
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-    echo "\includegraphics[scale=1]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[scale=1]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   else
-    echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "JPG" ] || [ "$CAP_FILETYPE" = "JPEG" ]; then
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.
-    echo "\includegraphics[scale=1]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[scale=1]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   else
-    echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
+    echo "\oldincludegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.$FILETYPE}%" > $ROOTDIR/$RESULTFILE
   fi
 else
   echo "! No method available for handling filetype $FILETYPE"
@@ -333,7 +327,7 @@ fi
 
 # svg2pdf2fit $1
 # 
-#   "\includegraphics[width=\linewidth]{Src/VcCharge.pdf}"
+#   "\oldincludegraphics[width=\linewidth]{Src/VcCharge.pdf}"
 #   "\vspace{-10pt}"
 #   "\caption{#2}\label{fig:}"
 # 
