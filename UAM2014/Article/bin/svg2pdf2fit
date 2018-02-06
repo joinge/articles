@@ -1,0 +1,59 @@
+#!/bin/bash
+
+TMPDIR='./Temp'
+COMMONDIR='./Common'
+COMPILEDDIR='./Compiled'
+SRCDIR='./Src'
+GRAPHICSDIR='./Graphics'
+LATEXCOMMON="${HOME}/.latex"
+
+echo ' '
+echo '¤~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~¤'
+echo '  Starting svg2pdf2fit..'
+echo '¤~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~¤'
+
+FILENAMETMP=${1%.*}
+FILENAME=${FILENAMETMP##*/}
+MYPATH=${1%/*}
+
+echo "Received file $FILENAME.svg, located in ./$MYPATH"
+
+if [ "$MYPATH" = "$SRCDIR" ] || [ "./$MYPATH" = "$SRCDIR"  ]; then
+  echo "Assuming Src directory of a Latex folder"
+  cd $SRCDIR
+  if [ $? -ne 0 ]; then
+    echo ">> $SRCDIR does not exist, aborting."
+    exit 1
+  fi
+elif [ "$MYPATH" = "$GRAPHICSDIR" ] || [ "./$MYPATH" = "$GRAPHICSDIR" ]; then
+  echo "Assuming Graphics directory of a Latex folder"
+  cd $GRAPHICSDIR
+  if [ $? -ne 0 ]; then
+    echo ">> $GRAPHICSDIR does not exist, aborting."
+    exit 1
+  fi
+else
+  echo "SVG-file has to be located in either Graphics or Src directory. Aborting."
+  exit 1
+fi
+pwd
+# If this point is reached, we should be in the directory where the file is located.
+echo "/usr/bin/inkscape --export-pdf=$FILENAME.pdf --export-text-to-path --file=$1"
+
+inkscape --export-pdf="$FILENAME.pdf" --export-text-to-path --file="$FILENAME.svg"
+if [ $? -ne 0 ]; then
+  echo ">> Inkscape failed to convert image. Wrong filename? Aborting."
+  exit 1
+fi
+# This tool produces a cropped pdf, and saves it as <name>-crop.pdf
+pdfcrop "$FILENAME.pdf"
+if [ $? -ne 0 ]; then
+  echo ">> PdfCrop failed to crop pdf. Aborting."
+  exit 1
+fi
+
+mv $FILENAME.pdf .$TMPDIR
+mv ${FILENAME}-crop.pdf $FILENAME.pdf
+echo ">> Success! $FILENAME.svg converted to $FILENAME.pdf"
+
+cd ..

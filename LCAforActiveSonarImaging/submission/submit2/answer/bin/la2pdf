@@ -1,0 +1,482 @@
+#!/bin/bash
+
+#gokill ${1}.pdf
+TMPDIR='./tmp'
+COMMONDIR='./common'
+LATEXCOMMON="${HOME}/.latex/current"
+COMPILEDDIR='./pdf'
+SRCDIR='./src'
+GRAPHICSDIR='./gfx'
+
+LATEXLOG='latex.log'
+GLOSSLOG='gloss.log'
+DVIPSLOG='dvips.log'
+PSPDFLOG='pspdf.log'
+PDFLALOG='pdfla.log'
+MOVELOG='move.log'
+OVERFULL='overfull.log'
+
+PDFVIEWER='okular'
+EXECDIR='./bin'
+LATEXEXEC="${HOME}/.latex/bin"
+SETTINGSFILE='la2pdf.settings'
+
+GITINTERVAL=$(( 30*60 ))
+
+#Info: Extend in order to catch errors and warnings as they occur. Be specific each time.
+function printLATEXLOG
+{
+  # grep '\@input'   $TMPDIR/$PDFLALOG  -A 1
+  # grep '\@include' $TMPDIR/$PDFLALOG -A 2
+  grep 'Warning: Unused global option' $TMPDIR/$PDFLALOG -A 2
+#   grep 'pdfoutput is not set'          $TMPDIR/$LATEXLOG
+#   grep 'Warning: Option'               $TMPDIR/$LATEXLOG | grep 'not available'
+  grep 'Font Warning'                  $TMPDIR/$PDFLALOG -A 1
+  echo ''
+  #grep 'Overfull'                      $TMPDIR/$PDFLALOG -B 1
+  grep 'Font Warning'                  $TMPDIR/$PDFLALOG -A 1
+#   grep 'Warning: Reference'            $TMPDIR/$LATEXLOG
+  # grep 'undefined references'          $TMPDIR/$LATEXLOG
+  grep 'Warning: Label'                $TMPDIR/$PDFLALOG
+  # grep 'multiply-defined labels'       $TMPDIR/$PDFLALOG
+  # grep '!'                             $TMPDIR/$PDFLALOG  -A 3 -B 2
+#   grep 'Overfull'                      $TMPDIR/$LATEXLOG -B 1 >  $TMPDIR/$OVERFULL
+#   echo '--'                                                   >> $TMPDIR/$OVERFULL
+  grep 'Overfull'                      $TMPDIR/$PDFLALOG -B 1 >> $TMPDIR/$OVERFULL
+  echo "Overfull boxes: See $TMPDIR/$OVERFULL"
+#   grep 'LaTeX Error'                   $TMPDIR/$LATEXLOG -A 1
+#   grep 'LaTeX Error: Command'          $TMPDIR/$LATEXLOG | grep 'already defined'
+
+}
+
+
+cd $TMPDIR
+if [ $? -ne 0 ]; then
+  echo ":) $TMPDIR does not exist, creating it."
+  mkdir $TMPDIR
+  if [ $? -ne 0 ]; then
+    echo ":( Creating $TMPDIR failed. Aborting."
+    exit 1
+  fi
+else
+  echo ">> $TMPDIR already exists. Performing no further actions."
+  cd ..
+fi
+cd $COMPILEDDIR
+if [ $? -ne 0 ]; then
+  echo ":) $COMPILEDDIR does not exist, creating it."
+  mkdir $COMPILEDDIR
+  if [ $? -ne 0 ]; then
+    echo ":( Creating $COMPILEDDIR failed. Aborting."
+    exit 1
+  fi
+else
+  echo ">> $COMPILEDDIR already exists. Performing no further actions"
+  cd ..
+fi
+
+  #Check that Compiled-directory exists:
+cd $COMMONDIR
+if [ $? -ne 0 ]; then
+  echo ":! $COMMONDIR does not exist. Assuming first run."
+  echo "Intialising directory:"
+  echo ":) Symlinking $COMMONDIR -> $LATEXCOMMON"
+  ln -s -T $LATEXCOMMON $COMMONDIR
+  if [ $? -ne 0 ]; then
+    echo ":( Symlinking $COMMONDIR -> $LATEXCOMMON failed. Aborting."
+    exit 1
+  fi
+  ln -s -T $LATEXEXEC $EXECDIR
+  if [ $? -ne 0 ]; then
+    echo ":( Symlinking $EXECDIR -> $LATEXEXEC failed. Aborting."
+    exit 1
+  fi
+  cd $SRCDIR
+  if [ $? -ne 0 ]; then
+    echo ">> $SRCDIR does not exist, creating it."
+    mkdir $SRCDIR
+    if [ $? -ne 0 ]; then
+      echo "FATAL: Creating $SRCDIR failed. Aborting."
+      exit 1
+    fi
+  else
+    echo ">> $SRCDIR already exists. Performing no further actions."
+    cd ..
+  fi
+  cd $GRAPHICSDIR
+  if [ $? -ne 0 ]; then
+    echo ">> $GRAPHICSDIR does not exist, creating it."
+    mkdir $GRAPHICSDIR
+    if [ $? -ne 0 ]; then
+      echo "FATAL: Creating $GRAPHICSDIR failed. Aborting."
+      exit 1
+    fi
+  else
+    echo ">> $GRAPHICSDIR already exists. Performing no further actions."
+    cd ..
+  fi
+  echo ">> Setting up Git VCS..."
+  echo "     git init"
+  git init
+  if [ $? -ne 0 ]; then
+    echo "FATAL: git init failed. Aborting."
+    exit 1
+  fi
+  FILESLIST=$(ls *.tex)
+  echo "     git add $FILESLIST"
+  git add $FILESLIST
+  if [ $? -ne 0 ]; then
+    echo "FATAL: git add failed. Aborting."
+    exit 1
+  fi
+  git commit -m "Initial commit"
+  if [ $? -ne 0 ]; then
+    echo "FATAL: git commit failed. Aborting."
+    exit 1
+  fi
+  echo "la2pdf will exit now. Rerun to compile the code."
+  exit 1
+else
+  cd ..
+fi
+
+
+echo ":) Hello. Scanning ${1}.tex for documentclass options..."
+
+cat ${1}.tex | sed s/[%].*// \
+             | tr -s '\n' ' ' \
+             | sed s/.*documentclass\\[// \
+             | sed s/\\]\{.*\}// \
+             > "$TMPDIR/$SETTINGSFILE"
+
+SETTINGS=$(cat $TMPDIR/$SETTINGSFILE)
+if [ $? -ne 0 ]; then
+  echo ":( Uhm, could not find any..? This may cause trouble..."
+else
+  echo ":) Found these: $SETTINGS"
+fi
+
+# cd $TMPDIR
+# if [ $? -ne 0 ]; then
+#   echo "! $TMPDIR does not exist. Creating it."
+#   mkdir $TMPDIR
+# else
+#   cd ..
+# fi
+
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Starting latex..'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# #latex -interaction=nonstopmode ${1}.tex > $TMPDIR/$LATEXLOG 2>> $TMPDIR/$LATEXLOG
+# latex -interaction=nonstopmode ${1}.tex > $TMPDIR/$LATEXLOG 2>> $TMPDIR/$LATEXLOG
+# if [ $? -ne 0 ]; then
+#   cat $TMPDIR/$LATEXLOG
+#   echo '!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  FAILED: latex'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   printLATEXLOG
+#   exit 1
+# fi
+#   cat $TMPDIR/$LATEXLOG
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  SUCCESS: latex'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Building glossary..'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '>> First run:'                                        >  $TMPDIR/$GLOSSLOG
+# makeglossaries -s ${1}.ist -t ${1}.glg -o ${1}.gls ${1}.glo > $TMPDIR/$GLOSSLOG
+#                                                            2>> $TMPDIR/$GLOSSLOG
+# goglossary ${1}
+
+
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Starting dvips..'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# dvips -o ${1}.ps ${1}.dvi > $TMPDIR/$DVIPSLOG 2>> $TMPDIR/$DVIPSLOG
+# if [ $? -ne 0 ]; then
+#   cat $TMPDIR/$DVIPSLOG
+#   echo '!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  FAILED: dvips'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   exit 1
+# fi
+#   cat $TMPDIR/$DVIPSLOG
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  SUCCESS: dvips'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# 
+# 
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Starting ps2pdf..'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# ps2pdf ${1}.ps ${1}-pics.pdf > $TMPDIR/$PSPDFLOG 2>> $TMPDIR/$PSPDFLOG
+# if [ $? -ne 0 ]; then
+#   cat $TMPDIR/$PSPDFLOG
+#   echo '!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  FAILED: ps2pdf'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   exit 1
+# fi
+#   cat $TMPDIR/$PSPDFLOG
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  SUCCESS: ps2pdf'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Starting pdflatex...'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+
+grep "glossary" $TMPDIR/$SETTINGSFILE
+if [ "$?" = "0" ]; then
+  echo ''
+  echo ':) Building glossary..'
+  makeglossaries -s ${1}.ist -t ${1}.glg -o ${1}.gls ${1}.glo
+                                                              > $TMPDIR/$GLOSSLOG
+                                                            2>> $TMPDIR/$GLOSSLOG
+  if [ $? -ne 0 ]; then
+    cat $TMPDIR/$GLOSSLOG
+    echo ':( FAILED: glossaries'
+    exit 1
+  fi
+    cat $TMPDIR/$GLOSSLOG
+    echo ':) SUCCESS: glossaries'
+fi
+
+grep "xelatex" $TMPDIR/$SETTINGSFILE
+if [ "$?" = "0" ]; then
+
+  echo ':) Starting xelatex...'
+
+  #Run this twice in order to ensure that references are
+  #set correctly.
+#   cd $COMPILEDDIR
+  xelatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials ${1}.tex
+  if [ $? -ne 0 ]; then
+    cat $TMPDIR/$GLOSSLOG
+    echo ':( FAILED: xelatex'
+    exit 1
+  fi
+    cat $TMPDIR/$GLOSSLOG
+    echo ':) SUCCESS: xelatex'
+
+  # This tricks Kile into thinking the xelatex command put temp-files in compiled-dir. Running PDF-sync
+  # should thus be possible without locking the pdf-file which xelatex writes into during build.
+#   echo "xelatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials -output-directory=$COMPILEDDIR ${1}.tex"
+
+else
+  pdflatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials ${1}.tex
+  if [ $? -ne 0 ]; then
+    cat $TMPDIR/$GLOSSLOG
+    echo ':( FAILED: pdflatex'
+    exit 1
+  fi
+    cat $TMPDIR/$GLOSSLOG
+    echo ':) SUCCESS: pdflatex'
+fi
+
+
+
+# > $TMPDIR/$PDFLALOG 2>> $TMPDIR/$PDFLALOG
+# if [ $? -ne 0 ]; then
+#   cat $TMPDIR/$PDFLALOG
+#   echo '!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  FAILED: xelatex'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   printLATEXLOG
+#   exit 1
+# fi
+
+# cp $COMPILEDDIR/*.aux ./
+# cp $COMPILEDDIR/${1}-blx.bib ./
+# IS_BIBTEX=false
+# IS_BIBLATEX=false
+# 
+# grep "bibtex" "$TMPDIR/$SETTINGSFILE"
+# if [ "$?" = "0" ]; then
+#   IS_BIBTEX=true
+# fi
+# grep "biblatex" "$TMPDIR/$SETTINGSFILE"
+# if [ "$?" = "0" ]; then
+#   IS_BIBLATEX=true
+# fi
+# 
+# if [ $IS_BIBTEX ]; then
+#   echo ''
+#   echo ':) Building bibliography..'
+#   bibtex ${1}.aux
+# 
+#   if [ $? -ne 0 ]; then
+#     cat $TMPDIR/$GLOSSLOG
+#     echo ':( FAILED: bibtex'
+#     exit 1
+#   fi
+#     cat $TMPDIR/$GLOSSLOG
+#     echo ':) SUCCESS: bibtex'
+# fi
+
+
+# xelatex -interaction=nonstopmode -shell-escape -src-specials ${1}.tex > $TMPDIR/$PDFLALOG 2>> $TMPDIR/$PDFLALOG
+# if [ $? -ne 0 ]; then
+#   cat $TMPDIR/$PDFLALOG
+#   echo '!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  FAILED: pdflatex'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   exit 1
+# fi
+#   cat $TMPDIR/$PDFLALOG
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#   echo '  SUCCESS: pdflatex'
+#   echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+
+#echo '                                               '
+#echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#echo '  Starting Adobe Acrobat Reader'
+#echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#acroread ${1}.pdf
+
+# echo '                                               '
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  Starting / Refreshing KPDF'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+#gokill ${1}.pdf
+#kpdf ${1}.pdf &
+
+
+
+# cd $COMPILEDDIR
+# if [ $? -ne 0 ]; then
+#   echo ">> $COMPILEDDIR does not exist. Creating it."
+#   mkdir $COMPILEDDIR
+# else
+#   cd ..
+# fi
+
+# CURFILE=$(grep "currentFile" ${1}.tex)
+# BEG=${CURFILE#*�}
+# END=${BEG%�*}
+# if [ "$CURFILE" = "" ]; then
+#   echo '>> currentFile: Not specified. Using default filename.'
+#   mv ${1}.pdf ${COMPILEDDIR}/${1}.pdf  2> $TMPDIR/$MOVELOG
+#   echo ">> PDF stored as ${COMPILEDDIR}/${1}.pdf"
+#   FILENAME=${1}
+# else
+#   echo '>> currentFile: Specified. Using this as filename.'
+#   mv ${1}.pdf ${COMPILEDDIR}/${END}.pdf 2> $TMPDIR/$MOVELOG
+#   echo ">> PDF stored as ${COMPILEDDIR}/${END}.pdf"
+#   FILENAME=${END}
+# fi
+
+FILENAME=$(cat "$TMPDIR/filename.txt")
+if [ $? -ne 0 ]; then
+  echo ":s $TMPDIR/filename.txt does not exist. Using default."
+#   cp *.pdf ${COMPILEDDIR}/ 2> $TMPDIR/$MOVELOG
+  echo ":) PDF moved to ${COMPILEDDIR}/"
+  FILENAMEPRESENT="No"
+else
+#   cp ${1}.pdf ${COMPILEDDIR}/$FILENAME.pdf 2> $TMPDIR/$MOVELOG
+  echo ":) PDF stored as ${COMPILEDDIR}/$FILENAME.pdf"
+  FILENAMEPRESENT="Yes"
+fi
+# mv ${1}.synctex.gz ${COMPILEDDIR}/
+
+TIME=$(date +%s)
+# Check to see when the last Git commit was committed.d
+LASTGIT=$(cat "$TMPDIR/lastgit.txt")
+if [ $? -ne 0 ]; then
+  echo ":s $TMPDIR/lastgit.txt does not exist. Committing changes."
+  git commit -a -m "la2pdf commit - $(date +%Y:%m:%d%t%T%t\(%a%_d.%b\))"
+
+  # Make sure that the temp-dir actually exists
+  cd $TMPDIR
+  if [ $? -ne 0 ]; then
+    mkdir $TMPDIR
+  else
+    cd ..
+  fi
+
+  echo $TIME > $TMPDIR/lastgit.txt
+elif [ $(( $TIME - $LASTGIT )) -ge $GITINTERVAL ]; then
+  echo ":) More than $GITINTERVAL s since last commit. Committing changes."
+  git commit -a -m "la2pdf commit - $(date +%Y:%m:%d%t%T%t\(%a%_d.%b\))"
+  echo $TIME > $TMPDIR/lastgit.txt
+else
+  echo ":) Less than $GITINTERVAL s since last commit. Letting go..."
+fi
+
+
+# echo ":) Cleaning up. Moving files to $TMPDIR"
+#   mv *.aux          $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.dvi       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.glg       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.glo       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.gls       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.ist       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   cp ${1}.log       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.out       $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.ps        $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}-pics.pdf  $TMPDIR 2>> $TMPDIR/$MOVELOG
+#   mv ${1}.toc       $TMPDIR 2>> $TMPDIR/$MOVELOG
+# echo ":) Done."
+# echo ""
+
+# echo '                                               '
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+# echo '  ABSTRACT'
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+#echo '�~~ Latex ~~�'
+# grep $TMPDIR/$LATEXLOG '\@input' -A 1
+# grep $TMPDIR/$LATEXLOG '\@include' -A 2
+# grep 'Overfull' $TMPDIR/$LATEXLOG 
+# grep 'Warning'  $TMPDIR/$LATEXLOG -A 2
+# grep '!'        $TMPDIR/$LATEXLOG -A 2
+
+# echo '�~~ Glossary ~~�'
+# cat $TMPDIR/$GLOSSLOG
+# echo ''
+# echo '�~~ Dvi2Ps ~~�'
+# cat $TMPDIR/$DVIPSLOG
+# echo ''
+# echo '�~~ Ps2Pdf ~~�'
+# cat $TMPDIR/$PSPDFLOG
+# echo ''
+# echo '�~~ XeLaTeX ~~�'
+# printLATEXLOG
+# echo '�~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~�'
+
+if [ "$FILENAMEPRESENT" = "Yes" ]; then
+  VAR=$(ps -ef | grep $PDFVIEWER | grep $FILENAME)
+
+  if [ "$VAR" = "" ]; then
+    echo ":) No $PDFVIEWER session with ${FILENAME}.pdf opened detected. Opening PDF file."
+    nohup $PDFVIEWER  $COMPILEDDIR/${FILENAME}.pdf > $TMPDIR/nohup.log &
+  else
+    #sleep 0.5s
+    echo 'Sleeping 1s prior to updating file'
+    sleep 1s  #Note: It might be necessary to change this when document becomes large.
+    touch $COMPILEDDIR/${FILENAME}.pdf #Okular fails to automatically reload without this
+  fi
+else
+  VAR=$(ps -ef | grep $PDFVIEWER | grep ${1})
+
+  if [ "$VAR" = "" ]; then
+    echo ":) No $PDFVIEWER session with ${1}.pdf opened detected. Opening PDF file."
+#     nohup $PDFVIEWER  $COMPILEDDIR/${1}.pdf > $TMPDIR/nohup.log &
+  else
+    #sleep 0.5s
+    echo 'Sleeping 1s prior to updating file'
+#     sleep 1s  #Note: It might be necessary to change this when document becomes large.
+    touch $COMPILEDDIR/${1}.pdf #Okular fails to automatically reload without this
+  fi
+#   echo "touching ${1}"
+#   sleep 2s  #Note: It might be necessary to change this when document becomes large.
+#   touch $COMPILEDDIR/${1}.pdf #Okular fails to automatically reload without this
+
+#   cp ${1}.pdf $COMPILEDDIR/${1}.pdf 
+fi
+
+exit 0

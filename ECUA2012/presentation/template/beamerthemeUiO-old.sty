@@ -1,0 +1,60 @@
+% Official presentation theme for UiO
+% Implemented by dag@ifi.uio.no
+% Version 2009-09-16
+% Renamed "-old" 2010-11-13
+
+\newif\ifNorskUiOBeamer   \NorskUiOBeamerfalse
+\DeclareOptionBeamer{norsk}{\NorskUiOBeamertrue}
+\DeclareOptionBeamer{nynorsk}{\NorskUiOBeamertrue}
+\ProcessOptionsBeamer
+
+\RequirePackage{type1cm}
+\RequirePackage{type1ec}
+
+\mode<presentation>
+\setbeamertemplate{background}
+  {\def\UiOBeamer@BGA{uio-bg-1}%
+    \def\UiOBeamer@BGB{uio-bg}%
+    \ifnum\insertframenumber=1
+      \def\UiOBeamerMargin{1cm}
+      \includegraphics[width=\paperwidth,height=\paperheight]{\UiOBeamer@BGA}%
+    \else
+      \def\UiOBeamerMargin{2cm}
+      \includegraphics[width=\paperwidth,height=\paperheight]{\UiOBeamer@BGB}%
+    \fi}
+
+\renewcommand{\frametitle}[1]{{\bf\LARGE #1\par}\bigskip}
+
+\defbeamertemplate*{sidebar right}{UiO}
+{
+  \ifNorskUiOBeamer
+    \def\UiOBeamerLogo{uio-name}%
+  \else
+    \def\UiOBeamerLogo{uio-name-e}%
+  \fi
+  \ifnum\insertframenumber=1
+    \def\UiOBeamerMargin{2mm}
+  \else
+    \def\UiOBeamerMargin{1.4cm}
+  \fi
+  \vskip 1mm%
+  \llap{\includegraphics[height=8mm]{\UiOBeamerLogo}%
+    \hspace*{\UiOBeamerMargin}}%
+  \vfill%
+  \llap{\makebox[\paperwidth]{\hspace*{0.5cm}%
+      \rlap{%
+        \insertshortinstitute\quad
+        \insertshortauthor\quad
+        \insertshorttitle\quad
+        \insertshortdate}%
+      \hfill
+      \usebeamertemplate***{navigation symbols}%
+      \ifnum\insertframenumber>1
+        \llap{\raisebox{5mm}[0pt][0pt]{\insertframenumber}}%
+      \fi
+      \hspace*{1.5cm}}}%
+  \vskip 2pt%
+}
+
+\mode
+<all>

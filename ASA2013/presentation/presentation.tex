@@ -1,0 +1,562 @@
+\documentclass[
+    beamer                                       % Document type (non-standard)
+%  , handout
+%   , xelatex                                      % Use the XeLaTeX compiler
+%  , movie
+  ,table,dvipsnames,svgnames
+]{common/mytemplate}
+
+\pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>}
+
+% \mode<handout>{\setbeamercolor{background canvas}{bg=black!5}}
+
+% \RequirePackage[table,dvipsnames,svgnames]{xcolor}
+\definecolor{tabBlue}{HTML}{AACCFF}
+\usepackage{template/beamerthemeUiO}
+% \usepackage{common/oxygentheme}
+% \setbeameroption{show only notes}
+% \setbeameroption{notes on second screen=left}
+
+% \newcommand\remotesource{http://www.joinge.net/compet}
+
+\title{\newline\newline Adapting the MVDR beamformer to a GPU for differently sized active sonar imaging systems}
+\subtitle{}
+\author[]{\textbf{Jo Inge Buskenes}$^{\text{a}}$, Jon Petter Åsen$^{\text{b}}$, Carl-Inge~Colombo~Nilsen$^{\text{a}}$, Andreas~Austeng$^{\text{a}}$}
+\date[Jo Inge Buskenes at ASA/ICA, Montreal, June\ 2013]{Montreal, Canada, 2013}
+\institute[Dept.\ of Informatics, University of Oslo]{\bf$^{\text{a}}$Department of Informatics, University of Oslo, Norway\\
+                                                      \bf$^{\text{b}}$MI-Lab, Norwegian University of Science and Technology}
+% \date{Sist revidert: 27.01.2009}
+
+\definecolor{LightBlue}{rgb}{0.3,0.3,1}
+\definecolor{DarkBlue}{rgb}{0.2,0.2,0.7}
+\setbeamercolor{block title}{bg=DarkBlue,fg=white}%bg=background, fg= foreground
+\setbeamercolor{block body}{bg=gray!20,fg=black}%bg=background, fg= foreground
+\setbeamertemplate{blocks}[rounded]
+
+\RequirePackage[latin1]{inputenc}%              % Set input encoding (optionally latin1) utf8
+\RequirePackage[T1]{fontenc}%                 % Set font encoding
+
+\begin{document}
+
+\begin{frame}
+\vspace*{2\baselineskip}
+  \titlepage
+\end{frame}
+\note{\null{}}
+
+% \AtBeginSection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents %[currentsection,hideallsubsections]
+%   }
+% }
+
+% \AtBeginSubsection[]
+% {
+%   \frame<handout:0>
+%   {
+%     \frametitle{Agenda}
+%     \tableofcontents[sectionstyle=show/hide,subsectionstyle=show/shaded/hide]
+%   }
+% }
+
+\newcommand<>{\highlighton}[1]{%
+  \alt#2{\structure{#1}}{{#1}}
+}
+
+\newcommand{\icon}[1]{\pgfimage[height=1em]{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Content starts here %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% {
+
+
+
+% \section{Case study}
+% \subsection{Realtime sectorcan imaging}
+% 
+% {
+% \setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/use_case_sectorscan.svg}}%
+% \begin{frame}
+% \vspace{-80pt}\hspace{-25pt}
+% \frametitle{\color{white}Realtime requirements?}
+% \framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
+% \vspace{100pt}\ 
+% % \begin{figure}[H]
+% % \begin{narrow}{-1.6cm}{-1.6cm}
+% % \graphicsAI<1>[drawing,width=\linewidth]{gfx/use_case_sectorscan3.svg}
+% % \end{narrow}
+% % \end{figure}   
+% \end{frame}
+% }
+
+
+
+% \renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Active Sonar}
+% \vspace{-25pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/SonarPrinciple.svg}
+% \end{narrow}
+% \end{figure}
+% % \begin{itemize}
+% % \item Each pixel value is estimated by focusing the receiver on that point.
+% % \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+% \frametitle{Context}
+% \framesubtitle{Imaging techniques}
+% \vspace{-10pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/imaging_concepts.png}
+% \end{narrow}
+% \end{figure}
+% A phased array can be used in several imaging modes:
+% \begin{itemize}
+% \item \emph{Sector scan}: Image computed from a single ping
+% \item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+% \item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+% \end{itemize}
+% % \begin{block}{Proposed method: Generic, can be used in all modes}
+% % \vspace{-25pt}
+% % \end{block}
+% \end{frame}
+% }
+
+% \section{}
+% \begin{frame}
+%   \frametitle{Agenda}
+%   \tableofcontents%[%section=1,
+%                    %hidesubsections]
+% \end{frame}
+
+\renewcommand{\frametitle}[2]{{\vspace*{10pt}\bf\Large #1\par}}
+
+
+
+
+% \begin{frame}
+% \frametitle{Acknowledgements}
+% \framesubtitle{}
+% \vspace{-3pt}
+% \begin{itemize}
+% \item Kongsberg Maritime.
+% \item FFI guys.
+% \end{itemize}
+% \end{frame}
+
+% General system, may be applied to several different datasets
+
+% \section{Introduction}
+% 
+% 
+% \begin{frame}
+% \frametitle{What we do}
+% \framesubtitle{}
+% \vspace{-10pt}
+% \begin{figure}[H]
+% \begin{narrow}{-0.5cm}{0pt}
+% \hspace{-10pt}\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/applications.svg}
+% \end{narrow}
+% \end{figure}
+% % A phased array can be used in several imaging modes:
+% % \begin{itemize}
+% % \item \emph{Sector scan}: Image computed from a single ping
+% % \item \emph{Sidescan}: Image created by stacking images from several subsequent pings
+% % \item \emph{Synthetic aperture sonar}: Image computed from overlapping pings
+% % \end{itemize}
+% % % \begin{block}{Proposed method: Generic, can be used in all modes}
+% % % \vspace{-25pt}
+% % % \end{block}
+% \end{frame}
+% 
+
+
+\begin{frame}
+\frametitle{Image Reconstruction}
+\framesubtitle{Medical Ultrasound Imaging}
+% \vspace{-25pt}
+\begin{figure}[H]
+\begin{narrow}{-0.5cm}{0pt}
+\graphicsAI<1>[drawing,width=1.05\linewidth]{gfx/applications.svg}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{itemize}
+\item Videos and 3D processing $\rightarrow$ High computational requirements.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{\hspace{-.5cm}Image Reconstruction}
+\framesubtitle{\hspace{-.5cm}Synthetic\\\hspace{-.5cm}Aperture\\\hspace{-.5cm}Sonar}
+\framesubtitle{Active Sonar}
+\vspace{-45pt}
+\begin{figure}[H]
+\begin{narrow}{.1cm}{-0.6cm}
+\flushright\hspace{-10pt}\graphicsAI<1>[drawing,width=.92\linewidth]{gfx/rock_formation.svg}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{narrow}{-0.5cm}{-0.5cm}
+\begin{itemize}\small
+\item SAS image of a 25 x 25m wide by 5m high rock formation at 70m depth.
+\item Theoretical resolution of 3-4cm throughout the image.
+\item Data collected by HUGIN AUV carrying the HISAS interferometric SAS. Courtesy of the Norwegian Defence Research Establishment.
+\end{itemize}
+\end{narrow}
+\end{frame}
+
+\begin{frame}
+\frametitle{Beamforming}
+\framesubtitle{The Delay and Sum beamformer (conventional method)}
+\begin{figure}[H]
+\begin{narrow}{-0.9cm}{-0.9cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/beamforming_das.svg} %{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}                                                                                                                                                                                                                                                                                                   
+\end{frame}
+
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/scenario_interference.svg}}%
+\begin{frame}
+\vspace{-151pt}
+\frametitle{\hspace{-.5cm}Simulated Responses}
+\framesubtitle{\hspace{-.5cm}What determines a\\\hspace{-.5cm}beamformer's ability to\\\hspace{-.5cm}suppress interference?}
+\end{frame}
+}
+
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/scenario_interference_das.svg}}%
+\begin{frame}
+\vspace{-160pt}
+\frametitle{\hspace{-.5cm}Simulated Responses}
+\framesubtitle{\hspace{-.5cm}The Delay-and-Sum\\\hspace{-.5cm}(DAS) beamformer}
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/scenario_interference_mvdr.svg}}%
+\begin{frame}
+\vspace{-142pt}
+\frametitle{\hspace{-.5cm}Simulated Responses}
+\framesubtitle{\hspace{-.5cm}The Minimum Variance\\\hspace{-.5cm}Distortionless Response\\\hspace{-.5cm}(MVDR)\\\hspace{-.5cm}beamformer}
+\end{frame}
+}
+
+
+% \begin{frame}
+% \frametitle{Beamforming}
+% \framesubtitle{Minimum Variance Distortionless Response (MVDR) beamformer}
+% \begin{figure}[H]
+% \begin{narrow}{-0.9cm}{-0.9cm}
+% \graphicsAI<1>[drawing,width=\linewidth]{gfx/beamforming_mv.svg} %{../Docs/GeiloSrc/Figs/das.pdf}
+% \end{narrow}
+% \end{figure}                                                                                                                                                                                                                                                                                                   
+% \end{frame}
+
+
+\begin{frame}
+\frametitle{MVDR beamformer}
+\framesubtitle{Computational steps and complexity}\\
+% \vspace{-15pt}
+\begin{figure}[H]
+\begin{narrow}{-.5cm}{-.5cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/beamforming_mv_light.svg} %{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\vspace{-5pt}\textbf{Complexity increases fast with system size, but:}
+\begin{itemize}
+\item Each pixel in the image can be processed independently.
+\item Use Graphics Processing Units (GPUs)?
+\end{itemize}
+\end{frame}
+% 
+% 
+% % \begin{frame}
+% % \frametitle{MVDR}
+% % \framesubtitle{Estimating $\R$}
+% % \vspace{15pt}
+% % % An estimate $\eR$ of $\R$ can be computed as
+% % % \begin{align*}
+% % % \R = E\{\x[n]\x\H[n]\} = %\frac{1}{(2N_{\text{avg}}}\sumb{n'=n-Navg}{Navg}\sumb{k=0}{M-L+1} \x_k[n]\x_k\H[n]
+% % % \end{align*}
+% % \begin{itemize}
+% % \item Spatial (subarray) averaging to improve estimate
+% % \item Temporal averaging to improve speckle statistics
+% % \item Diagonal loading improve numerical conditioning
+% % \end{itemize}
+% % \end{frame}
+% 
+% \subsection{Graphics processing Units (GPUs)}
+% 
+\begin{frame}
+\makeatletter%
+% \special{pdf: put @thispage <</Group << /S /Transparency /I true /CS /DeviceRGB>> >>}%
+\makeatother%
+\frametitle{GPUs for image reconstruction}
+\framesubtitle{}
+\vspace{-3pt}
+\begin{figure}[H]
+\begin{narrow}{0cm}{0cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/gpus.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\begin{itemize}
+\item CPUs: Optimized for running \emph{a few} potentially complex threads, that may have \emph{complex} data dependencies.
+\item GPUs: Optimized for running \emph{hundreds} of light-weight threads, with \emph{simple} data dependencies.
+\end{itemize}
+\end{frame}
+
+% 
+% \section{Implementation on a GPU}
+% 
+\begin{frame}
+\frametitle{Implementation}
+\framesubtitle{MVDR on GPU}
+\vspace{-15pt}
+\begin{figure}[H]
+\begin{narrow}{0cm}{0cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/implementation.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementation}
+\framesubtitle{Beamspace MVDR on GPU (frequency domain version)}
+\vspace{-13pt}
+\begin{figure}[H]
+\begin{narrow}{0cm}{0cm}
+\graphicsAI<1>[drawing,width=\linewidth]{gfx/implementation_beamspace.svg}%{../Docs/GeiloSrc/Figs/das.pdf}
+\end{narrow}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Bandwidth limited design!!!}
+\framesubtitle{}
+\begin{center}
+\begin{minipage}{4cm}
+\begin{block}{}
+\centering $A = B\;c + D$
+\end{block}
+\end{minipage}
+\end{center}
+\begin{itemize}
+\item 4 floats over I/O (3 reads, 1 write) 
+\item 2 floating point operations.
+\end{itemize}
+\begin{table}[H]\centering%\normalsize
+\begin{tabular}[c]{l r r r@{}  l}\hline
+\rowcolor{tabBlue} &
+\multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{arith}$} & \multicolumn{1}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$} & \multicolumn{2}{>{\columncolor{tabBlue}}c}{\bf B$_\text{mem}$/B$_\text{arith}$} \\\hline
+Arithmetic & 1.03 Tflop/s & & &\\
+Global memory & & 36 Gfloats/s & \hspace{30pt} 1 &:30 \\
+Shared memory & & 257 Gfloats/s & 1 &:4 \\
+Registers & & $>$1.5 Tfloats/s & $>$3 &:2
+\end{tabular}
+\caption{Nvidia Quadro 6000: Memory throughput, $B_{\lowercase{\text{mem}}}$, compared to arithmetic throughput, $B_\text{arith}$.}
+\end{table}
+\end{frame}
+
+% \begin{frame}
+% \frametitle{Experimental Setup}
+% \framesubtitle{HISAS 1030}
+% \begin{figure}[H]
+% \graphicsAI<1>[drawing,width=0.6\linewidth]{gfx/hisas_on_hugin.jpg} %{../Docs/GeiloSrc/Figs/das.pdf}
+% \end{figure}
+% \begin{itemize}
+% \item High resolution interferometric SAS
+% \item 2x32 element phased array transmitter/receiver
+% \item Array length: 120cm
+% \item Sampling frequency: 100kHz
+% \item Opening angle: 15deg (TX), 23deg (RX)
+% \end{itemize}
+% \end{frame}
+
+% \section{Results}
+% 
+% \subsection{Image Quality}
+
+\begin{frame}
+\frametitle{Results (benchmarks)}
+\framesubtitle{}
+\vspace{-3pt}
+\begin{itemize}
+\item Test system: Intel Xeon quad core CPU, and a Nvidia Quadro 6000 GPU (equivalent to Geforce GTX480).
+\end{itemize}
+\begin{narrow}{-.5cm}{-.5cm}
+\begin{figure}[H]\centering
+\graphicsAI<1>[drawing,width=1\linewidth]{gfx/benchmark1_tagged.svg}
+\end{figure}
+\end{narrow}
+\vspace{-10pt}
+\begin{itemize}
+\item GPU version $\approx$ 2 orders of magnitude faster than (plain) C.
+\end{itemize}
+\end{frame}
+
+
+\section{Case study}
+% \subsection{Realtime sectorcan imaging}
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/use_case_sectorscan3.svg}}%
+\begin{frame}
+\vspace{-150pt}\hspace{-25pt}
+\frametitle{\color{white}Realtime requirements?}
+\framesubtitle{\vspace{-10pt}\color{white}Sectorscan imaging}
+% \vspace{100pt}\ 
+% \begin{figure}[H]
+% \begin{narrow}{-1.6cm}{-1.6cm}
+% \graphicsAI<1>[drawing,width=\linewidth]{gfx/use_case_sectorscan3.svg}
+% \end{narrow}
+% \end{figure}   
+\end{frame}
+}
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/scenario_interference_lca.svg}}%
+\begin{frame}
+\vspace{-142pt}
+\frametitle{\hspace{-.5cm}Alternative for very large systems}
+\framesubtitle{\hspace{-.5cm}The Low Complexity\\\hspace{-.5cm}Adaptive\\\hspace{-.5cm}(LCA)\\\hspace{-.5cm}beamformer}
+\end{frame}
+}
+
+\begin{frame}
+\frametitle{Image Quality}
+\framesubtitle{\scriptsize Shipwreck Holmengraa imaged with HISAS1030 from Kongsberg Maritime}
+\vspace{-5pt}
+\begin{figure}[H]
+\begin{narrow}{-2cm}{-2cm}\centering
+\graphicsAI<1>[width=0.85\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}
+\end{narrow}
+\end{figure}
+\vspace{-10pt}
+\begin{itemize}
+\item All adaptive beamformers improve edge definition and suppress noise compared to DAS.
+\end{itemize}
+\end{frame}
+
+% \subsection{Benchmarks}
+
+
+
+
+{
+\setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/AUVenv.png}}%
+\begin{frame}
+\vspace{-25pt}\frametitle{\color{white}Conclusion}
+\framesubtitle{}
+\vspace{-5pt}\color{white}
+\begin{itemize}
+\item \color{white}GPUs are well suited to accelerate algorithms such as the MVDR beamformer
+\item \color{white}Our GPU implementation of the MVDR beamformer
+\begin{itemize}
+\item \color{white}fully supports active sonar systems,
+\item \color{white}easily outperforms CPU implementations, and
+\item \color{white}can run in beamspace mode to maintain imaging speeds for large systems.
+\end{itemize}
+\item \color{white}LCA: A lightweight and easily implementable alternative for very large systems.
+\end{itemize}
+\vfill
+\textbf{\color{black}Acknowledgements}:
+\begin{itemize}
+\item Thanks to the Norwegian Defence Research Establishment (FFI) and Kongsberg Maritime for providing us with data.
+\end{itemize}
+\end{frame}
+}
+
+% 
+% {
+% \setbeamertemplate{background}{\graphicsAI[width=\paperwidth]{gfx/AUVenv.png}}%
+% \begin{frame}
+% \vspace{-15pt}\frametitle{\color{white}Conclusion}
+% \framesubtitle{}
+% \vspace{-5pt}\color{white}
+% \begin{itemize}
+% \item \color{white}GPUs are well suited to accelerate algorithms such as the MVDR beamformer
+% \item \color{white}Our GPU implementation of the MVDR beamformer
+% \begin{itemize}
+% \item \color{white}fully supports active sonar systems,
+% \item \color{white}easily outperforms CPU implementations, and
+% \item \color{white}runs fast enough to support realtime sectorscan imaging.
+% \end{itemize}
+% \end{itemize}
+% \begin{figure}[H]%[width=0.5\linewidth]
+% \graphicsAI<1>[width=0.3\linewidth]{gfx/happy_fish.png}\\
+% \color{black}\centering\LARGE\textbf{Questions?}
+% \end{figure}
+% % \vspace{-10pt}
+% \end{frame}
+% }
+% 
+% % \begin{frame}
+% % \frametitle{}
+% % \framesubtitle{}
+% % 
+% % \begin{figure}[H]%[width=0.5\linewidth]
+% % \graphicsAI<1>[width=0.3\linewidth]{gfx/happy_fish.png}
+% % \end{figure}
+% % \vspace{-10pt}
+% % \centering\LARGE\textbf{Questions?}
+% % 
+% % \end{frame}
+% 
+
+
+\end{document}
+
+
+
+
+% \documentclass[
+%   ucs,
+%   utf8
+%   12pt,                   %extsize
+%   draft,                  %for empty decorations
+%     hyperref={
+%       breaklinks=true,      %Break links when necessary
+%       linktocpage=true,     %Enable link to page?
+%       linkcolor=PineGreen,  %Colour of links to labels within document
+%       citecolor=Brown,      %Colour of links to the biliography
+%       filecolor=Red,        %Colour of links to local files
+%       pagecolor=Red,        %Colour of links to other pages withing document
+%       urlcolor=Blue,        %Colour of the links to external URLs
+%       colorlinks=true,      %??
+%       plainpages=false,     %Store roman/arabic numbering differently to avoid
+%       bookmarksnumbered
+%     },                      %``duplicate'' warning.
+% %   usepdftitle={},         %
+%     xcolor={
+%       table,                %For colour in tabulars (will pull in colortbl)
+%       dvipsnames,
+%       svgnames
+%     }
+%   c,                      %centered
+%   t,                      %top aligned
+%   compress,               %
+%   trans,                  %
+%   noamsthm,               %
+%   notheorems,             %
+%   envcountsec,            %
+%   ignoreonframetext,      %
+%   handout,                %
+%   notes={}                %
+% ]{beamer}

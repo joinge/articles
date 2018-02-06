@@ -1,0 +1,117 @@
+Α α   alpha
+Β β   beta
+Γ γ   gamma
+Δ δ   delta
+Ε ε   epsilon
+Ζ ζ   zeta
+Η η   eta
+Θ θ   theta
+Ι ι   iota
+Κ κ   kappa
+Λ λ   lambda
+Μ μ   mu
+Ν ν   nu
+Ξ ξ   xi
+Ο ο   omicron
+Π π   pi
+Ρ ρ   rho
+Σ σ/ς    sigma
+Τ τ   tau
+Υ υ   upsilon
+Φ φ   phi
+Χ χ   chi
+Ψ ψ   psi
+Ω ω   omega
+<I></I>
+<sub></sub>
+<sup></sup>
+
+01
+Each Kaiser window is steered in the interval <I>φ</I>=[0, <I>φ</I><sub>3dB</sub>(<I>β</I>)]. The angle  <I>φ</I><sub>3dB</sub>(<I>β</I>) is the amount of steering needed for the steered response to have a -3 dB crossing that is exactly half that of the unsteered window. With each window steered this way we expect the resolution gain to remain predictable and independent of <I>β</I>, and we also effectively constrain the white noise gain of the beamformer.
+
+02
+One of the objects used to test the beamformers is a 1x1 m resolution test cross attached to an anchor with a diameter of approximately 13 cm. Source image curtesy of Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).
+
+03
+MVDR image with typical frequency responses for windows used in various pixel regions.
+<I>Left</I>: MVDR sectorscan image of the oiltanker Holmengraa, with the pixel groups are indicated with red boxes.
+<I>Right</I>: MVDR window amplitude and phase responses computed from 40x40 pixel groups in the shadow, highlight and speckle region of the image. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The size of the pixel groups were chosen ad-hoc for the histograms to be near invariant to a shift in position within the same region. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lsines at -13 dB and -43 dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3 dB in highlight. The phase varies most in the highlight region where we see the highest contrast.
+
+04
+<I>Determining Kaiser parameter boundaries</I>: LCA images of the resolution test cross and anchor created with a large and equal size window database, but where the upper bounds for <I>β</I> and <I>φ</I> is varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance <I>δ</I> between the two -3 dB points of the anchor (red object). These are specified relatively to the reference distance  <I>Δx</I><sub>ref</sub> from the upper left DAS image.
+
+<I>Upper bound β</I>:
+Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR tend to choose windows with levels lower than that of Kaiser with <I>β</I>=2, but here we observe further improvement going to <I>β</I>=5.
+
+<I>Upper bound φ</I>:
+As we increase the upper bound of the steering <I>φ</I>, we also increase the lateral image resolution.
+
+05
+Kaiser windows chosen for each pixel in the image. The underlying image is the one shown in Figure 4, with the same parameters. The location of the anchor, cut line and main scatter locations of the cross is marked in red.
+
+05a
+<I>β</I>-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a a narrow response (<I>β</I>=0) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.
+
+05b
+<I>φ</I>-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in Figure 4.
+
+06
+<I>LCA images using different window database sizes</I>. The window boundaries are the same. The upper left image is identical to a rectangularly weighted DAS. Observe that sampling the <I>β</I>-range more finely increases the sidelobe suppression but leaves resolution unchanged. Adding more steering-variations improves both sidelobe suppression and resolution. However, using more than <I>N<sub>β</sub></I>=2 window types and <I>N<sub>φ</sub></I>=2 steering angles makes minimal difference.
+
+07
+Comparing image quality of DAS, MVDR and LCA with Kaiser or trigonometric windows.
+
+07a
+<I>Image quality of approximate point scatterers found in the resolution test cross scene</I>. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.
+
+07b
+<I>Image quality of the full sector Holmengraa scene</I>. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.
+
+08
+<I>Steering angle needed to cut the -3 dB distance of the Kaiser window's spatial response in half.</I> The needed amount of steering depends on the number of channels <I>M</I>, the element spacing relative to the wavelength <I>d/λ</I>, and the Kaiser parameter <I>β</I>. Note how the angle scales near proportionally with <I>d/λ</I>.
+
+Media1
+
+
+Media2
+Animation of how an MVDR image changes as a function of subarray length <I>L</I> and temporal averaging <I>K</I>.
+
+
+
+
+
+
+
+
+MVDR beamforming. For each pixel in range and azimuth,\newline
+<I>1.</I> an <I>L</I>x<I>L</I> sample covariance matrix <I>R</I> is computed,
+<I>2.</I> the term <I>R</I><sup>-1</sup><I>1</I> is found using a linear equation solver,
+<I>3.</I> and the beamformer output <I>z</I> is computed from (6), where <I>w</I> is found by substituting <I>R</I><sup>-1</sup><I>1</I> into (2).
+
+03
+Per-pixel computational complexity of the steps in MVDR beamforming (prior to any optimizations). To avoid signal cancellation in an active sonar system we usually set <I>L</I><<I>M/2</I>, in which region the computation of the spatial covariance matrix dominates in terms of arithmetic complexity, especially when performing temporal averaging.
+
+04
+Step 1: Building <I>R</I>. This is a visualization of how <I>R</I> could be built in a case with <I>M=5</I> sensors, with subarray size <I>L=3</I> and temporal averaging set to <I>K=1</I>. Here <I>R'<sub>l</sub></I> is the sample covariance matrix for the <I>l</I>th subarray, and $\breve{\R}$ is the average of <I>N<sub>K</sub></I> of these. Note that instead of performing the temporal sum last as here, one could take more temporal samples into consideration in the computation of each <I>r<sub>ij</sub></I>.
+
+05
+Arithmetic optimization of computing <I>R</I>: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. 3 (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory optimized case, and by a factor 6-22 in the instruction optimized case.
+
+06
+MVDR implementated on a GPU. We do this in 3 steps, where each step process the full image before moving on to the next step. <I>Step 1</I>: The sample covariance matrix <I>R</I> is formed by threads running along its diagonals. This allows spatial averaging to be implemented in a computationally efficient manner and minimizes inter-thread communication. <I>Step 2</I>: <I>R</I><sup>-1</sup><I>1</I> is computed using the heavily optimized batched linear equation solver from Nvidia. <I>Step 3</I>: The beamformer output <I>z</I> is computed in a straight forward fashion by <I>L</I> threads that first sum the subarrays and then apply the MVDR weighting function. A single thread finally sum all the channels up.
+
+07
+HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77 m depth outside of Horten, Norway. The image was processed with <I>M=32</I>, <I>L=16</I>, <I>K=1</I> and <I>d=1%</I>. Prior to display the image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 Mpx. Note how MVDR improves edge definition and reduces noise in shadow regions.
+
+08
+MVDR benchmarks. A 1 Mpx image from a <I>M=32</I> channel array was processed for all <I>L</I>, and for <I>K</I>∈{0,1,2}. <I>Top</I>: The time the GPU spent on building <I>R</I>, solving <I>R</I><sup>-1</sup><I>1</I>, and computing <I>z</I>. Note the major speedup of building <I>R</I> when compared to the complexity plot in Fig. 3.
+<I>Bottom</I>: Compared to a reference Matlab and single thread C implementation running on a CPU the GPU offered a speedup of 2-3 orders of magnitude, but these numbers are somewhat misleading. If the C implementation was properly optimized we expect the GPU to be no more than a factor 5-10 faster, even if its theoretical peak performance is ~20 times higher than that of the CPU.
+
+09
+Execution time of an arithmetic-only and a memory-only version of the MVDR code. A dataset from an <I>M=32</I> array was processed for all <I>L</I> using <I>K=1</I>, and the mean execution time for a 1 Mpx image was used here. From this plot we can infer that the kernel building <I>R</I> is memory bound, as the time the kernel spends performing memory transactions is higher than the corresponding time it spends carrying out arithmetical operations. Furthermore, when the total runtime is larger than the restricted kernels this can largely be attributed to latency, which we can see that building <I>R</I> suffers from with the chosen parameters.
+
+10
+Code efficiency. An estimate of the number of floating point operations per second (Flop/s), found by dividing the theoretical complexity curves by actual run-times. This is a cruel measure as it does not include any other instructions than the actual arithmetic operations in the MVDR computation.
+
+11
+MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20 Kepler GPU. The exact same scenario and code as in Fig. 8 was used here. With no code alterations the performance was only improved marginally compared to running on the Quadro 6000.

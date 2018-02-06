@@ -482,23 +482,23 @@ Models are not ROCCAN (???)
 
 Our models are stored in regular 3D model files. The simulator begins by loading these into a tree of nodes, each representing a vertex in the model with corresponding facet and texture information. Then the vertices are placed into a virtual scene in OpenGL, and a camera set up to capture the part of the scene corresponding to the image. When OpenGL renders the image, it first computes which vertex contributes to which pixel in the image, then computes the intensity and color of the pixel based on the node's facet, texture and scattering model. The code that operates on vertices are called a vertex shader, and the code that operates on pixels are called a fragment shader.
 
-The mapping of the vertices from object coordinates to image coordinates happen through a set of transformations:
+Mapping of the vertices from object coordinates to image coordinates happen through a set of transformations:
 %
 \begin{align*}
-\bmat{x\\y\\0\\1}_\text{image} = \boldsymbol{P} \cdot \boldsymbol{V} \cdot \boldsymbol{M} \cdot \bmat{x\\y\\z\\1}_\text{object},
+\bmat{x\\y\\0\\1}_\text{image} = \boldsymbol{P} \cdot \boldsymbol{V} \cdot \boldsymbol{M} \cdot \bmat{x\\y\\z\\1}_\text{model},
 \end{align*}
 %
-where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are transformation matrices. These will be described next.
+where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are model, view and transformation matrices, respectively. These will be described next.
 
-The first transform we apply is the model matrix $\M$, which operates in the model's local coordinate system. It is defined as
+The model matrix $\M$ is the first transform applied to the object, and is defined as:
 %
 \begin{align}
-\M = \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model},
+\M = \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \cdot \bmat{x \\ y \\ z \\ w}_\text{model},
 \end{align}
 %
-where $\boldsymbol{S}$, $\boldsymbol{R}$ and $\boldsymbol{T}$ are matrices\todo{be explicit on dependencies?} for scaling, rotation and translation, respectively. These are provided for reference in Appendix \ref{transformation_matrices}.
+where $\boldsymbol{S}$, $\boldsymbol{R}$ and $\boldsymbol{T}$ are transformation matrices\todo{be explicit on dependencies?} that sets the object's scale, rotation and translation, respectively. Combined these transforms map the object from its local coordinate system to the world's coordinate system. They are provided for reference in Appendix \ref{transformation_matrices}.
 
-Next we map the model into world coordinates using the view matrix $\V$. This involves aligning the camera to precisely fit the image region. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation then take the form of
+Next the object is mapped into world coordinates with the view matrix $\V$. This involves aligning the camera to precisely fit the image region. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation then take the form of
 %
 \begin{align}
 \V &= \mat{T}(x_\text{c}, y_\text{c}, z_\text{c}) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
@@ -866,63 +866,85 @@ A final post-processing step is performed in OpenCL, which allow general purpose
 \appendix
 
 \section{Transformation matrices}\label{transformation_matrices} 
-%
-We place, resize and orient objects in an euclidean 3D space using suitable transformation matrices that are applied to each of the object's vertices:
-\begin{align}
-\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T}\R\boldsymbol{S} \bmat{x \\ y \\ z \\ w}_\text{model}.
-\end{align}
-Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\R$
-There is nothing special to these matrices, but we supply them here for completeness.
 
-We implement rotations in a 3D euclidean space by combining matrices that rotate around each of the three respective dimensions. For rotation by an angle $\phi_x$ clockwise around the $x$-axis we have
+Each data model that we load into OpenGL is defined in its own local coordinate system. To map them into OpenGL world coordinates a set of common transformation matrices are applied to each model's vertices:
+%
 \begin{align}
-\R_x(\phi_x) &= \bmat{
+\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \cdot \bmat{x \\ y \\ z \\ w}_\text{model}.
+\end{align}
+%
+Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\boldsymbol{R}$ and finally translated with $\boldsymbol{T}$, resulting in the transformed coordinates $(x_t,y_t,z_t)$. The parameter $w$ defines whether the vertex is a position ($w=1$) or a direction ($w=0$), which need to be handled differently. While these matrices are well-known in the field of computer graphics, there exist several different conventions but we supply them here for completeness.
+
+The scaling and translation matrices are simple:
+%
+\begin{align}
+\boldsymbol{S}(s_x,s_y,s_z) &= \bmat{
+   s_x  &  0    &  0    &  0 \\
+   0    &  s_y  &  0    &  0 \\
+   0    &  0    &  s_z  &  0 \\
+   0    &  0    &  0    &  1 \\
+  },
+  \end{align}
+%
+and
+
+TZF64LJO2AUK2XEM
+%
+\begin{align}
+\boldsymbol{T}(dx,dy,dz) &= \bmat{
+	1  &  0  &  0  &  dx \\
+	0  &  1  &  0  &  dy \\
+	0  &  0  &  1  &  dz \\
+	0  &  0  &  0  &  1 \\
+},
+\end{align}
+%
+where ($s_x$, $s_y$, $s_z$) and ($dx$, $dy$, $dz$) is scaling and translation factors.
+
+Rotations will be specified using intrinsic Euler angles, i.e. as yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the $z$-, $y$- and $x$-axis, respectively. The Brian-Tait $Z$-$Y'$-$X''$ convention is used for rotation order, in which roll is applied first, then pitch and finally yaw:
+%
+\begin{align}
+\R(\phi_x) = \R_z(\phi)\R_y(\theta)\R_x(\psi),
+\end{align}
+%
+where
+%
+\begin{align}
+\R_x(\psi) &= \bmat{
 1  &  0           &  0           &  0 \\
-0  &  \cos\phi_x  &  -\sin\phi_x &  0 \\
-0  &  \sin\phi_x  &  \cos\phi_x  &  0 \\
+0  &  \cos\psi  &  -\sin\psi &  0 \\
+0  &  \sin\psi  &  \cos\psi  &  0 \\
 0  &  0           &  0           &  1 \\
 },
 \end{align}
-and similarly, for the other two euclidean dimensions we have
+%
 \begin{align}
-\R_y(\phi_y) &= \bmat{
-\cos\phi_y  &  0  &  \sin\phi_y  &  0 \\
-0           &  1  &  0           &  0 \\
--\sin\phi_y &  0  &  \cos\phi_y  &  0 \\
-0           &  0  &  0           &  1 \\
-},
+\R_y(\theta) & = \bmat{
+\cos\theta	& 0          & \sin\theta & 0 \\
+0					& 1                   & 0          & 0          &  \\
+-\sin\theta  & 0                   & \cos\theta & 0          &  \\
+0            & 0                   & 0          & 1          &  \\
+},           &
 \end{align}
+%
 and
+%
 \begin{align}
-\R_z(\phi_z) &= \bmat{
-\cos\phi_z  &  -\sin\phi_z &  0  &  0 \\
-\sin\phi_z  &  \cos\phi_z  &  0  &  0 \\
-0           &  0           &  1  &  0 \\
+\R_z(\phi) &= \bmat{
+\cos\phi  &  -\sin\phi &  0  &  0 \\
+\sin\phi  &  \cos\phi  &  0  &  0 \\
+0				&  0           &  1  &  0 \\
 0           &  0           &  0  &  1 \\
 }.
 \end{align}
-The order in which these are applied matters. We rotate around the $x$-axis first, then around $y$ and finally around $z$:
-\begin{align}
-\R(\phi_x, \phi_y, \phi_z) &= \R_z(\phi_z)\;\R_y(\phi_y)\;\R_x(\phi_x).
-\end{align}
+%
+Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. Hence, one degree of freedom is lost at these points, an effect known as Gimbal lock. This can be solved by avoiding Eulean angles, e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter is the most common, due to added benefits such as reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. However, in for our application this is not needed.
+%
+Translation is performed last. 
+%
 
-\begin{align}
-\boldsymbol{T}(dx,dy,dz) &= \bmat{
-1  &  0  &  0  &  dx \\
-0  &  1  &  0  &  dy \\
-0  &  0  &  1  &  dz \\
-0  &  0  &  0  &  1 \\
-}
-\end{align}
 
-\begin{align}
-\boldsymbol{S}(s_x,s_y,s_z) &= \bmat{
-s_x  &  0    &  0    &  0 \\
-0    &  s_y  &  0    &  0 \\
-0    &  0    &  s_z  &  0 \\
-0    &  0    &  0    &  1 \\
-}
-\end{align}
+
 
 % \section{MVDR Complexity Formulas}\label{mvdr_formulas}
 % 
@@ -944,15 +966,13 @@ s_x  &  0    &  0    &  0 \\
 % 
 % 
 % 
-
-
   \section*{Acknowledgments}
 \else
   \section*{Acknowledgment}
 \fi
 
 
-The authors would like to thank the Norwegian Defence Research Establishment (FFI) for funding to develop the simulator\todo{more?}.
+The authors would like to express their gratitude to the Norwegian Defence Research Establishment (FFI) for funding the development of the simulator.
 
 
 % Can use something like this to put references on a page
@@ -974,7 +994,7 @@ The authors would like to thank the Norwegian Defence Research Establishment (FF
 % \end{thebibliography}
 
 
-\input{bio/jo_inge_buskenes}
+\input{bio/jo_inge_buskenes_new}
 % \input{bio/jon_petter_aasen}
 % \input{bio/carl-inge_nilsen}
 % \input{bio/andreas_austeng}
@@ -994,6 +1014,8 @@ The authors would like to thank the Norwegian Defence Research Establishment (FF
 
 
 \vfill 
+
+\input{derivations}
 
 \end{document}
 

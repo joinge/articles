@@ -8,16 +8,29 @@
  , biblatex                                 % Use a bibliography
 ]{common/mytemplate}
 
-\hypersetup{
-   bookmarksopen=true
- , bookmarksopenlevel=2
-}
+%\documentclass[
+%%uiophd
+%%, floatrow
+%%, xelatex
+%%, glossary                                     % Use a glossary
+%%, biblatex                                 % Use a bibliography
+%]{common/uiophd}
+
+
+%\hypersetup{
+%   bookmarksopen=true
+% , bookmarksopenlevel=2
+%}
 
 % \usepackage[utf8]{inputenc}         % or whatever you use
 
-\title{My title}
-\author{My name}
+% Fonts:
+% https://tex.stackexchange.com/questions/19898/getting-urw-garamond-and-the-license
 
+
+\title{Faster, Smarter, Better - Bridging high performance computing and adaptive image reconstruction to create cognitive sonar systems of tomorrow}
+\author{Jo Inge Buskenes}
+%\department{Department of Informatics}
 
 \newcommand*\1{\vec 1}
 \renewcommand*\a{\vec a}
@@ -54,6 +67,13 @@
 \begin{document}
 \frontmatter
 \maketitle
+
+\input{preface}
+
+\input{abstract}
+
+\input{publications}
+
 \tableofcontents
 
 \mainmatter
@@ -66,8 +86,13 @@
 \newpage
 \input{background}
 
-\newpage
-\input{litterature_review}
+\input{../HowtoHowtoCapon/howto_howto_capon}
+
+%\includearticle
+
+
+%\newpage
+%\input{litterature_review}
 
 \newpage
 \input{derivations}

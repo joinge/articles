@@ -245,7 +245,7 @@ if [ "$?" = "0" ]; then
     echo ':) SUCCESS: glossaries'
 fi
 
-grep "xelatex" $TMPDIR/$SETTINGSFILE
+grep "tex" $TMPDIR/$SETTINGSFILE
 if [ "$?" = "0" ]; then
 
   echo ':) Starting xelatex...'
@@ -253,7 +253,7 @@ if [ "$?" = "0" ]; then
   #Run this twice in order to ensure that references are
   #set correctly.
 #   cd $COMPILEDDIR
-  xelatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials ${1}.tex
+  xelatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials thesis.tex
   if [ $? -ne 0 ]; then
     cat $TMPDIR/$GLOSSLOG
     echo ':( FAILED: xelatex'
@@ -267,7 +267,7 @@ if [ "$?" = "0" ]; then
 #   echo "xelatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials -output-directory=$COMPILEDDIR ${1}.tex"
 
 else
-  pdflatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials ${1}.tex
+  pdflatex -synctex=1 -interaction=nonstopmode -shell-escape -src-specials thesis.tex
   if [ $? -ne 0 ]; then
     cat $TMPDIR/$GLOSSLOG
     echo ':( FAILED: pdflatex'

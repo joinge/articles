@@ -1,0 +1,25 @@
+\ProvidesPackage{beamerthemecma}[2004/05/03 ver 0.10]
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\DeclareOption{grid}{\beamertemplategridbackground[0.2cm]}
+\ProcessOptions\relax
+%
+% Copyright 2004 by Andrew McMurry <andrew.mcmurry@astro.uio.no>
+%
+% This program can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt.
+%
+%\usepackage[pdftex]{graphics}
+%\DeclareOption{grid}{\def\CMA@grid\True
+\mode<presentation>
+%\beamertemplategridbackground[0.2cm]
+\pgfdeclareimage[height=0.6cm]{uiologo}{/local/share/logo/uio-name}
+\pgfdeclareimage[height=0.6cm]{cmalogo}{/local/share/logo/cma_logo}
+\colorlet{structure}{red!28!green!47!blue!69}
+\usefoottemplate{\vbox{
+    \vskip1.0mm\pgfuseimage{uiologo}\hfill\pgfuseimage{cmalogo}
+    \vskip1.0mm\insertvrule{0.3mm}{structure}
+    \vskip0.3mm\insertvrule{0.8mm}{structure}
+  }
+}
+\mode<all>

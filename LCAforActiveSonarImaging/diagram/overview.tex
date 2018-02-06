@@ -1,0 +1,87 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{pgf}
+% % \usepackage{pgf-blur}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata,graphs,
+		fadings,mindmap,positioning,
+		shadows,shadows.blur,
+	        shapes} 
+% \usegdlibrary{layered}
+
+\pagestyle{empty}
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+    
+\tikzstyle{section} = [
+   draw,
+   ellipse,
+   fill=gray!50!gray,
+%    drop shadow,
+   blur shadow={shadow blur steps=8},
+   node distance=3cm,
+   minimum height=2em,
+   shade, shading=axis, top color=black!10!white, bottom color=black!25!white %shading angle=45
+   ]
+   
+\tikzstyle{goal} = [
+%    draw,
+%    rounded rectangle,
+%    fill=white,
+%    drop shadow,
+%    blur shadow={shadow blur steps=8},
+   node distance=0.5cm,
+   minimum height=0.2cm,
+   minimum height=0.2cm,
+   ]
+   
+\tikzstyle{structure} = [
+   draw, ellipse,
+   fill=white!20,
+   drop shadow,
+   node distance=3cm,
+   minimum height=2em]
+    
+\tikzset{state/.style={
+	rectangle,
+	rounded corners,
+	draw=black, very thick,
+	minimum height=2em,
+	inner sep=2pt,
+	text centered,
+	},
+}
+
+\begin{document}
+\begin{tikzpicture}[->,>=stealth']
+
+\node[section](abstract){ \bf Abstract };
+
+\node[section, below of=abstract](introduction){ \bf Introduction };
+
+\node[section, below of=introduction](methods){ \bf Methods };
+
+\node[section, below of=methods](results){ \bf Results };
+
+\node[section, below of=results](discussion){ \bf Discussion };
+
+\node[section, below of=discussion](conclusion){ \bf Conclusion };
+
+
+
+\node[goal, left of=introduction](intro_goals){ \bf Goals };
+\node[goal, left of=intro_goals](intro_goals_why){ \bf Why };
+\node[goal, below of=intro_goals_why](intro_goals_what){ \bf What };
+
+
+\path
+(abstract)        edge  (introduction)
+(introduction)    edge  (methods)
+   (introduction) edge  (goals)
+(methods)         edge  (results)
+(results)         edge  (discussion)
+(discussion)      edge  (conclusion);
+
+\end{tikzpicture}
+\end{document}

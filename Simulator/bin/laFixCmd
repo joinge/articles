@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ROOTDIR=$(pwd)
+RESULTFILE="result.tex"
+
+# echo ${1} | tr -s '_' '\_'
+# echo ${2} | tr -s '_' '\_'
+# FILE=$(echo ${1} | tr -s '_' '\_')
+CMD=${1//"ref"/"\linewidth"}
+CMD=$(echo "${1}"  | sed 's'\\_/_/g') # Replace globally
+FILE=$(echo "$FILE" | sed 's/_/\\_/g') # --- || ---
+# echo "${1}"
+# echo $FILE
+
+if [ "$2" = "" ]; then 
+#   echo "\href{$1}{$FILE}"
+  echo "\href{./$1}{$FILE}" > $ROOTDIR/$RESULTFILE
+else
+#   echo "\href{$2/$1}{$FILE}"
+  echo "\href{$2/$1}{$FILE}" > $ROOTDIR/$RESULTFILE
+fi
+
+exit 0

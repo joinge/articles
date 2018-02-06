@@ -1,0 +1,70 @@
+
+\newif\ifOPTtodos\OPTtodostrue
+
+
+%==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+% PACKAGES %
+%==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\RequirePackage{amsmath,amssymb}
+%~~ Fonts ~~%
+
+\RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
+\RequirePackage[T1]{fontenc}%                 % Set font encoding
+
+%~~ Colours and Graphics ~~%
+\RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+
+\RequirePackage{graphicx}%
+
+\RequirePackage{wrapfig}                        %For enabling text to wrap around figures
+\RequirePackage{subfigure}
+
+%~~ Floats ~~%
+\RequirePackage{float}                          % Needed for the 'H' 
+                                                % (Fig. placement: htbp - here, top, bottom, page)
+                                                %                  H - here and only here!
+\RequirePackage{multirow}                       % For more options with tables..
+\renewcommand*\arraystretch{1.05}
+
+
+%~~ COMMENTING ~~%
+                                                % For <\todo[inline]{description}>
+\ifOPTtodos\RequirePackage[backgroundcolor=LightBlue]{todonotes} 
+\else      \RequirePackage[disable]{todonotes} 
+\fi
+
+\RequirePackage{verbatim}                       % For <\begin{comment} ... \end{comment}>
+\RequirePackage[final]{listings}                % For <\begin{lstlisting} ... \end{lstlisting}>
+% \newcommand\lststart{}%\vspace{0.5\baselineskip}}
+% \newcommand\lstend{}%\vspace{-0.5\baselineskip}}
+
+
+%~~ REFERENCES ~~%
+\RequirePackage{varioref}                       % \vref{} replace \ref{} on page \pageref{}
+
+\RequirePackage{lastpage}                       % To be able to reference the last page
+
+
+%~~ MATH STUFF ~~%
+\RequirePackage{amssymb, amstext, amsmath, mathrsfs, mathdots}
+
+
+%~~ OTHER ~~%
+\RequirePackage{ifthen}                         % Combinatorial statements
+\RequirePackage{calc}                           % More flexible size specifications
+\RequirePackage{fp}                             % Floating point arithmetic
+
+%~~ HYPERLINKS ~~%
+\RequirePackage{hyperref}
+
+\RequirePackage{url}   
+
+%~~ INDEXES (GLOSSARY, ...) ~~%
+\RequirePackage[toc,nonumberlist]{glossaries}%
+\renewcommand\glsdescwidth{0.8\linewidth}
+\renewcommand\glspagelistwidth{0pt}
+
+%% Packet for turning/rotating objects
+\RequirePackage{rotating}
+
+

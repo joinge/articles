@@ -393,6 +393,7 @@
 %==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % PACKAGES %
 %==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\let\circledS\undefined 								% To avoid conflicts where this is previously defined
 \RequirePackage{amsmath,amssymb}
 %~~ Fonts ~~%
 \ifOPTxelatex%
@@ -435,6 +436,7 @@
 %       dvipsnames,
 %       svgnames  }
 \else
+\typeout{====Just before mytemplate's xcolor load====}
 \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
 \fi
 

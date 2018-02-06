@@ -1,0 +1,1694 @@
+<!doctype html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    
+    <title>LCA: Low Complexity Adaptive Beamformer</title>
+    
+    <meta name="description" content="A presentation of LCA">
+    <meta name="author" content="Andreas Austeng">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- <link rel="stylesheet" href="reveal/css/reveal.min.css"> -->
+    <link rel="stylesheet" href="reveal/css/reveal-aa.css">
+    <!-- <link rel="stylesheet" href="reveal/css/theme/simple.css" id="theme"> -->
+    <link rel="stylesheet" href="reveal/css/theme/default.css" id="theme">
+    
+
+    <style type="text/css">
+      #authors {
+      font-size: 0.75em;
+      }
+      #journal {
+      font-style: italic;
+      font-size: 0.75em;
+      }
+      #footnote {
+      font-size: 0.75em;
+      font-style: italic;
+      }
+      #footnote-small {
+      font-size: 0.6em;
+      font-style: italic;
+      }
+    </style>
+ 
+
+   <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="reveal/lib/css/zenburn.css">
+    
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = 'reveal/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--		<script type="text/javascript"
+			src="file:MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+			</script>
+      -->		
+    <!--[if lt IE 9]>
+	<script src="lib/js/html5shiv.js"></script>
+	<![endif]-->
+  </head>
+  
+  <body>
+    
+    <div class="reveal">
+      
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+	
+	<!-- First section, title + toc -->
+	<section>
+	  <section>
+	    <br/><br/>
+	    <h2>LCA</h2>
+	    <h3> Low Complexity Adaptive Beamformer</h3>
+	    <br/>
+	    <p>Jo Inge Buskenes & Andreas Austeng</p>
+	    <small><p>Kongsberg Maritime AS <br/> 4. Desember 2014</p></small>
+	    <br/><br/> <br/>
+	    <img style="border:0px; margin:0px 0px; background:rgba(1,1,1,0.0); box-shadow:0 0 0 #fff" width=100% src="img/MN_IFI_Segl_A.png" />
+	    <aside class="notes">Noe viktig man skal huske på???</aside>
+	  </section>
+
+	  <section>
+	    <h3>Outline</h3>
+	    <ul>
+	      <li>Who are we?</li>
+	      <li>MV and active adaptive acoustic imaging</li>
+	      <li>LCA</li>
+	      <li>What more ???</li>
+	    </ul>
+	  </section>
+
+	</section>
+	
+	<!-- Second section, Who are we? -->
+	<section>
+
+	<section>
+	  <h4>University of Oslo (UiO)</h4>
+	  <h4>The Faculty of Mathematics and Natural Sciences (Matnat)</h4>
+	  <h3>Department of Informatics (Ifi)</h3>
+	    <img width=90% src="img/Forskningsgrupper.png" alt="Forskningsgrupper ved Ifi" />
+	    <br/>
+	</section>
+
+	  
+	  <section>
+	    <h3>Digital signalbehandling og bildeanalyse (DSB)</h3>
+	    <ul>
+	      <li>Fire faste vitenskapelige ansatte <br/>
+		<small>(Anne Solberg, Fritz Albregtsen, Sverre Holm og Andreas Austeng)</small></li>
+	      <li>En ingeniør <br/>
+		<small>(Svein Bø)</small></li>
+	      <li>For tiden:</li>
+	      <ul>
+		<li> 5 II'ere <br/>
+		  <small>(Leiv Gelius, Roy E Hansen, Håvard Danielsen, Eigil Samset, Are Jensen)</small></li>
+		<li> 2 postdoctorer <br/>
+		  <small>(Ann Blomberg, Sten Roar Snare)</small>
+		<li> 12 stipendiater <br/>
+		  <small>Jo Inge Buskenes, Andreas Kleppe, Stig Asle Vaksvik Synnes, Vikash Pandey, Hani Mirarkolaei, Lars Hofsøy Breivik, Trond Bergh, Anders Ueland, Ole Marius Hoel Rindal, Tor Inge Birkenes, Knut Landmark, Angelique Berghelot </small>
+	      </ul>
+	    </ul>
+	  </section>
+
+	  <section>
+	    <h3>Acoustic imaging and image formation</h3>
+	    <h4>24 PhD/Postdoctors last 10 years</h4>
+	    <small><table class="reveal">
+ 	      <tr>
+		<td>
+ 		  <ul>
+		    <li>UiO:</li>
+		      <ul>
+			<li>Johan Fredrik Synnevåg (2004-2008)</li>
+			<li>Jan Egil Krikebø (2004-2008)</li>
+			<li>Carl Inge Nilsen (2006-2009)</li>
+			<li>Are Jensen (2009-2012, PDoc)</li>
+			<li>Endrias Asgedom (2009-2012)</li>
+			<li>Jo Inge Buskenes (2010-2015)</li>
+			<li>Knut Landmark (2011-2015)</li>
+			<li>Vikash Pandev (2012-2016)</li>
+			<li>Ole Marius Hoel Rindal (2014-2018)</li>
+		      </ul> 
+		    <li>NFR (Kongsberg Maritime):</li>
+		    <ul>
+		      <li>Fabrice Prieur (2009-2011)</li>
+		      <li>Ann Blomberg (2009-2012)</li>
+		      <li>S Peter Näsholm (2009-2012, PDoc)</li>		      
+		    </ul>
+		    <li>NFR (FriProg)</li>
+		    <ul>
+		      <li>Ann Blomberg (2013-2016, PDoc)
+		    </ul>
+		    <li>NFR / Kongsberg Maritime</li>
+		    <ul>
+		      <li>Tor Inge Birkenes (2014-2017)
+		    </ul>
+		  </ul>
+		</td>
+		<td> &nbsp; &nbsp;  &nbsp; </td>
+		<td>
+		  <ul>
+		    <li>NFR (GE Vingmed Ultrasound)</li>
+		    <ul>
+		      <li>Hani Mirarkolei (2013-2016)</li>
+		      <li>Lars Breivik (2013-2016)</li>
+		      <li>Sten Roar Snare (2013-2016, PDoc)</li>
+		    </ul>
+		    <li>NFR (Squarehead Technology)</li>
+		    <ul>
+		      <li>Ines Hafizovic (2008-2012)</li>
+		      <li>Trond Bergh (2014-2017)</li>
+		    </ul>		    
+		    <li>Ghinese Government</li>
+		    <ul>
+		      <li>Wei Zhang (2011-2014)
+		    </ul>
+		    <li>HiBV (SniperPos)</li>
+		    <ul>
+		      <li>Antonio Ramos (2009-2014)</li>		      
+		    </ul>
+		    <li>NTNU</li>
+		    <ul>
+		      <li>Saaed Mehdizadeh (2010-2012)</li>
+		      <li> Jon Petter Åsen (2010-2014)</li>
+		    </ul>
+		    <li>FFI</li>
+		    <ul>
+		      <li>Stig Asle Vaksvik Synnes (2011-2016)</li> 
+		    </ul>
+		  </ul>
+		</td>
+	      </tr>
+	    </table></small>
+	  </section>
+	  
+	  
+	  <section>
+	    <h3>Current collaboration with KM</h3>
+	    <ul>
+	      <li>Tor Inge Birkenes, NæringsPhD</li>
+	      <li><strong>CIUS: Centre for Innovative Ultrasound Solutions</strong><br/> in healthcare, maritime, and oil & gas industries
+		<ul>
+		  <li>Felles søknad med NTNU, HiBV, Ifi/UiO, GE Vingmed, Kongsberg Maritime, Medistim, Halfwave, InPhase Solutions, Statoil, Helse Midt-Norge, ...</li>
+		  <li>4 PhD'er v/Ifi, 8 PhD'er v/HiBV, 28 PhD/PDoc v/NTNU</li>
+		</ul>
+		<img width=90% src="img/CIUS.png" alt="CIUS /">
+	    </ul>
+	  </section>
+	  
+	</section>
+	
+	<section>
+	  <section>
+	    <h3>Active adaptive acoustic imaging</h3>
+	    <ul>
+	      <li>MV/MVDR/Capon BF:<br/> 
+		Minimum Variance (Distortionless Response) Beamformer 
+		<ul>
+		  <li>Method known to 
+		    <ul>
+		      <li>work well in passive imaging</li>
+		      <li>fail if coherent signals</li>
+		      <li>need lots of data for estimating covariance matrix $R$		      
+		    </ul>
+		</ul>
+		<br/>
+	      <li>We (DSB/Ifi/UiO) have worked on adapting this method for active acoustic imaging
+		<ul>
+		  <li> Single snapshot data, coherent signals, robustification, implementation ...
+		</ul>
+	    </ul>
+	  </section>
+
+	  <section>
+	    <img width=70% src="img/Synnevag_AdaptiveBF_2007.png" alt="Synnevåg et al; Adaptive Beamforming">
+	    <p id="footnote">Synnevåg, J.-F.; Austeng, A.; Holm, S., "Adaptive Beamforming Applied to Medical Ultrasound Imaging," Ultrasonics, Ferroelectrics, and Frequency Control, IEEE Transactions on , vol.54, no.8, pp.1606,1613, August 2007</p>
+	  </section>
+
+	  <section>
+	    <img width=70% src="img/Synnevag_Benefit_2009.png" alt="Synnevåg et al; Benefit of MV">
+	    <p id="footnote">Synnevåg, J.-F.; Austeng, A.; Holm, S., "Benefits of minimum-variance beamforming in medical ultrasound imaging," Ultrasonics, Ferroelectrics, and Frequency Control, IEEE Transactions on , vol.56, no.9, pp.1868,1879, September 2009</p>
+	  </section>
+
+	  <section>
+	    <img width=65% src="img/Synnevag_LowComplexity_2011.png" alt="Synnevåg et al; Low Complexity Data-Dependent Beamformer">
+	    <p id="footnote">Synnevåg, J.-F.; Austeng, A.; Holm, S., "A low-complexity data-dependent beamformer," Ultrasonics, Ferroelectrics, and Frequency Control, IEEE Transactions on , vol.58, no.2, pp.281,289, February 2011</p>
+	  </section>
+
+	  <section>
+	    <h3>Delay-and-sum (DAS) beamformer (BF)</h3>
+	    <table class="reveal">
+		<col style="width:30%">
+		<col style="width:10%">
+		<col style="width:60%">
+ 		<tr>
+		  <td style="vertical-align:middle; font-size:80%"><strong>Beamforming</strong>:<br/>The process of combining signals from different elements</td>
+		  <td><br> </td>
+		  <td> <img width=90% src="img/das.png" alt="DAS"></td>
+		</tr>
+	      </table>
+
+	      <div class="box-red" data-title="DAS">
+		$z[n] = \sum_{m=0}^{M-1} w_m^*[n] x_m[n$-$\Delta_m[m]] = \mathbf{w}^H[n] \mathbf{X}[n]$</div>
+	      <ul>
+		<li>The weights $\mathbf{w}$ are predefined and (usually) used for all pixels in the image
+	      </ul>
+	  </section>
+	  
+	  <section>
+	    <h3>DAS uses predefined windows</h3>
+	    <table class="reveal">
+ 		<tr>
+		  <td> <img width=90% src="img/VindusFunk.png" alt="Windows"></td>
+		  <td style="vertical-align:middle; font-size:100%"> Typical window functions</td>
+		</tr>
+ 		<tr>
+		  <td style="vertical-align:middle; font-size:100%">Spatial response<br/> of window functions</td>
+		  <td> <img width=90% src="img/RespVindusFunk.png" alt="Windows"></Td>
+		</tr>
+	      </table>
+	  </section>
+
+	  <section>
+	    <h3>Minimum variance (MV) beamforming</h3>
+	    <ul>
+	      <li> Adaptively choose weights with unit gain in direction of interest, that minimize the contribution from other directions:<br><br>
+	      </li>
+	    </ul>
+	    <div class="box-red" data-title="MV">
+	      $$\min_\mathbf{w[n]} E\{|z[n]|\} = 
+	      \min_\textbf{w} E\{ | \mathbf{w}^H \mathbf{X} |^2 \} = 
+	      \min_\textbf{w} \mathbf{w}^H \mathbf{R} \mathbf{w}$$ 
+	      such that $\ \mathbf{w}^H \mathbf{a}(\mathbf{k}_0) = 1,$ where 
+	      $\ \mathbf{a}(\mathbf{k}_0)\ $ is the steering vector.</div>
+	    
+	    <img width=50% src="img/MvBfIllustrasjon.png" alt="">
+	  </section>
+	  
+	  <section>
+	    <h3>MV response to point target</h3>
+	    <img width=70% src="img/BeampatternPoints.png" alt="">
+	    <div style="width:80%; margin: 0px auto;" class="box-red" data-title="">
+	      DAS vs MV BF:<br/> The MV BF passes the signal of interest with unity gain while the interfering signal is suppressed. 
+	    </div>
+	  </section>
+	  
+	<section>
+	  <h3>MV response to cyst/shadow target</h3>
+	    <table class="reveal">
+		<col style="width:25%">
+		<col style="width:5%">
+		<col style="width:70%">
+ 		<tr>
+		  <td style="vertical-align:middle"> <img width=100% src="img/CystResp.png" alt="DAS"></td>
+		  <td><br> </td>
+		  <td> <img width=100% src="img/BeampatternCyst.png" alt="DAS"></td>
+		</tr>
+	      </table>
+	    <div style="width:80%; margin: 0px auto;" class="box-red" data-title="">
+	      DAS vs MV BF:<br/> The MV BF allows large sidelobes in regions with little energy.
+	    </div>	  
+	</section>
+
+	<section>
+	  <h3>Challenges when using the MV BF</h3>
+	  <ul>
+	    <li>Find a good estimate for $R$ (the covariance matrix)</li>
+	    <li>Make the MV BF robust:</li>
+	    <ul>
+	      <li>Make it work for coherent signals</li>
+	      <li>Attain</li>
+	      <ul>
+		<li>Narrower peaks than DAS</li>
+		<li>Steeper and more defined edges than DAS</li>
+		<li>BUT: Speckle as DAS</li>
+	      </ul>
+	    </ul>
+	    <li>Reduce the computational cost.</li>
+	    <li>Use it correctly!</li>	    
+	  </ul>
+	</section>
+
+	<section>
+	  <h3>Estimating $R$ : Averaging and conditioning</h3>
+	  <img width=80%  style="background:rgba(255,255,255,0.8)" src="img/MV_averaging.png" alt="Averaging">
+	  <div style="width:50%; margin: 0px auto;" class="box-red" data-title="">
+	    We are using 1., 2. and 3.
+	  </div>	    
+	</section>
+
+	<section>
+	  <h3>High resolution BFs needs better spatial sampling!</h3>
+	  <img width=60% src="img/fig1_2way.png" alt="MV resolution">
+	  <div style="width:80%; margin: 0px auto;" class="box-red" data-title="">
+	    To avoid scalloping loss, MV needs 4-16 times denser sampling than DAS (depending on target scene and SNR).
+	  </div>	  
+	</section>
+
+	<section>
+	  <h3>Lessons learned ...</h3>
+	  
+	  <div style="font-size:80%">
+	    <table style="border-spacing:0 0.4em" class="reveal">
+	      <col style="width:45%">
+	      <col style="width:8%">
+	      <col style="width:45%">
+	      <tr>
+		<th>Known problems </th>
+		<th> &nbsp </th>
+		<th> Solutions</th>
+	      </tr>
+
+ 	      <tr>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li><strong>Signal Cancellation</strong></li>
+		    <ul>
+		      <li>Coherent signals</li>
+		    </ul>
+		</ul>
+		</td>
+		<td style="vertical-align:top">$\Rightarrow$</td>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li>Estimate $\mathbf{R}$ by spatial averaging</li>
+		    <li>Increase no. of image lines</li>
+		  </ul>
+		</td>
+	      </tr>
+ 	      
+	      <tr>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li><strong>Robustness</strong></li>
+		    <ul>
+		      <li>W.r.t. phase aberrations and sensor imperfections</li>
+		    </ul>
+		  </ul>
+		</td>
+		<td style="vertical-align:top">$\Rightarrow$</td>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li>Diagonal loading</li>
+		    <ul>
+		      <li>Estimate $\mathbf{R}$ as $\mathbf{\hat{R}} = 
+			\mathbf{\tilde{R}} + \epsilon \mathbf{I}$ </li>
+		    </ul>
+		  </ul>
+		</td>
+	      </tr>
+	      
+ 	      <tr>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li><strong>Speckle statistics</strong></li>
+		    <ul>
+		      <li>Wants speckle to look as with DAS BF</li>
+		    </ul>
+		  </ul>
+		</td>
+		<td style="vertical-align:top">$\Rightarrow$</td>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li>Averaging in time</li>
+		    <ul>
+		      <li>$\mathbf{R}$ is averaged over one "signal length" in time</li>
+		    </ul>
+		  </ul>
+		</td>
+	      </tr>
+	      
+ 	      <tr>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li><strong>Many param's to adjust</strong></li>
+		  </ul>
+		</td>
+		<td style="vertical-align:top">$\Rightarrow$</td>
+		<td style="vertical-align:top"> 
+		  <ul>
+		    <li>Exp: "One size fits all"</li>
+		</ul>
+		</td>
+	      </tr>
+	      
+	    </table>
+	  </div>
+	</section>
+	
+
+
+	<section>
+	  <h3>What can be obtained?</h3>
+          <h4>Simulation study</h4>
+          <video data-autoplay loop width="80%">
+            <source src="mov/sim_points_mv.mp4" type="video/mp4" />
+            <source src="mov/sim_points_mv.ogv" type="video/ogg" />
+          </video>
+	  <p id="footnote-small">Images courtesy by J.P. Åsen </p>
+	</section>
+
+
+	<section>
+	  <h3>What can be obtained?</h3>
+          <h4>In vitro example</h4>
+	  
+ 	  <small>  
+	    <table class="reveal">
+	      <col style="width:33%">
+	      <col style="width:33%">
+	      <col style="width:33%">
+ 	      <tr>
+		<td><img width=100% src="mov/paper3/das.gif" alt="DAS"></td>
+		<td><img width=100% src="mov/paper3/mv.gif" alt="MV"></td>
+		<td><img width=100% src="mov/paper3/mv_oversampling.gif" alt="MV w/oversampling"></td>
+	      </tr>
+ 	      <tr>
+		<td>DAS</td>
+		<td>MV</td>
+		<td>MV w/oversampling</td>
+	      </tr>
+	      
+	    </table>
+	  </small>
+	  <br/>	  <br/>
+	    <p id="footnote-small">Images courtesy by J.P. Åsen <br/>
+	      Asen, J.; Austeng, A.; Holm, S., "Capon beamforming and moving objects-an analysis of lateral shift-invariance," Ultrasonics, Ferroelectrics, and Frequency Control, IEEE Transactions on , vol.61, no.7, pp.1152,1160, July 2014 </p>
+	</section>
+	
+	<section>
+	  Examples!	  Examples!	  Examples!	  Examples!
+	</section>
+
+	</section>
+
+	<section>
+	  <section>
+	    <h1>LCA</h1>
+	  </section>
+	  
+	  <section>
+	    <h3>LCA: Low-complexity adaptive beamforming</h3>
+	    <ul>
+	      <li> Adaptively choose the best predefined window (with unit gain in the direction of interest), i.e. the window that minimize the contribution from other directions:<br><br>
+	      </li>
+	    </ul>
+	    <div class="box-red" data-title="LCA">
+	      $$\min_\mathbf{p} E\{|z[n]|\} = 
+	      \min_\textbf{p} E\{ | \mathbf{w}_p^H \mathbf{X} |^2 \},
+	      \quad p = {0,\ldots, P-1}$$ 
+	      where $\{\mathbf{w}_0, \mathbf{w}_1, \ldots, \mathbf{w}_{P-1}\}$ 
+	      have unit gain in the steering direction.
+	    </div>
+	    
+	    <p id="footnote-small">
+	    <ul>
+	      <li>The method</li>
+	      <ul>
+		<li>addresses the computational complexity of adaptive beamforming</li>
+		<li>a ”hybrid” method using predetermined windows</li>
+		<li>combine classical windows with experience from the MV beamformer in the window design.</li>
+		
+	      </ul>
+	    </ul>
+	    </p>
+	  </section>
+	  
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>The best predetermined window for all image points</h3>
+ 	    <small>  
+	      <table class="reveal">
+		<col style="width:33%">
+		<col style="width:33%">
+		<col style="width:33%">
+ 		<tr>
+		  <td><img height=60% src="img/LCA_DAS.png" alt="DAS"></td>
+		  <td><img height=60% src="img/LCA_Kaiser.png" alt="DAS-Kaiser"></td>
+		  <td><img height=60% src="img/LCA_2wind.png" alt="LCA, 2 windows"></td>
+		</tr>
+ 		<tr>
+		  <td>DAS</td>
+		  <td>DAS w/Kaiser</td>
+		  <td>LCA (DAS/Kaiser)</td>
+		</tr>
+		
+	      </table>
+	    </small>
+	    <br/>
+	    <p id="footnote">Similar to "Dual- and multi-apodization".</p>
+	    <p id="footnote-small"> H. Stankwitz, R. Dallaire, and J. Fienup, “Spatially 
+	      variant apodization for sidelobe control in sar imagery,” in Radar 
+	      Conference, 1994., Record of the 1994 IEEE National, mar 1994, pp. 132 –137.
+	      <br/>
+	      H. C. Stankwitz, R. J. Dallaire, and J. R. Fienup, “Nonlinear apodization
+	      for sidelobe control in sar imagery,” IEEE Transactions on Aerospace
+	      and Electronic Systems, Vol. AES-31, No. 1, pp. 267–279, 1995.</p>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>12-window example ...</h3>
+ 	    <small>  
+	      <table class="reveal">
+		<col style="width:33%">
+		<col style="width:33%">
+		<col style="width:33%">
+ 		<tr>
+		  <td><img height=60% src="img/LCA_DAS.png" alt="DAS"></td>
+		  <td><img height=60% src="img/LCA_Kaiser.png" alt="DAS-Kaiser"></td>
+		  <td><img height=60% src="img/LCA_12wind.png" alt="LCA, 2 windows"></td>
+		</tr>
+ 		<tr>
+		  <td>DAS</td>
+		  <td>DAS w/Kaiser</td>
+		  <td>LCA (DAS/Kaiser)</td>
+		</tr>		
+	      </table>
+<br>
+	      Windows used
+	      <table  style="border: 1px solid gray" class="reveal">
+		<col style="width:25%">
+		<col style="width:25%">
+		<col style="width:25%">
+		<col style="width:25%">
+ 		<tr>
+		  <td>Boxcar</td>
+		  <td>Kaiser(2)</td>
+		  <td>Kaiser(3)</td>
+		  <td>Kaiser(4)</td>
+		</tr>		
+ 		<tr style="border: 1px solid gray">
+		  <td>Inv. Kaiser(2)</td>
+		  <td>Inv. Kaiser(4)</td>
+		  <td>Kaiser(3), $\phi$=1/(2M)</td>
+		  <td>Kaiser(3), $\phi$=3/(4M)</td>
+		</tr>		
+ 		<tr>
+		  <td>Kaiser(3), $\phi$=1/(M)</td>
+		  <td>Kaiser(3), $\phi$=-1/(2M)</td>
+		  <td>Kaiser(3), $\phi$=-3/(4M)</td>
+		  <td>Kaiser(3), $\phi$=-1/(M)</td>
+		</tr>		
+	      </table>
+	    </small>
+	  </section>
+
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>Simulation study, cyst phantom</h3>
+
+	    <img width=60% src="img/DAS_cyst.png" alt="DAS, Cystphantom">
+	    <br/>
+	    <p id="footnote">
+	      <ul>
+		<li>DAS, Boxcar window.</li>
+	      </ul>
+	    </p>	    
+	    <p id="footnote-small">
+	      (64-element, 2.5-MHz, 19.7 mm linear transducer, pitch: $\lambda/2$.)
+	    </p>
+	  </section>
+	  
+	  
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>Simulation study, cyst phantom</h3>
+	    
+	    <img width=60% src="img/LCA4_cyst.png" alt="LCA, 4 windows">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>LCA, 4 windows.</li>
+		<li> Notice how black speckle areas are emphasized.
+	      </ul>
+	    </p>
+	    <p id="footnote-small">
+	      (Windows used: Boxcar, Kaiser(4), Kaiser(3) with $\phi=\pm$ 1/(2M) )
+	    </p>
+	    
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>Simulation study, cyst phantom</h3>
+
+	    <img width=60% src="img/LCA12_cyst.png" alt="DAS, Cystphantom">
+	    <br/>
+	    <p id="footnote">	     
+	      <ul>
+		<li>LCA, 12 windows</li>
+		<li>K=15 corresponds  approximately to the range resolution</li>
+	      </ul>
+	    </p>	   
+	  </section>
+
+	  <!-- Simuleringsstudie fra Ann, SX90 sonar -->
+	  <section>
+	    <h3>SX90 simulation study</h3>
+	    <ul>
+	      <li>Cylindrical stave array simulated using the Focus toolbox.</li>
+	      <li>Array with 32 staves, 13 staves at a time used for BF.</li>
+	      <li>Center frequency: 27 kHz, Bandwidth: 700 Hz.</li>
+	      <li>Transmitted pulse: 32 ms linear FM chirp.</li>
+	      <li>Matched filtering applied prior to BF.</li>
+	    </ul>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>SX90 study, response to two point sources.</h3>
+	    
+	    <img width=68% src="img/SX90_points_DAS.png" alt="SX90, points">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>DAS, Boxcar window.</li>
+	      </ul>
+	    </p>
+	  </section>
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>SX90 study, response to two point sources (2).</h3>
+	    
+	    <img width=75% src="img/SX90_points_LCA.png" alt="SX90, points">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>LCA</li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <!-- Studie av eksperimentelle data, Ann, SX90 sonar -->
+	  <section>
+	    <h3>SX90, experimental results</h3>
+	    <img width=75% src="img/SX90_array.png" alt="SX90, experimental setup">
+	    <br/>
+	    <p id="footnote-small">	   
+	    KM data from sea trial near Horten, February 2007.
+	    </p>
+	  </section>
+
+	  <section>
+	    <h3>SX90, experimental results (2)</h3>
+	    
+	    <small>	
+	      <table class="reveal">
+		<col style="width:25%">
+		<col style="width:25%">
+		<tr>
+		  <td>DAS</td>
+		  <td>DAS Hanning</td>
+		</tr>
+ 		<tr>
+		  <td><img width=80% src="img/SX90_expr_full_DAS.png" alt="DAS"></td>
+		  <td><img width=80% src="img/SX90_expr_full_Hanning.png" alt="Hanning"></td>
+		</tr>
+		<tr>
+		  <td>MV</td>
+		  <td>LCA</td>
+		</tr>
+ 		<tr>
+		  <td><img width=80% src="img/SX90_expr_full_MV.png" alt="MV"></td>
+		  <td><img width=80% src="img/SX90_expr_full_LCA.png" alt="LCA"></td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+
+	  <section>
+	    <h3>SX90, experimental results (3)</h3>
+	    <img width=75% src="img/SX90_expr_full_cut.png" alt="SX90, experimental cuts">
+	    <br/>
+	    <p id="footnote-small">	   
+	    Cross section through the reflector comparing Hanning weighted DAS, MV nd LCA Beamformers.
+	    </p>
+	  </section>
+	  
+	  <!-- HISAS 1030 i reel-aperture mode -->
+
+	  <section>
+	    <h3>HISAS 1030 in real-aperture mode</h3>
+	    <h4>Simulated and experimental results</h4>
+	    <img width=75% src="img/HS1030_scene.png" alt="HiSAS 1030, simulation scene">
+	    <br/>
+	    <p id="footnote-small">	   
+	   Simulation setup for HiSAS used as sidescan sonar. FOCUS simulation.
+	    </p>
+	  </section>
+
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>HISAS 1030 in real-aperture mode (2)</h3>	    
+	    <img width=60% src="img/HS1030_DAS.png" alt="Sim.study, DAS">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>DAS, Boxcar window</li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>HISAS 1030 in real-aperture mode (3)</h3>	    
+	    <img width=60% src="img/HS1030_Hanning.png" alt="Sim.study, DAS Hanning">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>DAS, Hanning window</li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>HISAS 1030 in real-aperture mode (4)</h3>	    
+	    <img width=60% src="img/HS1030_MV.png" alt="Sim.study, MV">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>MV, Subarray length: 16, Diag.loading: 3%</li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>HISAS 1030 in real-aperture mode (5)</h3>	    
+	    <img width=60% src="img/HS1030_LCA.png" alt="Sim.study, LCA">
+	    <br/>
+	    <p id="footnote">	   
+	      <ul>
+		<li>LCA</li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <section>
+	    <h3>HISAS 1030 in real-aperture mode (6)</h3>	    
+	    <img height="400" src="img/HS1030_Detail1.png" >
+	    <img height="400" src="img/HS1030_Detail2.png" >
+	    
+	    <p id="footnote">	   
+	      <ul>
+		<li>Detailed view </li>
+	      </ul>
+	    </p>
+	  </section>
+
+	  <!-- HISAS 1030 i reel-aperture mode, Holmengra-data -->
+
+	  <!-- ----------------------   ----------------------- -->
+	  <!-- LCA parameter study -->
+	  <!-- ----------------------   ----------------------- -->
+
+	  </section>
+	  <section>
+
+	  <section>
+	    <h3>LCA-study</h3>	    
+	    <ul>
+	      <li>Wished to answer:</li>
+	      <ul>
+		<li>How many windows?</li>
+		<li>How many steering angles?</li>
+		<li>How much "averaging"?</li>
+	      </ul>
+	      <li>Simulation study:</li>
+	      <ul>
+		<li>FOCUS simulation</li>
+		<li>HiSAS 1030, real aperture</li>
+		<li>Sector-scan imaging</li>
+	      </ul>
+	      <li>Compare LCA to DAS and MV<br><br></li>
+	      
+	      <li>Finding:</li>
+	      <ul>
+		<li>You only need a few windows and steering angles.</li>
+	      </ul>
+	    </ul>
+
+	  </section>
+
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>LCA-study (2)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_03.png" />
+	    LCA with trigonometric and Kaiser windows - Capon shining
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+
+	  <section  data-transition="none"  data-background-transition="none">
+	    <h3>LCA-study (3)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_04.png" />
+
+	    Capon: Tuning regularisation.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.05$</td>
+		  <td>L=16</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+
+ 	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (4)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_05.png" />
+
+	    Capon: Tuning regularization (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.20$</td>
+		  <td>L=16</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (5)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_06.png" />
+
+	    Capon: Tuning subarray.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=20</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (6)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_07.png" />
+
+	    Capon: Tuning subarray (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (7)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_08.png" />
+
+	    Capon: Tuning subarray (3).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=12</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (8)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_09.png" />
+
+	    Capon: Tuning time averaging.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 1</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 1</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (9)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_10.png" />
+
+	    Capon: Tuning time averaging (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 3</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 3</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (10)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_11.png" />
+
+	    Capon: Tuning time averaging (3).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 5</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 5</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (11)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_12.png" />
+
+	    Capon: Tuning time averaging (4).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (12)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_13.png" />
+
+	    LCA: Reasonable settings.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-0.57,0.57]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (13)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_14.png" />
+
+	    LCA: Lots of Kaiser windows -- wide span.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,20]$ (19 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (14)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_15.png" />
+
+	     LCA: Lots of trigonometric windows -- wide span.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,20]$ (19 values)</td>
+		  <td>$\phi \in [-1.07,1.07]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (15)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_16.png" />
+
+	    LCA: Kaiser -- reducing steering span.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,20]$ (19 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (19 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (16)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_17.png" />
+
+	   LCA: Kaiser -- reducing steering span (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,20]$ (19 values)</td>
+		  <td>$\phi \in [-0.36,0.36]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (17)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_18.png" />
+
+	    LCA: Adjusting resolution/SNR.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,5]$ (19 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (19 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (18)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_19.png" />
+
+	    LCA: Adjusting resolution/SNR (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [5,20]$ (19 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (19 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (19)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_20.png" />
+
+	    LCA: Fewer windows.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (19 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (20)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_21.png" />
+
+	    LCA: Fewer steering angles.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (19 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (21)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_22.png" />
+
+	   LCA: Fewer windows and steering angles.
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,10]$ (9 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (9 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>LCA-study (22)</h3>
+	    <img width=100% src="LCA/lca-JoInge_Page_23.png" />
+
+	   LCA: Fewer windows and steering angles (2).
+	    <small>  
+	      <table  style="border-spacing:0 0.5em" class="reveal">
+		<col style="width:10%">
+		<col style="width:30%">
+		<col style="width:40%">
+		<col style="width:20%">
+ 		<tr>
+		  <td>General</td>
+		  <td>M = 32</td>
+		  <td>$\Delta r$=$\frac{c}{2B}$=2.5 cm</td>
+		  <td>$\frac{640\mbox{pixels}/12\mbox{m}}{\Delta r} = \frac{4}{3}$</td>
+		</tr>
+ 		<tr>
+		  <td>LCA</td>
+		  <td>$\beta \in [0,5]$ (9 values)</td>
+		  <td>$\phi \in [-0.72,0.72]$ (5 values)</td>
+		  <td>Navg = 7</td>
+		</tr>
+ 		<tr>
+		  <td>Capon</td>
+		  <td>$\Delta = 0.01$</td>
+		  <td>L=16</td>
+		  <td>Navg = 7</td>
+		</tr>
+	      </table>
+	    </small>
+	  </section>
+
+
+
+
+
+	  </section>
+
+	  <section>
+
+	  <section>
+	    <h3>Robustification study</h3>
+	    <ul>
+	      <li>17-element (and 15-element) ULA, Center frequency: 27 kHz, Bandwidth: 1 kHz.</li>
+	      <li>Effect of adding Gaussian white noise:</li>
+	      <ul>
+		<li> Pre-beamforming per-channel SNR of</li>
+		<ul>
+		  <li>infinite (no noise), 3dB, 6dB and 9dB.</li>
+		</ul>
+	      </ul>
+	      <li>Effect of incorrect propagation velocity:</li>
+	      <ul>
+		<li>Simulated (true) velocity of 1540 m/s.</li>
+		<li>Assumed velocity of 1540 m/s, 1586.2 m/s, 1617 m/s, 1663.2 m/s. </li>
+		<li>(i.e. 0%, 1%, 3% and 5% off).</li>
+	      </ul>
+	    </ul>
+	  </section>
+
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (2)</h3>
+	    <img width=70% src="img/ULA_noise_DAS.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (3)</h3>
+	    <img width=70% src="img/ULA_noise_MV.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (4)</h3>
+	    <img width=70% src="img/ULA_noise_LCA.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (2)</h3>
+	    <img width=45% src="img/ULA_error_DAS.png" />
+	    <img width=45% src="img/ULA_errorX_DAS.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (3)</h3>
+	    <img width=45% src="img/ULA_error_MV.png" />
+	    <img width=45% src="img/ULA_errorX_MV.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (4)</h3>
+	    <img width=45% src="img/ULA_error_LCA.png" />
+	    <img width=45% src="img/ULA_errorX_LCA.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      17-element ULA
+	    </p>
+	  </section>
+
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (2)</h3>
+	    <img width=70% src="img/ULA_error15_DAS.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      15-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (3)</h3>
+	    <img width=70% src="img/ULA_error15_MV.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      15-element ULA
+	    </p>
+	  </section>
+	  <section  data-transition="none" data-background-transition="none">
+	    <h3>Robustification study (4)</h3>
+	    <img width=70% src="img/ULA_error15_LCA.png" />
+	    <br/>
+	    <p id="footnote-small">	   
+	      15-element ULA
+	    </p>
+	  </section>
+
+	  </section>
+
+
+
+	  <section>
+	    <h3>Other aspects ...</h3>
+	    <ul>
+	      <li>For a given steering angle, it is possible to find the optimal trigonometric window parameterized as $w[n] = \alpha + (1-\alpha)*\cos(\frac{2\pi m}{M-1})$ (i.e. find optimal $\alpha$).  </li>
+	      <li> Time averaging can be done in many ways ...</li>
+	      <li> Applying a shifted (and scaled) window is the same as shifting the total image. LCA might therefore be performed at the (complex) image itself.</li>
+	    </ul>
+	  </section>
+
+
+	
+	  
+	  
+	  
+	  
+	
+      </div>
+      
+    </div>
+    
+    <script src="reveal/lib/js/head.min.js"></script>
+    <script src="reveal/js/reveal.min.js"></script> 
+    <!-- <script src="reveal/js/reveal.js"></script> -->
+    
+    <script>
+      
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+      controls: true,
+      progress: true,
+      history: true,
+      center: true,
+
+    // The "normal" size of the presentation, aspect ratio will be preserved
+    // when the presentation is scaled to fit different resolutions. Can be
+    // specified using percentage units.
+    // width: 960,
+    // height: 700,
+
+      
+      theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+      transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+      
+      // To use mathjax in offline modus it has to be downloaded and moved to the relative folder MathJax/
+      //math: {mathjax: 'MathJax/MathJax.js'},	
+      //math: {mathjax: 'MathJax/MathJax.js'},
+      
+      // Parallax scrolling
+      // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+      // parallaxBackgroundSize: '2100px 900px',
+      
+      // Optional libraries used to extend on reveal.js
+      dependencies: [
+      { src: 'reveal/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'reveal/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'reveal/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal/plugin/math/math.js', async: true }, // MathJax
+      ]
+      });
+      
+    </script>
+    
+  </body>
+</html>
