@@ -207,6 +207,17 @@
    \DeclareOption{bibtex}{\OPTbibliographytrue}
    \DeclareOption{biblatex}{\OPTbibliographytrue}
    \DeclareOption{xelatex}{\PassOptionsToClass{xelatex}{\@bdoctype}\OPTxelatextrue}
+   
+   % These are the standard uiophd.cls options:
+   \DeclareOption{10pt}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}} % Not allowed
+   \DeclareOption{11pt}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}} % Not allowed
+   \DeclareOption{12pt}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}} % The only allowed size
+   \DeclareOption{american}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{USenglish}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{english}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{UKenglish}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{altfont}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption*{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
 \fi
 
 % Options for the report, book and article class
@@ -305,8 +316,10 @@
 
 \DeclareOption{layout}{\OPTlayouttrue}
 
-\DeclareOption{english}{\def\@language{english}}
-\DeclareOption{norsk}{\def\@language{norsk}}
+\ifOPTuiophd\else
+   \DeclareOption{english}{\def\@language{english}}
+   \DeclareOption{norsk}{\def\@language{norsk}}
+\fi
 
 \DeclareOption{linux}{\OPTlinuxtrue}
 \DeclareOption{windows}{\OPTlinuxfalse\OPTwindowstrue}
@@ -436,7 +449,6 @@
 %       dvipsnames,
 %       svgnames  }
 \else
-\typeout{====Just before mytemplate's xcolor load====}
 \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
 \fi
 
@@ -602,7 +614,7 @@
 \RequirePackage{tikz}
 
 
-% Customised titles (\titleformat...)
+% Customised titles (\...)
 \ifOPTbeamer\else\ifOPTieee\else
 \usepackage{titlesec}
 \fi\fi
@@ -612,7 +624,7 @@
 }
 
 
-% \titleformat{<command>}[<shape>]{<format}{<label>}{<sep>}{<before>}[<after>]
+% \format{<command>}[<shape>]{<format}{<label>}{<sep>}{<before>}[<after>]
 
 % \ifOPTmovie%
 % \RequirePackage[final]{movie15}                  
@@ -757,21 +769,21 @@
 
 \newcommand\source[1]{\mbox{}\hfill \textit{[ \footnote{Based on #1.} ]}}
 
-%For inline abbreviations:
-\newcommand\fig[1]{\hyperref[#1]{fig.}~\ref{#1}}
-\newcommand\figpage[1]{\hyperref[#1]{fig.}~\ref{#1} (page \pageref{#1})}
-\newcommand\Fig[1]{\hyperref[#1]{Fig.}~\ref{#1}}
-\newcommand\tab[1]{\hyperref[#1]{tab.}~\ref{#1}}
-\newcommand\tabpage[1]{\hyperref[#1]{tab.}~\ref{#1} (page \pageref{#1})}
-\newcommand\Tab[1]{\hyperref[#1]{Tab.}~\ref{#1}}
-\newcommand\eq[1]{\hyperref[#1]{eq.}~\ref{#1}}
-\newcommand\eqpage[1]{\hyperref[#1]{eq.}~\ref{#1} (page \pageref{#1})}
-\newcommand\Eq[1]{\hyperref[#1]{Eq.}~\ref{#1}}
-\newcommand\lign[1]{\hyperref[#1]{lign.}~\ref{#1}}
-\newcommand\lignpage[1]{\hyperref[#1]{lign.}~\ref{#1} (page \pageref{#1})}
-\newcommand\Lign[1]{\hyperref[#1]{Lign.}~\ref{#1}}
-\newcommand\lst[1]{\hyperref[#1]{list}~\ref{#1}}
-\newcommand\lstpage[1]{\hyperref[#1]{list}~\ref{#1} (page \pageref{#1})}
+%%For inline abbreviations:
+%\newcommand\fig[1]{\hyperref[#1]{fig.}~\ref{#1}}
+%\newcommand\figpage[1]{\hyperref[#1]{fig.}~\ref{#1} (page \pageref{#1})}
+%\newcommand\Fig[1]{\hyperref[#1]{Fig.}~\ref{#1}}
+%\newcommand\tab[1]{\hyperref[#1]{tab.}~\ref{#1}}
+%\newcommand\tabpage[1]{\hyperref[#1]{tab.}~\ref{#1} (page \pageref{#1})}
+%\newcommand\Tab[1]{\hyperref[#1]{Tab.}~\ref{#1}}
+%\newcommand\eq[1]{\hyperref[#1]{eq.}~\ref{#1}}
+%\newcommand\eqpage[1]{\hyperref[#1]{eq.}~\ref{#1} (page \pageref{#1})}
+%\newcommand\Eq[1]{\hyperref[#1]{Eq.}~\ref{#1}}
+%\newcommand\lign[1]{\hyperref[#1]{lign.}~\ref{#1}}
+%\newcommand\lignpage[1]{\hyperref[#1]{lign.}~\ref{#1} (page \pageref{#1})}
+%\newcommand\Lign[1]{\hyperref[#1]{Lign.}~\ref{#1}}
+%\newcommand\lst[1]{\hyperref[#1]{list}~\ref{#1}}
+%\newcommand\lstpage[1]{\hyperref[#1]{list}~\ref{#1} (page \pageref{#1})}
 
 % A hack to make images hyperlinked, e.g. \href{<url>}{\xbox{\includegraphics{<img>}}}:
 \newsavebox{\ximagebox}\newlength{\ximageheight}
@@ -967,7 +979,7 @@
 % \renewcommand{\leftmark}[1]{\sectionmark}
 
 
-\ifOPTuam\else
+\ifOPTuam\ifOPTuiophd\else
    \ifOPTtwoside
    %Every first page of a chapter is ``plain'' (for some reason):
    \fancypagestyle{plain}
@@ -1030,66 +1042,92 @@
    %   \cfoot{}
    \rfoot{\SeaGreen{\textit{Page \thepage}}}
    \fi
+
+\fi\fi
+
+\ifOPTuiophd
+   % Every first page of a chapter is ``plain'' (for some reason).
+   % Only print page number on these pages
+	\fancypagestyle{plain}
+	{ \lhead{}
+		\chead{}
+		\rhead{}
+		\lfoot{}
+		\cfoot{}
+		\rfoot{\thepage}
+		\renewcommand\headrulewidth{0pt}
+		\renewcommand\footrulewidth{0pt}
+		%   \setlength{\headrulewidth}{0pt}
+		%   \setlength{\footrulewidth}{0pt}
+	}
+   
+   \fancyhead{}
+%	\fancyhead[RO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
+	%   \fancyhead[LO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
+	\fancyhead[RO]{\rightmark}
+	\fancyfoot{}
+	\fancyfoot[LE]{\thepage}
+	\fancyfoot[RO]{\thepage}
+
 \fi
 
 
-%  \arabic{COUNTER} : The value of COUNTER printed as an arabic numeral.
-%  \roman{COUNTER}  : Its value printed as a lower-case roman numberal.
-%  \Roman{COUNTER}  : Its value printed as an upper-case roman numberal.
-%  \alph{COUNTER}   : Value of COUNTER printed as a lower-case letter:
-%                         1 = a, 2 = b, etc.
-%  \Alph{COUNTER}   : Value of COUNTER printed as an upper-case letter:
-%                           1 = A, 2 = B, etc.
-\newcommand\secspace{\hspace{2pt}}
-
-\ifOPTsecarab
-% \renewcommand{\thesection}{\arabic{section}\secspace}
-\fi
-\ifOPTsecalph
-\renewcommand{\thesection}{\alph{section}\secspace}
-\fi
-\ifOPTsecAlph
-\renewcommand{\thesection}{\Alph{section}\secspace}
-\fi
-\ifOPTsecroman
-\renewcommand{\thesection}{\roman{section}\secspace}
-\fi
-\ifOPTsecRoman
-\renewcommand{\thesection}{\Roman{section}\secspace}
-\fi
-
-\ifOPTsubsecarab
-\renewcommand{\thesubsection}{\thesection.\arabic{subsection}\secspace}
-\fi
-\ifOPTsubsecalph
-\renewcommand{\thesubsection}{\thesection\alph{subsection}\secspace}
-\fi
-\ifOPTsubsecAlph
-\renewcommand{\thesubsection}{\thesection\Alph{subsection}\secspace}
-\fi
-\ifOPTsubsecroman
-\renewcommand{\thesubsection}{\thesection.\roman{subsection}\secspace}
-\fi
-\ifOPTsubsecRoman
-\renewcommand{\thesubsection}{\thesection.\Roman{subsection}\secspace}
-\fi
-
-\ifOPTsubsubsecarab
-% \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}\secspace}
-\fi
-\ifOPTsubsubsecalph
-\renewcommand{\thesubsubsection}{\thesubsection\alph{subsubsection}\secspace}
-\fi
-\ifOPTsubsubsecAlph
-\renewcommand{\thesubsubsection}{\thesubsection\Alph{subsubsection}\secspace}
-\fi
-\ifOPTsubsecroman
-\renewcommand{\thesubsubsection}{\thesubsection.\roman{subsubsection}\secspace}
-\fi
-\ifOPTsubsecRoman
-\renewcommand{\thesubsubsection}{\thesubsection.\Roman{subsubsection}\secspace}
-\fi
-
+	%  \arabic{COUNTER} : The value of COUNTER printed as an arabic numeral.
+	%  \roman{COUNTER}  : Its value printed as a lower-case roman numberal.
+	%  \Roman{COUNTER}  : Its value printed as an upper-case roman numberal.
+	%  \alph{COUNTER}   : Value of COUNTER printed as a lower-case letter:
+	%                         1 = a, 2 = b, etc.
+	%  \Alph{COUNTER}   : Value of COUNTER printed as an upper-case letter:
+	%                           1 = A, 2 = B, etc.
+	\newcommand\secspace{\hspace{2pt}}
+	
+	\ifOPTsecarab
+	% \renewcommand{\thesection}{\arabic{section}\secspace}
+	\fi
+	\ifOPTsecalph
+	\renewcommand{\thesection}{\alph{section}\secspace}
+	\fi
+	\ifOPTsecAlph
+	\renewcommand{\thesection}{\Alph{section}\secspace}
+	\fi
+	\ifOPTsecroman
+	\renewcommand{\thesection}{\roman{section}\secspace}
+	\fi
+	\ifOPTsecRoman
+	\renewcommand{\thesection}{\Roman{section}\secspace}
+	\fi
+	
+	\ifOPTsubsecarab
+	\renewcommand{\thesubsection}{\thesection.\arabic{subsection}\secspace}
+	\fi
+	\ifOPTsubsecalph
+	\renewcommand{\thesubsection}{\thesection\alph{subsection}\secspace}
+	\fi
+	\ifOPTsubsecAlph
+	\renewcommand{\thesubsection}{\thesection\Alph{subsection}\secspace}
+	\fi
+	\ifOPTsubsecroman
+	\renewcommand{\thesubsection}{\thesection.\roman{subsection}\secspace}
+	\fi
+	\ifOPTsubsecRoman
+	\renewcommand{\thesubsection}{\thesection.\Roman{subsection}\secspace}
+	\fi
+	
+	\ifOPTsubsubsecarab
+	% \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}\secspace}
+	\fi
+	\ifOPTsubsubsecalph
+	\renewcommand{\thesubsubsection}{\thesubsection\alph{subsubsection}\secspace}
+	\fi
+	\ifOPTsubsubsecAlph
+	\renewcommand{\thesubsubsection}{\thesubsection\Alph{subsubsection}\secspace}
+	\fi
+	\ifOPTsubsecroman
+	\renewcommand{\thesubsubsection}{\thesubsection.\roman{subsubsection}\secspace}
+	\fi
+	\ifOPTsubsecRoman
+	\renewcommand{\thesubsubsection}{\thesubsection.\Roman{subsubsection}\secspace}
+	\fi
 
 
 % \renewcommand{\thesubsection}{\thesection\alph{subsection}\hspace{2pt}}
@@ -1215,36 +1253,38 @@
 % LISTS %      
 %%%%%%%%%                                       %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-\newenvironment{enumerate0}
-{\begin{enumerate}
-%   \setlength\parskip{\baselineskip}
-% \setlength\abovedisplayskip{0pt}
-% \setlength\belowdisplayskip{0pt}
-% \setlength\abovedisplayshortskip{0pt}
-% \setlength\belowdisplayshortskip{0pt}
-  \setlength{\itemsep}{0pt}
-  \setlength{\parskip}{0.5\baselineskip}
-  \setlength{\parsep}{0pt}}
-% 10pt plus0.3pt minus0.3pt
-{\end{enumerate}}
-
-% \setlength\topsep{0pt}
-% \setlength\partopsep{0pt}
-\newenvironment{itemize0}
-{\begin{itemize}
-% \setlength\abovedisplayskip{0pt}
-% \setlength\belowdisplayskip{0pt}
-% \setlength\abovedisplayshortskip{0pt}
-% \setlength\belowdisplayshortskip{0pt}
-  \setlength{\parindent}{0pt}
-  \setlength{\itemsep}{0pt}
-  \setlength{\parskip}{5pt plus0.3pt minus0.3pt}
-  \setlength{\parsep}{0pt}
-
-%   \renewcommand\indent{}
-%   \renewcommand\parindent{}
-}
-{\end{itemize}}
+\ifOPTuiophd\else
+	\newenvironment{enumerate0}
+	{\begin{enumerate}
+	%   \setlength\parskip{\baselineskip}
+	% \setlength\abovedisplayskip{0pt}
+	% \setlength\belowdisplayskip{0pt}
+	% \setlength\abovedisplayshortskip{0pt}
+	% \setlength\belowdisplayshortskip{0pt}
+	  \setlength{\itemsep}{0pt}
+	  \setlength{\parskip}{0.5\baselineskip}
+	  \setlength{\parsep}{0pt}}
+	% 10pt plus0.3pt minus0.3pt
+	{\end{enumerate}}
+	
+	% \setlength\topsep{0pt}
+	% \setlength\partopsep{0pt}
+	\newenvironment{itemize0}
+	{\begin{itemize}
+	% \setlength\abovedisplayskip{0pt}
+	% \setlength\belowdisplayskip{0pt}
+	% \setlength\abovedisplayshortskip{0pt}
+	% \setlength\belowdisplayshortskip{0pt}
+	  \setlength{\parindent}{0pt}
+	  \setlength{\itemsep}{0pt}
+	  \setlength{\parskip}{5pt plus0.3pt minus0.3pt}
+	  \setlength{\parsep}{0pt}
+	
+	%   \renewcommand\indent{}
+	%   \renewcommand\parindent{}
+	}
+	{\end{itemize}}
+\fi
 
 %%%%%%%%%%%%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % GLOSSARY %   
@@ -1291,7 +1331,7 @@
 % CAPTIONS %
 %%%%%%%%%%%%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-\ifOPTuam\else
+\ifOPTuam\ifOPTuiophd\else
    %% What you want written under floating objects
    \captionnamefont{\footnotesize\itshape}
    \captiontitlefont{\footnotesize\slshape}
@@ -1300,104 +1340,104 @@
    \newcommand\subcaption[1]{{\footnotesize\centering#1}}
    \typeout{ -test- }
    % \setlength{\belowcaptionskip}{-10pt}
-\fi
+\fi\fi
 
 %%%%%%%%%%%%%%%                                 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % MATHEMATICS %
 %%%%%%%%%%%%%%%                                 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 
-% \newcommand\note[1]{\color{Red}#1\baseColour}
-\newcommand\mathgreen[1]{\color{Green}#1\baseColour}
-\newcommand\mathred[1]{\color{Red}#1\baseColour}
-%~~ MATH MODE MODS ~~%
-% \,  small space 3/18 of a quad
-% \:  medium space  4/18 of a quad
-% \;  large space 5/18 of a quad
-% \!  negative space  -3/18 of a quad
-
-\newcommand\nn{\nonumber\\}
-\renewcommand\-{\text{\scriptsize-}}
-
-\newcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
-\newcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
-\newcommand\case[1]{\begin{cases}#1\end{cases}}
-\newcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
-
-\newcommand\rand{\text{rand}}
-\newcommand\randn{\text{randn}}
-\newcommand\rect{\text{rect}}
-\newcommand\sinc{\text{sinc}}
-\newcommand\tr{\text{tr}}
-\newcommand\adj{\text{adj}}
-
-% \newcommand\max{\text{max}}
-% \newcommand\min{\text{min}}
-
-\newcommand\qqquad{\quad\qquad}
-\newcommand\qqqquad{\qquad\qquad}
-
-\renewcommand\l[1]{\left#1}
-\renewcommand\r[1]{\right#1}
-
-% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
-
-%Keyword colouring:
-\newcommand\kw[1]{#1}
-\newcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
-
-\newcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
-\newcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
-\newcommand\var[3]{#1_\text{#2}\of{#3}}
-
-\newcommand\diag{\text{diag}}
-
-% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
-\newcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
-\newcommand\mathnorm{\textstyle}
-\newcommand\mathbig[1]{\displaystyle#1\mathnorm}
-\newcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
-\newcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
-\newcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
-\newcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
-
-\newcommand\sumu[1]{\sum\limits^{#1}\,}
-\newcommand\suml[1]{\sum\limits_{#1}\,}
-\newcommand\sumb[2]{\sum\limits_{#1}^{#2}\,}
-
-\newcommand\produ[1]{\prod\limits^{#1}\,}
-\newcommand\prodl[1]{\prod\limits_{#1}\,}
-\newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
-
-%Math macros:
-\newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
-\newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
-
-\renewcommand\d[1]{\scriptstyle\kw{\,d\parm{#1}}\displaystyle}
-
-% These commands are mutually exclusive. Remember to "renew" in v2.
-\ifOPTvtwo
-  \newcommand\intb[4]{\int\limits_{#3}^{#4} #1 \d{#2}} % \int{exp}{var}{from}{to}
-  \newcommand\intl[3]{\int\limits_{#3} #1 \d{#2}} % \int{exp}{var}{for all}
-  \newcommand\intu[2]{\int #1 \d{#2}} % \int{exp}{var}{for all}
-%   \newcommand\intu[2]{\int #1\, \scriptstyle\kw{d\parm{#2}}\displaystyle} % \int{exp}{var}{for all}  
-\else %v1:
-  \newcommand\intb[4]{\int\limits_{#2}^{#3} #4\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{from}{to}{exp}
-  \newcommand\intl[3]{\int\limits_{#2} #3\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{for all}{exp}
-  \newcommand\intu[2]{\int #2\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{for all}{exp}
-  \newcommand\intt[4]{\int\limits_{#3}^{#4} #1\, \scriptstyle\kw{d\parm{#2}}\displaystyle} % deprecated - use \intb
-\fi
-
-
-\ifOPTxelatex
-   \renewcommand\T{^{\scriptscriptstyle T}}
-\else
-   \newcommand\T{^{\scriptscriptstyle T}}
-\fi
-\renewcommand\H{^{\scriptscriptstyle H}}
-
-\renewcommand\vec[1]{\boldsymbol{#1}}
-\newcommand\mat[1]{\boldsymbol{#1}}
+%% \newcommand\note[1]{\color{Red}#1\baseColour}
+%\newcommand\mathgreen[1]{\color{Green}#1\baseColour}
+%\newcommand\mathred[1]{\color{Red}#1\baseColour}
+%%~~ MATH MODE MODS ~~%
+%% \,  small space 3/18 of a quad
+%% \:  medium space  4/18 of a quad
+%% \;  large space 5/18 of a quad
+%% \!  negative space  -3/18 of a quad
+%
+%\newcommand\nn{\nonumber\\}
+%\renewcommand\-{\text{\scriptsize-}}
+%
+%\newcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+%\newcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+%\newcommand\case[1]{\begin{cases}#1\end{cases}}
+%\newcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+%
+%\newcommand\rand{\text{rand}}
+%\newcommand\randn{\text{randn}}
+%\newcommand\rect{\text{rect}}
+%\newcommand\sinc{\text{sinc}}
+%\newcommand\tr{\text{tr}}
+%\newcommand\adj{\text{adj}}
+%
+%% \newcommand\max{\text{max}}
+%% \newcommand\min{\text{min}}
+%
+%\newcommand\qqquad{\quad\qquad}
+%\newcommand\qqqquad{\qquad\qquad}
+%
+%\renewcommand\l[1]{\left#1}
+%\renewcommand\r[1]{\right#1}
+%
+%% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+%
+%%Keyword colouring:
+%\newcommand\kw[1]{#1}
+%\newcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+%
+%\newcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+%\newcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+%\newcommand\var[3]{#1_\text{#2}\of{#3}}
+%
+%\newcommand\diag{\text{diag}}
+%
+%% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+%\newcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+%\newcommand\mathnorm{\textstyle}
+%\newcommand\mathbig[1]{\displaystyle#1\mathnorm}
+%\newcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+%\newcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+%\newcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+%\newcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+%
+%\newcommand\sumu[1]{\sum\limits^{#1}\,}
+%\newcommand\suml[1]{\sum\limits_{#1}\,}
+%\newcommand\sumb[2]{\sum\limits_{#1}^{#2}\,}
+%
+%\newcommand\produ[1]{\prod\limits^{#1}\,}
+%\newcommand\prodl[1]{\prod\limits_{#1}\,}
+%\newcommand\prodb[2]{\prod\limits_{#1}^{#2}\,}
+%
+%%Math macros:
+%\newcommand\diff[2]{\frac{\kw{d}\,\textstyle #1\scriptstyle}{\kw{d\parm{#2}}}\displaystyle}
+%\newcommand\ddiff[2]{\frac{\kw{d^2}\,\displaystyle #1\scriptstyle}{\kw{d\parm{#2}}^2}\displaystyle}
+%
+%\renewcommand\d[1]{\scriptstyle\kw{\,d\parm{#1}}\displaystyle}
+%
+%% These commands are mutually exclusive. Remember to "renew" in v2.
+%\ifOPTvtwo
+%  \newcommand\intb[4]{\int\limits_{#3}^{#4} #1 \d{#2}} % \int{exp}{var}{from}{to}
+%  \newcommand\intl[3]{\int\limits_{#3} #1 \d{#2}} % \int{exp}{var}{for all}
+%  \newcommand\intu[2]{\int #1 \d{#2}} % \int{exp}{var}{for all}
+%%   \newcommand\intu[2]{\int #1\, \scriptstyle\kw{d\parm{#2}}\displaystyle} % \int{exp}{var}{for all}  
+%\else %v1:
+%  \newcommand\intb[4]{\int\limits_{#2}^{#3} #4\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{from}{to}{exp}
+%  \newcommand\intl[3]{\int\limits_{#2} #3\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{for all}{exp}
+%  \newcommand\intu[2]{\int #2\, \scriptstyle\kw{d\parm{#1}}\displaystyle} % \int{var}{for all}{exp}
+%  \newcommand\intt[4]{\int\limits_{#3}^{#4} #1\, \scriptstyle\kw{d\parm{#2}}\displaystyle} % deprecated - use \intb
+%\fi
+%
+%
+%\ifOPTxelatex
+%   \renewcommand\T{^{\scriptscriptstyle T}}
+%\else
+%   \newcommand\T{^{\scriptscriptstyle T}}
+%\fi
+%\renewcommand\H{^{\scriptscriptstyle H}}
+%
+%\renewcommand\vec[1]{\boldsymbol{#1}}
+%\newcommand\mat[1]{\boldsymbol{#1}}
 
 
 % \renewcommand*\a{\vec a}
@@ -1569,27 +1609,29 @@
 %    \item[]}{\end{list}}
 % \fi
 
-% \hbadness=10000                                 %Disables "underfull hbox" infomessages.
-
-%% Numbering depth
-\setcounter{tocdepth}{4}       % Depth of numbering in the TOC (1.1.1)
-\setcounter{secnumdepth}{3}    % Depth of numbering in the document (1.1.1)
- 
-%% Define "size" of a length
-\setlength{\unitlength}{1mm}
-
-\fussy  % Options: fussy, sloppy
-%% 
-\clubpenalty=10000
-%% 
-\widowpenalty=10000 
-%% 
-\displaywidowpenalty=10000
-%% 
-\adjdemerits=10000
- 
-\hfuzz=1pc % Don't bother to report overfull boxes if over-edge is < 1pc
-\vfuzz=1pc % Don't bother to report overfull boxes if over-edge is < 1pc
+\ifOPTstdclass
+	% \hbadness=10000                                 %Disables "underfull hbox" infomessages.
+	\typeout{====Are these options evaluated???====}
+	%% Numbering depth
+	\setcounter{tocdepth}{4}       % Depth of numbering in the TOC (1.1.1)
+	\setcounter{secnumdepth}{3}    % Depth of numbering in the document (1.1.1)
+	 
+	%% Define "size" of a length
+	\setlength{\unitlength}{1mm}
+	
+	\fussy  % Options: fussy, sloppy
+	%% 
+	\clubpenalty=10000
+	%% 
+	\widowpenalty=10000 
+	%% 
+	\displaywidowpenalty=10000
+	%% 
+	\adjdemerits=10000
+	 
+	\hfuzz=1pc % Don't bother to report overfull boxes if over-edge is < 1pc
+	\vfuzz=1pc % Don't bother to report overfull boxes if over-edge is < 1pc
+\fi
 
 %%%%%%%%%%%%%
 %% DUMMIES %%

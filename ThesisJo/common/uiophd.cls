@@ -12,27 +12,42 @@
 \DeclareOption{altfont}{}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions \relax
+
+\RequirePackage{ifpdf,ifxetex} % To detect with Tex engine is being used 
+
 \RequirePackage[\uiophd@lang]{babel}
 \RequirePackage{emptypage}
 %\RequirePackage[T1]{fontenc}
+
+\ifxetex
+\RequirePackage[a4paper,twoside,margin=2.5cm,xetex]{geometry}       % [showframe] different margins on title pages
+\else
 \RequirePackage[a4paper,twoside,margin=2.5cm]{geometry}
+\fi
 \RequirePackage{keyval}
 %\RequirePackage{pdfpages}
 \RequirePackage{setspace}
-\AtBeginDocument{\parskip=0pt plus 2.5pt\relax
-	\setstretch{1.1}}
+%\AtBeginDocument{\parskip=0pt plus 2.5pt\relax
+%	\setstretch{1.1}}
 \LoadClass[a4paper,twoside,openright,12pt]{report}
-\IfFileExists{t1zgmj.fd}
-{\RequirePackage[full]{textcomp}
-	\RequirePackage[garamond,expert]{mathdesign}
-	\RequirePackage[swashQ]{garamondx}}
-{\renewcommand{\rmdefault}{ptm}}
-\IfFileExists{berasans.sty}
-{\RequirePackage[scaled]{berasans}}
-{\renewcommand{\sfdefault}{phv}}
-\IfFileExists{beramono.sty}
-{\RequirePackage[scaled]{beramono}}
-{\renewcommand{\ttdefault}{pcr}}
+
+\ifxetex
+   \RequirePackage{fontspec}
+   \setmainfont[Mapping=tex-text]{EB Garamond}
+%      \setmainfont[Mapping=tex-text,Numbers={OldStyle},Ligatures{Common},Contextuals=Alternate]{EB Garamond}
+\else
+	\IfFileExists{t1zgmj.fd}
+	{\RequirePackage[full]{textcomp}
+		\RequirePackage[garamond,expert]{mathdesign}
+		\RequirePackage[swashQ]{garamondx}}
+	{\renewcommand{\rmdefault}{ptm}}
+	\IfFileExists{berasans.sty}
+	{\RequirePackage[scaled]{berasans}}
+	{\renewcommand{\sfdefault}{phv}}
+	\IfFileExists{beramono.sty}
+	{\RequirePackage[scaled]{beramono}}
+	{\renewcommand{\ttdefault}{pcr}}
+\fi
 \newcommand{\frontmatter}{\cleardoublepage
 	\pagenumbering{roman}}
 \newcommand{\mainmatter}{\cleardoublepage
