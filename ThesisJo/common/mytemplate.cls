@@ -588,18 +588,40 @@
   \renewcommand\glspagelistwidth{0pt}
 \fi
 
-\ifOPTuam\else\ifOPTbibliography
+\ifOPTbibliography
   \RequirePackage[autostyle]{csquotes}
+\ifOPTuiophd
+  \typeout{=====Hello there sucker!!!======}
   \RequirePackage[
      backend=biber
-   , defernums=true
-   , doi=true
-   , eprint=false
-%    , sortlocale=
-   , style=authoryear-icomp
-   , url=false
+   , style=ieee
+   , citestyle=ieee
+%   , defernums=true
+%   , doi=true
+%   , eprint=false
+%%    , sortlocale=
+%%   , style=authoryear-icomp
+%   , url=false
    ]{biblatex}
-\fi\fi
+\else
+	\ifOPTuam\else
+%	  \RequirePackage[
+%	     backend=biber
+%	   , defernums=true
+%	   , doi=true
+%	   , eprint=false
+%	%    , sortlocale=
+%	   , style=numeric
+%	%   , style=authoryear-icomp
+%	   , url=false
+%	   ]{biblatex}
+	\fi
+\fi
+
+\fi
+
+
+
 %% Packet for turning/rotating objects
 \RequirePackage{rotating}
 
