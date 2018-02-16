@@ -1,3 +1,7 @@
+\input{variables}\ifMonolithic\else\input{header}\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\graphicspath{{../HowtoHowtoCapon/final/gfx/}}
+
 
 \newcommand\IEEEmembership[1]{}
 
@@ -36,21 +40,31 @@
 []%after
 \titlespacing*{\chapter}{0pt}{*0}{*2}
 
-\newcommand\title[1]{}
-\newcommand\maketitle{}
+\providecommand\title[1]{} 
+\renewcommand\title[1]{}
+
+% \newcommand\title[1]{}
+\providecommand\maketitle{}
+\renewcommand\maketitle{}
 
 % \titleformat{\chapter}[runin]{}
 % {\put(-10,0){\color{SeaGreen}\Large\emph\thesection}}%  {\footnotesize \enspace \emph{Sec.}  }
 %   {0pt}{\color{Black}\Large\bfseries\filright\textsl}[\vspace{15pt}\newline]
 % \titlespacing*{\chapter}{0pt}{*4}{*0}
- 
+
 
 %\newcommand\title[1]{\makeatletter\def\mytitle{#1}\makeatother}
 %\newcommand\maketitle{\makeatletter\meaning\@maketitle\makeatother}
 
-\newcommand\author[1]{}
-%\newcommand\thanks[1]{}
+\providecommand\author[1]{}
+\renewcommand\author[1]{}
+
+\providecommand\markboth[2]{}
 \renewcommand\markboth[2]{}
+
+% \newcommand\author[1]{}
+%\newcommand\thanks[1]{}
+% \renewcommand\markboth[2]{}
 
 % \ifOPTbeamer
 %\newenvironment{narrow}[2]{%
@@ -72,7 +86,7 @@
 \setlength{\itemindent}{1cm}%\parindent
 \setlength{\parsep}{\parskip}	
 }%\rightmargin\leftmargin
-	\item[\textbf{Abstract ---}]\relax}
+\item[\textbf{Abstract ---}]\relax}
 {\endlist}
 
 % Options for the abstract package
@@ -115,8 +129,32 @@
 %\let\Fig\undefined
 \typeout{====Start of macro parse====}
 \subimport{../HowtoHowtoCapon/}{macros}
+\typeout{====done====}
+
+
+
+%    \ifPhdDoc
+%   \RequirePackage[
+%      backend=biber
+%    , style=ieee
+%    , citestyle=ieee
+% %   , defernums=true
+% %   , doi=true
+% %   , eprint=false
+% %%    , sortlocale=
+% %%   , style=authoryear-icomp
+% %   , url=false
+%    ]{biblatex}
+%    \fi
+
+\typeout{====ifMonolithic====}
+\ifMonolithic\else
+   \addbibresource{../HowtoHowtoCapon/library.bib}
+\fi
 
 \typeout{====Start document parse====}
+\ifMonolithic\else\input{subheader}\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \cleardoublepage
 \chapter{Paper II}
@@ -142,9 +180,29 @@ Volume 40, Issue 2, April 2015
 
 \begin{center}
 {\Large\bf An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
-	
+
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 \end{center}
 
+\newif\ifBS\BSfalse
+\ifBS
+\input{../HowtoHowtoCapon/document}
+\fi
 
+\graphicspath{{../HowtoHowtoCapon/final/gfx/}}
 \subimport{../HowtoHowtoCapon/}{document}
+
+
+   
+% \else
+%    Hello \newpage
+% 
+%    \pagestyle{fancy}
+% 
+%    \cleardoublepage
+%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=-]{build/2_mvdr.pdf}
+% \fi
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\ifMonolithic\else\input{subfooter}\fi

@@ -5,8 +5,8 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{common/mytemplate}[2011/01/11 by Jo Inge Buskenes]
-\typeout{-- using mytemplate}
-
+% \typeout{-- using mytemplate}
+\typeout{====Entering mytemplate.cls====}
 
 % Default version number is most recent. Redefine in document to use features in
 % older versions only.
@@ -101,6 +101,9 @@
 
 \newif\ifOPTtodos         \OPTtodostrue
 \newif\ifOPTbibliography  \OPTbibliographyfalse
+\newif\ifOPTbiblatex      \OPTbiblatexfalse
+\newif\ifOPTbibtex        \OPTbibtexfalse
+\newif\ifOPTbiber         \OPTbiberfalse
 \newif\ifOPTglossary      \OPTglossaryfalse
 
 % Standard parameters
@@ -206,6 +209,7 @@
 \ifOPTuiophd
    \DeclareOption{bibtex}{\OPTbibliographytrue}
    \DeclareOption{biblatex}{\OPTbibliographytrue}
+   \DeclareOption{biber}{\OPTbibertrue}
    \DeclareOption{xelatex}{\PassOptionsToClass{xelatex}{\@bdoctype}\OPTxelatextrue}
    
    % These are the standard uiophd.cls options:
@@ -406,244 +410,288 @@
 %==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % PACKAGES %
 %==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-\let\circledS\undefined 								% To avoid conflicts where this is previously defined
-\RequirePackage{amsmath,amssymb}
-%~~ Fonts ~~%
-\ifOPTxelatex%
-  \typeout{-- XeLaTeX specified, loading fontspec package}%
-  \RequirePackage{fontspec}%               % Provides font selecting commands
-%   \RequirePackage[cm-default]{fontspec}%               % Provides font selecting commands
-% \setmathfont{cm-default}
-% \setmathfont{Asana-Math}
-%   \RequirePackage{xunicode}%                    % Provides unicode character macros
-\fi
-\ifOPTlualatex
-  \typeout{-- LuaLaTeX specified, loading fontspec package}%
-  \RequirePackage{fontspec}%               % Provides font selecting commands
-%   \RequirePackage[cm-default]{fontspec}%               % Provides font selecting commands
-% \setmathfont{cm-default}
-% \setmathfont{Asana-Math}
-%   \RequirePackage{xunicode}%                    % Provides unicode character macros
-\fi
-\ifOPTlualatex\else\ifOPTxelatex\else%
-  \typeout{-- PdfLaTeX specified, loading inputenc and fontenc}%
-  \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
-  \RequirePackage[T1]{fontenc}%                 % Set font encoding
-\fi\fi
 
-
-\ifOPTbeamer\else
-\ifOPTdefaultformat\else
-\ifOPTuam\else
-   \RequirePackage{lmodern}                        % The truetype implementation of Computer Modern
-\fi
-\fi
-\fi
-
-%~~ Colours and Graphics ~~%
-\ifOPTbeamer
-% \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
-
-%  , xcolor={
-%       table,                %For colour in tabulars (will pull in colortbl)
-%       dvipsnames,
-%       svgnames  }
-\else
-\RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
-\fi
-
-\ifOPTbeamer
-\else                                                % Increases the available colour palette
-  \ifOPTxelatex
-     \ifOPTuiophd
-     \else
-        \RequirePackage[xetex,final]{graphicx}
-     \fi%      % Adds \includegraphics{} etc.
-  \fi
-  \ifOPTlualatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
-  \ifOPTxelatex\else\ifOPTlualatex\else%
-      \RequirePackage{graphicx}%
-  \fi\fi
-\fi
-\RequirePackage{wrapfig}                        %For enabling text to wrap around figures
-\RequirePackage{subfigure}
-
-%~~ Floats ~~%
-\ifOPTuam\else
-   \RequirePackage{ccaption}                       % For customised captions
-\fi
-\ifOPTfloatrow
-  \RequirePackage{floatrow}
-  \floatsetup[table]{capposition=top}
-\else
-  \RequirePackage{float}                        % Needed for the 'H' 
-\fi                                             % (Fig. placement: htbp - here, top, bottom, page)
-                                                %                  H - here and only here!
-\RequirePackage{threeparttable}                 % For table notes
-
-\RequirePackage{multirow}                       % For more options with tables..
-\renewcommand*\arraystretch{1.05}
-
-
-%~~ COMMENTING ~~%
-                                                % For <\todo[inline]{description}>
-\ifOPTtodos\ifOPTbeamer
-   \definecolor{lightblue}{rgb}{0.8,0.8,1}
-   \RequirePackage[backgroundcolor=lightblue]{todonotes}
-   \else
-   \RequirePackage[backgroundcolor=LightBlue]{todonotes}
-   \fi
-\else      \RequirePackage[disable]{todonotes} 
-%            \newcommand\todo[2][]{\immediate\write18{echo #1 > /dev/null}}
-%            \newcommand\listoftodos{}
-%            \newcommand\missingfigure{}
-\fi
-
-\RequirePackage{verbatim}                       % For <\begin{comment} ... \end{comment}>
-% \ifOPTbeamer\else
-\RequirePackage[final]{listings}                % For <\begin{lstlisting} ... \end{lstlisting}>
-% \fi
-% \newcommand\lststart{}%\vspace{0.5\baselineskip}}
-% \newcommand\lstend{}%\vspace{-0.5\baselineskip}}
-
-\ifOPTbeamer\else% Bah, was a pain... Bunch of xkeyval errors when included.
-\RequirePackage{fancyvrb}
-\fi
-
-\ifOPTbeamer
-\RequirePackage[absolute,overlay]{textpos}                        % For specifying text etc. absolutely
-\fi
-
-%~~ REFERENCES ~~%
-\RequirePackage{varioref}                       % \vref{} replace \ref{} on page \pageref{}
-
-\ifOPTbeamer\else
-\RequirePackage{lastpage}                       % To be able to reference the last page
-\fi
-
-% \RequirePackage%[ style=alphabetic%
-% %                , bibstyle=authoryear%
-% %                , citestyle=authoryear%
-% %                , natbib=false ]%
-%                {biblatex}
-% \RequirePackage{bibunits}
-% \RequirePackage{splitbib}
-
-% \RequirePackage{natbib}
-
-%~~ MATH STUFF ~~%
-% \RequirePackage{amsmath, amsthm}
-\RequirePackage{amssymb, amstext, amsmath, mathrsfs, mathdots}
-% \RequirePackage{unicode-math}
-% http://github.com/wspr/unicode-math
-
-% \RequirePackage[amssymb]{SIunits}                        % For consistent SI unit usage
-
-% \RequirePackage{mathdots}
-
-%~~ LAYOUT ~~%
-% 
-\ifOPTreport%
-%   \def\openright{}
-  \RequirePackage[
-%                   avantgarde
-%                   bookman
-%                   charter
-%                   courier
-%                   helvetica
-%                   newcentury
-%                   palatino
-                  times
-%                   utopia
-                  ]{quotchap}               %For customisable chapter/section headings.
-  \renewcommand\chapterheadstartvskip{\vspace*{-5\baselineskip}}
-% \newenvironment{savequote}{}{}
-% \newcommand\qauthor{}
-\fi
-
-\RequirePackage{fancyhdr}                       % fancyheading deprecated.
-
-% \RequirePackage[titles]{tocloft}                % For customising TOC
-
-%~~ OTHER ~~%
-\RequirePackage{ifthen}                         % Combinatorial statements
-\RequirePackage{calc}                           % More flexible size specifications
-\RequirePackage{fp}                             % Floating point arithmetic
-
-%~~ HYPERLINKS ~~%
-\ifOPTbeamer\else
-\ifOPTxelatex
-  \RequirePackage[xetex]{hyperref}
-\else
-  \RequirePackage{hyperref}
-\fi
-\fi
-
-\RequirePackage{url}   
-
-%~~ INDEXES (GLOSSARY, ...) ~~%
-\ifOPTglossary
-  \RequirePackage[toc,nonumberlist]{glossaries}%
-  \renewcommand\glsdescwidth{0.8\linewidth}
-  \renewcommand\glspagelistwidth{0pt}
-\fi
-
-\ifOPTbibliography
-  \RequirePackage[autostyle]{csquotes}
 \ifOPTuiophd
-  \typeout{=====Hello there sucker!!!======}
-  \RequirePackage[
-     backend=biber
-   , style=ieee
-   , citestyle=ieee
-%   , defernums=true
-%   , doi=true
-%   , eprint=false
-%%    , sortlocale=
-%%   , style=authoryear-icomp
-%   , url=false
-   ]{biblatex}
+   \typeout{++++amsmath,amssymb++++}
+   \let\circledS\undefined                         % To avoid conflicts where this is previously defined
+   \RequirePackage{amsmath,amssymb}
+   \ifOPTxelatex%
+       \RequirePackage{fontspec}%               % Provides font selecting commands
+   \else
+      \typeout{++++inputenc++++}
+      \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
+      \typeout{++++fontenc+++}
+      \RequirePackage[T1]{fontenc}%                 % Set font encoding
+   \fi
+   \typeout{++++xcolor+++}
+   \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+   \typeout{++++fancyhdr++++}
+   \RequirePackage{fancyhdr}                       % fancyheading deprecated.
+   \typeout{++++hyperref++++}
+   \RequirePackage{hyperref}
+   \typeout{++++biblatex++++}
+   \RequirePackage[
+         backend=biber
+      , defernums=true
+      , doi=true
+      , eprint=false
+   %    , sortlocale=
+      , style=numeric
+   %   , style=authoryear-icomp
+      , url=false
+      ]{biblatex}
+   \typeout{++++pdfpages++++}
+   \RequirePackage[final]{pdfpages}
+   \typeout{++++titlesec++++}
+   \RequirePackage{titlesec}
+%    \ifOPTlayout
+%    \typeout{++++layout++++}
+%       \RequirePackage{layout}
+%    \fi
+   \typeout{--------------}
 \else
-	\ifOPTuam\else
-%	  \RequirePackage[
-%	     backend=biber
-%	   , defernums=true
-%	   , doi=true
-%	   , eprint=false
-%	%    , sortlocale=
-%	   , style=numeric
-%	%   , style=authoryear-icomp
-%	   , url=false
-%	   ]{biblatex}
-	\fi
-\fi
+   \let\circledS\undefined 								% To avoid conflicts where this is previously defined
+   \RequirePackage{amsmath,amssymb}
 
-\fi
-
-
-
-%% Packet for turning/rotating objects
-\RequirePackage{rotating}
-
-\ifOPTlayout
-  \RequirePackage{layout}                       % \layout to print layout
-% Alternative (no package needed):                \printinunitsof{cm}\prntlen{\textwidth}
-\else
-  \newcommand\layout{}
-\fi
-
-\RequirePackage[final]{pdfpages}
-\RequirePackage{tikz}
+   %~~ Fonts ~~%
+   \ifOPTxelatex%
+   \typeout{-- XeLaTeX specified, loading fontspec package}%
+   \RequirePackage{fontspec}%               % Provides font selecting commands
+   %   \RequirePackage[cm-default]{fontspec}%               % Provides font selecting commands
+   % \setmathfont{cm-default}
+   % \setmathfont{Asana-Math}
+   %   \RequirePackage{xunicode}%                    % Provides unicode character macros
+   \fi
+   \ifOPTlualatex
+   \typeout{-- LuaLaTeX specified, loading fontspec package}%
+   \RequirePackage{fontspec}%               % Provides font selecting commands
+   %   \RequirePackage[cm-default]{fontspec}%               % Provides font selecting commands
+   % \setmathfont{cm-default}
+   % \setmathfont{Asana-Math}
+   %   \RequirePackage{xunicode}%                    % Provides unicode character macros
+   \fi
+   \ifOPTlualatex\else\ifOPTxelatex\else%
+   \typeout{-- PdfLaTeX specified, loading inputenc and fontenc}%
+   \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
+   \RequirePackage[T1]{fontenc}%                 % Set font encoding
+   \fi\fi
 
 
-% Customised titles (\...)
-\ifOPTbeamer\else\ifOPTieee\else
-\usepackage{titlesec}
-\fi\fi
+   \ifOPTbeamer\else
+   \ifOPTdefaultformat\else
+   \ifOPTuam\else
+   \ifOPTuiophd\else
+      \RequirePackage{lmodern}                        % The truetype implementation of Computer Modern
+   \fi
+   \fi
+   \fi
+   \fi
 
-\AtBeginDocument{%
-\RequirePackage{longtable}
-}
+   %~~ Colours and Graphics ~~%
+   \ifOPTbeamer
+   % \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+
+   %  , xcolor={
+   %       table,                %For colour in tabulars (will pull in colortbl)
+   %       dvipsnames,
+   %       svgnames  }
+   \else
+   \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+   \fi
+
+   \ifOPTbeamer
+   \else                                                % Increases the available colour palette
+   \ifOPTxelatex
+      \ifOPTuiophd
+      \else
+         \RequirePackage[xetex,final]{graphicx}
+      \fi%      % Adds \includegraphics{} etc.
+   \fi
+   \ifOPTlualatex\RequirePackage[xetex,final]{graphicx}\fi%      % Adds \includegraphics{} etc.
+   \ifOPTxelatex\else\ifOPTlualatex\else%
+         \RequirePackage{graphicx}%
+   \fi\fi
+   \fi
+   \RequirePackage{wrapfig}                        %For enabling text to wrap around figures
+   \RequirePackage{subfigure}
+
+   %~~ Floats ~~%
+   \ifOPTuam\else
+      \RequirePackage{ccaption}                       % For customised captions
+   \fi
+   \ifOPTfloatrow
+   \RequirePackage{floatrow}
+   \floatsetup[table]{capposition=top}
+   \else
+   \RequirePackage{float}                        % Needed for the 'H' 
+   \fi                                             % (Fig. placement: htbp - here, top, bottom, page)
+                                                   %                  H - here and only here!
+   \RequirePackage{threeparttable}                 % For table notes
+
+   \RequirePackage{multirow}                       % For more options with tables..
+   \renewcommand*\arraystretch{1.05}
+
+
+   %~~ COMMENTING ~~%
+                                                   % For <\todo[inline]{description}>
+   \ifOPTtodos\ifOPTbeamer
+      \definecolor{lightblue}{rgb}{0.8,0.8,1}
+      \RequirePackage[backgroundcolor=lightblue]{todonotes}
+      \else
+      \RequirePackage[backgroundcolor=LightBlue]{todonotes}
+      \fi
+   \else      \RequirePackage[disable]{todonotes} 
+   %            \newcommand\todo[2][]{\immediate\write18{echo #1 > /dev/null}}
+   %            \newcommand\listoftodos{}
+   %            \newcommand\missingfigure{}
+   \fi
+
+   \RequirePackage{verbatim}                       % For <\begin{comment} ... \end{comment}>
+   % \ifOPTbeamer\else
+   \RequirePackage[final]{listings}                % For <\begin{lstlisting} ... \end{lstlisting}>
+   % \fi
+   % \newcommand\lststart{}%\vspace{0.5\baselineskip}}
+   % \newcommand\lstend{}%\vspace{-0.5\baselineskip}}
+
+   \ifOPTbeamer\else% Bah, was a pain... Bunch of xkeyval errors when included.
+   \RequirePackage{fancyvrb}
+   \fi
+
+   \ifOPTbeamer
+   \RequirePackage[absolute,overlay]{textpos}                        % For specifying text etc. absolutely
+   \fi
+
+   %~~ REFERENCES ~~%
+   \RequirePackage{varioref}                       % \vref{} replace \ref{} on page \pageref{}
+
+   \ifOPTbeamer\else
+   \RequirePackage{lastpage}                       % To be able to reference the last page
+   \fi
+
+   % \RequirePackage%[ style=alphabetic%
+   % %                , bibstyle=authoryear%
+   % %                , citestyle=authoryear%
+   % %                , natbib=false ]%
+   %                {biblatex}
+   % \RequirePackage{bibunits}
+   % \RequirePackage{splitbib}
+
+   % \RequirePackage{natbib}
+
+   %~~ MATH STUFF ~~%
+   % \RequirePackage{amsmath, amsthm}
+   \RequirePackage{amssymb, amstext, amsmath, mathrsfs, mathdots}
+   % \RequirePackage{unicode-math}
+   % http://github.com/wspr/unicode-math
+
+   % \RequirePackage[amssymb]{SIunits}                        % For consistent SI unit usage
+
+   % \RequirePackage{mathdots}
+
+   %~~ LAYOUT ~~%
+   % 
+   \ifOPTreport%
+   %   \def\openright{}
+   \RequirePackage[
+   %                   avantgarde
+   %                   bookman
+   %                   charter
+   %                   courier
+   %                   helvetica
+   %                   newcentury
+   %                   palatino
+                     times
+   %                   utopia
+                     ]{quotchap}               %For customisable chapter/section headings.
+   \renewcommand\chapterheadstartvskip{\vspace*{-5\baselineskip}}
+   % \newenvironment{savequote}{}{}
+   % \newcommand\qauthor{}
+   \fi
+
+   \RequirePackage{fancyhdr}                       % fancyheading deprecated.
+
+   % \RequirePackage[titles]{tocloft}                % For customising TOC
+
+   %~~ OTHER ~~%
+   \RequirePackage{ifthen}                         % Combinatorial statements
+   \RequirePackage{calc}                           % More flexible size specifications
+   \RequirePackage{fp}                             % Floating point arithmetic
+
+   %~~ HYPERLINKS ~~%
+   \ifOPTbeamer\else
+   \ifOPTxelatex
+   \RequirePackage[xetex]{hyperref}
+   \else
+   \RequirePackage{hyperref}
+   \fi
+   \fi
+
+   \RequirePackage{url}   
+
+   %~~ INDEXES (GLOSSARY, ...) ~~%
+   \ifOPTglossary
+   \RequirePackage[toc,nonumberlist]{glossaries}%
+   \renewcommand\glsdescwidth{0.8\linewidth}
+   \renewcommand\glspagelistwidth{0pt}
+   \fi
+
+   \ifOPTbibliography
+   \RequirePackage[autostyle]{csquotes}
+   \ifOPTuiophd
+   \typeout{=====Hello there sucker!!!======}
+   \RequirePackage[
+      backend=biber
+      , style=ieee
+      , citestyle=ieee
+   %   , defernums=true
+   %   , doi=true
+   %   , eprint=false
+   %%    , sortlocale=
+   %%   , style=authoryear-icomp
+   %   , url=false
+      ]{biblatex}
+   \else
+      \ifOPTuam\else
+   	  \RequirePackage[
+   	     backend=biber
+   	   , defernums=true
+   	   , doi=true
+   	   , eprint=false
+   	%    , sortlocale=
+   	   , style=numeric
+   	%   , style=authoryear-icomp
+   	   , url=false
+   	   ]{biblatex}
+      \fi
+   \fi
+
+   \fi
+
+
+
+   %% Packet for turning/rotating objects
+   \RequirePackage{rotating}
+
+   \ifOPTlayout
+   \RequirePackage{layout}                       % \layout to print layout
+   % Alternative (no package needed):                \printinunitsof{cm}\prntlen{\textwidth}
+   \else
+   \newcommand\layout{}
+   \fi
+
+   \RequirePackage[final]{pdfpages}
+   \RequirePackage{tikz}
+
+
+   % Customised titles (\...)
+   \ifOPTbeamer\else\ifOPTieee\else
+   \usepackage{titlesec}
+   \fi\fi
+
+   \AtBeginDocument{%
+   \RequirePackage{longtable}
+   }
+ \fi
 
 
 % \format{<command>}[<shape>]{<format}{<label>}{<sep>}{<before>}[<after>]
@@ -891,6 +939,23 @@
 % FLOATS  %
 %%%%%%%%%%%                                     %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
+\ifOPTuiophd
+    \renewcommand\topfraction{0.9}  % max fraction of floats at top
+    \renewcommand\bottomfraction{0.8} % max fraction of floats at bottom
+    %   Parameters for TEXT pages (not float pages):
+    \setcounter{topnumber}{2}
+    \setcounter{bottomnumber}{2}
+    \setcounter{totalnumber}{4}     % 2 may work better
+    \setcounter{dbltopnumber}{2}    % for 2-column pages
+    \renewcommand\dbltopfraction{0.9} % fit big float above 2-col. text
+    \renewcommand\textfraction{0.07}  % allow minimal text w. figs
+    %   Parameters for FLOAT pages (not text pages):
+    \renewcommand\floatpagefraction{0.85}  % require fuller float pages
+  % N.B.: floatpagefraction MUST be less than topfraction !!
+    \renewcommand\dblfloatpagefraction{0.85} % require fuller float pages
+
+\else
+
 % Alter some LaTeX defaults for better treatment of figures:
     % See p.105 of "TeX Unbound" for suggested values.
     % See pp. 199-200 of Lamport's "LaTeX" book for details.
@@ -915,6 +980,10 @@
 %   \vbadness=25 %correction underfull vbox ignored
 %   \hfuzz=2pt (whats the accepted line overflow?)
 %   \tolerance= (1000 - overfull hbox' ignored)
+
+\fi
+
+
 %%%%%%%%%%%%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % LISTINGS %
 %%%%%%%%%%%%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
@@ -924,6 +993,7 @@
 
 % \ifOPTbeamer\else
 \ifOPTdefaultformat\else
+\ifOPTuiophd\else
 \lstset{
   %These 3 parameters should be re-specified for each listing:
    language=c%
@@ -976,13 +1046,14 @@
  , numberstyle=\tiny\color{SeaGreen}%
  , stepnumber=1%
  , numbersep=10pt }
-\fi
+\fi\fi
 
-\ifOPTbeamer
+\ifOPTbeamer\else
+\ifOPTuiophd\else
 \lstset{
   basicstyle=\tiny\ttfamily%\scriptsize
  }
-\fi
+\fi\fi
 % % Beamer hates fancyvrb
 % \ifOPTbeamer\else
 % \lstset{
@@ -1681,3 +1752,5 @@
 %        EMC
 %      }
 %      in \LaTeX. 
+
+\typeout{====End mytemplate.cls====}

@@ -272,8 +272,9 @@ elif [ "$CAP_FILETYPE" = "PS" ]; then
     echo "\includegraphics[$CORRECTED_OPT]{$PATHLOCFILE/$FILENAME.eps}%" > $ROOTDIR/$RESULTFILE
   fi
 elif [ "$CAP_FILETYPE" = "EPS" ]; then
-  echo "Running: epstopdf $PATHLOCFILE/$FILENAME.$FILETYPE"
-  epstopdf --nodebug --outfile=$PATHLOCFILE/$FILENAME.pdf $PATHLOCFILE/$FILENAME.$FILETYPE
+  echo "Running: epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf"
+#   epstopdf --nodebug --outfile=$PATHLOCFILE/$FILENAME.pdf $PATHLOCFILE/$FILENAME.$FILETYPE
+  epspdf $PATHLOCFILE/$FILENAME.$FILETYPE $PATHLOCFILE/$FILENAME.pdf
 
 #   mv $FILENAME.pdf $PATHLOCFILE/
   if [ "$CORRECTED_OPT" = "DEFAULT" ]; then #No options specified.

@@ -1,0 +1,98 @@
+
+% \documentclass[
+% bibtex,
+% xelatex]{common/uiophd}
+ 
+\documentclass[
+   uiophd
+ , 12pt
+ , english
+ , floatrow
+%  , xelatex
+ , glossary                                     % Use a glossary
+ , biblatex                                 % Use a bibliography
+%  , layout
+]{common/mytemplate}
+
+\typeout{++++import++++}
+\usepackage{import}
+
+% \typeout{--------------}
+%\hypersetup{
+%   bookmarksopen=true
+% , bookmarksopenlevel=2
+%}
+
+\newcommand*\cleartoleftpage{%
+	\clearpage
+	\ifodd\value{page}\hbox{}\newpage\fi
+}
+% Fonts:
+% https://tex.stackexchange.com/questions/19898/getting-urw-garamond-and-the-license
+
+\providecommand\1{}
+\renewcommand*\1{\vec 1}
+\providecommand\a{}
+\renewcommand*\a{\vec a}
+\providecommand\b{}
+\renewcommand*\b{\vec b}
+\providecommand\eR{}
+\renewcommand*\eR{\mat{\hat R}}
+\providecommand\eRi{}
+\renewcommand*\eRi{\hat{\mat R}\;\!^{-1}}
+\providecommand\k{}
+\renewcommand*\k{\vec k}
+\providecommand\n{}
+\renewcommand*\n{\vec n}
+\providecommand\p{}
+\renewcommand*\p{\vec p}
+\providecommand\R{}
+\renewcommand*\R{\mat R}
+\providecommand\Ri{}
+\renewcommand*\Ri{\R^{-1}}
+\providecommand\s{}
+\renewcommand*\s{\vec s}
+
+\providecommand\v{}
+\renewcommand*\v{\vec v}
+\providecommand\x{}
+\renewcommand*\x{\vec x}
+\providecommand\X{}
+\renewcommand*\X{\mat X}
+\providecommand\w{}
+\renewcommand*\w{\vec w}
+
+\providecommand\argmin{}
+\renewcommand*\argmin[1]{\underset{#1}{\text{argmin}}\ }
+\providecommand\norm{}
+\renewcommand*\norm[1]{\left\lVert #1 \right\rVert}
+\providecommand\min{}
+\renewcommand*\min[1]{\underset{#1}{\text{min}}}
+\providecommand\sinc{}
+\renewcommand\sinc{\text{sinc}}
+
+\providecommand*\nn{}
+\renewcommand*\nn{\nonumber\\}
+
+\providecommand\sumb{}
+\renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
+
+\typeout{++++floatrow++++}
+\usepackage{floatrow}
+%\usepackage{bibtex}
+%\usepackage{comment}
+\typeout{++++environ++++}
+\usepackage{environ}
+%\usepackage[runin]{abstract}
+\typeout{++++parskip++++}
+\usepackage[parfill]{parskip}
+\typeout{++++glossaries++++}
+\usepackage[nonumberlist,nogroupskip]{glossaries}
+\typeout{--------------}
+% \newcommand\gls[1]{#1}
+
+
+% Increase header a bit to allow two lines in it
+\addtolength\headheight{\topmargin}
+\setlength\topmargin{0pt}
+

@@ -1,87 +1,5 @@
+\input{variables}\input{header}
 
-% \documentclass[
-% bibtex,
-% xelatex]{common/uiophd}
- 
-\documentclass[
-   uiophd
- , 12pt
- , english
- , floatrow
- , xelatex
- , glossary                                     % Use a glossary
- , biblatex                                 % Use a bibliography
-]{common/mytemplate}
-
-\usepackage{import}
-%\documentclass[
-%%uiophd
-%%, floatrow
-%%, xelatex
-%%, glossary                                     % Use a glossary
-%%, biblatex                                 % Use a bibliography
-%]{common/uiophd}
-
-
-%\hypersetup{
-%   bookmarksopen=true
-% , bookmarksopenlevel=2
-%}
-
-% \usepackage[utf8]{inputenc}         % or whatever you use
-\newcommand*\cleartoleftpage{%
-	\clearpage
-	\ifodd\value{page}\hbox{}\newpage\fi
-}
-% Fonts:
-% https://tex.stackexchange.com/questions/19898/getting-urw-garamond-and-the-license
-
-\providecommand\1{}
-\renewcommand*\1{\vec 1}
-\providecommand\a{}
-\renewcommand*\a{\vec a}
-\providecommand\b{}
-\renewcommand*\b{\vec b}
-\providecommand\eR{}
-\renewcommand*\eR{\mat{\hat R}}
-\providecommand\eRi{}
-\renewcommand*\eRi{\hat{\mat R}\;\!^{-1}}
-\providecommand\k{}
-\renewcommand*\k{\vec k}
-\providecommand\n{}
-\renewcommand*\n{\vec n}
-\providecommand\p{}
-\renewcommand*\p{\vec p}
-\providecommand\R{}
-\renewcommand*\R{\mat R}
-\providecommand\Ri{}
-\renewcommand*\Ri{\R^{-1}}
-\providecommand\s{}
-\renewcommand*\s{\vec s}
-
-\providecommand\v{}
-\renewcommand*\v{\vec v}
-\providecommand\x{}
-\renewcommand*\x{\vec x}
-\providecommand\X{}
-\renewcommand*\X{\mat X}
-\providecommand\w{}
-\renewcommand*\w{\vec w}
-
-\providecommand\argmin{}
-\renewcommand*\argmin[1]{\underset{#1}{\text{argmin}}\ }
-\providecommand\norm{}
-\renewcommand*\norm[1]{\left\lVert #1 \right\rVert}
-\providecommand\min{}
-\renewcommand*\min[1]{\underset{#1}{\text{min}}}
-\providecommand\sinc{}
-\renewcommand\sinc{\text{sinc}}
-
-\providecommand*\nn{}
-\renewcommand*\nn{\nonumber\\}
-
-\providecommand\sumb{}
-\renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
 
 
 \title{Faster, Smarter, Better - Bridging high performance computing and adaptive image reconstruction to create cognitive sonar systems of tomorrow}
@@ -89,19 +7,12 @@
 %\department{Department of Informatics}
 
 
-\usepackage{floatrow}
-\usepackage{glossaries}
-%\usepackage{bibtex}
-%\usepackage{comment}
-\usepackage{environ}
-%\usepackage[runin]{abstract}
-\usepackage[parfill]{parskip}
-%\usepackage{parskip}
 
-\input{glossary}
-\makeglossaries
 
 \addbibresource{references.bib}
+\ifMonolithic
+   \addbibresource{../HowtoHowtoCapon/library.bib}
+\fi
 
 %\setlength\parskip{\baselineskip}
 
@@ -110,57 +21,106 @@
 %	plus.5\baselineskip%          % amount of stretch
 %	minus.3\baselineskip}          % pickyness on underfull vbox
 
+
+\input{glossary}
+
+\makeglossaries
+
+
+% \usepackage{layout}
 \begin{document}
+
 \frontmatter
 \maketitle
 
-\input{preface}
+\ifMonolithic
+   \input{preface}
+\else
+   \cleardoublepage
+   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/preface.pdf}
+%    \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/2_mvdr.pdf}
+%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=3-]{build/2_mvdr.pdf}
+\fi
 
-\input{abstract}
+\typeout{----Printing glossary----}
+\printglossary 
 
-\input{publications}
-
-\tableofcontents
 
 \mainmatter
+% \layout
+% 
+\ifMonolithic
+   \input{literature_review} 
+\else
+   \cleardoublepage
+   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/literature_review.pdf}
+\fi
 
-\printglossary
-
-\newpage
-\pagestyle{fancy}
-\input{introduction}
-
-\newpage
-{{\include{background}}}
-
-\newpage
-{
-	\newif\ifPhdDoc\PhdDoctrue                     % Run as part of PhD?
-	\input{2_mvdr}
-	
-	\includearticle
-	
-}
-
-%\includearticle
+\ifMonolithic
+   \input{2_mvdr} 
+\else
+   \cleardoublepage
+   \includepdf[pagecommand={\thispagestyle{plain}}, pages=1]{build/2_mvdr.pdf}
+   \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/2_mvdr.pdf}
+   \includepdf[pagecommand={\thispagestyle{plain}}, pages=3-]{build/2_mvdr.pdf} 
+\fi
 
 
-%\newpage
-%\input{litterature_review}
+% \includearticle[]{build/2_mvdr.pdf}
 
-\newpage
-\input{derivations}
 
-\newpage
-\addcontentsline{toc}{chapter}{List of Tables}
-\listoftables
+% \ifMonolithic
+% 
+%   \input{preface}
+% 
+%   \input{abstract}
+% 
+%   \input{publications}
+% 
+%   \tableofcontents
+% 
+% 
 
-\newpage
-\addcontentsline{toc}{chapter}{List of Figures}
-\listoffigures
-
-\newpage
-%\printbibliography
+% 
+%   \newpage
+%   \pagestyle{fancy}
+%   \input{introduction}
+% 
+%   \newpage
+%   {{\include{background}}}
+% 
+%   \newpage
+%   {
+%     \newif\ifPhdDoc\PhdDoctrue                     % Run as part of PhD?
+%     \input{2_mvdr}
+% 
+% %     \includearticle
+% 
+%   }
+% 
+%   %\includearticle
+% 
+% 
+%   %\newpage
+%   %\input{litterature_review}
+% 
+%   \newpage
+%   \input{derivations}
+% 
+%   \newpage
+%   \addcontentsline{toc}{chapter}{List of Tables}
+%   \listoftables
+% 
+%   \newpage
+%   \addcontentsline{toc}{chapter}{List of Figures}
+%   \listoffigures
+% 
+  \newpage
+  \printbibliography
+% 
+% % \else
+% 
+% \fi
     
 \end{document}
 

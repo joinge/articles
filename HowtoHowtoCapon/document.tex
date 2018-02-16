@@ -316,7 +316,7 @@ To use Nvidia's own terminology, the Quadro 6000 comprises 14 streaming multipro
 % -bank conflicts when L > 32. not treated.
 
 
-\subsection{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}\label{computing_eR}
+\subsection[Computing the Spatial Covariance Matrix]{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}\label{computing_eR}
 
 % As Fig. \ref{mvdr_complexity} illustrates the computation of $\eR$ 
 
@@ -386,7 +386,7 @@ Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On t
 
 % \cite{Owens2007}\todo{Find a good spot for these}
 
-\subsection{Solving $\hat{\boldsymbol{R}}$$\;\!^{-1}$$\mathbf{1}$}
+\subsection[Inverting R]{Solving $\hat{\boldsymbol{R}}$$\;\!^{-1}$$\mathbf{1}$}
 
 As intuition might suggest the matrix product $\eRi\1$ can be carried out by first inverting the matrix $\eR$, then performing the inner product with $\1$. However, one can also solve the linear equation $\hat{\boldsymbol{R}}\boldsymbol{b} = \1$ for $\boldsymbol{b}$, where $\boldsymbol{b} = \eRi\1$. This is the preferred approach since the solution is obtained directly and without the added computational cost of the final inner product.
 
@@ -394,7 +394,7 @@ An important thing to note here is that unlike the problems most GPU libraries t
 
 
 
-\subsection{Computing $z$}
+\subsection[Computing z]{Computing $z$}
 
 The beamformer output $z$ is computed on a per-pixel basis by first computing the MVDR weights $\w$, which are merely scaled versions of $\eRi\1$ (\ref{weights}). Then the sum in (\ref{finalZ}) is found by assigning a group of $L$ threads to respective elements of $x_l$, which then proceed to accumulate these for all $N_L$ subarrays. The resulting data vector is finally multiplied with the weight vector using the same threads, and then a single thread is used to sum these products to obtain $z$.
 
@@ -698,6 +698,15 @@ The authors would like to thank Kongsberg Maritime and the Norwegian Defence Res
 \fi
 
 
+
+\ifPhdDoc
+   \printbibliography
+%    \bibliographysty
+%    \bibliography{library.bib}
+%    \print
+\else
+
+% Originally build with bibtex:
 % \bibliographystyle{IEEEtran}
 % \bibliography{library.bib}
 
@@ -939,7 +948,7 @@ R.~E. Hansen, H.~J. Callow, T.~O. S\ae{}b\o, S.~A. Synnes, P.~E. Hagen,
 
 \end{thebibliography}
 
-\ifPhdDoc\else
+
 \input{bio/jo_inge_buskenes}
 \input{bio/jon_petter_aasen}
 \input{bio/carl-inge_nilsen}
