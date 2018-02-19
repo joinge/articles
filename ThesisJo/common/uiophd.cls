@@ -1,6 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
 \ProvidesClass{common/uiophd}[2016/09/26 v 1.04 UiO document class]
 \typeout{====Inside uiophd.cls====}
+% \RequirePackage{fix-cm}
 \DeclareOption{10pt}{\ClassWarningNoLine{uiophd}{Do not use type size '10pt'}}
 \DeclareOption{11pt}{\ClassWarningNoLine{uiophd}{Do not use type size '11pt'}}
 \DeclareOption{12pt}{}
@@ -11,6 +12,7 @@
 % % % \DeclareOption{american}{\renewcommand{\uiophd@lang}{USenglish}}
 % \newcommand{\uiophd@lang}{USenglish}
 \DeclareOption{altfont}{}
+\DeclareOption{draft}{}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions \relax
 
@@ -30,8 +32,10 @@
 % \RequirePackage{keyval}
 % \RequirePackage{pdfpages}
 \RequirePackage{setspace}
-\AtBeginDocument{\parskip=0pt plus 2.5pt\relax
-	\setstretch{1.1}}
+\AtBeginDocument{%\parskip=12pt plus 2.5pt\relax
+   \parskip=6pt plus 2.5pt\relax
+	\setstretch{1.1}
+	}
 \LoadClass[a4paper,twoside,openright,12pt]{report}
 
 \ifxetex
@@ -40,9 +44,11 @@
 %      \setmainfont[Mapping=tex-text,Numbers={OldStyle},Ligatures{Common},Contextuals=Alternate]{EB Garamond}
 \else
 	\IfFileExists{t1zgmj.fd}
-	{\RequirePackage[full]{textcomp}
-		\RequirePackage[garamond,expert]{mathdesign}
-		\RequirePackage[swashQ]{garamondx}}
+	{  \usepackage{ebgaramond}
+% 	   \RequirePackage[full]{textcomp}
+% 		\RequirePackage[garamond,expert]{mathdesign}
+% 		\RequirePackage[swashQ]{garamondx}
+   }
 	{\renewcommand{\rmdefault}{ptm}}
 % 	\IfFileExists{berasans.sty}
 % 	{\RequirePackage[scaled]{berasans}}

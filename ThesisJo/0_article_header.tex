@@ -1,0 +1,107 @@
+
+
+
+
+\newcommand\IEEEmembership[1]{}
+% 
+% \titleformat{\chapter}%command
+% [display]%shape
+% % {}%format
+% {\flushright}%format
+% {}%label
+% {0pt}%sep
+% {\color{Black}\Huge\bfseries}%before
+% []%after
+% \titlespacing*{\chapter}{0pt}{*0}{*2}
+
+
+\renewcommand\thesection{\arabic{section}}
+\renewcommand\thesubsection{\arabic{section}.\arabic{subsection}}
+
+\providecommand\title[1]{} 
+\renewcommand\title[1]{}
+
+% \newcommand\title[1]{}
+\providecommand\maketitle{}
+\renewcommand\maketitle{}
+
+% \titleformat{\chapter}[runin]{}
+% {\put(-10,0){\color{SeaGreen}\Large\emph\thesection}}%  {\footnotesize \enspace \emph{Sec.}  }
+%   {0pt}{\color{Black}\Large\bfseries\filright\textsl}[\vspace{15pt}\newline]
+% \titlespacing*{\chapter}{0pt}{*4}{*0}
+
+
+%\newcommand\title[1]{\makeatletter\def\mytitle{#1}\makeatother}
+%\newcommand\maketitle{\makeatletter\meaning\@maketitle\makeatother}
+
+\providecommand\author[1]{}
+\renewcommand\author[1]{{\vbadness=99999}}
+
+\providecommand\markboth[2]{}
+\renewcommand\markboth[2]{}
+
+% \newcommand\author[1]{}
+\providecommand\thanks[1]{}
+\renewcommand\thanks[1]{}
+% \renewcommand\markboth[2]{}
+
+% \ifOPTbeamer
+%\newenvironment{narrow}[2]{%
+%	\begin{list}{}{%
+%			\setlength{\topsep}{0pt}%
+%			\setlength{\leftmargin}{#1}%
+%			\setlength{\rightmargin}{#2}%
+%			\setlength{\listparindent}{\parindent}%
+%			\setlength{\itemindent}{\parindent}%
+%			\setlength{\parsep}{\parskip}}%
+%		\item[]}{\end{list}}
+
+\renewenvironment{abstract}%
+{\vspace{2\baselineskip}\list{}{\footnotesize
+\setlength{\topsep}{\parskip}%
+\setlength{\leftmargin}{0pt}%
+\setlength{\rightmargin}{0pt}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{1cm}%\parindent
+\setlength{\parsep}{\parskip}	
+}%\rightmargin\leftmargin
+\item[\textbf{Abstract ---}]\relax}
+{\endlist\newpage}
+
+% Options for the abstract package
+%\setlength\absleftindent{0mm}
+%\setlength\absrightindent{0mm}
+
+
+%\newenvironment{IEEEkeywords}{}{}
+%\excludecomment{IEEEkeywords}
+\NewEnviron{IEEEkeywords}{
+}
+
+\newcommand\IEEEcompsoctitleabstractindextext[1]{#1}
+
+\newcommand\IEEEdisplaynotcompsoctitleabstractindextext{}
+\newcommand\IEEEpeerreviewmaketitle{} %\par\vspace*{\fill}\clearpage
+%\renewcommand\maketitle{}
+
+\renewcommand\AA{Å}
+
+\newcommand\IEEEPARstart[2]{#1#2}
+
+\newif\ifPeerReview\PeerReviewtrue              % Whether to create the PeerReview version or
+% Journal version
+\newif\ifOnlineColor\OnlineColortrue            % Compile online color version?
+\ifOnlineColor
+\newcommand\figPostfix{_online}              % Colored images online
+\else
+\newcommand\figPostfix{_bw}                  % Black and white in journal
+\fi
+
+\newif\ifCLASSOPTIONcompsoc\CLASSOPTIONcompsocfalse
+
+\newif\ifCLASSOPTIONcaptionsoff\CLASSOPTIONcaptionsofffalse
+
+\newcommand\appendices{\textsc{Appendix}}
+
+\newenvironment{IEEEbiography}{}{}
+% 

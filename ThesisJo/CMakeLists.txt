@@ -26,7 +26,14 @@ set(SUBFILES
    literature_review
    background
    derivations
-   2_mvdr
+   )
+set(SUBFILE_DEPS
+   header.tex
+   subheader.in.tex
+   variables.tex
+   common/uiophd.cls
+   common/mytemplate.cls
+   Clean
    )
    
 # set(SUBFILES_IEEE
@@ -65,16 +72,8 @@ add_custom_target(Clean ALL
    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
    )
 
-file(WRITE all.log "" )
-# set(last_log "")
-foreach(file ${SUBFILES})
-   list(APPEND SUBFILES_PDF ${file}.pdf)
-   list(APPEND SUBFILES_GLO ${file}.glo)
-   list(APPEND SUBFILES_LOG ${file}.log)
-#    configure_file(subheader.in.tex 
-#                [COPYONLY] [ESCAPE_QUOTES] [@ONLY]
-#                [NEWLINE_STYLE [UNIX|DOS|WIN32|LF|CRLF] ])
-
+   
+function(compile file) # optional: deps
    add_custom_command(
       OUTPUT ${file}.pdf ${file}.glo
       COMMAND grep Monolithictrue variables.tex ||
@@ -95,26 +94,51 @@ foreach(file ${SUBFILES})
               ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
               echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
               echo " \\(Re\\)building ${file}.pdf \\(final\\)..." &&
-              ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex #&&
-#               ./bin/pagecnt.sh ${CMAKE_CURRENT_BINARY_DIR}/${file}
-#               [=[V1=$(cat cnt.txt)]=] &&
-#               [=[V2=$(pdfinfo ${file}.pdf | grep Pages | awk '{print $2})]=] &&
-#               [=[$(($V1+$V2)) > cnt.txt]=] #&&
-#               export [=[PCNT=$((${PCNT}+${CNT}))]=]
+              ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+              cp ${CMAKE_BINARY_DIR}/${file}.pdf ${file}.pdf &&
+              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${file}.synctex.gz
             )
       COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      DEPENDS ${file}.tex subheader.in.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean
+      DEPENDS ${ARGN}
       )
+endfunction()
 
-   add_custom_target(${file}.log ALL
-      COMMAND test ! -f ${file}.log || cat ${file}.log >> ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log
+function(make_log file) # optional: deps
+   add_custom_target(${file} ALL
+      COMMAND test ! -f ${file}.log || 
+            ( cat ${file}.log >> ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log &&
+              cat ${file}.log
+              | sed '/Unsupported document class/d'
+              | sed '/mdugm/d'
+              | sed '/printglossaries found/d'
+              > ${CMAKE_SOURCE_DIR}/${file}.log #&&
+            )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       DEPENDS ${file}.pdf
       )
+endfunction()
+   
+file(WRITE all.log "" )
+# set(last_log "")
+foreach(file ${SUBFILES})
+   list(APPEND SUBFILES_PDF ${file}.pdf)
+   list(APPEND SUBFILES_GLO ${file}.glo)
+   list(APPEND SUBFILES_LOG ${file}.log)
+
+   compile(${file} ${file}.tex ${SUBFILE_DEPS})
+   make_log(${file})
+   
 #       file(READ build/${file}.log TXT)
 #       file(APPEND all.log ${TXT})
 endforeach()
+
+compile(2_mvdr 2_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ${SUBFILE_DEPS})
+make_log(2_mvdr)
+
+compile(3_lca 3_lca.tex 0_article_header.tex ../LCAforActiveSonarImaging/document.tex ../LCAforActiveSonarImaging/macros.tex ${SUBFILE_DEPS})
+make_log(3_lca)
+
 
 ############
 # Glossary #
@@ -182,6 +206,10 @@ message("${SUBFILES_PDF}")
 #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 #    DEPENDS ${SUBFILES_PDF} ${TOP_FILE}.tex header.tex variables.tex
 #    )
+
+compile(${file} ${file}.tex header.tex subheader.in.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean)
+
+
 add_custom_command(
    OUTPUT ${TOP_FILE}.pdf
    COMMAND echo "" && echo ""
@@ -220,7 +248,7 @@ add_custom_target(thesis ALL
 #    COMMAND awk [=['!a[$0]++']=] thesis.log
 #    COMMAND ${CMAKE_COMMAND} -E create_symlink build/all.log all.log
    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-   DEPENDS ${TOP_FILE}.pdf ${SUBFILES_LOG} 
+   DEPENDS ${TOP_FILE}.pdf ${SUBFILES} 
    )
    
 #       add_custom_target(${file} ALL

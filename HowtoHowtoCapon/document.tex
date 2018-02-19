@@ -1,7 +1,8 @@
-
-
-\title{An Optimized GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}
-
+% 
+% \graphicspath{gfx/../}
+%
+\title{An Optimized GPU Implementation of the MVDR Beamformer for Active Sonar Imaging}%
+%
 \author{Jo~Inge~Buskenes,~\IEEEmembership{Student Member,~IEEE,} %
         Jon~Petter~\AA{}Åsen,~\IEEEmembership{Student Member,~IEEE,} %
         Carl-Inge~Colombo~Nilsen,~\IEEEmembership{Member,~IEEE,} %
@@ -9,25 +10,25 @@
 \thanks{J. I. Buskenes, C.-I. C. Nilsen and A. Austeng are with the Department of Informatics, University of Oslo, 0316 Oslo, Norway.}%
 \thanks{J. P. \AA{}sen is with MI-Lab, Norwegian University of Science and Technology, 7491 Trondheim, Norway.}% <-this % stops a space
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
-}
-
+}%
+%
 % The paper headers
 \markboth{IEEE Journal of Oceanic Engineering}%
-{A Robust and Optimized GPU Implementation of the MVDR beamformer}
-
+{A Robust and Optimized GPU Implementation of the MVDR beamformer}%
+%
 % Publishers ID mark:
 %\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
-
+%
 % use for special paper notices
 %\IEEEspecialpapernotice{(Invited Paper)}
-
+%
 % for Computer Society papers, we must declare the abstract and index terms
 % PRIOR to the title within the \IEEEcompsoctitleabstractindextext IEEEtran
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
-\begin{abstract}
+\begin{abstract}%
 % Two limiting factors of modern phased array sonar imaging systems are the angular resolution and contrast. Adaptive beamformers target these limitatitons by weighting sensors dynamically to fit the impinging wavefield.
-
+%
 The minimum variance distortionless response (MVDR) beamformer has recently been proposed as an attractive alternative to conventional beamformers in active sonar imaging. Unfortunately, it is very computationally complex because a spatial covariance matrix must be estimated and inverted for each image pixel. This may discourage its use unnecessarily in sonar systems which are continuously being pushed to ever higher imaging ranges and resolutions.
 
 In this study we show that for active sonar systems up to 32 channels, the computation time can be significantly reduced by performing arithmetic optimizations, and by implementing the MVDR beamformer on a graphics processing unit (GPU). We point out important hardware limitations for these devices, and assess the design in terms of how efficiently it is able to use the GPU's resources. On a quad-core Intel Xeon system with a high-end Nvidia GPU, our GPU implementation renders more than a million pixels per second (1\;MP/s). Compared to our initial central processing unit (CPU) implementation the optimizations described herein led to a speedup of more than two orders of magnitude, or an expected five to ten times improvement had the CPU received similar optimization effort. This throughput enables real-time processing of sonar data, and makes the MVDR a viable alternative to conventional methods in practical systems.
@@ -35,13 +36,13 @@ In this study we show that for active sonar systems up to 32 channels, the compu
 
 % We benchmarked optimized implementations of the MV beamformer in MATLAB and C, running on a quad-core Intel Xeon E5620, and in CUDA running on a high-end nVidia card. The beamformers operated on data from the 32x4 element Kongsberg Martime HISAS1030 sonar, using a conservative set of robustification parameters. 
 %The CPU would then be free to take on the rest of the beamforming as well.
-\end{abstract}
-
+\end{abstract}%
+%
 % Keywords (normally not used for peer reviews)
 \begin{IEEEkeywords}
 Adaptive beamforming, MVDR, Capon, sonar, active sonar, GPU, graphics processing unit, complexity.
 \end{IEEEkeywords}
-}
+}%
 
 % make the title area
 \maketitle
@@ -176,14 +177,17 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 
 
 \subsection{Beamforming}
-
+\ifPhdDoc
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske1\figPostfix.eps}
+\else
 \ifPeerReview
-\begin{figure}[H]\centering
+\begin{figure}[htbp]\centering
 \includegraphics[width=0.8\linewidth]{gfx/buske1\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/beamforming.eps}
-\fi%
+\fi\fi%
 \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then, before summation, a suitable set of delays $\Delta$ and weights $w$ are applied to focus on a pixel of interest at angle and range ($\theta,n$).}\label{beamforming}
 \end{figure}
 Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{beamforming}). Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
@@ -226,16 +230,22 @@ The final estimate $\eR$ is found by adding a fraction $d$ of the total power of
 where $\I$ is an identity matrix, $\tr\{\cdot\}$ represents the matrix trace operation, and $\tr\{\breve{\R}[n]\}$ is an estimate of the energy received from this pixel.
 
 Note how subarray averaging led to a size reduction of $\eR$ from $\mathbb{C}^{M,M}$ to $\mathbb{C}^{L,L}$, and hence will produce an $L$-element weight set when substituted into (\ref{z}). This weight set is applied to all the subarrays, before computing the beamformer output as in (\ref{z}). Or, equivalently, we may apply the weight set to the sum of all the subarrays by
+%
 \begin{align}
 z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{finalZ}
 \end{align}
+%
+\ifPhdDoc
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske2\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske2\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/implementation.eps}
-\fi%
+\fi\fi%
 \caption{MVDR beamforming. For each pixel in range and azimuth:\newline
 1. an $L\times{}L$ sample covariance matrix $\eR$ is computed; \newline
 2. the term $\eR^{-1}\1$ is found using a linear equation solver;\newline
@@ -256,13 +266,18 @@ Next we will evaluate these steps in terms of arithmetic complexity, and then di
 % Computing and inverting $\eR$ is by far the most computationally intensive tasks in MVDR beamforming. This 
 
 If we neglect spatial and temporal averaging, then the computation of $\eR$ is reduced to a single outer product with complexity of O($M^2$), and the inversion is then of O($M^3$). This might lead us to believe that the inversion step is by far the most complex. But if we implement spatial and temporal averaging as in (\ref{spatialR}), then computing $\eR$ is of O($N_K N_L L^2$) and the inversion of O($L^3$). Computing $\eR$ is now the most complex operation whenever $N_LN_K>L$.
+%
+\ifPhdDoc
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske3\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske3\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_complexity.eps}
-\fi%
+\fi\fi%
 \caption{Per-pixel computational complexity of the steps in MVDR beamforming (before any optimizations). To avoid signal cancellation in an active sonar system we usually set $L<\frac{M}{2}$, in which region the computation of $\eR$ dominates in terms of arithmetic complexity, especially when performing temporal averaging.}\label{mvdr_complexity}
 \end{figure}
 To visualize these relations, and include the effects of using complex numbers, we set up complexity formulas that account for the total number of arithmetic operations for each step in the MVDR process (see appendix \ref{mvdr_formulas}). The only excluded operation was partial pivoting used in the inversion step, but this should contribute marginally to the end result. The entire range of possible subarray sizes from $L\in[1,M]$ was finally evaluated, with temporal averaging set to $K\in\{0,1,2\}$, and the number of channels set to $M\in\{8,16,32\}$. The results are shown in \Fig{mvdr_complexity}.
@@ -270,7 +285,7 @@ To visualize these relations, and include the effects of using complex numbers, 
 Note how the computation of $\eR$ completely dominates at smaller subarray sizes, that solving $\eRi\1$ only plays a notable role for larger array and subarray sizes, and that the computation of $z$ has a negligible impact on computation time. Also notice how temporal averaging comes with a high computational penalty. This is because building $\eR$ is heavy on complex multiplications, which require three times as many arithmetic instructions as a complex addition, and a lot of these are repeated unnecessarily.
 
 
-
+ 
 
 \section{Mapping the MVDR to a GPU}\label{maptogpu}
 
@@ -283,13 +298,17 @@ To use Nvidia's own terminology, the Quadro 6000 comprises 14 streaming multipro
 
 %  this assumes that the implementation is solely bound by arithmetic throughput.  r bound by memory bandwidth, arithmetic latency or arithmetic bandwidth.  or  is solely bound by processing power.   These cores need to be kept busy if we are to That make for a total of 448 CUDA cores which we need to keep busy if we want to tap the full potential. 
 
+\ifPhdDoc
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske4\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske4\figPostfix.eps}
 \else
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_build_R.eps}
-\fi%
+\fi\fi%
 \caption{Step 1: Building $\eR$. This is a visualization of how $\eR$ could be built in a case with $M=5$ sensors, with subarray size $L=3$ and temporal averaging set to $K=1$. Here $\R'_{l}$ is the sample covariance matrix for the $l$th subarray, and $\breve{\R}$ is the average of $N_K$ of these. Note that instead of performing the temporal sum last as here, one could take more temporal samples into consideration in the computation of each $r_{ij}$.}\label{mvdr_build_R}
 \end{figure}
 
@@ -331,27 +350,40 @@ In Fig. \ref{mvdr_build_R}, we illustrate how to reduce the arithmetic complexit
 \item avoid redundant multiplications;
 \item avoid redundant summations by first computing the upper row of $\eR$ and then adding/subtracting to these iteratively to find the diagonals of $\eR$.
 \end{enumerate}
-%
+
+\ifPhdDoc
+\begin{figure}[tp]\centering
+\includegraphics[width=\linewidth]{gfx/buske5\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
-\includegraphics[width=.8\linewidth]{gfx/buske5\figPostfix.eps}
+\includegraphics[width=.8\linewidth]{gfx/buske5\figPostfix.eps} 
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
-\fi%
+\fi\fi%
 \caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. \ref{mvdr_complexity} (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory-optimized case, and by a factor 6-22 in the instruction-optimized case.}\label{mvdr_complexity_optimized}
 \end{figure}
 
 To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied, we call it a "minimum instructions" solution, and when step 2 is left out, we call it a "minimum memory" solution. Fig. \ref{mvdr_complexity_optimized} compares the two solutions, and formulas may be found in Appendix \ref{mvdr_formulas}. Here the complexity curves are relative to the reference implementation in Fig. \ref{mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
+\ifPhdDoc
+\begin{figure}[p]\centering
+\includegraphics[width=.997\linewidth]{gfx/buske6\figPostfix.eps}
+% Caption is the same, but using newlines for the items in it (since it is now on a page)
+\caption{MVDR implemented on a GPU. We do this in 3 steps, where each step process the full image before moving on to the next step. \\[.5\baselineskip]\textbf{Step~1}: The sample covariance matrix $\eR$ is formed by threads running along its diagonals. This allows spatial averaging to be implemented in a computationally efficient manner and minimizes interthread communication.
+\\[.5\baselineskip]\textbf{Step~2}: $\eRi\1$ is computed using the heavily optimized batched linear equation solver from Nvidia~\cite{Nvidia}. 
+\\[.5\baselineskip]\textbf{Step~3}: The beamformer output $z$ is computed in a straightforward fashion using $L$ threads that first sum the subarrays and then apply the MVDR weighting function. A single thread finally sums all the channels up.}\label{mvdr_implementation}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske6\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/mvdr_implementation.eps}
+\fi
+\caption{MVDR implemented on a GPU. We do this in 3 steps, where each step process the full image before moving on to the next step. \emph{Step~1}: The sample covariance matrix $\eR$ is formed by threads running along its diagonals. This allows spatial averaging to be implemented in a computationally efficient manner and minimizes interthread communication. \emph{Step~2}: $\eRi\1$ is computed using the heavily optimized batched linear equation solver from Nvidia~\cite{Nvidia}. \emph{Step~3}: The beamformer output $z$ is computed in a straightforward fashion using $L$ threads that first sum the subarrays and then apply the MVDR weighting function. A single thread finally sums all the channels up.}\label{mvdr_implementation}
 \fi%
-\caption{MVDR implementated on a GPU. We do this in 3 steps, where each step process the full image before moving on to the next step. \emph{Step~1}: The sample covariance matrix $\eR$ is formed by threads running along its diagonals. This allows spatial averaging to be implemented in a computationally efficient manner and minimizes interthread communication. \emph{Step~2}: $\eRi\1$ is computed using the heavily optimized batched linear equation solver from Nvidia~\cite{Nvidia}. \emph{Step~3}: The beamformer output $z$ is computed in a straightforward fashion using $L$ threads that first sum the subarrays and then apply the MVDR weighting function. A single thread finally sums all the channels up.}\label{mvdr_implementation}
 \end{figure}
 
 \subsubsection{Arithmetic Throughput}
@@ -418,8 +450,9 @@ The beamformer output $z$ is computed on a per-pixel basis by first computing th
 % \item Design has generally not been optimized for efficient use of memory.
 % \end{itemize}
 
-The GPU design is summarized and compared to our CPU designs in table \ref{implementation_summary}.
-\begin{table}[!h]\centering%\normalsize
+The GPU design is summarized and compared to our CPU designs in Table \ref{implementation_summary}.
+%
+\begin{table}[!ht]\centering%\normalsize
 % \begin{tabular}[c]{l r r r@{}  l}\hline
 \begin{tabular}[l]{l >{\raggedright}p{.27\linewidth} p{.28\linewidth}}\hline
 \rowcolor{tabBlue} & \bf GPU & \bf CPU \\\hline
@@ -449,56 +482,80 @@ Data transfers & Minimum & Moderate
 
 To demonstrate the imaging capability of the MVDR beamformer, we have processed experimental datasets from the $M=32$ element Kongsberg Maritime HISAS1030 sonar mounted on a HUGIN autonomous underwater vehicle (AUV)~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar (SAS) with an array length of 1.2\;m, operating frequency of 100\;kHz, and bandwidth of 30\;kHz. The element size and spacing is 2.5\;$\lambda$ and the opening angle is 25$^\circ$. To produce the image shown in \Fig{holmengraa}, the sonar was operated in sidescan mode. The studied object is the 1500-dwt oil tanker wreck Holmengraa. It is 68\;m long and 9\;m wide, and lies at a slanted seabed at 77\;m depth outside Horten, Norway. The 1 megapixel (MP) MVDR image was here processed with parameters $L=16$, $K=1$, and $d=1\%$.
 
+\ifPhdDoc
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske7\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske7\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.eps}
-\fi%
+\fi\fi%
 \caption{HISAS sidescan sonar (SSS) image of the shipwreck Holmengraa that lies on a slanted seabed at 77\;m depth outside of Horten, Norway. The image was processed with $M=32$, $L=16$, $K=1$ and $d=1\%$. The image was linearly upinterpolated by a factor 2 in azimuth making its total size 1.46 megapixels (MP). Note how MVDR improves edge definition and reduces noise in shadow regions.}\label{holmengraa}
 \end{figure}
 
 The computational performance of our implementation was first assessed on a test system with a quad-core Intel Xeon E5620, 64\;GB of RAM and an Nvidia Quadro 6000 card. The results were obtained by processing a 1\;MP image from the data from a 32 channel array, for all subarray sizes $L$, and for $K\in\{0,1,2\}$. Runtime measurements are shown in \Fig{benchmarks}. The runtimes of memory-only and arithmetic-only GPU kernels are depicted in \Fig{code_assessment}. An estimate of computation efficiency is presented in \Fig{code_assess_flops}. We were also granted a test drive at the Boston HPC centre on a machine with an Intel Xeon E5-2670, 32\;GB RAM and an Nvidia K20. The results from this run are shown in \Fig{benchmarks_boston}.
 
+\ifPhdDoc
+\begin{figure}[p]\centering
+\includegraphics[width=\linewidth]{gfx/buske8\figPostfix.eps}
+% Same caption but slightly different formatting since it is now on its own page
+\caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.
+\\[.5\baselineskip]\textbf{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in Fig. \ref{mvdr_complexity}.
+\\[.5\baselineskip]\textbf{Bottom:} Compared to a reference MATLAB and single thread C implementation running on a CPU the GPU offered a speedup of 2-3 orders of magnitude, but these numbers are somewhat misleading. If the C implementation was properly optimized we expect the GPU to be no more than a factor 5-10 faster, even if its theoretical peak performance is ~20 times higher than that of the CPU.}\label{benchmarks}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske8\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark.eps}
-\fi%
-\caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.\newline \emph{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in Fig. \ref{mvdr_complexity}.\newline
+\fi\caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.\newline \emph{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in Fig. \ref{mvdr_complexity}.\newline
 \emph{Bottom:} Compared to a reference MATLAB and single thread C implementation running on a CPU the GPU offered a speedup of 2-3 orders of magnitude, but these numbers are somewhat misleading. If the C implementation was properly optimized we expect the GPU to be no more than a factor 5-10 faster, even if its theoretical peak performance is ~20 times higher than that of the CPU.}\label{benchmarks}
+\fi%
 \end{figure}
 
+\ifPhdDoc
+\begin{figure}[p]\centering
+\includegraphics[width=\linewidth]{gfx/buske9\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske9\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/code_assessment.eps}
-\fi%
+\fi\fi%
 \caption{Execution time of an arithmetic-only and a memory-only version of the MVDR code. A dataset from an $M=32$ array was processed for all $L$ using $K=1$, and the mean execution time for a 1 megapixel (MP) image was used here. From this plot we can infer that the kernel building $\eR$ is memory bound, as the time the kernel spends performing memory transactions is higher than the corresponding time it spends carrying out arithmetical operations. Furthermore, when the total runtime is larger than the restricted kernels this can largely be attributed to latency, which we can see that building $\eR$ suffers from with the chosen parameters.}\label{code_assessment}
 \end{figure}
 
+\ifPhdDoc
+\begin{figure}[p]\centering
+\includegraphics[width=\linewidth]{gfx/buske10\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske10\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/code_assess_flops.eps}
-\fi
+\fi\fi
 \caption{\protect Code efficiency. An estimate of the number of floating point operations per second (Flop/s), found by dividing the theoretical complexity curves by actual run-times. This is a crude measure as it does not include any other instructions than the actual arithmetic operations in the MVDR computation.}\label{code_assess_flops}
 \end{figure}
 
+\ifPhdDoc
+\begin{figure}[tbp]\centering
+\includegraphics[width=\linewidth]{gfx/buske11\figPostfix.eps}
+\else
 \ifPeerReview
 \begin{figure}[!t]\centering
 \includegraphics[width=.8\linewidth]{gfx/buske11\figPostfix.eps}
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark_boston.eps}
-\fi
+\fi\fi
 \caption{\protect MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20 Kepler GPU. The exact same scenario and code as in Fig. \ref{benchmarks} was used here. With no code alterations the performance was only improved marginally compared to running on the Quadro 6000.}\label{benchmarks_boston}
 \end{figure}
 
@@ -515,7 +572,7 @@ Note from \Fig{benchmarks} how the building of $\eR$ now only takes up a fractio
 
 When optimizing a GPU design it is important to know whether it is limited by memory bandwidth or arithmetical throughput. To measure this we made two versions of the MVDR kernel: One that only performs arithmetic operations, and one that only performs memory operations. Then, we benchmarked these kernels and compared their runtimes to the total runtime (\Fig{code_assessment}). A first thing to note is how these kernels seem equally occupied performing memory and arithmetic operations. This is a good sign, but since we consistently minimized memory consumption at the expense of some extra computations when building $\eR$ , we know it to be bound by memory bandwidth. It also has a problem with latency, which can be inferred from the total runtime being significantly higher than that of the two single-function kernels. Since the GPU hardware can carry out memory and arithmetic operations concurrently and independently, this gap indicates that the GPU sometimes does ``nothing''. In our case this is due to synchronization hold-ups when performing temporal averaging, which is carried out in a sequential manner.
 
-Even with all our efforts we were only able to obtain processing rates of 40\;GFlop/s on average in the desirable range of subarray sizes (\Fig{mvdr_complexity}). This is mainly due to the inversion step, since for the most part we obtained more than 100\;GFlop/s when building $\eR$. While these numbers are slightly underestimated, they are regardless far away from the Quadro 6000's peak of 1\;TFlop/s. Again, we believe this is due to the design being bound by memory bandwidth. This belief is further supported by the test results from running the code on the new K20 Kepler card, where we saw a modest factor 1.5-2 speedup. Although the Kepler card peaks at 3.5-4\;Tflop/s, its shared memory bandwidth is only approximately twice that of the Quadro 6000, hence matches the observed speedup. However, it is likely that the Kepler card would perform better had we optimized our design for it. For scientific computing, the Kepler boards are considered more attractive, with the introduction of features such as kernels calling kernels, more registers, more shared memory, and better mechanisms for hiding or removing data transfers.
+Even with all our efforts we were unable to obtain processing rates higher than 40\;GFlop/s on average in the desirable range of subarray sizes (\Fig{mvdr_complexity}). This is mainly due to the inversion step, since for the most part we obtained more than 100\;GFlop/s when building $\eR$. While these numbers are slightly underestimated, they are regardless far away from the Quadro 6000's peak of 1\;TFlop/s. Again, we believe this is due to the design being bound by memory bandwidth. This belief is further supported by the test results from running the code on the new K20 Kepler card, where we saw a modest factor 1.5-2 speedup. Although the Kepler card peaks at 3.5-4\;Tflop/s, its shared memory bandwidth is only approximately twice that of the Quadro 6000, hence matches the observed speedup. However, it is likely that the Kepler card would perform better had we optimized our design for it. For scientific computing, the Kepler boards are considered more attractive, with the introduction of features such as kernels calling kernels, more registers, more shared memory, and better mechanisms for hiding or removing data transfers.
 
 
 % If the HISAS1030 was attached to a platform moving at 1.8m/s, for which the maximum range is 250\;m~\cite{Hansen2010}, the pulse repetition frequency could be set to 3\;Hz. We could further assume a complex sampling frequency of 40\;kHz to accomodate the  HISAS1030's bandwidth of 30\;kHz, and beamform $M=32$ lateral beams. The throughput required for real-time processing of these images would then be 1\;MP/s. As we have seen, this is something our GPU implementation can handle if $L$ is not too large.\todo{droppe denne kanskje}%, leaving the \gls{CPU} free to take on other assignments.
@@ -600,7 +657,14 @@ All in all, the MVDR maps well to the GPU since the computations involved are in
 % - instead, can issue 2 instructions per warp in the same cycle
 % 
 
+\ifPhdDoc
+\clearpage
+\appendix
+% \section*{Appendix}
+\renewcommand\thesection{\Roman{section}}
+\else
 \appendices
+\fi
 
 \section{MVDR Complexity Formulas}\label{mvdr_formulas}
 
@@ -664,7 +728,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % DOCUMENT APPENDICES %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\appendices
+\appendix
 
 % use section* for acknowledgement
 \ifCLASSOPTIONcompsoc% % This command fixes abstract positioning for compsoc articles:
@@ -700,7 +764,7 @@ The authors would like to thank Kongsberg Maritime and the Norwegian Defence Res
 
 
 \ifPhdDoc
-   \printbibliography
+   \printbibliography[title=References,heading=subbibliography]
 %    \bibliographysty
 %    \bibliography{library.bib}
 %    \print

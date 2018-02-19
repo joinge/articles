@@ -1,0 +1,205 @@
+\typeout{====Start of macro file====}
+
+\providecommand\Fig{}
+\renewcommand\Fig[1]{Fig.~\ref{#1}}
+\providecommand\eq{}
+\renewcommand\eq[1]{(\ref{#1})}
+
+\providecommand\Grey[1]{{\color{Grey}#1}}
+\providecommand\Red[1]{{\color{Red}#1}}
+\providecommand\Blue[1]{{\color{Blue}#1}}
+\providecommand\DarkBlue[1]{{\color{DarkBlue}#1}}
+\providecommand\LightBlue[1]{{\color{LightBlue}#1}}
+\providecommand\Brown[1]{{\color{Brown}#1}}
+\providecommand\Green[1]{{\color{Green}#1}}
+\providecommand\SeaGreen[1]{{\color{SeaGreen}#1}}
+\providecommand\Yellow[1]{{\color{yellow}#1}}
+\providecommand\Orange[1]{{\color{orange}#1}}
+
+\providecommand*\nn{}
+\renewcommand*\nn{\nonumber\\}
+
+\providecommand\nmat{}
+\renewcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+\providecommand\bmat{}
+\renewcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+\providecommand\case{}
+\renewcommand\case[1]{\begin{cases}#1\end{cases}}
+\providecommand\textbox{}
+\renewcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+
+\providecommand\rand{}
+\renewcommand\rand{\text{rand}}
+\providecommand\randn{}
+\renewcommand\randn{\text{randn}}
+\providecommand\rect{}
+\renewcommand\rect{\text{rect}}
+\providecommand\sinc{}
+\renewcommand\sinc{\text{sinc}}
+\providecommand\tr{}
+\renewcommand\tr{\text{tr}}
+\providecommand\adj{}
+\renewcommand\adj{\text{adj}}
+
+% \renewcommand\max{\text{max}}
+\providecommand\argmin{}
+\renewcommand\argmin[1]{\text{arg}\;\underset{#1}{\text{min}}}
+
+\providecommand\qqquad{}
+\renewcommand\qqquad{\quad\qquad}
+\providecommand\qqqquad{}
+\renewcommand\qqqquad{\qquad\qquad}
+
+% renewcommand\l[1]{\left#1}
+% renewcommand\r[1]{\right#1}
+
+% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+
+%Keyword colouring:
+\providecommand\kw{}
+\renewcommand\kw[1]{#1}
+\providecommand\parm{}
+\renewcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+
+\providecommand\of{}
+\renewcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+\providecommand\df{}
+\renewcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+\providecommand\var{}
+\renewcommand\var[3]{#1_\text{#2}\of{#3}}
+
+\providecommand\diag{}
+\renewcommand\diag{\text{diag}}
+
+% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+\providecommand\mt{}
+\renewcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+\providecommand\mathnorm{}
+\renewcommand\mathnorm{\textstyle}
+\providecommand\mathbig{}
+\renewcommand\mathbig[1]{\displaystyle#1\mathnorm}
+\providecommand\mathsmall{}
+\renewcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+\providecommand\mathtiny{}
+\renewcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+\providecommand\sfrac{}
+\renewcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+\providecommand\nfrac{}
+\renewcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+
+\providecommand\sumu{}
+\renewcommand\sumu[1]{\sum\limits^{#1}\;}
+\providecommand\suml{}
+\renewcommand\suml[1]{\sum\limits_{#1}\;}
+\providecommand\sumb{}
+\renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
+
+\providecommand\produ{}
+\renewcommand\produ[1]{\prod\limits^{#1}\;}
+\providecommand\prodl{}
+\renewcommand\prodl[1]{\prod\limits_{#1}\;}
+\providecommand\prodb{}
+\renewcommand\prodb[2]{\prod\limits_{#1}^{#2}\;}
+
+\providecommand\defeq{}
+\renewcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
+
+%Math macros:
+\providecommand*\T{}
+\renewcommand*\T{^{\scriptscriptstyle T}}
+\providecommand\H{}
+\renewcommand\H{^{\scriptscriptstyle H}}
+
+\providecommand\vec{}
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\providecommand\mat{}
+\renewcommand\mat[1]{\boldsymbol{#1}}
+
+\providecommand\Om{}
+\renewcommand\Om{O_\text{m}}
+\providecommand\Oa{}
+\renewcommand\Oa{O_\text{a}}
+\providecommand\Nl{}
+\renewcommand\Nl{N_\text{l}}
+\providecommand\Nk{}
+\renewcommand\Nk{N_\text{k}}
+\providecommand\1{}
+\renewcommand\1{\vec 1}
+\providecommand\I{}
+\renewcommand\I{\mat I}
+\providecommand\a{}
+\renewcommand*\a{\vec a}
+\providecommand\f{}
+\renewcommand*\f{\vec f}
+\providecommand\i{}
+\renewcommand*\i{\vec i}
+\providecommand\k{}
+\renewcommand*\k{\vec k}
+\providecommand\n{}
+\renewcommand*\n{\vec n}
+\providecommand\p{}
+\renewcommand*\p{\vec p}
+\providecommand\s{}
+\renewcommand*\s{\vec s}
+\providecommand\w{}
+\renewcommand*\w{\vec w}
+\providecommand\x{}
+\renewcommand*\x{\vec x}
+\providecommand\y{}
+\renewcommand*\y{\vec y}
+
+\providecommand\A{}
+\renewcommand*\A{\mat A}
+%\renewcommand*\B{\mat B}
+%\renewcommand*\C{\mat C}
+\providecommand\E{}
+\renewcommand*\E{\mat E}
+\providecommand\P{}
+\renewcommand*\P{\mat P}
+\providecommand\eP{}
+\renewcommand*\eP{\mat{\hat P}}
+\providecommand\R{}
+\renewcommand*\R{\mat R}
+\providecommand\Ri{}
+\renewcommand*\Ri{\R^{-1}}
+\providecommand\eR{}
+\renewcommand*\eR{\mat{\hat R}}
+\providecommand\eRi{}
+\renewcommand*\eRi{\hat{\mat R}\;\!^{-1}}
+\providecommand\Navg{}
+\renewcommand*\Navg{N_\text{avg}}
+\providecommand\W{}
+\renewcommand*\W{\mat W}
+\providecommand\X{}
+\renewcommand*\X{\mat X}
+\providecommand\Xd{}
+\renewcommand*\Xd{\X_{\!\Delta}}
+\providecommand\Y{}
+\renewcommand*\Y{\mat Y}
+
+\providecommand\L{}
+\renewcommand*\L{\mat \Lambda}
+%\renewcommand*\U{\mat U}
+% renewcommand*\t{\mathtiny{^T}}
+% \renewcommand*\h{\mathtiny{^H}}
+\providecommand\t{}
+\renewcommand*\t{^T}
+\providecommand\h{}
+\renewcommand*\h{^H}
+
+\providecommand\minus{}
+\renewcommand\minus{\scalebox{0.75}[1.0]{$-$}}
+
+\ifPeerReview
+\graphicspath{./submission/submit1}
+\fi
+
+% \newcommand\multimedia[1]{\textbf{{\color{red}[#1]}}}
+\newcommand\multimedia[2]{\href{#1}{#2}}
+
+% \newcommand\mediaPath{gfx/media}
+\newcommand\articlePath{http://folk.uio.no/joibu/articles/2015_JOE_LCA}
+
+\newcommand\mediaI{\multimedia{\articlePath/media1.mp4}{Media Movie~1}}
+\newcommand\mediaII{\multimedia{\articlePath/media2.mp4}{Media Movie~2}}
+

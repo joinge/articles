@@ -221,6 +221,7 @@
    \DeclareOption{english}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{UKenglish}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{altfont}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{draft}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption*{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
 \fi
 
@@ -422,9 +423,12 @@
       \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
       \typeout{++++fontenc+++}
       \RequirePackage[T1]{fontenc}%                 % Set font encoding
+      \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)|
    \fi
    \typeout{++++xcolor+++}
    \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+   \typeout{++++ccaption+++}
+   \RequirePackage{ccaption}                       % For customised captions
    \typeout{++++fancyhdr++++}
    \RequirePackage{fancyhdr}                       % fancyheading deprecated.
    \typeout{++++hyperref++++}
@@ -436,9 +440,11 @@
       , doi=true
       , eprint=false
    %    , sortlocale=
-      , style=numeric
+      , style=numeric-comp
+%       , style=ieee,
    %   , style=authoryear-icomp
       , url=false
+      , sorting=none
       ]{biblatex}
    \typeout{++++pdfpages++++}
    \RequirePackage[final]{pdfpages}
@@ -950,9 +956,9 @@
     \renewcommand\dbltopfraction{0.9} % fit big float above 2-col. text
     \renewcommand\textfraction{0.07}  % allow minimal text w. figs
     %   Parameters for FLOAT pages (not text pages):
-    \renewcommand\floatpagefraction{0.85}  % require fuller float pages
+%     \renewcommand\floatpagefraction{0.85}  % require fuller float pages
   % N.B.: floatpagefraction MUST be less than topfraction !!
-    \renewcommand\dblfloatpagefraction{0.85} % require fuller float pages
+%     \renewcommand\dblfloatpagefraction{0.85} % require fuller float pages
 
 \else
 
@@ -1142,7 +1148,8 @@
    % Every first page of a chapter is ``plain'' (for some reason).
    % Only print page number on these pages
 	\fancypagestyle{plain}
-	{ \lhead{}
+	{  \vbadness 1000
+	   \lhead{}
 		\chead{}
 		\rhead{}
 		\lfoot{}
@@ -1153,14 +1160,44 @@
 		%   \setlength{\headrulewidth}{0pt}
 		%   \setlength{\footrulewidth}{0pt}
 	}
+   \fancypagestyle{empty}
+   {  % \hbadness 99999
+      \vbadness 99999
+      \lhead{}
+      \chead{}
+      \rhead{}
+      \lfoot{}
+      \cfoot{}
+      \rfoot{}
+      \renewcommand\headrulewidth{0pt}
+      \renewcommand\footrulewidth{0pt}
+      %   \setlength{\headrulewidth}{0pt}
+      %   \setlength{\footrulewidth}{0pt}
+   }
+   \fancypagestyle{normal}
+   {  % \hbadness 99999
+      \vbadness 1000
+      \pagestyle{fancy}
+%  \fancyhead[RO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
+   %   \fancyhead[LO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
    
+%       \lhead{}
+%       \chead{}
+%       \rhead{}
+%       \lfoot{}
+%       \cfoot{}
+%       \rfoot{}
+%       \renewcommand\headrulewidth{0pt}
+%       \renewcommand\footrulewidth{0pt}
+      %   \setlength{\headrulewidth}{0pt}
+      %   \setlength{\footrulewidth}{0pt}
+   }   
+
    \fancyhead{}
-%	\fancyhead[RO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
-	%   \fancyhead[LO]{\SeaGreen{\let\uppercase\relax\textsc\leftmark}}
-	\fancyhead[RO]{\rightmark}
-	\fancyfoot{}
-	\fancyfoot[LE]{\thepage}
-	\fancyfoot[RO]{\thepage}
+   \fancyhead[RO]{\rightmark}
+   \fancyfoot{}
+   \fancyfoot[RO]{\thepage}
+   \fancyfoot[LE]{\thepage}
 
 \fi
 
@@ -1424,7 +1461,18 @@
 % CAPTIONS %
 %%%%%%%%%%%%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-\ifOPTuam\ifOPTuiophd\else
+\ifOPTuiophd
+%    %% What you want written under floating objects
+%    \captionnamefont{\footnotesize\bf\itshape}
+%    \captiontitlefont{\footnotesize\bf\slshape}
+%    \captionstyle{}
+%    \captiondelim{: }
+%    \newcommand\subcaption[1]{{\footnotesize\centering#1}}
+% %    \typeout{ -test- }
+%    % \setlength{\belowcaptionskip}{-10pt}
+
+\else
+\ifOPTuam\else
    %% What you want written under floating objects
    \captionnamefont{\footnotesize\itshape}
    \captiontitlefont{\footnotesize\slshape}
@@ -1433,7 +1481,8 @@
    \newcommand\subcaption[1]{{\footnotesize\centering#1}}
    \typeout{ -test- }
    % \setlength{\belowcaptionskip}{-10pt}
-\fi\fi
+\fi
+\fi
 
 %%%%%%%%%%%%%%%                                 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % MATHEMATICS %
