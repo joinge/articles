@@ -111,7 +111,7 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure}[tbp]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig1.eps}%
+   \includegraphics[width=.8\linewidth]{gfx/fig1.eps}%
 \else
    \begin{figure}[tbp]\centering%
    \ifPeerReview%
@@ -124,7 +124,7 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure}[tbp]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig2.png}%
+   \includegraphics[width=.7\linewidth]{gfx/fig2.png}%
 \else
    \begin{figure}[tbp]\centering%
    \ifPeerReview%
@@ -136,37 +136,50 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 \end{figure}
 
 
-\setcounter{topnumber}{1}
-\setcounter{dbltopnumber}{1}
+
 
 \ifPhdDoc
    \begin{figure*}[tbp]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig3.pdf}%
+   \includegraphics[width=\linewidth]{gfx/fig3_phd.pdf}%
+   \caption{\emph{Determining LCA window type}: MVDR image with typical frequency responses for windows used in various pixel regions.\\[.5\baselineskip]
+   \textbf{Left:} MVDR sectorscan image of the oiltanker Holmengraa, with 40x40 pixel groups for the shadow, highlight and speckle region of the image indicated with red boxes.\\[.5\baselineskip]
+   \textbf{Right:} MVDR window amplitude and phase responses computed from the 40x40 pixel groups. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The size of the pixel groups were chosen ad-hoc for the histograms to be visually invariant to a shift in position within the same region. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.}\label{mvdr_selected_windows}
 \else
+\setcounter{topnumber}{1}
+\setcounter{dbltopnumber}{1}
+
    \begin{figure*}[t]\centering%
    \includegraphics[width=\linewidth]{gfx/buske3_online.pdf}%
+   \caption{\emph{Determining LCA window type}: MVDR image with typical frequency responses for windows used in various pixel regions.\newline
+   \emph{Left:}\hfill
+   \parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, with 40x40 pixel groups for the shadow, highlight and speckle region of the image indicated with red boxes.}\protect\\\hspace{\textwidth}
+   \emph{Right:}\hfill
+   \parbox[t]{.95\linewidth}{MVDR window amplitude and phase responses computed from the 40x40 pixel groups. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The size of the pixel groups were chosen ad-hoc for the histograms to be visually invariant to a shift in position within the same region. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.} }\label{mvdr_selected_windows}
 \fi%
-\caption{\emph{Determining LCA window type}: MVDR image with typical frequency responses for windows used in various pixel regions.\newline
-\emph{Left:}\hfill
-\parbox[t]{.95\linewidth}{MVDR sectorscan image of the oiltanker Holmengraa, with 40x40 pixel groups for the shadow, highlight and speckle region of the image indicated with red boxes.}\protect\\\hspace{\textwidth}
-\emph{Right:}\hfill
-\parbox[t]{.95\linewidth}{MVDR window amplitude and phase responses computed from the 40x40 pixel groups. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The size of the pixel groups were chosen ad-hoc for the histograms to be visually invariant to a shift in position within the same region. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.} }\label{mvdr_selected_windows}
+
 \end{figure*}
 
 \ifPhdDoc
    \begin{figure*}[tbp]\centering%
    \includegraphics[width=\linewidth]{gfx/fig4.pdf}%
+   \caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large window database, but where the upper bounds for $\beta$ and $\phi$ are varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two \protect\minus{}3\,dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
+   \\[.5\baselineskip]
+   \textbf{Upper bound $\beta$:} Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR prefers windows with sidelobe levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.
+   \\[.5\baselineskip]
+   \textbf{Upper bound $\phi$:} As we increase the upper bound of the steering $\phi$, we also increase the lateral image resolution.
+   }
 \else
    \begin{figure*}[t]%
    \includegraphics[width=\textwidth]{gfx/buske4_online.pdf}%
+   \caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large window database, but where the upper bounds for $\beta$ and $\phi$ are varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two \protect\minus{}3\,dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
+   \newline
+   \emph{Upper bound $\beta$:}\hfill
+   \parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR prefers windows with sidelobe levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
+   \emph{Upper bound $\phi$:}\hfill
+   \parbox[t]{.89\linewidth}{As we increase the upper bound of the steering $\phi$, we also increase the lateral image resolution. }
+   }
 \fi%
-\caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large window database, but where the upper bounds for $\beta$ and $\phi$ are varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two \protect\minus{}3\,dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
-\newline
-\emph{Upper bound $\beta$:}\hfill
-\parbox[t]{.89\linewidth}{Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{mvdr_selected_windows} suggests that MVDR prefers windows with sidelobe levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.}\newline
-\emph{Upper bound $\phi$:}\hfill
-\parbox[t]{.89\linewidth}{As we increase the upper bound of the steering $\phi$, we also increase the lateral image resolution. }
-}\label{oversampling_mosaic_bounds}
+\label{oversampling_mosaic_bounds}
 \end{figure*}
 
 \setcounter{dbltopnumber}{2}
@@ -194,7 +207,7 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 \fi
 
 \ifPhdDoc
-   \begin{figure*}[tbp]\centering%
+   \begin{figure*}[tb]\centering%
    \includegraphics[width=\linewidth]{gfx/fig6.pdf}%
 \else
    \begin{figure*}[t]%\centering%
@@ -404,7 +417,14 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 % DOCUMENT APPENDICES %
 %%%%%%%%%%%%%%%%%%                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\ifPhdDoc
+\clearpage
+\appendix
+\renewcommand\thesection{\Roman{section}}
+\else
 \appendices
+\fi
+
 
 \section{Steering angle}\label{appendix:steering_angles}
 

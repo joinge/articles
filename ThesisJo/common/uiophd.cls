@@ -44,10 +44,11 @@
 %      \setmainfont[Mapping=tex-text,Numbers={OldStyle},Ligatures{Common},Contextuals=Alternate]{EB Garamond}
 \else
 	\IfFileExists{t1zgmj.fd}
-	{  \usepackage{ebgaramond}
-% 	   \RequirePackage[full]{textcomp}
-% 		\RequirePackage[garamond,expert]{mathdesign}
-% 		\RequirePackage[swashQ]{garamondx}
+	{
+% 	\usepackage{ebgaramond}
+	   \RequirePackage[full]{textcomp}
+		\RequirePackage[garamond,expert]{mathdesign}
+		\RequirePackage[swashQ]{garamondx}
    }
 	{\renewcommand{\rmdefault}{ptm}}
 % 	\IfFileExists{berasans.sty}
