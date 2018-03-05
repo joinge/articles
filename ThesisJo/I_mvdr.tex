@@ -2,19 +2,15 @@
 \input{0_article_header}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\newif\ifBuildBibliography\BuildBibliographyfalse
-% \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\usepackage{subfig}
-
 %\let\Fig\undefined
 \typeout{====Start of macro parse====}
-\input{../LCAforActiveSonarImaging/macros}
+\input{../HowtoHowtoCapon/macros}
 \typeout{====done====}
 
 
 % \typeout{====ifMonolithic====}
 \ifMonolithic\else
-   \addbibresource{../LCAforActiveSonarImaging/references.bib}
+   \addbibresource{../HowtoHowtoCapon/library.bib}
 \fi
 
 \typeout{====Start document parse====}
@@ -22,7 +18,7 @@
 % \usepackage{parskip}
 
 
-\graphicspath{{../LCAforActiveSonarImaging/submission/final/}}
+\graphicspath{{../HowtoHowtoCapon/submission/final/}}
 \ifMonolithic\else\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 
@@ -33,14 +29,14 @@
 \setlength\parskip{\baselineskip}
 \renewcommand\baselinestretch{1.1}
 
-\chapter{Paper II}
+\chapter{Paper I}\label{ch:paperI}
 
-{\Large\bf Low Complexity Adaptive Beamforming}
+{\Large\bf An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
 
-J.I. Buskenes, R.E. Hansen and A. Austeng
+J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 
 IEEE Journal of Oceanic Engineering\\
-Volume 42, Issue 1, January 2017%\\
+Volume 40, Issue 2, April 2015%\\
 % \vfill
 }
 
@@ -49,13 +45,13 @@ Volume 42, Issue 1, January 2017%\\
 \pagestyle{normal}
 \thispagestyle{plain}
 \fancyhead[LE]{\bf Paper II}
-\fancyhead[RO]{\bf\flushright Low Complexity Adaptive Beamforming}
+\fancyhead[RO]{\bf\flushright An Optimized GPU implementation of the\\ MVDR Beamformer for Active Sonar Imaging}
 
 \begin{center}
-{\Large\bf Low Complexity Adaptive Beamforming}
+{\Large\bf An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
 
 \vspace{\baselineskip}
-J.I. Buskenes, R.E. Hansen and A. Austeng
+J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 \end{center}
 
 \overfullrule=1mm
@@ -63,8 +59,8 @@ J.I. Buskenes, R.E. Hansen and A. Austeng
 {
 
 % \newgeometry{headheight=50pt}
-%    \vboxbadness=99999 % Mute underfull vboxes, these are already reviewed
-   \input{../LCAforActiveSonarImaging/document}
+   \vbadness=99999 % Mute underfull vboxes, these are already reviewed
+   \input{../HowtoHowtoCapon/document}
 % \restoregeometry
 }
    

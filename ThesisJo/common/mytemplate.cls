@@ -825,21 +825,40 @@
 %~~ HYPERREF ~~%
 \ifOPTbeamer\else
 \ifOPTdefaultformat\else
-\hypersetup{
-   breaklinks=true,                             % Break links when necessary
- , linktocpage=true                             % Enable link to page?
- , linkcolor=PineGreen                          % Colour of links to labels within document
- , citecolor=Brown                              % Colour of links to the biliography
- , filecolor=Red                                % Colour of links to local files
- , urlcolor=SeaGreen                            % Colour of the links to external URLs
- , colorlinks=true                              % ??
- , plainpages=false                             % Store roman/arabic numbering differently to avoid
-                                                % ``duplicate'' warning.
-  , final
-%  , bookmarksopen=true
-%  , bookmarksopenlevel=3
-%  , bookmarks=true
- , bookmarksnumbered }                          % Have the bookmarks numbered.
+\ifOPTuiophd
+   \hypersetup{
+     breaklinks=true                             % Break links when necessary
+   , linktocpage=true                             % Enable link to page?
+   , linkcolor=Black%PineGreen                          % Colour of links to labels within document
+   , citecolor=Brown                              % Colour of links to the biliography
+   , filecolor=Red                                % Colour of links to local files
+   , urlcolor=SeaGreen                            % Colour of the links to external URLs
+   , colorlinks=true                              % ??
+   , plainpages=false                             % Store roman/arabic numbering differently to avoid
+                                                   % ``duplicate'' warning.
+   , final
+   %  , bookmarksopen=true
+   %  , bookmarksopenlevel=3
+   %  , bookmarks=true
+   , bookmarksnumbered }                          % Have the bookmarks numbered.
+
+\else
+   \hypersetup{
+      breaklinks=true,                             % Break links when necessary
+   , linktocpage=true                             % Enable link to page?
+   , linkcolor=PineGreen                          % Colour of links to labels within document
+   , citecolor=Brown                              % Colour of links to the biliography
+   , filecolor=Red                                % Colour of links to local files
+   , urlcolor=SeaGreen                            % Colour of the links to external URLs
+   , colorlinks=true                              % ??
+   , plainpages=false                             % Store roman/arabic numbering differently to avoid
+                                                   % ``duplicate'' warning.
+   , final
+   %  , bookmarksopen=true
+   %  , bookmarksopenlevel=3
+   %  , bookmarks=true
+   , bookmarksnumbered }                          % Have the bookmarks numbered.
+\fi
 \fi
 \fi
 

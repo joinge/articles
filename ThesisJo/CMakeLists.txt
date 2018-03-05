@@ -19,16 +19,17 @@ set(DRAFT_ARGS -draftmode ${BUILD_ARGS})
 set(TOP_FILE thesis)
 
 set(SUBFILES
-   preface
-   abstract
-   publications
-   introduction
-   literature_review
-   background
-   derivations
+#    preface
+#    abstract
+#    1_introduction
+   2_publications
+#    3_discussion
+#    literature_review
+#    background
+#    derivations
    )
 set(SUBFILE_DEPS
-   header.tex
+#    header.tex
    subheader.in.tex
    variables.tex
    common/uiophd.cls
@@ -65,52 +66,162 @@ set(SUBFILE_DEPS
 #       )
 # endforeach()
 
+add_custom_command(
+   OUTPUT subheader.tex
+   COMMAND grep 'printglossar' ${file}.tex &&
+                 sed s/'@USE_GLOSSARY@'/'true'/g  ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex ||
+                 sed s/'@USE_GLOSSARY@'/'false'/g ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+   DEPENDS ${CMAKE_SOURCE_DIR}/subheader.in.tex Clean
+   )
+add_custom_target (Configure ALL
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+   DEPENDS subheader.tex
+   )
+
+
+
 add_custom_target(Clean ALL
    COMMAND rm thesis.log || true
+   COMMAND rm header.fmt || true
    COMMAND echo "2" > ${CMAKE_BINARY_DIR}/cnt.txt
    COMMAND echo "" > ${CMAKE_BINARY_DIR}/all.glo
+   COMMAND echo "" > ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log
    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
    )
 
+#          COMMAND grep Monolithictrue variables.tex ||
+#             ((grep 'printglossar' ${file}.tex &&
+#                  sed s/'@USE_GLOSSARY@'/'true'/g  subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ||
+#                  sed s/'@USE_GLOSSARY@'/'false'/g subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ) &&
    
 function(compile file) # optional: deps
+#     add_custom_command(
+#     OUTPUT ${file}.fmt
+#     COMMAND  echo "" && echo "" &&
+#                 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#                 echo " Precompiling header..." &&
+#                 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#     #             echo "pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\"header\" \"&pdflatex\" mylatexformat.ltx header.tex"
+#                 pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"${file}\\" \\"\\&pdflatex\\" mylatexformat.ltx ${file}.tex &&
+#                 cp ${CMAKE_BINARY_DIR}/${file}.fmt ${file}.fmt
+#     COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#     DEPENDS ${file}.tex Clean
+#     )
    add_custom_command(
-      OUTPUT ${file}.pdf ${file}.glo
-      COMMAND grep Monolithictrue variables.tex ||
-            ((grep 'printglossar' ${file}.tex &&
-                 sed s/'@USE_GLOSSARY@'/'true'/g  subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ||
-                 sed s/'@USE_GLOSSARY@'/'false'/g subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ) &&
-              cat ${CMAKE_BINARY_DIR}/cnt.txt &&
+      OUTPUT ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
+      COMMAND cat cnt.txt &&
               echo "" && echo "" &&
               echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
               echo " Building ${file}.pdf..." &&
               echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Biber..." &&
-              biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${file} &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " \\(Re\\)building ${file}.pdf \\(draft\\)"
-              ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " \\(Re\\)building ${file}.pdf \\(final\\)..." &&
-              ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
-              cp ${CMAKE_BINARY_DIR}/${file}.pdf ${file}.pdf &&
-              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${file}.synctex.gz
-            )
+              cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+#               cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex
+              cp ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
+              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz
       COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      DEPENDS ${ARGN}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${ARGN} Configure #PrecompiledSubHeader
       )
+   add_custom_command(
+      OUTPUT ${file}.bbl
+      COMMAND touch ${file}.old.bcf &&
+              diff ${file}.bcf ${file}.old.bcf >/dev/null ||
+             (echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+              echo " Biber..." &&
+              cd ${CMAKE_SOURCE_DIR} &&
+              biber --output-directory=${CMAKE_BINARY_DIR} ${file} &&
+              cp ${CMAKE_BINARY_DIR}/${file}.bcf ${CMAKE_BINARY_DIR}/${file}.old.bcf &&
+              echo "~~~~~~~~~~~~~~~~~~~~~~~"
+             )
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${file}.bcf
+      )
+   add_custom_command(
+      OUTPUT ${file}.gls
+      COMMAND touch ${file}.old.glo &&
+              diff ${file}.glo ${file}.old.glo >/dev/null ||
+             (echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+              echo " Makeindex..." &&
+              makeindex -s ${file}.ist -o ${file}.gls ${file}.glo &&
+              cp ${CMAKE_BINARY_DIR}/${file}.glo ${CMAKE_BINARY_DIR}/${file}.old.glo &&
+              echo "~~~~~~~~~~~~~~~~~~~~~~~"
+             )
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${file}.glo ${file}.ist
+      )
+#    set_source_files_properties(
+# #               ${file}.aux
+#               ${file}.bbl # biber references
+# #               ${file}.bcf # pdflatex bibliography references
+# #               ${file}.glo # pdflatex glossary references
+# #               ${file}.ist
+#               PROPERTIES GENERATED true)
+   add_custom_command(
+      OUTPUT ${file}.pdf
+      COMMAND cat cnt.txt &&
+              echo "" && echo "" &&
+              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              echo " Building ${file}.pdf..." &&
+              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+#               cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex
+              cp ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
+              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz
+      COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${file}.bbl ${file}.gls
+      )
+   add_custom_target(${file}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${file}.pdf
+      )
+#    set_source_files_properties(
+#               ${file}.aux
+#               ${file}.bbl # biber references
+#               ${file}.bcf # pdflatex bibliography references
+#               ${file}.glo # pdflatex glossary references
+#               ${file}.ist
+#               PROPERTIES GENERATED true)
+#    add_custom_command(
+#       OUTPUT ${file}.pdf ${file}.glo
+#       COMMAND cat ${CMAKE_BINARY_DIR}/cnt.txt &&
+#               echo "" && echo "" &&
+#               echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               echo " Building ${file}.pdf..." &&
+#               echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
+#               echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               echo " Biber..." &&
+#               biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${file} &&
+#               echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               echo " \\(Re\\)building ${file}.pdf \\(draft\\)" &&
+#               ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
+#               echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               echo " \\(Re\\)building ${file}.pdf \\(final\\)..." &&
+#               ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+#               cp ${CMAKE_BINARY_DIR}/${file}.pdf ${file}.pdf &&
+#               cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${file}.synctex.gz
+#       COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#       DEPENDS ${ARGN} Configure #PrecompiledSubHeader
+#       )
 endfunction()
 
 function(make_log file) # optional: deps
    add_custom_target(${file} ALL
       COMMAND test ! -f ${file}.log || 
-            ( cat ${file}.log >> ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log &&
+            ( cat ${file}.log
+              | sed '/Unsupported document class/d'
+              | sed '/mdugm/d'
+              | sed '/printglossaries found/d'
+              | sed '/no file/d'
+              >> ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log &&
               cat ${file}.log
               | sed '/Unsupported document class/d'
               | sed '/mdugm/d'
+              | sed '/printglossaries found/d'
               | sed '/printglossaries found/d'
               > ${CMAKE_SOURCE_DIR}/${file}.log #&&
             )
@@ -121,62 +232,102 @@ endfunction()
    
 file(WRITE all.log "" )
 # set(last_log "")
+
+# add_custom_command(
+#    OUTPUT header.fmt
+#    COMMAND  echo "" && echo "" &&
+#             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#             echo " Precompiling header..." &&
+#             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+# #             echo "pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\"header\" \"&pdflatex\" mylatexformat.ltx header.tex"
+#             pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
+#             cp ${CMAKE_BINARY_DIR}/header.fmt header.fmt
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#    DEPENDS header.tex Clean
+#    )
+# add_custom_target (PrecompiledHeader ALL
+#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#    DEPENDS header.fmt
+#    )
+# 
+# add_custom_command(
+#    OUTPUT subheader.fmt
+#    COMMAND grep 'printglossar' ${file}.tex &&
+#                  sed s/'@USE_GLOSSARY@'/'true'/g  subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ||
+#                  sed s/'@USE_GLOSSARY@'/'false'/g subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex &&
+#             echo "" && echo "" &&
+#             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+#             echo " Precompiling header..." &&
+#             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+# #             echo "pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\"header\" \"&pdflatex\" mylatexformat.ltx header.tex"
+#             pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"subheader\\" \\"\\&pdflatex\\" mylatexformat.ltx subheader.tex &&
+#             cp ${CMAKE_BINARY_DIR}/subheader.fmt subheader.fmt
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#    DEPENDS subheader.in.tex Clean
+#    )
+# add_custom_target (PrecompiledSubHeader ALL
+#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#    DEPENDS subheader.fmt
+#    )
+# set(SUBFILE_DEPS ${SUBFILE_DEPS} header.fmt)
+# pdftex --output-directory=build -ini -jobname="header" "&pdflatex" mylatexformat.ltx header.tex
+
 foreach(file ${SUBFILES})
    list(APPEND SUBFILES_PDF ${file}.pdf)
-   list(APPEND SUBFILES_GLO ${file}.glo)
-   list(APPEND SUBFILES_LOG ${file}.log)
+#    list(APPEND SUBFILES_GLO ${file}.glo)
+#    list(APPEND SUBFILES_LOG ${file}.log)
 
    compile(${file} ${file}.tex ${SUBFILE_DEPS})
-   make_log(${file})
+#    make_log(${file})
    
 #       file(READ build/${file}.log TXT)
 #       file(APPEND all.log ${TXT})
 endforeach()
 
-compile(2_mvdr 2_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ${SUBFILE_DEPS})
-make_log(2_mvdr)
-
-compile(3_lca 3_lca.tex 0_article_header.tex ../LCAforActiveSonarImaging/document.tex ../LCAforActiveSonarImaging/macros.tex ${SUBFILE_DEPS})
-make_log(3_lca)
+# compile(I_mvdr I_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ${SUBFILE_DEPS})
+# make_log(I_mvdr)
+# 
+# compile(II_mvdr_ultrasound II_mvdr_ultrasound.tex 0_article_header.tex ../HRUIonGPU/document.tex ../HRUIonGPU/macros.tex ${SUBFILE_DEPS})
+# make_log(II_mvdr_ultrasound)
+# 
+# compile(III_lca III_lca.tex 0_article_header.tex ../LC AforActiveSonarImaging/document.tex ../LCAforActiveSonarImaging/macros.tex ${SUBFILE_DEPS})
+# make_log(III_lca)
 
 
 ############
 # Glossary #
 ############
-
+# grep Monolithictrue ../variables.tex ||
+#             (
 # add_custom_target(start_glo)
-set(last_glo ${SUBFILES_PDF})
-foreach(file ${SUBFILES})
-   add_custom_command(
-      OUTPUT ${file}_cumulative.glo
-      COMMAND grep Monolithictrue ../variables.tex ||
-            ( echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Building ${file}.glo" &&
-              ../bin/pagecnt.sh ${file} &&
-              cat ${file}_cumulative.glo >> all.glo
-            )
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${last_glo} ${file}.glo
-      )
-   set(last_glo ${file}_cumulative.glo)
-endforeach()
-add_custom_command(
-   OUTPUT ${TOP_FILE}_cumulative.glo
-   COMMAND grep Monolithictrue ../variables.tex ||
-         ( echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-            echo " Building ${TOP_FILE}_cumulative.glo" &&
-            cat all.glo > ${TOP_FILE}_cumulative.glo #&&
-         )
-   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-   DEPENDS ${last_glo}
-   )
-add_custom_target(Glossary
-   COMMAND grep Monolithictrue ../variables.tex ||
-         ( cat ${TOP_FILE}_cumulative.glo > ${TOP_FILE}.glo #&&
-         )
-   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-   DEPENDS ${TOP_FILE}_cumulative.glo
-   )
+# set(last_glo ${SUBFILES_PDF})
+# foreach(file ${SUBFILES})
+#    add_custom_command(
+#       OUTPUT ${file}_cumulative.glo
+#       COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+#               echo " Building ${file}.glo" &&
+#               ../bin/pagecnt.sh ${file} &&
+#               cat ${file}_cumulative.glo >> all.glo
+#       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#       DEPENDS ${last_glo} ${file}.glo
+#       )
+#    set(last_glo ${file}_cumulative.glo)
+# endforeach()
+# add_custom_command(
+#    OUTPUT ${TOP_FILE}_cumulative.glo
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+#             echo " Building ${TOP_FILE}_cumulative.glo" &&
+#             cat all.glo > ${TOP_FILE}_cumulative.glo #&&
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS ${last_glo}
+#    )
+# add_custom_target(Glossary
+#    COMMAND cat ${TOP_FILE}_cumulative.glo > ${TOP_FILE}.glo #&&
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS ${TOP_FILE}_cumulative.glo
+#    )
       
 # foreach(file ${SUBFILES_IEEE})
 #    list(APPEND SUBFILES_PDF ${file}.pdf)
@@ -193,7 +344,7 @@ add_custom_target(Glossary
 #       DEPENDS ${file}.tex subheader.tex
 #       )
 # endforeach()
-message("${SUBFILES_PDF}")
+# message("${SUBFILES_PDF}")
 
 # add_custom_command(
 #    OUTPUT ${TOP_FILE}.pdf
@@ -207,50 +358,54 @@ message("${SUBFILES_PDF}")
 #    DEPENDS ${SUBFILES_PDF} ${TOP_FILE}.tex header.tex variables.tex
 #    )
 
-compile(${file} ${file}.tex header.tex subheader.in.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean)
+# compile(${file} ${file}.tex header.tex subheader.in.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean)
 
+# message(${SUBFILES_PDF})
 
-add_custom_command(
-   OUTPUT ${TOP_FILE}.pdf
-   COMMAND echo "" && echo ""
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND echo " Building ${TOP_FILE}.pdf "
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND ${BUILD_COMMAND} ARGS ${DRAFT_ARGS} ${TOP_FILE}.tex
-#    COMMAND test ! -f thesis.bcf || biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${TOP_FILE}
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND echo " Biber..."
-   COMMAND biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${TOP_FILE}
-#    COMMAND makeindex ARGS ${TOP_FILE}.idx # if needed
-#    COMMAND makeindex ARGS -s style.gls
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND echo " Makeindex..."
-   COMMAND cd ${CMAKE_BINARY_DIR} && makeindex -s ${TOP_FILE}.ist -o ${TOP_FILE}.gls ${TOP_FILE}_cumulative.glo
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND echo " \\(Re\\)building ${TOP_FILE}.pdf \\(draft\\)..."
-   COMMAND ${BUILD_COMMAND} ${DRAFT_ARGS} ${TOP_FILE}.tex
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND echo " \\(Re\\)building ${TOP_FILE}.pdf \\(final\\)..."
-   COMMAND ${BUILD_COMMAND} ${BUILD_ARGS} ${TOP_FILE}.tex
-   COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
-   COMMAND cp build/${TOP_FILE}.pdf ${TOP_FILE}.pdf
+compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean)
+
+# add_custom_command(
+#    OUTPUT ${TOP_FILE}.pdf
+#    COMMAND echo "" && echo ""
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND echo " Building ${TOP_FILE}.pdf "
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND ${BUILD_COMMAND} ARGS ${DRAFT_ARGS} ${TOP_FILE}.tex
+# #    COMMAND test ! -f thesis.bcf || biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${TOP_FILE}
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND echo " Biber..."
+#    COMMAND biber --output-directory=${CMAKE_CURRENT_BINARY_DIR} ${TOP_FILE}
+# #    COMMAND makeindex ARGS ${TOP_FILE}.idx # if needed
+# #    COMMAND makeindex ARGS -s style.gls
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND echo " Makeindex..."
+#    COMMAND cd ${CMAKE_BINARY_DIR} && makeindex -s ${TOP_FILE}.ist -o ${TOP_FILE}.gls ${TOP_FILE}_cumulative.glo
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND echo " \\(Re\\)building ${TOP_FILE}.pdf \\(draft\\)..."
+#    COMMAND ${BUILD_COMMAND} ${DRAFT_ARGS} ${TOP_FILE}.tex
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND echo " \\(Re\\)building ${TOP_FILE}.pdf \\(final\\)..."
 #    COMMAND ${BUILD_COMMAND} ${BUILD_ARGS} ${TOP_FILE}.tex
-#    COMMAND ${CMAKE_COMMAND} -E create_symlink build/${TOP_FILE}.log ${TOP_FILE}.log
-   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-   DEPENDS Glossary ${SUBFILES_PDF} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean
-   )
+#    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+#    COMMAND cp build/${TOP_FILE}.pdf ${TOP_FILE}.pdf
+# #    COMMAND ${BUILD_COMMAND} ${BUILD_ARGS} ${TOP_FILE}.tex
+# #    COMMAND ${CMAKE_COMMAND} -E create_symlink build/${TOP_FILE}.log ${TOP_FILE}.log
+#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#    DEPENDS Glossary ${SUBFILES_PDF}  ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean
+#    )
+#    I_mvdr.pdf II_mvdr_ultrasound.pdf III_lca.pdf
    
 # file(READ build/${TOP_FILE}.log TXT)
 # file(APPEND all.log ${TXT})
 
-add_custom_target(thesis ALL
-#    COMMAND cat ${CMAKE_BINARY_DIR}/thesis.log >> thesis.log
-#    COMMAND awk [=['!a[$0]++']=] thesis.log
-#    COMMAND ${CMAKE_COMMAND} -E create_symlink build/all.log all.log
-   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-   DEPENDS ${TOP_FILE}.pdf ${SUBFILES} 
-   )
-   
+# add_custom_target(thesis
+# #    COMMAND cat ${CMAKE_BINARY_DIR}/thesis.log >> thesis.log
+# #    COMMAND awk [=['!a[$0]++']=] thesis.log
+# #    COMMAND ${CMAKE_COMMAND} -E create_symlink build/all.log all.log
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS ${TOP_FILE}.pdf
+#    )
+#    
 #       add_custom_target(${file} ALL
 #       COMMAND cat build/${file}.log >> thesis.log
 #       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

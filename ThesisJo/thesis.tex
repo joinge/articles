@@ -1,18 +1,11 @@
-\input{variables}\input{header}
-
-
+%%&header
+%
+\input{header}
 
 \title{Faster, Smarter, Better - Bridging high performance computing and adaptive image reconstruction to create cognitive sonar systems of tomorrow}
 \author{Jo Inge Buskenes}
 %\department{Department of Informatics}
 
-
-
-
-\addbibresource{references.bib}
-\ifMonolithic
-   \addbibresource{../HowtoHowtoCapon/library.bib}
-\fi
 
 %\setlength\parskip{\baselineskip}
 
@@ -21,49 +14,98 @@
 %	plus.5\baselineskip%          % amount of stretch
 %	minus.3\baselineskip}          % pickyness on underfull vbox
 
-
+%\endofdump
 \input{glossary}
-
 \makeglossaries
 
 
-% \usepackage{layout}
+
+%
+%
+%% \usepackage{layout}
 \begin{document}
 
 \frontmatter
 \maketitle
 
-\ifMonolithic
-   \input{preface}
-\else
-   \cleardoublepage
-   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/preface.pdf}
-%    \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/2_mvdr.pdf}
-%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=3-]{build/2_mvdr.pdf}
-\fi
+%\ifMonolithic
+%   \input{preface.tex}
+%\else
+%   \cleardoublepage
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/preface.pdf}
+%%    \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/2_mvdr.pdf}
+%%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=3-]{build/2_mvdr.pdf}
+%\fi
 
-\typeout{----Printing glossary----}
+\typeout{----Printing glossary----}|
 \printglossary 
 
 
 \mainmatter
 % \layout
 % 
-\ifMonolithic
-   \input{literature_review} 
-\else
-   \cleardoublepage
-   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/literature_review.pdf}
-\fi
+% \ifMonolithic
+%    \input{literature_review} 
+% \else
+%    \cleardoublepage
+%    \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/literature_review.pdf}
+% \fi
 
-\ifMonolithic
-   \input{2_mvdr} 
-\else
-   \cleardoublepage
-   \includepdf[pagecommand={\thispagestyle{plain}}, pages=1]{build/2_mvdr.pdf}
-   \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/2_mvdr.pdf}
-   \includepdf[pagecommand={\thispagestyle{plain}}, pages=3-]{build/2_mvdr.pdf} 
-\fi
+%\subfile{1_introduction.tex}
+
+\subfile{2_publications.tex}
+
+%\subfile{3_discussion.tex}
+
+%\ifMonolithic
+%	\input{1_introduction.tex} 
+%\else
+%	\cleardoublepage
+%	\includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/1_introduction.pdf}
+%\fi
+%
+%\ifMonolithic
+%   \input{2_publications.tex} 
+%\else
+%   \cleardoublepage
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/2_publications.pdf}
+%\fi
+
+%\ifMonolithic
+%	\input{3_discussion.tex} 
+%%\else
+%	\cleardoublepage
+%	\includepdf[pagecommand={\thispagestyle{plain}}, pages=-]{build/3_discussion.pdf}
+%\fi
+
+%\printbibliography[title=References]%heading=subbibliography
+
+%\ifMonolithic
+%   \input{I_mvdr.tex} 
+%\else
+%   \cleardoublepage
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=1]{build/I_mvdr.pdf}
+%   \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/I_mvdr.pdf}
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=3-]{build/I_mvdr.pdf} 
+%\fi
+%
+%\ifMonolithic
+%   \input{II_mvdr_ultrasound.tex} 
+%\else
+%   \cleardoublepage
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=1]{build/II_mvdr_ultrasound.pdf}
+%   \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/II_mvdr_ultrasound.pdf}
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=3-]{build/II_mvdr_ultrasound.pdf} 
+%\fi
+%
+%\ifMonolithic
+%   \input{III_lca.tex} 
+%\else
+%   \cleardoublepage
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=1]{build/III_lca.pdf}
+%   \includepdf[pagecommand={\thispagestyle{empty}}, pages=2]{build/III_lca.pdf}
+%   \includepdf[pagecommand={\thispagestyle{plain}}, pages=3-]{build/III_lca.pdf} 
+%\fi
 
 
 % \includearticle[]{build/2_mvdr.pdf}
@@ -115,8 +157,8 @@
 %   \addcontentsline{toc}{chapter}{List of Figures}
 %   \listoffigures
 % 
-  \newpage
-  \printbibliography
+%  \newpage
+%  \printbibliography
 % 
 % % \else
 % 

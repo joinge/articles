@@ -1,0 +1,135 @@
+\input{variables}\ifMonolithic\else\input{header}\fi \input{0_article_header}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+% % *** CITATION PACKAGES ***
+% %
+% \usepackage{cite}
+% % cite.sty was written by Donald Arseneau
+% % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
+% % \cite{} output to follow that of IEEE. Loading the cite package will
+% % result in citation numbers being automatically sorted and properly
+% % "compressed/ranged". e.g., [1], [9], [2], [7], [5], [6] without using
+% % cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
+% % \cite will automatically add leading space, if needed. Use cite.sty's
+% % noadjust option (cite.sty V3.8 and later) if you want to turn this off.
+% % cite.sty is already installed on most LaTeX systems. Be sure and use
+% % version 4.0 (2003-05-27) and later if using hyperref.sty. cite.sty does
+% % not currently provide for hyperlinked citations.
+% % The latest version can be obtained at:
+% % http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
+% % The documentation is contained in the cite.sty file itself.
+% %
+% % 
+% % IEEEtran.cls handling of captions and this will result in nonIEEE style
+% % figure/table captions. To prevent this problem, be sure and preload
+% % caption.sty with its "caption=false" package option. This is will preserve
+% % IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later 
+% % (recommended due to many improvements over 1.2) of subfig.sty supports
+% % the caption=false option directly:
+\usepackage[caption=false,font=footnotesize]{subfig}
+% %
+% % The latest version and documentation can be obtained at:
+% % http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
+% % The latest version and documentation of caption.sty can be obtained at:
+% % http://www.ctan.org/tex-archive/macros/latex/contrib/caption/
+% 
+% 
+% % *** PDF, URL AND HYPERLINK PACKAGES ***
+% %
+% \usepackage{url}
+% % url.sty was written by Donald Arseneau. It provides better support for
+% % handling and breaking URLs. url.sty is already installed on most LaTeX
+% % systems. The latest version can be obtained at:
+% % http://www.ctan.org/tex-archive/macros/latex/contrib/misc/
+% % Read the url.sty source comments for usage information. Basically,
+% % \url{my_url_here}.
+% 
+% 
+% 
+% % correct bad hyphenation here
+% \hyphenation{op-tical net-works semi-conduc-tor}
+% 
+% %%% My packages
+% \usepackage{amsmath,epsfig}
+% \usepackage{amsfonts}
+% \usepackage{color}
+
+%\let\Fig\undefined
+\typeout{====Start of macro parse====}
+\input{../HRUIonGPU/macros}
+\typeout{====done====}
+
+
+% \typeout{====ifMonolithic====}
+\ifMonolithic\else
+   \addbibresource{../HRUIonGPU/mybib.bib}
+\fi
+
+\typeout{====Start document parse====}
+
+% \usepackage{parskip}
+
+
+\graphicspath{{../HRUIonGPU/}}
+\ifMonolithic\else\input{subheader}\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 
+\overfullrule=1mm
+\cleardoublepage
+\pagestyle{empty}
+
+{
+\setlength\parskip{\baselineskip}
+\renewcommand\baselinestretch{1.1}
+
+
+\chapter{Paper II}\label{ch:paperII}
+
+
+{\Large\bf Implementing Capon Beamformer on a GPU for\\ Real-Time Cardiac Ultrasound Imaging}
+
+J.P. Åsen, J.I. Buskenes, C.-I.C. Nilsen, A. Austeng and S. Holm
+
+IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control\\
+Volume 61, Issue 1, January 2015%\\
+% \vfill
+}
+
+
+\cleardoublepage
+\pagestyle{normal}
+\thispagestyle{plain}
+\fancyhead[LE]{\bf Paper II}
+\fancyhead[RO]{\bf\flushright Implementing Capon Beamformer on a GPU for\\ Real-Time Cardiac Ultrasound Imaging}
+
+\begin{center}
+{\Large\bf Implementing Capon Beamformer on a GPU for Real-Time Cardiac Ultrasound Imaging}
+
+\vspace{\baselineskip}
+J.P. Åsen, J.I. Buskenes, C.-I.C. Nilsen, A. Austeng and S. Holm
+J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
+\end{center}
+
+
+% \graphicspath{{../HowtoHowtoCapon/submission/final/}}
+{
+
+% \newgeometry{headheight=50pt}
+%    \vbadness=99999 % Mute underfull vboxes, these are already reviewed
+   \input{../HRUIonGPU/document}
+% \restoregeometry
+}
+   
+% \else
+%    Hello \newpage
+% 
+%    \pagestyle{fancy}
+% 
+%    \cleardoublepage
+%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=-]{build/2_mvdr.pdf}
+% \fi
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\ifMonolithic\else\input{subfooter}\fi

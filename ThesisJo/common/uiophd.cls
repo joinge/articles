@@ -43,14 +43,19 @@
    \setmainfont[Mapping=tex-text]{EB Garamond}
 %      \setmainfont[Mapping=tex-text,Numbers={OldStyle},Ligatures{Common},Contextuals=Alternate]{EB Garamond}
 \else
-	\IfFileExists{t1zgmj.fd}
-	{
-% 	\usepackage{ebgaramond}
-	   \RequirePackage[full]{textcomp}
-		\RequirePackage[garamond,expert]{mathdesign}
-		\RequirePackage[swashQ]{garamondx}
-   }
-	{\renewcommand{\rmdefault}{ptm}}
+%     \newif\iftrue\truetrue
+%     \iftrue
+%     
+%     \else
+% 	\IfFileExists{t1zgmj.fd}
+% 	{
+% % 	\usepackage{ebgaramond}
+ 	   \RequirePackage[full]{textcomp}
+ 		\RequirePackage[garamond,expert]{mathdesign}
+ 		\RequirePackage[swashQ]{garamondx}
+%    }
+% 	{\renewcommand{\rmdefault}{ptm}}
+%    \fi
 % 	\IfFileExists{berasans.sty}
 % 	{\RequirePackage[scaled]{berasans}}
 % 	{\renewcommand{\sfdefault}{phv}}

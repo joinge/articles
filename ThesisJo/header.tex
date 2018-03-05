@@ -1,19 +1,24 @@
-
+%%&header
+\input{variables}
 % \documentclass[
 % bibtex,
 % xelatex]{common/uiophd}
- 
+
 \documentclass[
-   uiophd
- , 12pt
- , english
- , floatrow
+uiophd
+, 12pt
+, english
+, floatrow
 %  , xelatex
- , glossary                                     % Use a glossary
- , biblatex                                 % Use a bibliography
+, glossary                                     % Use a glossary
+, biblatex                                 % Use a bibliography
 %  , draft
 %  , layout
 ]{common/mytemplate}
+ 
+
+%\typeout{++++standalone++++}
+%\usepackage[subpreambles=true]{standalone}
 
 % \typeout{++++import++++}
 % \usepackage{import}
@@ -30,6 +35,9 @@
 }
 % Fonts:
 % https://tex.stackexchange.com/questions/19898/getting-urw-garamond-and-the-license
+
+\providecommand*\paper[1]{}
+\renewcommand*\paper[1]{{\bf{}Paper #1}}
 
 \providecommand\1{}
 \renewcommand*\1{\vec 1}
@@ -78,6 +86,8 @@
 \providecommand\sumb{}
 \renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
 
+% \typeout{++++mylatexformat++++}
+% \usepackage{mylatexformat}
 \typeout{++++floatrow++++}
 \usepackage{floatrow}
 %\usepackage{bibtex}
@@ -93,6 +103,9 @@
 \usepackage{afterpage}
 % \typeout{++++placeins++++}
 % \usepackage{afterpage}
+\typeout{++++subfiles++++}
+\usepackage{subfiles}
+
 \typeout{--------------}
 
 
@@ -139,4 +152,11 @@
 {}%before
 []%after
 \titlespacing*{\subsection}{0pt}{*0}{*0}
+
+\addbibresource{references.bib}
+\ifMonolithic
+\addbibresource{../HowtoHowtoCapon/library.bib}
+\fi
+
+
 
