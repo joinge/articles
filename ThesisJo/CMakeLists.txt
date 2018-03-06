@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 2.8)
 # set(BUILD_ARGS -outdir=${CMAKE_CURRENT_BINARY_DIR} -pdf [=[-pdflatex=pdflatex -synctex=1 -interaction=nonstopmode]=])
 
 set(BUILD_COMMAND pdflatex)
+# set(BUILD_COMMAND xelatex)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=nonstopmode)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=batchmode)
 set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1)
@@ -105,6 +106,7 @@ add_custom_command(
            "${CMAKE_COMMAND}" -E echo " Precompiling header..." &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
            cd ${CMAKE_SOURCE_DIR} &&
+#            xelatex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&xelatex\\" mylatexformat.ltx header.tex &&
            pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
            "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/header.fmt ${CMAKE_SOURCE_DIR}/header.fmt &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
@@ -161,8 +163,9 @@ function(compile file) # optional: deps
              ("${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
               "${CMAKE_COMMAND}" -E echo " Biber..." &&
               cd ${CMAKE_SOURCE_DIR} &&
-              biber --output-directory=${CMAKE_BINARY_DIR} ${file} &&
-              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.bcf ${CMAKE_BINARY_DIR}/${file}.old.bcf &&
+             (biber --output-directory=${CMAKE_BINARY_DIR} ${file} &&
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.bcf ${CMAKE_BINARY_DIR}/${file}.old.bcf ||
+              "${CMAKE_COMMAND}" -E touch ${file}.tex ) &&
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
              )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

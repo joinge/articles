@@ -22,6 +22,7 @@
 % \RequirePackage{emptypage}
 \ifxetex\else
    \RequirePackage[T1]{fontenc}
+   \RequirePackage[utf8]{inputenc}
 \fi
 
 \ifxetex

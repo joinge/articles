@@ -419,11 +419,13 @@
    \ifOPTxelatex%
        \RequirePackage{fontspec}%               % Provides font selecting commands
    \else
-      \typeout{++++inputenc++++}
-      \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
       \typeout{++++fontenc+++}
       \RequirePackage[T1]{fontenc}%                 % Set font encoding
-      \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)|
+      \typeout{++++inputenc++++}
+      \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
+      % Loading fontenc first is advisable:           https://tex.stackexchange.com/a/34046
+      \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)
+%      \RequirePackage{newunicodechar}
    \fi
    \typeout{++++xcolor+++}
    \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
@@ -478,8 +480,9 @@
    \fi
    \ifOPTlualatex\else\ifOPTxelatex\else%
    \typeout{-- PdfLaTeX specified, loading inputenc and fontenc}%
-   \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
    \RequirePackage[T1]{fontenc}%                 % Set font encoding
+   \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
+   % Loading fontenc first is advisable:           https://tex.stackexchange.com/a/34046
    \fi\fi
 
 

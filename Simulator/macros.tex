@@ -1,0 +1,483 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%% IEEE ''APPROVED'' PACKAGES %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%
+%\usepackage{cite}
+%
+%\ifCLASSINFOpdf
+%   \usepackage[dvips]{graphicx}                 % Might not work. Use 'latex' instead of 
+%   \ifFlatArchive\else                          % 'pdflatex'
+%      \graphicspath{./gfx/}
+%   \fi
+%\else
+%   \usepackage[dvips]{graphicx}
+%   \ifFlatArchive\else
+%      \graphicspath{./gfx/}
+%   \fi
+%\fi
+%
+%\RequirePackage[table,dvipsnames,svgnames]{xcolor}
+%
+%\usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
+%\interdisplaylinepenalty=2500                   % Allows multiline equations to be broken
+%
+%% \RequirePackage{amssymb}
+%
+%\RequirePackage{array}
+%
+%\ifCLASSOPTIONcompsoc
+%   \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+%\else
+%   \usepackage[caption=false,font=footnotesize]{subfig}
+%\fi
+%
+%% \usepackage{caption}
+%% \usepackage{subcaption}
+%\usepackage{color}
+%\usepackage{calc}
+%\usepackage{fp}
+%
+%% 
+%% \ifCLASSOPTIONcaptionsoff                       % IEEE promoted hack to turn off captions from the 
+%%    \let\MYorigsubfloat\subfloat                 % subfloat package should the captionsoff option
+%%    \renewcommand{\subfloat}[2][\relax]{\MYorigsubfloat[]{#2}} % be specified.
+%% \fi
+%
+%\ifFloatAtEnd
+%\ifCLASSOPTIONcaptionsoff                       % Places float at the end of the document when the
+%  \usepackage[nomarkers]{endfloat}              % captionsoff options is specified to IEEEtrans.cls
+%  \let\MYoriglatexcaption\caption               % (PeerReview mode)
+%  \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
+%\fi
+%\fi
+%
+%% \usepackage{fixltx2e}                           % Fix some twocolumn float problems
+%
+%% \usepackage{stfloats}                          % Allows: \begin{figure*}[!b]
+%                                                % (double column figures on top/bottom)
+%
+%\usepackage{url}                                % Support for handling and breaking URLs
+%
+%% NOTE: PDF hyperlink and bookmark features are not required in IEEE
+%%       papers and their use requires extra complexity and work.
+%% \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
+%% pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,
+%% colorlinks=true,linkcolor={black},citecolor={black},urlcolor={black},
+%% pdftitle={Optimal Window Design for the Low Complexity Adaptive Beamformer in Active Sonar Imaging},
+%% pdfsubject={},
+%% pdfauthor={Jo Inge Buskenes},
+%% pdfkeywords={adaptive beamforming, beamforming, complexity, sonar, active}}%
+%\ifCLASSINFOpdf
+%%    \usepackage[\MYhyperrefoptions,pdftex]{hyperref}
+%   \usepackage[pdftex,
+%    final,                %Keep hyperlink stuff even when in draft mode
+%    breaklinks=true,      %Break links when necessary
+%    linktocpage=true,     %Enable link to page?
+%    linkcolor=black,  %Colour of links to labels within document
+%    citecolor=black,      %Colour of links to the biliography
+%    filecolor=red,        %Colour of links to local files
+%    pagecolor=black,        %Colour of links to other pages withing document
+%    urlcolor=Blue,        %Colour of the links to external URLs
+%    colorlinks=true,      %??
+%    plainpages=false,     %Store roman/arabic numbering differently to avoid
+%    bookmarksnumbered ]{hyperref}
+%% 
+%% \else
+%%    \usepackage[\MYhyperrefoptions,breaklinks=true,dvips]{hyperref}%
+%\fi
+%%    \usepackage{breakurl}                        % Allows 'dvips' driver to break links
+%
+%%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%% ADDITIONAL PACKAGES %       
+%%%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%
+%% \ifPeerReview
+%% \let\OldIncludegraphics{\includegraphics}
+%% \usepackage{letltxmacro}
+%% \LetLtxMacro{\OldIncludegrsaphics}{\includegraphics}
+%% \renewcommand{\includegraphics}[2][]{\OldIncludegraphics[width=\linewidth, #1]{#2}}
+%% \fi
+%
+%% % \makeatletter
+%% % \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+%% % \else\Gin@nat@width\fi}
+%% % \makeatother
+%% % \let\Oldincludegraphics\includegraphics
+%% % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
+%
+%% \usepackage[maxfloats=40]{morefloats}
+
+\newcounter{todoidx}
+% \setcounter{todoidx}
+\ifTODO
+   \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+   \setlength\marginparsep{1pt}
+   \setlength\marginparwidth{35pt}
+   \newlength\marginparwidthsmall
+   \setlength\marginparwidthsmall{\marginparwidth}
+   \addtolength\marginparwidthsmall{-7pt}
+   \newcommand\todo[1]{%
+      \addtocounter{todoidx}{1}%
+      {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
+      \marginpar{%
+         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
+
+   \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
+\else
+%    \usepackage[disable]{./todonotes} 
+   \newcommand\todo[1]{}
+\fi
+%
+%\newenvironment{narrow}[2]{%
+%\begin{list}{}{%
+%\setlength{\topsep}{0pt}%
+%\setlength{\leftmargin}{#1}%
+%\setlength{\rightmargin}{#2}%
+%\setlength{\listparindent}{\parindent}%
+%\setlength{\itemindent}{\parindent}%
+%\setlength{\parsep}{\parskip}}%
+%\item[]}{\end{list}}
+%
+%% \usepackage{float}
+%
+%\ifOnlineColor
+%   \definecolor{tabBlue}{HTML}{AACCFF}
+%\else
+%   \definecolor{tabBlue}{HTML}{CCCCCC}
+%\fi
+%
+%%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%% MACROS %       
+%%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%
+\let\oldincludegraphics\includegraphics
+\renewcommand\includegraphics[2][]{%
+  \immediate\write18{./bin/laFigure #2 #1}%
+  \input{result}}%
+%  
+%% \DeclareMathOperator*{\argmin}{\text{arg}\;\text{min}}
+%
+%\newcommand\Fig[1]{Fig.~\ref{#1}}
+%\newcommand\eq[1]{(\ref{#1})}
+%
+%\newcommand\Grey[1]{{\color{Grey}#1}}
+%\newcommand\Red[1]{{\color{Red}#1}}
+%\newcommand\Blue[1]{{\color{Blue}#1}}
+%\newcommand\DarkBlue[1]{{\color{DarkBlue}#1}}
+%\newcommand\LightBlue[1]{{\color{LightBlue}#1}}
+%\newcommand\Brown[1]{{\color{Brown}#1}}
+%\newcommand\Green[1]{{\color{Green}#1}}
+%\newcommand\SeaGreen[1]{{\color{SeaGreen}#1}}
+%\newcommand\Yellow[1]{{\color{yellow}#1}}
+%\newcommand\Orange[1]{{\color{orange}#1}}
+%
+%\newcommand\nn{\nonumber\\}
+%
+%\newcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+%\newcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+%\newcommand\case[1]{\begin{cases}#1\end{cases}}
+%\newcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+%
+%\newcommand\rand{\text{rand}}
+%\newcommand\randn{\text{randn}}
+%\newcommand\rect{\text{rect}}
+%\newcommand\sinc{\text{sinc}}
+%\newcommand\tr{\text{tr}}
+%\newcommand\adj{\text{adj}}
+%
+%% \newcommand\max{\text{max}}
+%\newcommand\argmin[1]{\text{arg}\;\underset{#1}{\text{min}}}
+%
+%\newcommand\qqquad{\quad\qquad}
+%\newcommand\qqqquad{\qquad\qquad}
+%
+%% \renewcommand\l[1]{\left#1}
+%% \renewcommand\r[1]{\right#1}
+%
+%% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+%
+%%Keyword colouring:
+%\newcommand\kw[1]{#1}
+%\newcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+%
+%\newcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+%\newcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+%\newcommand\var[3]{#1_\text{#2}\of{#3}}
+%
+%\newcommand\diag{\text{diag}}
+%
+%% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+%\newcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+%\newcommand\mathnorm{\textstyle}
+%\newcommand\mathbig[1]{\displaystyle#1\mathnorm}
+%\newcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+%\newcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+%\newcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+%\newcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+%
+%\newcommand\sumu[1]{\sum\limits^{#1}\;}
+%\newcommand\suml[1]{\sum\limits_{#1}\;}
+%\newcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
+%
+%\newcommand\produ[1]{\prod\limits^{#1}\;}
+%\newcommand\prodl[1]{\prod\limits_{#1}\;}
+%\newcommand\prodb[2]{\prod\limits_{#1}^{#2}\;}
+%
+%\newcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
+%
+%%Math macros:
+%\newcommand\T{^{\scriptscriptstyle T}}
+%\renewcommand\H{^{\scriptscriptstyle H}}
+%
+%\renewcommand\vec[1]{\boldsymbol{#1}}
+%\newcommand\mat[1]{\boldsymbol{#1}}
+%
+%\newcommand\Om{O_\text{m}}
+%\newcommand\Oa{O_\text{a}}
+%\newcommand\Nl{N_\text{l}}
+%\newcommand\Nk{N_\text{k}}
+%\newcommand\1{\vec 1}
+%\newcommand\I{\mat I}
+%\renewcommand*\a{\vec a}
+%\newcommand*\f{\vec f}
+%\renewcommand*\i{\vec i}
+%\renewcommand*\k{\vec k}
+%\newcommand*\n{\vec n}
+%\newcommand*\p{\vec p}
+%\newcommand*\s{\vec s}
+%\newcommand*\w{\vec w}
+%\newcommand*\x{\vec x}
+%\newcommand*\y{\vec y}
+%
+%\newcommand*\A{\mat A}
+%\newcommand*\B{\mat B}
+%% \newcommand*\C{\mat C}
+%\newcommand*\E{\mat E}
+%\renewcommand*\P{\mat P}
+%\newcommand*\eP{\mat{\hat P}}
+%\newcommand*\R{\mat R}
+%\newcommand*\Ri{\R^{-1}}
+%\newcommand*\eR{\mat{\hat R}}
+%\newcommand*\eRi{\hat{\mat R}\;\!^{-1}}
+%\newcommand*\Navg{N_\text{avg}}
+%\newcommand*\W{\mat W}
+%\newcommand*\X{\mat X}
+%\newcommand*\Xd{\X_{\!\Delta}}
+%\newcommand*\Y{\mat Y}
+%
+%\renewcommand\argmin{\text{argmin}}
+%
+%
+
+%
+%\renewcommand*\L{\mat \Lambda}
+%% \newcommand*\U{\mat U}
+%% \renewcommand*\t{\mathtiny{^T}}
+%% \newcommand*\h{\mathtiny{^H}}
+%\renewcommand*\t{^T}
+%\newcommand*\h{^H}
+\typeout{====Start of macro file====}
+
+\providecommand\Fig{}
+\renewcommand\Fig[1]{Fig.~\ref{#1}}
+\providecommand\eq{}
+\renewcommand\eq[1]{(\ref{#1})}
+
+\providecommand\Grey[1]{{\color{Grey}#1}}
+\providecommand\Red[1]{{\color{Red}#1}}
+\providecommand\Blue[1]{{\color{Blue}#1}}
+\providecommand\DarkBlue[1]{{\color{DarkBlue}#1}}
+\providecommand\LightBlue[1]{{\color{LightBlue}#1}}
+\providecommand\Brown[1]{{\color{Brown}#1}}
+\providecommand\Green[1]{{\color{Green}#1}}
+\providecommand\SeaGreen[1]{{\color{SeaGreen}#1}}
+\providecommand\Yellow[1]{{\color{yellow}#1}}
+\providecommand\Orange[1]{{\color{orange}#1}}
+
+\providecommand*\nn{}
+\renewcommand*\nn{\nonumber\\}
+
+\providecommand\nmat{}
+\renewcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
+\providecommand\bmat{}
+\renewcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+\providecommand\case{}
+\renewcommand\case[1]{\begin{cases}#1\end{cases}}
+\providecommand\textbox{}
+\renewcommand\textbox[2]{\footnotesize\text{\parbox{#1}{\centering\emph{#2}}}}
+
+\providecommand\rand{}
+\renewcommand\rand{\text{rand}}
+\providecommand\randn{}
+\renewcommand\randn{\text{randn}}
+\providecommand\rect{}
+\renewcommand\rect{\text{rect}}
+\providecommand\sinc{}
+\renewcommand\sinc{\text{sinc}}
+\providecommand\tr{}
+\renewcommand\tr{\text{tr}}
+\providecommand\adj{}
+\renewcommand\adj{\text{adj}}
+
+% \renewcommand\max{\text{max}}
+\providecommand\argmin{}
+\renewcommand\argmin[1]{\text{arg}\;\underset{#1}{\text{min}}}
+
+\providecommand\qqquad{}
+\renewcommand\qqquad{\quad\qquad}
+\providecommand\qqqquad{}
+\renewcommand\qqqquad{\qquad\qquad}
+
+% renewcommand\l[1]{\left#1}
+% renewcommand\r[1]{\right#1}
+
+% {\text{\parbox{1.5cm}{\centering volume hyper- sphere}}}
+
+%Keyword colouring:
+\providecommand\kw{}
+\renewcommand\kw[1]{#1}
+\providecommand\parm{}
+\renewcommand\parm[1]{#1}%\color{Black}#1\color{Black}}
+
+\providecommand\of{}
+\renewcommand\of[1]{\scriptstyle(\parm{#1})\displaystyle}
+\providecommand\df{}
+\renewcommand\df[1]{\scriptstyle[\parm{#1}]\displaystyle}
+\providecommand\var{}
+\renewcommand\var[3]{#1_\text{#2}\of{#3}}
+
+\providecommand\diag{}
+\renewcommand\diag{\text{diag}}
+
+% \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+\providecommand\mt{}
+\renewcommand\mt[1]{\text{\emph{#1}}} %mt = mathtext
+\providecommand\mathnorm{}
+\renewcommand\mathnorm{\textstyle}
+\providecommand\mathbig{}
+\renewcommand\mathbig[1]{\displaystyle#1\mathnorm}
+\providecommand\mathsmall{}
+\renewcommand\mathsmall[1]{\scriptstyle#1\mathnorm}
+\providecommand\mathtiny{}
+\renewcommand\mathtiny[1]{\scriptscriptstyle#1\mathnorm}
+\providecommand\sfrac{}
+\renewcommand\sfrac[2]{\scriptstyle\raisebox{0.25pt}[0pt][0pt]{$\frac{#1}{#2}$}\mathnorm}
+\providecommand\nfrac{}
+\renewcommand\nfrac[2]{\textstyle\frac{#1}{#2}\displaystyle}
+
+\providecommand\sumu{}
+\renewcommand\sumu[1]{\sum\limits^{#1}\;}
+\providecommand\suml{}
+\renewcommand\suml[1]{\sum\limits_{#1}\;}
+\providecommand\sumb{}
+\renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
+
+\providecommand\produ{}
+\renewcommand\produ[1]{\prod\limits^{#1}\;}
+\providecommand\prodl{}
+\renewcommand\prodl[1]{\prod\limits_{#1}\;}
+\providecommand\prodb{}
+\renewcommand\prodb[2]{\prod\limits_{#1}^{#2}\;}
+
+\providecommand\defeq{}
+\renewcommand\defeq{\overset{\underset{\mathrm{def}}{}}{=}}
+
+%Math macros:
+\providecommand*\T{}
+\renewcommand*\T{^{\scriptscriptstyle T}}
+\providecommand\H{}
+\renewcommand\H{^{\scriptscriptstyle H}}
+
+\providecommand\vec{}
+\renewcommand\vec[1]{\boldsymbol{#1}}
+\providecommand\mat{}
+\renewcommand\mat[1]{\boldsymbol{#1}}
+
+\providecommand\Om{}
+\renewcommand\Om{O_\text{m}}
+\providecommand\Oa{}
+\renewcommand\Oa{O_\text{a}}
+\providecommand\Nl{}
+\renewcommand\Nl{N_\text{l}}
+\providecommand\Nk{}
+\renewcommand\Nk{N_\text{k}}
+\providecommand\1{}
+\renewcommand\1{\vec 1}
+\providecommand\I{}
+\renewcommand\I{\mat I}
+\providecommand\a{}
+\renewcommand*\a{\vec a}
+\providecommand\f{}
+\renewcommand*\f{\vec f}
+\providecommand\i{}
+\renewcommand*\i{\vec i}
+\providecommand\k{}
+\renewcommand*\k{\vec k}
+\providecommand\n{}
+\renewcommand*\n{\vec n}
+\providecommand\p{}
+\renewcommand*\p{\vec p}
+\providecommand\s{}
+\renewcommand*\s{\vec s}
+\providecommand\w{}
+\renewcommand*\w{\vec w}
+\providecommand\x{}
+\renewcommand*\x{\vec x}
+\providecommand\y{}
+\renewcommand*\y{\vec y}
+
+\providecommand\A{}
+\renewcommand*\A{\mat A}
+%\renewcommand*\B{\mat B}
+%\renewcommand*\C{\mat C}
+\providecommand\E{}
+\renewcommand*\E{\mat E}
+\providecommand\P{}
+\renewcommand*\P{\mat P}
+\providecommand\eP{}
+\renewcommand*\eP{\mat{\hat P}}
+\providecommand\R{}
+\renewcommand*\R{\mat R}
+\providecommand\Ri{}
+\renewcommand*\Ri{\R^{-1}}
+\providecommand\eR{}
+\renewcommand*\eR{\mat{\hat R}}
+\providecommand\eRi{}
+\renewcommand*\eRi{\hat{\mat R}\;\!^{-1}}
+\providecommand*\M{}
+\renewcommand*\M{\mat M}
+\providecommand\Navg{}
+\renewcommand*\Navg{N_\text{avg}}
+\providecommand\W{}
+\renewcommand*\W{\mat W}
+\providecommand\X{}
+\renewcommand*\X{\mat X}
+\providecommand\Xd{}
+\renewcommand*\Xd{\X_{\!\Delta}}
+\providecommand\Y{}
+\renewcommand*\Y{\mat Y}
+
+\providecommand*\V{}
+\renewcommand*\V{\mat V}
+
+%\providecommand\L{}
+%\renewcommand*\L{\mat \Lambda}
+%\renewcommand*\U{\mat U}
+% renewcommand*\t{\mathtiny{^T}}
+% \renewcommand*\h{\mathtiny{^H}}
+\providecommand\t{}
+\renewcommand*\t{^T}
+\providecommand\h{}
+\renewcommand*\h{^H}
+
+\providecommand\minus{}
+\renewcommand\minus{\scalebox{0.75}[1.0]{$-$}}
+
+%\ifPeerReview
+%\graphicspath{./submission/submit1}
+%\fi
+
+
+

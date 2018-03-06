@@ -1,5 +1,5 @@
 %&header
-% !TeX root = III_lca
+% !TeX root = IIII_simulator
 \input{subheader}
 \endofdump
 
@@ -10,7 +10,7 @@
   \input{glossary}
   \makeglossaries
   
-  \addbibresource{../LCAforActiveSonarImaging/references.bib}
+  \addbibresource{../Simulator/references.bib}
 \fi
 
 \newif\ifBuildBibliography\BuildBibliographyfalse
@@ -19,16 +19,18 @@
 
 %\let\Fig\undefined
 \typeout{====Start of macro parse====}
-\input{../LCAforActiveSonarImaging/macros}
-\typeout{====done====}
+\input{../Simulator/macros}
 
+\renewcommand\includegraphics[2][]{%
+  \immediate\write18{../Simulator/bin/laFigure #2 #1}%
+  \input{result}}%
 
 \typeout{====Start document parse====}
 
 % \usepackage{parskip}
 
 
-\graphicspath{{../LCAforActiveSonarImaging/submission/final/}}
+\graphicspath{{../Simulator/}}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{document}
 % 
@@ -39,14 +41,14 @@
 \setlength\parskip{\baselineskip}
 \renewcommand\baselinestretch{1.1}
 
-\chapter{Paper III}\label{ch:paperIII}
+\chapter{Paper IV}\label{ch:paperIV}
 
 {\Large\bf Low Complexity Adaptive Beamforming}
 
 J.I. Buskenes, R.E. Hansen and A. Austeng
 
 IEEE Journal of Oceanic Engineering\\
-Volume 42, Issue 1, January 2017%\\
+Submitted DD.MM.2017%\\
 % \vfill
 }
 
@@ -70,7 +72,7 @@ J.I. Buskenes, R.E. Hansen and A. Austeng
 
 % \newgeometry{headheight=50pt}
 %    \vboxbadness=99999 % Mute underfull vboxes, these are already reviewed
-   \input{../LCAforActiveSonarImaging/document}
+   \input{../Simulator/document}
 % \restoregeometry
 }
    
