@@ -22,9 +22,9 @@ set(TOP_FILE thesis)
 set(SUBFILES
 #    preface
 #    abstract
-#    1_introduction
+   1_introduction
    2_publications
-#    3_discussion
+   3_discussion
 #    literature_review
 #    background
 #    derivations
@@ -85,9 +85,9 @@ configure_file(${CMAKE_SOURCE_DIR}/subheader.in.tex
 
 
 add_custom_target(Clean ALL
-   COMMAND rm thesis.log || true
+#    COMMAND rm thesis.log || true
 #    COMMAND rm header.fmt || true
-#    COMMAND echo "2" > ${CMAKE_BINARY_DIR}/cnt.txt
+   COMMAND echo "2" > ${CMAKE_BINARY_DIR}/cnt.txt
 #    COMMAND echo "" > ${CMAKE_BINARY_DIR}/all.glo
 #    COMMAND echo "" > ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log
    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -101,9 +101,7 @@ add_custom_target(Clean ALL
 
 add_custom_command(
    OUTPUT header.fmt
-   COMMAND "${CMAKE_COMMAND}" -E echo "" &&
-           "${CMAKE_COMMAND}" -E echo "" &&
-           "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+   COMMAND "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
            "${CMAKE_COMMAND}" -E echo " Precompiling header..." &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
            cd ${CMAKE_SOURCE_DIR} &&
@@ -111,8 +109,12 @@ add_custom_command(
            "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/header.fmt ${CMAKE_SOURCE_DIR}/header.fmt &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-   DEPENDS ${CMAKE_SOURCE_DIR}/header.tex Clean
+   DEPENDS ${CMAKE_SOURCE_DIR}/header.tex ${CMAKE_SOURCE_DIR}/variables.tex 
 )
+add_custom_target(Header
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+   DEPENDS header.fmt Clean
+   )
 
 # pdftex --output-directory=build -ini -jobname="thesis" "&pdflatex" mylatexformat.ltx thesis; cp build/thesis.fmt ./; touch 2_publications.tex thesis.tex
    
@@ -132,10 +134,8 @@ function(compile file) # optional: deps
 #     )
    add_custom_command(
       OUTPUT  ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
-      COMMAND "${CMAKE_COMMAND}" -E echo "" &&
-              "${CMAKE_COMMAND}" -E echo "" &&
-              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              "${CMAKE_COMMAND}" -E echo " Building ${file}.pdf..." &&
+      COMMAND "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " 1st build ${file}.pdf..." &&
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
               cd ${CMAKE_SOURCE_DIR} &&
               ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
@@ -144,10 +144,11 @@ function(compile file) # optional: deps
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~" #&&
 #               "${CMAKE_COMMAND}" -E touch "${file}.stamp1"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${ARGN} header.fmt
+      DEPENDS ${ARGN}
       )
    add_custom_target("${file}_pdflatex1"
-      DEPENDS ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS ${file}.aux ${file}.bcf ${file}.glo ${file}.ist Header
       )
 #    set_source_files_properties(${file}.aux
 #                                ${file}.bcf
@@ -165,11 +166,13 @@ function(compile file) # optional: deps
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
              )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS "${file}_pdflatex1" ${file}.bcf
+      DEPENDS "${file}_pdflatex1" #${file}.bcf #"${file}_pdflatex1" 
       )
    add_custom_target("${file}_biber"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       DEPENDS ${file}.bbl
       )
+   add_dependencies("${file}_biber" "${file}_pdflatex1")
       
    add_custom_command(
       OUTPUT ${file}.gls
@@ -181,12 +184,14 @@ function(compile file) # optional: deps
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
              )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS "${file}_pdflatex1" ${file}.glo ${file}.ist
+      DEPENDS "${file}_pdflatex1" #${file}.glo #"${file}_pdflatex1"
       )
    add_custom_target("${file}_makeindex"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       DEPENDS ${file}.gls
       )
-#    set_source_files_properties(
+   add_dependencies("${file}_makeindex" "${file}_pdflatex1")
+      #    set_source_files_properties(
 # #               ${file}.aux
 #               ${file}.bbl # biber references
 # #               ${file}.bcf # pdflatex bibliography references
@@ -195,23 +200,23 @@ function(compile file) # optional: deps
 #               PROPERTIES GENERATED true)
    add_custom_command(
       OUTPUT ${file}.pdf
-      COMMAND "${CMAKE_COMMAND}" -E echo "" &&
-              "${CMAKE_COMMAND}" -E echo "" &&
-              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              "${CMAKE_COMMAND}" -E echo " Building ${file}.pdf..." &&
+      COMMAND "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " 2nd build ${file}.pdf..." &&
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
               cd ${CMAKE_SOURCE_DIR} &&
+              ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex &&
               ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
               "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
               "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz &&
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS "${file}_biber" ${file}.bbl "${file}_makeindex" ${file}.gls
+      DEPENDS ${file}.bbl ${file}.gls
       )
-   add_custom_target(${file}
+   add_custom_target("${file}"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       DEPENDS ${file}.pdf
       )
+   add_dependencies("${file}" "${file}_biber" "${file}_makeindex")
 #    set_source_files_properties(
 #               ${file}.aux
 #               ${file}.bbl # biber references
@@ -321,10 +326,10 @@ foreach(file ${SUBFILES})
 #       file(APPEND all.log ${TXT})
 endforeach()
 
-# compile(I_mvdr I_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ${SUBFILE_DEPS})
+compile(I_mvdr I_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ${SUBFILE_DEPS})
 # make_log(I_mvdr)
 # 
-# compile(II_mvdr_ultrasound II_mvdr_ultrasound.tex 0_article_header.tex ../HRUIonGPU/document.tex ../HRUIonGPU/macros.tex ${SUBFILE_DEPS})
+compile(II_mvdr_ultrasound II_mvdr_ultrasound.tex 0_article_header.tex ../HRUIonGPU/document.tex ../HRUIonGPU/macros.tex ${SUBFILE_DEPS})
 # make_log(II_mvdr_ultrasound)
 # 
 # compile(III_lca III_lca.tex 0_article_header.tex ../LC AforActiveSonarImaging/document.tex ../LCAforActiveSonarImaging/macros.tex ${SUBFILE_DEPS})

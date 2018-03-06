@@ -1,5 +1,20 @@
-\input{variables}\ifMonolithic\else\input{header}\fi \input{0_article_header}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%&header
+% !TeX root = I_mvdr_ultrasound
+\input{subheader}
+\endofdump
+
+\input{0_article_header}
+
+% These commands are already included in thesis.tex
+\ifRootBuild\else
+  \input{glossary}
+  \makeglossaries
+  \addbibresource{../HRUIonGPU/mybib.bib}
+\fi
+
+%
+%\input{variables}\ifMonolithic\else\input{header}\fi \input{0_article_header}
+%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 % % *** CITATION PACKAGES ***
@@ -27,7 +42,7 @@
 % % IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later 
 % % (recommended due to many improvements over 1.2) of subfig.sty supports
 % % the caption=false option directly:
-\usepackage[caption=false,font=footnotesize]{subfig}
+%\usepackage[caption=false,font=footnotesize]{subfig}
 % %
 % % The latest version and documentation can be obtained at:
 % % http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
@@ -58,23 +73,13 @@
 %\let\Fig\undefined
 \typeout{====Start of macro parse====}
 \input{../HRUIonGPU/macros}
-\typeout{====done====}
-
-
-% \typeout{====ifMonolithic====}
-\ifMonolithic\else
-   \addbibresource{../HRUIonGPU/mybib.bib}
-\fi
 
 \typeout{====Start document parse====}
 
-% \usepackage{parskip}
-
-
 \graphicspath{{../HRUIonGPU/}}
-\ifMonolithic\else\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 
+\begin{document}
+
 \overfullrule=1mm
 \cleardoublepage
 \pagestyle{empty}
@@ -131,5 +136,4 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 % \fi
 
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\ifMonolithic\else\input{subfooter}\fi
+\end{document}

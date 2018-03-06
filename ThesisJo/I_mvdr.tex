@@ -1,27 +1,28 @@
-\input{variables}\ifMonolithic\else\input{header}\fi
-\input{0_article_header}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%&header
+% !TeX root = I_mvdr
+\input{subheader}
+\endofdump
 
-%\let\Fig\undefined
+\input{0_article_header}
+
+% These commands are already included in thesis.tex
+\ifRootBuild\else
+  \input{glossary}
+  \makeglossaries
+  
+  \addbibresource{../HowtoHowtoCapon/library.bib}
+\fi
+
+
 \typeout{====Start of macro parse====}
 \input{../HowtoHowtoCapon/macros}
-\typeout{====done====}
-
-
-% \typeout{====ifMonolithic====}
-\ifMonolithic\else
-   \addbibresource{../HowtoHowtoCapon/library.bib}
-\fi
 
 \typeout{====Start document parse====}
 
-% \usepackage{parskip}
-
-
 \graphicspath{{../HowtoHowtoCapon/submission/final/}}
-\ifMonolithic\else\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 
+\begin{document}
+
 \cleardoublepage
 \pagestyle{empty}
 
@@ -74,5 +75,4 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 % \fi
 
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\ifMonolithic\else\input{subfooter}\fi
+\end{document}

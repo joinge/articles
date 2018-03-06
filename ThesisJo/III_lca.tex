@@ -1,10 +1,21 @@
-\input{variables}\ifMonolithic\else\input{header}\fi
+%&header
+% !TeX root = I_mvdr
+\input{subheader}
+\endofdump
+
 \input{0_article_header}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% These commands are already included in thesis.tex
+\ifRootBuild\else
+  \input{glossary}
+  \makeglossaries
+  
+  \addbibresource{../LCAforActiveSonarImaging/references.bib}
+\fi
 
 \newif\ifBuildBibliography\BuildBibliographyfalse
 % \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\usepackage{subfig}
+%\usepackage{subfig}
 
 %\let\Fig\undefined
 \typeout{====Start of macro parse====}
@@ -12,19 +23,14 @@
 \typeout{====done====}
 
 
-% \typeout{====ifMonolithic====}
-\ifMonolithic\else
-   \addbibresource{../LCAforActiveSonarImaging/references.bib}
-\fi
-
 \typeout{====Start document parse====}
 
 % \usepackage{parskip}
 
 
 \graphicspath{{../LCAforActiveSonarImaging/submission/final/}}
-\ifMonolithic\else\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{document}
 % 
 \cleardoublepage
 \pagestyle{empty}
@@ -78,5 +84,4 @@ J.I. Buskenes, R.E. Hansen and A. Austeng
 % \fi
 
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\ifMonolithic\else\input{subfooter}\fi
+\end{document}

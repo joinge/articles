@@ -1,5 +1,14 @@
-\input{variables}\ifMonolithic\else\input{header}\input{subheader}\fi
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%&header
+% !TeX root = frontmatter
+\input{subheader}
+\endofdump
+
+\ifRootBuild\else
+  \input{glossary}
+  \makeglossaries
+\fi
+
+\begin{document}
 
 
 \chapter*{Preface}
@@ -9,6 +18,8 @@ This thesis has been submitted to the Faculty of Mathematics and Natural Science
 \section*{Acknowledgements}
 
 
+\newpage
+\chapter*{Abstract}
 
 \newpage
 \chapter*{List of Publications}
@@ -17,5 +28,4 @@ This thesis has been submitted to the Faculty of Mathematics and Natural Science
 \chapter*{Related Publications}
 
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\ifMonolithic\else\input{subfooter}\fi
+\end{document}

@@ -101,7 +101,10 @@ uiophd
 % \usepackage{afterpage}
 \typeout{++++subfiles++++}
 \usepackage{subfiles}
-
+%\typeout{++++standalone++++}
+%\usepackage{standalone}
+\typeout{++++subfig++++}
+\usepackage[caption=false,font=footnotesize]{subfig}
 \typeout{--------------}
 
 
@@ -153,6 +156,8 @@ uiophd
 \ifMonolithic
 \addbibresource{../HowtoHowtoCapon/library.bib}
 \fi
+
+\renewcommand\include[1]{\subfile{#1}}
 
 \endofdump
 \begin{document}
