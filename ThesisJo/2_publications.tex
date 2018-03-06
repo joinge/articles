@@ -1,21 +1,20 @@
-%&2_publications
+%&header
 % !TeX root = 2_publications
 
-\input{header}
+%\input{header}
 \input{subheader}
 \endofdump
 
+\ifGlossary\else
 \input{glossary}
 \makeglossaries
+\fi
 
 \begin{document}
 %\documentclass[float=false, crop=false]{standalone}
 %\usepackage[subpreambles=true]{standalone}
 %\input{header}
 %\input{subheader}
-
-
-
 
 \chapter{Publications}
  
@@ -30,7 +29,6 @@ The upcoming papers will investigate various ways in which acoustical imaging sy
 Its widespread use and generic implementation makes it the reference. thus will be considered the reference method. , and this will be referred to as a fully adaptive technique. Due to its ability to analytically  to apply the minimum variance criteria in an exact manner, Due to its popularity and We view this as the reference method for We refer to it as fully adaptive since it computes analytically evaluates   yields  This is a fully adaptive method   This method is  on a \gls{GPGPU} for active sonar imaging. This is to prove that using a \gls{MVDR}
 
 Paper II takes the \gls{MVDR} method and applies it to clinical Ultrasound Imaging
-
 
 
 We point out important hardware limitations for these devices, and assess the design in terms of how efficiently it is able to use the GPU's resources. On a quad-core Intel Xeon system with a high-end Nvidia GPU, our GPU implementation renders more than a million pixels per second (1\;MP/s). Compared to our initial central processing unit (CPU) implementation the optimizations described herein led to a speedup of more than two orders of magnitude, or an expected five to ten times improvement had the CPU received similar optimization effort. This throu

@@ -15,6 +15,7 @@ set(BUILD_COMMAND pdflatex)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=batchmode)
 set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1)
 set(DRAFT_ARGS -draftmode ${BUILD_ARGS})
+set(USE_GLOSSARY true)
 
 set(TOP_FILE thesis)
 
@@ -34,7 +35,6 @@ set(SUBFILE_DEPS
    variables.tex
    common/uiophd.cls
    common/mytemplate.cls
-   Clean
    )
    
 # set(SUBFILES_IEEE
@@ -66,27 +66,30 @@ set(SUBFILE_DEPS
 #       )
 # endforeach()
 
-add_custom_command(
-   OUTPUT subheader.tex
-   COMMAND grep 'printglossar' ${file}.tex &&
-                 sed s/'@USE_GLOSSARY@'/'true'/g  ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex ||
-                 sed s/'@USE_GLOSSARY@'/'false'/g ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex
-   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-   DEPENDS ${CMAKE_SOURCE_DIR}/subheader.in.tex Clean
-   )
-add_custom_target (Configure ALL
-   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-   DEPENDS subheader.tex
-   )
-
+configure_file(${CMAKE_SOURCE_DIR}/subheader.in.tex
+               ${CMAKE_BINARY_DIR}/subheader.tex @ONLY)
+               
+# add_custom_command(
+#    OUTPUT subheader.tex
+#    COMMAND grep 'printglossar' ${file}.tex &&
+#                  sed s/'@USE_GLOSSARY@'/'true'/g  ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex ||
+#                  sed s/'@USE_GLOSSARY@'/'false'/g ${CMAKE_SOURCE_DIR}/subheader.in.tex > subheader.tex
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS ${CMAKE_SOURCE_DIR}/subheader.in.tex Clean
+#    )
+# add_custom_target (Configure ALL
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS subheader.tex
+#    )
+# 
 
 
 add_custom_target(Clean ALL
    COMMAND rm thesis.log || true
-   COMMAND rm header.fmt || true
-   COMMAND echo "2" > ${CMAKE_BINARY_DIR}/cnt.txt
-   COMMAND echo "" > ${CMAKE_BINARY_DIR}/all.glo
-   COMMAND echo "" > ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log
+#    COMMAND rm header.fmt || true
+#    COMMAND echo "2" > ${CMAKE_BINARY_DIR}/cnt.txt
+#    COMMAND echo "" > ${CMAKE_BINARY_DIR}/all.glo
+#    COMMAND echo "" > ${CMAKE_SOURCE_DIR}/${TOP_FILE}.log
    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
    )
 
@@ -94,6 +97,24 @@ add_custom_target(Clean ALL
 #             ((grep 'printglossar' ${file}.tex &&
 #                  sed s/'@USE_GLOSSARY@'/'true'/g  subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ||
 #                  sed s/'@USE_GLOSSARY@'/'false'/g subheader.in.tex > ${CMAKE_CURRENT_BINARY_DIR}/subheader.tex ) &&
+
+
+add_custom_command(
+   OUTPUT header.fmt
+   COMMAND "${CMAKE_COMMAND}" -E echo "" &&
+           "${CMAKE_COMMAND}" -E echo "" &&
+           "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+           "${CMAKE_COMMAND}" -E echo " Precompiling header..." &&
+           "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+           cd ${CMAKE_SOURCE_DIR} &&
+           pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
+           "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/header.fmt ${CMAKE_SOURCE_DIR}/header.fmt &&
+           "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+   DEPENDS ${CMAKE_SOURCE_DIR}/header.tex Clean
+)
+
+# pdftex --output-directory=build -ini -jobname="thesis" "&pdflatex" mylatexformat.ltx thesis; cp build/thesis.fmt ./; touch 2_publications.tex thesis.tex
    
 function(compile file) # optional: deps
 #     add_custom_command(
@@ -110,46 +131,60 @@ function(compile file) # optional: deps
 #     DEPENDS ${file}.tex Clean
 #     )
    add_custom_command(
-      OUTPUT ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
-      COMMAND cat cnt.txt &&
-              echo "" && echo "" &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Building ${file}.pdf..." &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
-#               cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex
-              cp ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
-              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz
-      COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+      OUTPUT  ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
+      COMMAND "${CMAKE_COMMAND}" -E echo "" &&
+              "${CMAKE_COMMAND}" -E echo "" &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " Building ${file}.pdf..." &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              cd ${CMAKE_SOURCE_DIR} &&
+              ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~" #&&
+#               "${CMAKE_COMMAND}" -E touch "${file}.stamp1"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${ARGN} Configure #PrecompiledSubHeader
+      DEPENDS ${ARGN} header.fmt
       )
+   add_custom_target("${file}_pdflatex1"
+      DEPENDS ${file}.aux ${file}.bcf ${file}.glo ${file}.ist
+      )
+#    set_source_files_properties(${file}.aux
+#                                ${file}.bcf
+#                                ${file}.glo
+#                                ${file}.ist
+#                                PROPERTIES GENERATED TRUE)
    add_custom_command(
       OUTPUT ${file}.bbl
-      COMMAND touch ${file}.old.bcf &&
-              diff ${file}.bcf ${file}.old.bcf >/dev/null ||
-             (echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Biber..." &&
+      COMMAND "${CMAKE_COMMAND}" -E compare_files "${file}.bcf" "${file}.old.bcf" ||
+             ("${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " Biber..." &&
               cd ${CMAKE_SOURCE_DIR} &&
               biber --output-directory=${CMAKE_BINARY_DIR} ${file} &&
-              cp ${CMAKE_BINARY_DIR}/${file}.bcf ${CMAKE_BINARY_DIR}/${file}.old.bcf &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~"
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.bcf ${CMAKE_BINARY_DIR}/${file}.old.bcf &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
              )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${file}.bcf
+      DEPENDS "${file}_pdflatex1" ${file}.bcf
       )
+   add_custom_target("${file}_biber"
+      DEPENDS ${file}.bbl
+      )
+      
    add_custom_command(
       OUTPUT ${file}.gls
-      COMMAND touch ${file}.old.glo &&
-              diff ${file}.glo ${file}.old.glo >/dev/null ||
-             (echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Makeindex..." &&
+      COMMAND "${CMAKE_COMMAND}" -E compare_files ${file}.glo ${file}.old.glo ||
+             ("${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " Makeindex..." &&
               makeindex -s ${file}.ist -o ${file}.gls ${file}.glo &&
-              cp ${CMAKE_BINARY_DIR}/${file}.glo ${CMAKE_BINARY_DIR}/${file}.old.glo &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~"
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.glo ${CMAKE_BINARY_DIR}/${file}.old.glo &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
              )
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${file}.glo ${file}.ist
+      DEPENDS "${file}_pdflatex1" ${file}.glo ${file}.ist
+      )
+   add_custom_target("${file}_makeindex"
+      DEPENDS ${file}.gls
       )
 #    set_source_files_properties(
 # #               ${file}.aux
@@ -160,18 +195,18 @@ function(compile file) # optional: deps
 #               PROPERTIES GENERATED true)
    add_custom_command(
       OUTPUT ${file}.pdf
-      COMMAND cat cnt.txt &&
-              echo "" && echo "" &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              echo " Building ${file}.pdf..." &&
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
-              cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
-#               cd ${CMAKE_SOURCE_DIR} && ${BUILD_COMMAND} ${DRAFT_ARGS} ${file}.tex
-              cp ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
-              cp ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz
-      COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
+      COMMAND "${CMAKE_COMMAND}" -E echo "" &&
+              "${CMAKE_COMMAND}" -E echo "" &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              "${CMAKE_COMMAND}" -E echo " Building ${file}.pdf..." &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
+              cd ${CMAKE_SOURCE_DIR} &&
+              ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
+              "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz &&
+              "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      DEPENDS ${file}.bbl ${file}.gls
+      DEPENDS "${file}_biber" ${file}.bbl "${file}_makeindex" ${file}.gls
       )
    add_custom_target(${file}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -362,7 +397,7 @@ endforeach()
 
 # message(${SUBFILES_PDF})
 
-compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean)
+compile(${TOP_FILE} ${TOP_FILE}.tex ${SUBFILE_DEPS})
 
 # add_custom_command(
 #    OUTPUT ${TOP_FILE}.pdf
@@ -389,7 +424,7 @@ compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls c
 #    COMMAND echo "~~~~~~~~~~~~~~~~~~~~~~~"
 #    COMMAND cp build/${TOP_FILE}.pdf ${TOP_FILE}.pdf
 # #    COMMAND ${BUILD_COMMAND} ${BUILD_ARGS} ${TOP_FILE}.tex
-# #    COMMAND ${CMAKE_COMMAND} -E create_symlink build/${TOP_FILE}.log ${TOP_FILE}.log
+# #    COMMAND "${CMAKE_COMMAND}" -E create_symlink build/${TOP_FILE}.log ${TOP_FILE}.log
 #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 #    DEPENDS Glossary ${SUBFILES_PDF}  ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls common/mytemplate.cls Clean
 #    )
@@ -401,7 +436,7 @@ compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls c
 # add_custom_target(thesis
 # #    COMMAND cat ${CMAKE_BINARY_DIR}/thesis.log >> thesis.log
 # #    COMMAND awk [=['!a[$0]++']=] thesis.log
-# #    COMMAND ${CMAKE_COMMAND} -E create_symlink build/all.log all.log
+# #    COMMAND "${CMAKE_COMMAND}" -E create_symlink build/all.log all.log
 #    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 #    DEPENDS ${TOP_FILE}.pdf
 #    )
@@ -510,7 +545,7 @@ compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls c
 # 
 # # The Eclipse generator creates a project name with an '@' in it. Pydev dislikes this,
 # # so we call this little cmake script to make that '@' into an '-' instead.
-# add_custom_target( FixEclipseProject ALL ${CMAKE_COMMAND} -P
+# add_custom_target( FixEclipseProject ALL "${CMAKE_COMMAND}" -P
 #    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FixEclipseProject.cmake
 #    ${CMAKE_CURRENT_BINARY_DIR} )
 # 
@@ -544,7 +579,7 @@ compile(${TOP_FILE} ${TOP_FILE}.tex header.tex variables.tex common/uiophd.cls c
 # # REPLICATE SOURCE TREE #
 # #########################
 # 
-# add_custom_target( ReplicateSourceTree ALL ${CMAKE_COMMAND} -P
+# add_custom_target( ReplicateSourceTree ALL "${CMAKE_COMMAND}" -P
 #    ${CMAKE_SOURCE_DIR}/cmake/ReplicateSourceTree.cmake
 #    ${CMAKE_BINARY_DIR}
 #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} )
