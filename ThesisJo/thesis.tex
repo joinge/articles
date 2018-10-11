@@ -6,7 +6,10 @@
 
 \RootBuildtrue
 
-\title{Faster, Smarter, Better - Bridging high performance computing and adaptive image reconstruction to create cognitive sonar systems of tomorrow}
+\title{Swift, Smart, Supreme - Sonar cognition with adaptive image reconstruction and synthesis}
+
+%\title{Faster, Smarter, Better - Adaptive sonars powered by graphics processing units}
+%\title{Faster, Smarter, Better - Smart sonars powered by  systems of tomorrow Powering sonar systems with intelligence using adaptive beamforming and performance computing and adaptive image reconstruction to create cognitive sonar systems of tomorrow}
 \author{Jo Inge Buskenes}
 %\department{Department of Informatics}
 
@@ -23,18 +26,123 @@
 \input{glossary}
 \makeglossaries
 
+\addbibresource{../library.bib}
 
 
+
+
+
+%% This is mostly ripped from the 'quotchap' package. It did not perform to my liking, so I've
+%% tweaked it some... 
 %
+%
+%% charter         bch
+%% palatino        ppl
+%% avantgarde      pag
+%% bookman         pbk
+%% courier         pcr
+%% helvetica       phv
+%% newcentury      pnc
+%% times           ptm
+%% utopia          put
+%
+% \def\@defaultcnfont{ptm}
+% 
+%% \newif\if@usecolor\@usecolortrue
+% \newcommand*{\@newfontcmd}{\@ifundefined{@defaultcnfont}{\newcommand*}{%
+%     \PackageWarning{quotchap}{%
+%       You have tried to specify more than one font to be\MessageBreak
+%       used for the chapter numbers. I ignore the font\MessageBreak
+%       `\CurrentOption'}
+%     \providecommand*}}
+% 
+% % \DeclareOption{grey}{\@usecolortrue}
+% % \DeclareOption{nogrey}{\@usecolorfalse}
+% \providecommand*{\@defaultcnfont}{pbk}
+%% \if@usecolor
+%   \definecolor{chaptergrey}{rgb}{0.6,0.6,0.6}%
+%% \else
+%%   \providecommand*{\color}[1]{}
+%% \fi
+% 
+% \newcommand*{\chapnumfont}{%
+%   \usefont{T1}{\@defaultcnfont}{b}{n}\fontsize{100}{130}\selectfont%
+%   \color{TealBlue}}
+% \let\size@chapter\huge
+% \providecommand*{\chapterheadstartvskip}{\vspace*{2.3\baselineskip}}
+% \providecommand*{\chapterheadendvskip}{\vspace{1.7\baselineskip}}
+% \providecommand*{\sectfont}{\relax}
+% \@ifundefined{@mainmattertrue}{\newif\if@mainmatter\@mainmattertrue}{}
+% 
+% \newenvironment{savequote}[1][10cm]{%
+%   \begin{lrbox}{\@quotebox}
+%     \begin{minipage}[t]{#1}\footnotesize\slshape
+%       \ignorespaces}{%
+%       \unskip\end{minipage}\end{lrbox}
+%   \global\setbox\@quotebox\copy\@quotebox
+%   \global\let\@printcites\@iprintcites
+%   \ignorespacesafterend}
+% \newcommand{\qauthor}[1]{%
+%   \par\smallskip
+%   {\raggedleft\upshape #1\qquad\hbox{}\par}\bigskip}
+% \newsavebox{\@quotebox}
+% \let\@printcites\relax
+% \renewcommand\chapter{%
+%   \if@openright\cleardoublepage\else\clearpage\fi
+%   \thispagestyle{plain}%
+%   \global\@topnum\z@
+%   \@printcites
+%   \@afterindentfalse
+%   \secdef\@chapter\@schapter}
+% \renewcommand{\@makechapterhead}[1]{\chapterheadstartvskip%
+%   {\size@chapter{\enspace\enspace\sectfont\raggedleft
+%       {\chapnumfont
+%         \ifnum \c@secnumdepth >\m@ne%
+%         \if@mainmatter\thechapter%
+%         \fi\fi
+%         \par\nobreak}%
+%       {\raggedleft\advance\leftmargin10em\interlinepenalty\@M #1\par}}
+%     \nobreak\chapterheadendvskip}}
+% \renewcommand{\@makeschapterhead}[1]{%
+%   {\let\c@secnumdepth\m@ne\@makechapterhead{#1}}}
+% \newcommand*{\@iprintcites}{%
+%   \vbox to\z@{\copy\@quotebox\vss}
+%   \global\let\@printcites\relax}
+% %% \CharacterTable
+% %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+% %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+% %%   Digits        \0\1\2\3\4\5\6\7\8\9
+% %%   Exclamation   \!     Double quote  \"     Hash (number) \#
+% %%   Dollar        \$     Percent       \%     Ampersand     \&
+% %%   Acute accent  \'     Left paren    \(     Right paren   \)
+% %%   Asterisk      \*     Plus          \+     Comma         \,
+% %%   Minus         \-     Point         \.     Solidus       \/
+% %%   Colon         \:     Semicolon     \;     Less than     \<
+% %%   Equals        \=     Greater than  \>     Question mark \?
+% %%   Commercial at \@     Left bracket  \[     Backslash     \\
+% %%   Right bracket \]     Circumflex    \^     Underscore    \_
+% %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+% %%   Right brace   \}     Tilde         \~}
+% % \endinput
+% 
+% \renewcommand\chapterheadstartvskip{\vspace*{-5\baselineskip}}
+
+
+
+
+
+
+
+
 %
 %% \usepackage{layout}
 
 %\let\oldsubfile\subfile
 
-
 \begin{document}
 %\renewcommand\input[1]{\subfile{#1}}
-
+\vbadness=99999
+\hbadness=99999
 
 \frontmatter
 \maketitle
@@ -53,7 +161,6 @@
 \tableofcontents
 
 %\printglossary 
-
 
 \mainmatter
 % \layout

@@ -22,7 +22,8 @@
 \graphicspath{{../HowtoHowtoCapon/submission/final/}}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{document}
-
+% \pagenumbering{Alph}                            % https://tex.stackexchange.com/a/331766
+\hypersetup{pageanchor=false}                   % https://tex.stackexchange.com/a/331766
 \cleardoublepage
 \pagestyle{empty}
 
@@ -30,9 +31,13 @@
 \setlength\parskip{\baselineskip}
 \renewcommand\baselinestretch{1.1}
 
-\chapter{Paper I}\label{ch:paperI}
 
-{\Large\bf An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
+\chapter*{Paper I}\label{ch:paperI}
+\providecommand*\papertitle{}\renewcommand*\papertitle{An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
+\addcontentsline{toc}{chapter}{\papertitle}
+
+
+{\Large\bf \papertitle}
 
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 
@@ -46,10 +51,10 @@ Volume 40, Issue 2, April 2015%\\
 \pagestyle{normal}
 \thispagestyle{plain}
 \fancyhead[LE]{\bf Paper II}
-\fancyhead[RO]{\bf\flushright An Optimized GPU implementation of the\\ MVDR Beamformer for Active Sonar Imaging}
+\fancyhead[RO]{\bf\flushright \papertitle}
 
 \begin{center}
-{\Large\bf An Optimized GPU implementation of the MVDR Beamformer for Active Sonar Imaging}
+{\Large\bf \papertitle}
 
 \vspace{\baselineskip}
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
@@ -60,7 +65,7 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 {
 
 % \newgeometry{headheight=50pt}
-   \vbadness=99999 % Mute underfull vboxes, these are already reviewed
+%   \vbadness=99999 % Mute underfull vboxes, these are already reviewed
    \input{../HowtoHowtoCapon/document}
 % \restoregeometry
 }

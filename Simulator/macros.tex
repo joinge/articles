@@ -108,9 +108,11 @@
 %
 %% \usepackage[maxfloats=40]{morefloats}
 
-\newcounter{todoidx}
 % \setcounter{todoidx}
+\ifOPTtodos\else
 \ifTODO
+   \newcounter{todoidx}
+%   \vbadness=99999	
    \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
    \setlength\marginparsep{1pt}
    \setlength\marginparwidth{35pt}
@@ -126,8 +128,10 @@
 
    \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
 \else
-%    \usepackage[disable]{./todonotes} 
-   \newcommand\todo[1]{}
+%    \usepackage[disable]{./todonotes}
+      \providecommand\todo[1]{}
+      \renewcommand\todo[1]{}
+\fi
 \fi
 %
 %\newenvironment{narrow}[2]{%
@@ -152,10 +156,12 @@
 %% MACROS %       
 %%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
+\ifOverLeaf\else
 \let\oldincludegraphics\includegraphics
 \renewcommand\includegraphics[2][]{%
-  \immediate\write18{./bin/laFigure #2 #1}%
+  \immediate\write18{../Simulator/bin/laFigure #2 #1}%
   \input{result}}%
+\fi
 %  
 %% \DeclareMathOperator*{\argmin}{\text{arg}\;\text{min}}
 %
@@ -302,7 +308,7 @@
 \providecommand\nmat{}
 \renewcommand\nmat[1]{\begin{matrix}#1\end{matrix}}
 \providecommand\bmat{}
-\renewcommand\bmat[1]{\begin{bmatrix}#1\end{bmatrix}}
+\renewcommand\bmat[1]{\begin{bmatrix*}[c]#1\end{bmatrix*}}
 \providecommand\case{}
 \renewcommand\case[1]{\begin{cases}#1\end{cases}}
 \providecommand\textbox{}
@@ -390,10 +396,18 @@
 \providecommand\H{}
 \renewcommand\H{^{\scriptscriptstyle H}}
 
-\providecommand\vec{}
-\renewcommand\vec[1]{\boldsymbol{#1}}
+\providecommand\udot{}  
+\renewcommand\udot[1]{\underaccent{\dot}{#1}}
+\providecommand\ubar{}  
+\renewcommand\ubar[1]{\underaccent{\bar}{#1}}
+\providecommand\uvec{}  
+\renewcommand\uvec[1]{\underaccent{\vec}{#1}}
+\providecommand\dvec{}                  % Decomposed vector
+\renewcommand\dvec[1]{\boldsymbol{#1}}
 \providecommand\mat{}
 \renewcommand\mat[1]{\boldsymbol{#1}}
+\providecommand\dmat{}                  % Decomposed vector
+\renewcommand\dmat[3]{\boldsymbol{#1}_{#2}^{#3}}
 
 \providecommand\Om{}
 \renewcommand\Om{O_\text{m}}
@@ -409,6 +423,8 @@
 \renewcommand\I{\mat I}
 \providecommand\a{}
 \renewcommand*\a{\vec a}
+\providecommand\c{}
+\renewcommand*\c{\vec c}
 \providecommand\f{}
 \renewcommand*\f{\vec f}
 \providecommand\i{}
@@ -450,6 +466,8 @@
 \renewcommand*\M{\mat M}
 \providecommand\Navg{}
 \renewcommand*\Navg{N_\text{avg}}
+\providecommand*\V{}
+\renewcommand*\V{\mat V}
 \providecommand\W{}
 \renewcommand*\W{\mat W}
 \providecommand\X{}
@@ -459,8 +477,7 @@
 \providecommand\Y{}
 \renewcommand*\Y{\mat Y}
 
-\providecommand*\V{}
-\renewcommand*\V{\mat V}
+
 
 %\providecommand\L{}
 %\renewcommand*\L{\mat \Lambda}

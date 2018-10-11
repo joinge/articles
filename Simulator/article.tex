@@ -12,8 +12,11 @@
 \newif\ifFloatAtEnd\FloatAtEndfalse             % Available in PeerReview mode:
                                                 % Place floats at end of document?
 \newif\ifTODO\TODOtrue                        % Use todo notes?
+\newif\ifOPTtodos\OPTtodosfalse
+\newif\ifPhdDoc\PhdDocfalse
 
-\newif\ifBuildBibliography\BuildBibliographyfalse  % Whether to include the references.bib file or use inline references.
+\newif\ifBuildBibliography\BuildBibliographytrue  % Whether to include the references.bib file or use inline references.
+\newif\ifOverLeaf\OverLeaftrue                  % Using OverLeaf to edit?
 
 \ifOnlineColor
    \newcommand\figPostfix{_online}              % Colored images online
@@ -52,6 +55,10 @@
 % IEEE ''APPROVED'' PACKAGES %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+%\usepackage[backend=biber,bibstyle=ieee]{biblatex}
+%\addbibresource{references.bib}
+
+\RequirePackage{amsfonts}
 \usepackage{cite}
 
 \ifCLASSINFOpdf
@@ -68,10 +75,10 @@
 
 \RequirePackage[table,dvipsnames,svgnames]{xcolor}
 
-\usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
+%\usepackage[cmex10]{amsmath}                    % cmex10 option to be IEEE explore compliant
+\usepackage[cmex10]{mathtools}                    % cmex10 option to be IEEE explore compliant
 \interdisplaylinepenalty=2500                   % Allows multiline equations to be broken
-
-% \RequirePackage{amssymb}
+\RequirePackage{amssymb}
 
 \RequirePackage{array}
 
@@ -108,6 +115,9 @@
 
 \usepackage{url}                                % Support for handling and breaking URLs
 
+\usepackage{accents}
+
+
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
 % \newcommand\MYhyperrefoptions{bookmarks=true,bookmarksnumbered=true,
@@ -141,6 +151,18 @@
 % ADDITIONAL PACKAGES %       
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shapes,snakes}
+%\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
+\newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+            
+\usepackage{multirow}
+\usepackage{tabularx}
+
+%\usepackage[active,float]{preview}
+%\PreviewEnvironment{gather} 
 % \ifPeerReview
 % \let\OldIncludegraphics{\includegraphics}
 % \usepackage{letltxmacro}
@@ -156,28 +178,30 @@
 % % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
 
 % \usepackage[maxfloats=40]{morefloats}
-\newcounter{todoidx}
-% \setcounter{todoidx}
+%\newcounter{todoidx}
+%% \setcounter{todoidx}
+%
+%\ifTODO
+%   \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+%   \setlength\marginparsep{1pt}
+%   \setlength\marginparwidth{35pt}
+%   \newlength\marginparwidthsmall
+%   \setlength\marginparwidthsmall{\marginparwidth}
+%   \addtolength\marginparwidthsmall{-7pt}
+%   \newcommand\todo[1]{%
+%      \addtocounter{todoidx}{1}%
+%      {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
+%      \marginpar{%
+%         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+%         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
+%
+%   \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
+%\else
+%%    \usepackage[disable]{./todonotes} 
+%   \newcommand\todo[1]{}
+%\fi
 
-\ifTODO
-   \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
-   \setlength\marginparsep{1pt}
-   \setlength\marginparwidth{35pt}
-   \newlength\marginparwidthsmall
-   \setlength\marginparwidthsmall{\marginparwidth}
-   \addtolength\marginparwidthsmall{-7pt}
-   \newcommand\todo[1]{%
-      \addtocounter{todoidx}{1}%
-      {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
-      \marginpar{%
-         {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
-         \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{\raggedright\scriptsize #1}}}}
-
-   \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{0.97\linewidth}{#1}}}
-\else
-%    \usepackage[disable]{./todonotes} 
-   \newcommand\todo[1]{}
-\fi
+\newcommand\gls[1]{}
 
 \newenvironment{narrow}[2]{%
 \begin{list}{}{%

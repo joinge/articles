@@ -16,18 +16,29 @@
 The upcoming papers will investigate various ways in which acoustical imaging systems can be improved by making them smarter in an operational sense. This involves granting them the ability to adapt their behavior to the information at hand, and the processing power needed to handle the information fast enough.
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Paper I}\label{sec:paperI} %
+\section{Intro}\label{sec:intro} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\paper{I} describes the use and implementation of the \gls{MVDR} beamformer in active sonar imaging in its most general and exact form. 
 
-Its widespread use and generic implementation makes it the reference. thus will be considered the reference method. , and this will be referred to as a fully adaptive technique. Due to its ability to analytically  to apply the minimum variance criteria in an exact manner, Due to its popularity and We view this as the reference method for We refer to it as fully adaptive since it computes analytically evaluates   yields  This is a fully adaptive method   This method is  on a \gls{GPGPU} for active sonar imaging. This is to prove that using a \gls{MVDR}
+   
 
-Paper II takes the \gls{MVDR} method and applies it to clinical Ultrasound Imaging
+   
 
+%
+%\paper{I} describes the use and implementation of the \gls{MVDR} beamformer in active sonar imaging in its most general and exact form. 
+%
+%Its widespread use and generic implementation makes it the reference. thus will be considered the reference method. , and this will be referred to as a fully adaptive technique. Due to its ability to analytically  to apply the minimum variance criteria in an exact manner, Due to its popularity and We view this as the reference method for We refer to it as fully adaptive since it computes analytically evaluates   yields  This is a fully adaptive method   This method is  on a \gls{GPGPU} for active sonar imaging. This is to prove that using a \gls{MVDR}
+%
+%Paper II takes the \gls{MVDR} method and applies it to clinical Ultrasound Imaging
+%
+%
+%We point out important hardware limitations for these devices, and assess the design in terms of how efficiently it is able to use the GPU's resources. On a quad-core Intel Xeon system with a high-end Nvidia GPU, our GPU implementation renders more than a million pixels per second (1\;MP/s). Compared to our initial central processing unit (CPU) implementation the optimizations described herein led to a speedup of more than two orders of magnitude, or an expected five to ten times improvement had the CPU received similar optimization effort. This throu
 
-We point out important hardware limitations for these devices, and assess the design in terms of how efficiently it is able to use the GPU's resources. On a quad-core Intel Xeon system with a high-end Nvidia GPU, our GPU implementation renders more than a million pixels per second (1\;MP/s). Compared to our initial central processing unit (CPU) implementation the optimizations described herein led to a speedup of more than two orders of magnitude, or an expected five to ten times improvement had the CPU received similar optimization effort. This throu
-
+Common:
+\begin{itemize}\setlength\baselineskip{0pt}
+\item Adaptive
+\item Processing speed
+\end{itemize}
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,22 +49,22 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 40, Issue 2, April 2015
 
-\begin{itemize}
-\item Minimum variance
-\item Full search space, continuous
-\item Element-space
+\begin{itemize}\setlength\baselineskip{0pt}
+\item Optimization: Minimum variance
+\item Solution space: Continuous, closed when made robust
+\item Time domain
 \item Sonar
-\item Computationally complex
-\item Common: Minimal temporal statistics (near single snapshot)
+\item Computationally complex, $O(N^3)$.
+\item Information significance: Minimal temporal sample support (~single snapshot)
 \end{itemize}
 
-This is a popular method that analytically estimates the array's weight set that best comply with the minimum variance criterion. Its analytic nature allows it to chose from an infinite number of possible weight sets, but with a solution space limited by the constraint of unit gain in the look direction. 
-
-The first paper is concerned with applying the Minimum Variance Distortionless Response (MVDR) beamformer to active sonar imaging, with emphasis on performing arithmetic reductions and solving the practical its high computational complexity. It shows that  with emphasis on solving and with the process of implementing this method on a \gls{GPU}. The goal is to improve sonar image quality without suffering the consequences of the MVDR's inherently high computational complexity.
-
-Combined, these steps led to a speedup of an order of magnitude or more compared to its straight-forward \gls{CPU} implementation.
-
-In functionality this method acts as our reference method, but its practicality is limited by a high computational complexity. The paper suggests means for reducing the arithmetic complexity and provide extensive details for fitting the implementation on a \gls{GPU} for a major speedup. It also relates the performance to theoretical maximums and investigates remaining bottlenecks.
+%This is a popular method that analytically estimates the array's weight set that best comply with the minimum variance criterion. Its analytic nature allows it to chose from an infinite number of possible weight sets, but with a solution space limited by the constraint of unit gain in the look direction. 
+%
+%The first paper is concerned with applying the Minimum Variance Distortionless Response (MVDR) beamformer to active sonar imaging, with emphasis on performing arithmetic reductions and solving the practical its high computational complexity. It shows that  with emphasis on solving and with the process of implementing this method on a \gls{GPU}. The goal is to improve sonar image quality without suffering the consequences of the MVDR's inherently high computational complexity.
+%
+%Combined, these steps led to a speedup of an order of magnitude or more compared to its straight-forward \gls{CPU} implementation.
+%
+%In functionality this method acts as our reference method, but its practicality is limited by a high computational complexity. The paper suggests means for reducing the arithmetic complexity and provide extensive details for fitting the implementation on a \gls{GPU} for a major speedup. It also relates the performance to theoretical maximums and investigates remaining bottlenecks.
 
 
 %Applying the MVDR-beamformer may not seem like fully adaptive technique 
@@ -93,6 +104,7 @@ J.I. Buskenes, R.E. Hansen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 42, Issue 1, January 2017
 
+
 \begin{itemize}
 \item Minimum variance
 \item Smaller search space, discrete
@@ -105,16 +117,31 @@ Volume 42, Issue 1, January 2017
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Paper IV}\label{sec:paperIV} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\textbf{A Real-Time Synthetic Aperture Sonar Simulator for Automatic Target Recognition: Notation and application}\\
+J.I. Buskenes, H. Midelfart\\
+\textit{IEEE Journal of Oceanic Engineering}\\
+Submitted DD.MM.2018%\\\\
+%Volume 42, Issue 1, January 2017
 
 \begin{itemize}
 \item Template-generation
 \item Autonomy
 \item Sonar
+	\item Incredibly fast template matching possible.
+	\item Possibly a powerful tool to pass prior knowledge to deep learning
+	\item Extracting the essential information is key 
+	\item Exploit hardware resources available
 \end{itemize}
 
 
 
 \section{Onlook}
+
+Machine cognition:
+\begin{itemize}
+\item Ethical dilemmas. Decision and actions have consequences. Who's legally responsible for a machine's doing? Itself?
+\item Safety. Machine flexibility allow more possible outcomes, and a wider range of security issues to consider.
+\end{itemize}
 
 R dim > 10000
 - Inverting such matrices better to do with gradient decent

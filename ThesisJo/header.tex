@@ -10,6 +10,7 @@ uiophd
 , biblatex                                 % Use a bibliography
 %  , draft
 %  , layout
+, todos
 ]{common/mytemplate}
  
 
@@ -152,12 +153,15 @@ uiophd
 []%after
 \titlespacing*{\subsection}{0pt}{*0}{*0}
 
-\addbibresource{references.bib}
-\ifMonolithic
-\addbibresource{../HowtoHowtoCapon/library.bib}
-\fi
+\addbibresource{../library.bib}
+%\ifMonolithic
+%\addbibresource{../HowtoHowtoCapon/library.bib}
+%\fi
 
 \renewcommand\include[1]{\subfile{#1}}
+
+\vbadness=99999
+\hbadness=99999
 
 \endofdump
 \begin{document}

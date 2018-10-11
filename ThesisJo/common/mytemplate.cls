@@ -222,6 +222,7 @@
    \DeclareOption{UKenglish}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{altfont}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{draft}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \DeclareOption{todos}{\OPTtodostrue}
    \DeclareOption*{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
 \fi
 
@@ -413,11 +414,17 @@
 %==========%                                    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 \ifOPTuiophd
-   \typeout{++++amsmath,amssymb++++}
-   \let\circledS\undefined                         % To avoid conflicts where this is previously defined
-   \RequirePackage{amsmath,amssymb}
+%   \typeout{++++amsmath,amssymb++++}
+%   \let\circledS\undefined                         % To avoid conflicts where this is previously defined
+%   \RequirePackage{amsmath,amssymb}
+    \typeout{++++mathtools++++}
+    \RequirePackage{mathtools}
+    \RequirePackage{amsfonts}
+%    \usepackage{amsfonts}
+   
    \ifOPTxelatex%
        \RequirePackage{fontspec}%               % Provides font selecting commands
+       \setmainfont[Mapping=tex-text]{EB Garamond}
    \else
       \typeout{++++fontenc+++}
       \RequirePackage[T1]{fontenc}%                 % Set font encoding
@@ -425,6 +432,10 @@
       \RequirePackage[utf8]{inputenc}%              % Set input encoding (optionally latin1)
       % Loading fontenc first is advisable:           https://tex.stackexchange.com/a/34046
       \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)
+      
+      \RequirePackage[full]{textcomp}
+     	\RequirePackage[garamond,expert]{mathdesign}
+     	\RequirePackage[swashQ]{garamondx}
 %      \RequirePackage{newunicodechar}
    \fi
    \typeout{++++xcolor+++}
@@ -456,6 +467,91 @@
 %    \typeout{++++layout++++}
 %       \RequirePackage{layout}
 %    \fi
+   \usepackage{tikz}
+   \usetikzlibrary{calc,positioning,shapes,snakes}
+   %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
+   \newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
+   \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+               \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+               
+               
+   \usepackage{accents} % For underaccent
+%   \usepackage{multirow}
+   \usepackage{tabularx}
+   
+   \usepackage[cacheDir=build%
+              ,blankBeforeBlockquote=false%	Require blank line before paragraph and quote
+              ,blankBeforeCodeFence=false%	Require blank line before paragraph and code fence
+              ,blankBeforeHeading=false%		Require blank line before paragraph and heading
+              ,breakableBlockquotes%			Blank line between block quotes
+              ,citationNbsps=true%				Non-breakable spaces inside notes/citations
+              ,citations=false%					Pandoc citation syntax
+              ,codeSpans=true%					Enable backticks for code, ``code here``
+              ,contentBlocks=false%				Enable iA Writer extension
+%              ,contentBlocksLanguageMap=<fn> JSON file that maps file extensions to prog.lang.
+              ,definitionLists=false%			Pandoc definition list syntax
+              ,fencedCode=false%					Enable fenced code extension
+              ,footnotes=false%					Enable Pandoc footnote extension
+              ,hashEnumerators=true% 			Enables #. lists
+              ,html=false%							Recognize html tags
+              ,hybrid=true%						Interspace Latex/Markdown
+              ,inlineFootnotes=false%			So.. ^[Inline footnote.]
+              ,preserveTabs=false%  			Convert tabs to spaces
+              ,smartEllipses=false% 			Convert ellipses to TeX
+              ,startNumber=false%   			Make first list number significant
+              ,tightLists=true%					Tight lists?
+              ,underscores=false%   			Emphasize with _abc_
+              ]{markdown}
+%   \usepackage[pilcrow]{easylist}
+   \usepackage{listings}
+   \lstset{
+     basicstyle=\rmfamily,
+     breaklines=true,
+     columns=fullflexible
+   }
+
+   \newif\ifTODO\TODOfalse
+   \newcounter{todoidx}
+   \newsavebox\mytodobox
+
+   \ifOPTtodos
+      \typeout{===cool===}
+   %   \vbadness=99999	
+      \definecolor{todobackground}{rgb}{0.95,0.95,0.95}
+      \setlength\marginparsep{1pt}
+      \setlength\marginparwidth{40pt}
+      \newlength\marginparwidthsmall
+      \setlength\marginparwidthsmall{\marginparwidth}
+      \addtolength\marginparwidthsmall{-10pt}
+      \newcommand\todo[1]{%
+         \addtocounter{todoidx}{1}%
+         {\color{Red}\bf(\thetodoidx{})}%%\fbox{\bf\thetodoidx{}}}%
+         \marginpar{\sbox{\mytodobox}{\hbadness=99999%https://tex.stackexchange.com/a/144615
+            {\vspace*{-10pt}\color{Red}\fbox{\bf\thetodoidx{}}}\\%
+            \fcolorbox{red}{todobackground}{\parbox{\marginparwidthsmall}{%
+            \hfuzz=\maxdimen%https://tex.stackexchange.com/a/144615
+            \raggedright\scriptsize #1}}}}}
+   
+      \newcommand\todopar[1]{\fcolorbox{red}{white}{\parbox{35pt}{#1}}}
+   \else
+      \typeout{===not cool===}
+   %    \usepackage[disable]{./todonotes} 
+      \newcommand\todo[1]{}
+   \fi
+   \usepackage{epigraph}
+%   \RequirePackage[
+%      %                   avantgarde
+%      %                   bookman
+%      %                   charter
+%      %                   courier
+%      %                   helvetica
+%      %                   newcentury
+%      %                   palatino
+%                        times
+%      %                   utopia
+%                        ]{quotchap}               %For customisable chapter/section headings.
+%%      \renewcommand\chapterheadstartvskip{\vspace*{-5\baselineskip}}
+
    \typeout{--------------}
 \else
    \let\circledS\undefined 								% To avoid conflicts where this is previously defined

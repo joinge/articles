@@ -14,6 +14,12 @@ echo ' '
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '  Starting laFigure'
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo "Hello"
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
+OLDPATH=$(pwd)
+cd ${SCRIPTPATH}/..
+# cd ../../Simulator/bin
 
 # echo ":) Hello. Scanning ${1}.tex for documentclass options..."
 # 
@@ -338,3 +344,5 @@ fi
 # svg2pdf2fit
 # 
 # sleep 1s
+
+cd ${OLDPATH}

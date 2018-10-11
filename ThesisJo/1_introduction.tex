@@ -1,5 +1,6 @@
 %&header
 % !TeX root = 1_introduction
+
 \input{subheader}
 \endofdump
 
@@ -8,47 +9,376 @@
   \makeglossaries
 \fi
 
+%\beforeepigraphskip
+
 \begin{document}
 
+%\begin{savequote}[15pc] \slshape
+%% % "The best way to predict the future is to invent it."
+%% % \qauthor{Alan Kay}
+%""
+%\qauthor{Douglas Adams---}
+%% % The only way to keep your health is to eat what you don't want, drink what you don't like, and do what you'd rather not.
+%% % Mark Twain (1835 - 1910)
+%% % "For a successful technology, reality must take precedence over public relations, for Nature cannot be fooled." 
+%% %   \qauthor{Richard P. Feynman}
+%\end{savequote}
 \chapter{Introduction}
+% \epigraphhead[0]{\epigraph{Deep Thought supercomputer:\\The answer to life, the universe and everything is... 42.}{\textit{The Hitchhikers Guide to the Galaxy}\\\textsc{Douglas Adams}}}
+\epigraphhead[0]{\epigraph{\textit{Cognition:}\\The mental action or process or acquiring knowledge and understanding through thought, experience, and the senses.}{\textsc{Oxford Dictionary}}}
 
-\section{Aims of this thesis}
+%\section{Aims of this thesis}
+%
+%No one size fits all. SDR.
+%
+%\begin{itemize}
+%* Accelerate adaptive beamforming
+%* Facilitate deep learning
+%\end{itemize}
+%
+%
+%
+%\section{Motivation and scope}
+%
 
-\begin{itemize}
-\item Accelerate adaptive beamforming
-\item Facilitate deep learning
-\end{itemize}
 
-\section{Motivation and scope}
+
+%to be a huge step in the This is because by combining the  interest in them is largely due to their merits. y spark such interest because 
 
 %Raw data -> preprocessing -> beamforming -> image
 %                  ^               ^      -> ATR
 %          shit in, shit out    adaptive
 %          
+%\begin{itemize}
+%* Improving imaging systems by making them smarter.
+%\begin{itemize}
+%	* Choose the best tool (algorithm) for the job
+%	* More complex not always better, but slower
+%	* Extracting the essential information is key 
+%	* Exploit hardware resources available
+%\end{itemize}
+%* Faster IS smarter
+% \begin{itemize}
+% 	* Short feedback loops allow real-time adaptivity
+% 	* More data contains more information
+% 	* Faster learning
+% \end{itemize}
+%* Smarter IS better
+% \begin{itemize}
+%	* Better image quality
+%	* Improved autonomy
+%\end{itemize}
+%\end{itemize}
+%\begin{markdown}
+
+%Hey
+%\end{markdown}
+
+\IncludeWritingTipstrue
+\newcommand\tip[1]{\ifIncludeWritingTips{}#1\fi}
+
+\titleformat{\section}%command
+[block]%shape
+% {}%format
+{\Large\bfseries}%format
+{}%label
+{0pt}%sep
+{}%before
+[]%after
+\titlespacing*{\section}{0pt}{*0}{*0}
+
+\titleformat{\subsection}%command
+[block]%shape
+% {}%format
+{\bfseries}%format
+{}%label
+{0pt}%sep
+{}%before
+[]%after
+\titlespacing*{\subsection}{0pt}{*0}{*0}
+
+% \ifIncludeWritingTips
+% \begin{markdown}
+Title: Sonar cognition with accelerated acustic image reconstruction and syntesis
+
+% 1. Tells you what question you have
+% 2. Tells us what question the paper answers
+% 3. Tells what the paper will argue
+% 4. Tells us what the paper is about
+
+% Focus on the reader! Tell them what they ought to question.
+
+% 20-25pages max!
+
+% Words of value: Tools, but, although, unrealistic, wrong, incorrect, flawed, etc.
+
+% Introduction - 1 paragraph: Attention grabbing, clarifies purpose, outlays roadmap
+
+
+% \end{markdown}
+% \fi
+
+% \section{Problem \& purpose statement, questions (PPS\&Q)}
+% \ifIncludeWritingTips
+% \begin{markdown}
+
+% \end{markdown}
+% \fi
+
+% PURPOSE:
+% \begin{itemize}
+% \item Attention: 
+% \end{itemize}
+
+% Adaptive methods for image reconstruction and synthesis often 
+% Research into HPC, big data and Value added to society when a method 
+
+%Cognitive machines crowning hallmark of human ingenuity. Reactive and proactive. General problem solvers that can aid mankind in its future endeavors. 
+%
+%Two dominating buzz words are echoing the landscape of modern data science. One is \emph{Deep Learning}, a field that strives to make machines learn the way the brain does. The other is \emph{Big Data}, on the other hand, refers to the fact that we continuously produce, process and store an ever increasing amount of data. 
+%
+%This is because the merits achieved by combining the two appears to be a huge leap towards the goal of making truly intelligent machines.
+
+\section{Motivation}
+
+
+Adaptive
+  transmit
+  mechanics
+
+
 \begin{itemize}
-\item Improving imaging systems by making them smarter.
-\item Big data - more processing power.
-\item Processing speed
-\begin{itemize}
-	\item Choose the best tool (algorithm) for the job
-	\item More complex not always better, but slower
-	\item Extracting the essential information is key 
-	\item Exploit hardware resources available
-\end{itemize}
-\item Faster IS smarter
- \begin{itemize}
- 	\item Short feedback loops allow real-time adaptivity
- 	\item More data contains more information
- 	\item Faster learning
- \end{itemize}
-\item Smarter IS better
- \begin{itemize}
-	\item Better image quality
-	\item Improved autonomy
-\end{itemize}
+\item Autonomy (sonar)
+\item Fast-feedback (Ultrasound)
+\item Better research
 \end{itemize}
 
-\section{Scope}
+\section{Scope (niche)}
+% 1. Establish research territory
+% 2. Introduce / review items of previous research in the area (obligatory)
+%     Why important, central, interesting, problematic, etc. (optional)
+% 3. Establish niche
+%     Indicating gap in previous research or the need to extend it
+% 4. Occupying the niche
+%     Outline purpose or state nature of present research
+%     List research questions or hypotheses
+%     Annouce principal findings
+%     State value of previous research
+% * Be specific
+% * Discuss context and background to research problem
+% * Emphasize the need and relevance for the researc
+
+\subsection{Research territory}
+Applications in sonar, ultrasound, radar, ...\\
+Dynamic / adaptive:
+\begin{itemize}
+  \item Image reconstruction / beamforming
+  \item Image synthesis / simulation
+\end{itemize}
+
+\subsection{Previous research}
+\begin{itemize}
+\item Image reconstruction / beamforming
+  \begin{itemize}
+  \item Sonar
+  \item Ultrasound
+  \end{itemize}
+\item ATR
+\end{itemize}
+
+d
+
+\subsection{Real-time adaptivity \tip{\hfill(niche)}}
+\begin{itemize}
+\item High speed adaptive image reconstruction (beamforming) \& synthesis (simulation)
+\item Gap: When to use adaptive methods? What can they offer? Is GPU acceleration feasible?
+\end{itemize}
+
+\subsection{GPU acceleration \tip{(occupying niche)}}
+\begin{itemize}
+\item GPU accelerated image reconstruction (beamforming) \& synthesis (simulation)
+\end{itemize}
+
+\section{Relevance}
+% Argue scientific relevance.
+% Use citations (secondary evidence), focus on discussion chapters
+\subsection{Theoretical / scientific}
+\begin{itemize}
+\item Latency matters. Swift reaction key in autonomy, real-time acoustic imagery important in human-machine interactions. (vague)
+\item Quick iterations provide greater research momentum.
+\end{itemize}
+
+\subsection{Practical}
+\begin{itemize}
+\item AUVs: Cheaper / more effective missions. Higher quality data. 
+\item Real-time imaging sonars,
+\item Clinical ultrasound: Real-time user feedback,
+\end{itemize}
+
+% More processing power:
+%   More research per time unit
+%   Lower latency
+%   Handles more data channels
+
+% Accelerated hardware: Cheaper, more compact.
+
+
+\section{Current scientific situation / background}
+% * Research territory -> Previous research -> Niche -> Occupy it
+% * Cite and explain most important related research
+% * Demonstrate field mastery / familiarity
+\begin{itemize}
+  \item 
+\end{itemize}
+% 
+\section{Objective \& problem statement \& Questions}
+% * Within first 3 pages, 1 page max
+% * ARGUMENT conceptualized around a PROBLEM that meets the needs of a DISCOURSE COMMUNITY
+% * Making CLAIMS with support from EVIDENCE to convince your audience
+% * Problem rationale (1-2s): "The problem here is... (foreground)" (brainstorming: any)(intro) 
+% * Knowledge gap (1-2s) - literature. Academic rationale. (l.review)
+% * Context - time, place, people (intro)
+% * Conceptual framework (optional) (l.review)
+% * Evidence (primary: own, secondary: peer reviewd) / logic
+% * (methods) 1-3 sentences: "The purpose of this research is to..." (must close knowledge gap!)
+% * Expand methodology (1-2s) (optional)
+% * Questions (findings/discussion):
+%   * PhD 5 questions
+%   * Aim to "open up" problem rationale, not introduce more problems.
+Objective
+\begin{itemize}
+\item Accelerate and simplify adaptive beamformers to make them real-time capable.
+\item 
+\end{itemize}
+Problem statement
+\begin{itemize}
+\item Adapting fast enough (vague)
+\end{itemize}
+Questions
+\begin{itemize}
+  \item Can GPUs enable real-time MVDR?
+  \item When to does frequency domain MVDR on GPU make sence?
+  \item Is LCA a viable alternative, and if so, why?
+  \item GPUs in image analysis / classification?
+\end{itemize}
+
+CLAIMS \& EVIDENCE:
+\begin{itemize}
+\item 
+\end{itemize}
+
+\section{Background}
+\ifIncludeWritingTips
+\begin{markdown}
+\end{markdown}
+\fi
+
+\section{Research design and context}
+\ifIncludeWritingTips
+\begin{markdown}
+    * Describe the context within which the research takes place
+    * Summarize methodology as well
+* Conceptual framework (optional)
+    * Specify the the thesis frame
+* Research significance (limitations, scope)
+    * Why is it important? Elaborate on assumptions, limitations, scope
+* Expected outcomes (?)
+* Overview of chapters
+    * Tell reader what to expect.
+    * Form the basis for establishing arguments and key points
+* Concluding paragraph
+    * Summarize key points
+    * Links to next chapter(?)
+\end{markdown}
+\fi
+
+\begin{lstlisting}
+Title: Sonar cognition with accelerated acustic image reconstruction and syntesis
+
+Sonar cognition(???) - introduction
+   Intelligence - Ability to acquire and apply knowledge and skills (that which learns and acts on information)
+      Filtering:  Optimize quality / significance
+      Processing: Throughput / latency
+      Storage:    Raw data or model
+      Feedback:   Immediate action/ direct causality / real-time adaptivity / short loop
+      Action:     Autonomy
+      Examples:   Mapping of genes, Self-driving cars, 2000 Titanics of data
+      
+   Information: Big data. Quality is key.
+   Algorithms: "Intelligent". *Adaptive*. Dynamic. Learning (feedback).
+   Processing: Faster. Smaller. Low-power. Dynamic optimization. 
+   Feedback: Cost associated with delayed action. 
+   Speed: Data compression/significance, Data-/task parallelity, hardware compatibility  
+   Future: Discover what we can't? Do what we won't?
+   
+Image quality
+   Standard metrics: Resolution, contrast/dynamic range (SNR)
+   Ideal metrics: Realistic. Information accuracy and quality.
+   Goal: Describe reality as best as possible.
+   
+Beamforming
+   Directionnal sensitivity
+   No need to physically move array
+   Dynamic behaviour require rapid processing
+
+Adaptive beamforming
+   Dynamic directionnal sensitivity
+
+Algorithms:
+   Beamformers: Conventional, adaptive
+   
+
+Hardware
+   Front-end: 
+      Sensor array: Convert energy to electrical signals, amplify, (de-)modulate, filter
+      Arrays: Boosts SNR. Recorded data spans space, not just time. Allow steering.
+   Processing:
+      Graphics Processing Units: Data parallell, both graphics/general purpose.
+      
+Key technical terms:
+   Array processing
+   (Adaptive) beamforming
+      Degrees of freedom, solution space
+   Graphics processors
+
+Summary of publications
+
+1. MVDR Sonar, exact, <32 channels
+   Adaptive, MV element space, reference
+   Exact solution
+   Full albeit constrained solution space
+   $O(M^3)$. All-to-all dependencies, GPU semi-optimal
+    
+2. MVDR UltraSound
+   Adaptive, MV beam space
+   Approximate solution
+   Full abeit constrained solution space 
+   >32 channels
+   $O(B^3)$. All-to-all dependencies, GPU semi-optimal
+   
+3. LCA
+   New, less known, practical
+   Adaptive, discrete solution space
+   $O(W^2)$. Perfect data parallellity, GPU optimal
+   Sonar verified
+   
+4. ATRSimulator
+   Image synthesis
+   ATR via template matching
+   High throughput avoid database
+   Improves classification
+   
+Future:
+   Software Defined Radio: Flexible, adaptive, cheap, rapid development.
+   SoCs: True heterogeneous hardware architectures
+   
+Discussion and future work
+   Summary and discussion
+   Future Work
+\end{lstlisting}
+
+%\section{Scope}
+
 
 %\section{Motivation and scope}
 
@@ -59,7 +389,6 @@
 %
 %data now enough? we have all of evolution.
 %
-%processimg loop small. learn to adapt behaviour then and there.
 %
 %arrays allow focus and width.but requires processing.
 %
@@ -84,7 +413,6 @@
 %To understand how we can evolve the intelligence of machines, perhaps it is best to look at how nature has done it. Our 5 basic senses are sight, smell, hearing, taste and touch. The information here is converted from the respective physical phenomena to electrical impulses through various cells. Then these electrical signals travel to a vast network of neurons that make up our brain. Since each neuron is linked to several others, the data dependency is many to many and very hard to understand.
 %
 %
-%Intelligence is by its essence a feedback loop. 
 %This requires them to sense their surroundings and To do so, we need equip it with sensors we grant them sensory input by converting energy in various physical forms into electrical signals, process these using analog and digital electronics, and imbue them with  Most of the components for doing so 
 %
 %Two big topics in recent years are big data and articifical intelligence. 
@@ -134,7 +462,7 @@
 %      Instrinsic and extrinsic information
 %      Data decomposition
 %      Data volume
-%      Amount of information, rank, dimensions
+%      Amount of information, rank, dimensions, degrees of freedom
 %      
 %   Machine intelligence / adaptivity / Deep learning
 %      Means for intelligence?
@@ -149,6 +477,7 @@
 %      - Deep neural nets interconnected, learning from each other?
 %      - The brain adapts its wiring to solve tasks, does this carry over?
 %      - Neuman networks - recursive
+%      - Brain focused vs. diffused state, chunk nurturing vs. forming
 %      - Energy efficient. But the body does it MUCH better
 %      - Only make the choices that are relevant. Adaptivity vs. computational/data requirements
 %        - The body has a lot of information stored in the genome. It doesn't start from scratch
@@ -195,23 +524,7 @@
 %      2012 - IEEE-US - Implementing Capon Beamforming on the GPU for Real Time Cardiac Ultrasound Imaging
 %      2011 - UAM2011 - A low complexity adaptive beamformer for active sonar imaging
 %
-%Discussion and future work
-%   Summary and discussion
-%      Simulator:
-%      - The way to train and constrain deep learning algorithms?
-%      MVDR:
-%      - Analytical optimization - full adaptivity.
-%      - Heavy on computations
-%      LCA:
-%      - Optimization by trial and error - discrete solution space.
-%      - Works almost as well as MVDR in most cases
-%      - Fast!
-%      - Well suited for hardware
-%      
-%      Lessions from deep learning:
-%      - 
-%      
-%   Future work
+
 %   
 %
 %\gls{ASIC}

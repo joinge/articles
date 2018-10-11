@@ -1,11 +1,15 @@
+%% !TeX root = IIII_simulator
+% !TeX root = article
 
+%Design, notation and application
 
-\title{A Real-Time Sonar Simulator for Automatic Target Recognition}
+\title{Real-Time Synthetic Aperture Sonar Simulation for Automatic Target Recognition: Notation and application}
 
-\author{{Jo~Inge~Buskenes,~\IEEEmembership{Student Member,~IEEE,} %
-        Herman~Midelfart, %
-        \O{}ivind~Midtgaard} %
-\thanks{J. I. Buskenes is with the Department of Informatics, University of Oslo, Norway.}%
+\author{{Jo~Inge~Buskenes, %
+        Herman~Midelfart%, %
+%        \O{}ivind~Midtgaard
+        } %
+\thanks{J. I. Buskenes is with both the Department of Informatics, University of Oslo, Norway, and the Norwegian Defense Research Establishment (FFI), Norway.}%
 \thanks{H. Midelfart and \O. Midtgaard are with The Norwegian Defence Research Establishment (FFI), Norway.}% <-this % stops a space
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
@@ -13,6 +17,7 @@
 % The paper headers
 \markboth{IEEE Journal of Oceanic Engineering}%
 {A GPU Sonar Simulator for Automatic Target Recognition}
+
 
 % Publishers ID mark:
 %\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
@@ -25,7 +30,7 @@
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
+\todo{Revise abstract, and make a point of the notation system}Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to isolate an image segment containing the object of interest, correlate it with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
 
 We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For every object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. The best performance is obtained when these parameters are estimated from the sonar image as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable template generator which can adapt to the characteristics of the current scene on-the-fly.
 \end{abstract}
@@ -36,7 +41,7 @@ We target this challenge with a sonar simulator that first takes as input a seab
 Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \end{IEEEkeywords}
 \fi}
-% \fi
+% \fi 
 
 % make the title area
 \maketitle
@@ -53,176 +58,1147 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \IEEEpeerreviewmaketitle
 
 
+
 \section{Introduction}
 
 \setcounter{totalnumber}{1}
 \setcounter{topnumber}{1}
 \setcounter{dbltopnumber}{1}
 
-\begin{figure*}[t]\centering%
-\includegraphics[width=\linewidth]{gfx/scene_coordinate_system.svg}%
-\caption{Simulator principle. A model of the seafloor and object is first loaded into OpenGL, and an orthogonal camera view set up to match the desired image region on the seafloor. Then the scene is rendered and an intensity image and a depth map is created. The intensity image along with the depth information is finally combined to form a sonar like image. This is our template.}\label{simulator_coordinate_system}%
-\end{figure*}
+\providecommand\m*{}\renewcommand*\m[2][\phantom{|}]{{\tikzmark{#2}{#1}}}
+\providecommand\k*{}\renewcommand*\k[2]{{\color{black}\tikzmark{#1}{#2}}}
+\providecommand\g*{}\renewcommand*\g[2]{{\color{Green}\tikzmark{#1}{#2}}}
+\providecommand\r*{}\renewcommand*\r[2]{{\color{Red}\tikzmark{#1}{#2}}}
+\providecommand\b*{}\renewcommand*\b[2]{{\color{blue}\tikzmark{#1}{#2}}}
 
 \begin{figure*}[t]\centering%
-\includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
-\caption{Simulator concept.}\label{buildup}%
+\ifOverLeaf%
+  \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
+\else
+  \includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
+\fi
+\caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor, and some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} choose parameters from a predefined set, while the \emph{adaptive} approach estimate them from the sonar image. All processing happens on a GPU, with OpenGL rendering a scene and OpenCL enabling general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allow a much wider range of object parameters to be searched for an optimal template, yielding better results at a fraction of the time.}\label{IV_buildup}%
 \end{figure*}
+
+\newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
+\begin{figure*}[t]\centering%
+\ifOverLeaf%
+  \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
+\else
+  \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
+\fi
+\caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
+\figstep{1}{\emph{Model placement.} When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\protect\ubar{M}$. To position and orient the models into the image frame $\protect\ubar{I}$, we apply the \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+}\\[.5\baselineskip]
+\figstep{2}{\emph{Camera/sonar setup.} To determine what parts of the scene the sonar can see, we place the OpenGL camera at the origin of the sonar frame, $\protect\udot{S}$, pointing at the origin of the image frame, $\protect\udot{I}$. This is achieved with the \emph{sonar (view) matrix} $\mat{T}_\textit{\tiny\!SI}$.
+}\\[.5\baselineskip]
+\figstep{3}{\emph{Projection and clipping}. With the scene and camera set up, the next step is compute how visible points in the scene project onto the viewing plane spanned by $x$ and $\varphi$ in $\ubar{C}$. The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
+}\\[.5\baselineskip]
+\figstep{4}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply the model, sonar and perspective matrices to each vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. We also make OpenGL compute the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+}\\[.5\baselineskip]
+\figstep{5}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
+}%
+}\label{IV_simulator_coordinate_system}%
+\end{figure*}
+
 
 % \IEEEPARstart{W}{hen} 
 % Autonomous underwater vehicles (AUVs). When an AUV with a sonar imaging system encounter an interesting object, it would be very beneficial if adapted its behavior to examine the object further. This is challenging as it would need to learn in what ways the interesting objects differ from the background, i.e. it relies on previous knowledge. It would also need to process this information is near real-time to act in an efficient manner.
 
 % - Adapt simulation to its behaviour, see if they still match.
 
-\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are becoming increasingly important in human underwater endeavors. When equipped with a synthetic aperture sonar (SAS), they can e.g. be used to map the seafloor, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or hunt for mines and biohazard waste. Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to improve imaging performance.
+
+\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are advancing the exploration of our underwater frontiers. Equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with the unforeseen, such as resolving poor imaging conditions, blocked paths, corrupted data or fascinating objects. One reason for this is the lack of reliable and adaptive system for automatic target recognition (ATR).
+
+%However, Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to create better images.
  
 % Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, compare it with a set of template images of the relevant object classes, and assign it to the class of the template with the the best fit.
 
-In conventional ATR an object of interest is first isolated, its properties attempted estimated, and a classifier used to determine what object class these properties belong to. The challenge is finding unique and intrinsic object properties, such as its type, shape and size, and to do so independently of extrinsic properties such as its alignment, burial depth, degeneration level or view angle. While SAS provide images with state of the art resolution and dynamic range, they still only represent an ambiguous acoustical 2D projection of the 3D object, littered with a highly coherent noise floor. 
 
-An alternative approach is to use template matching, where the isolated image segment is compared to a set of template images covering the relevant object classes, and assigned to the class of the template with the best fit. Since the templates are computed from 3D models, this reduces the issue of image ambiguity. However, a challenge is finding a set of templates that represent the actual configurations of object and seafloor, Another issue is that the size of precomputed library of templates grows exponentially with the number of parameters needed. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+
+Conventional ATR isolates an object of interest, extracts its key features, and use these to estimate the object's class. The challenge is to find features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle. Such features are rare in SAS, despite best-in-class resolution and dynamic range, due to image ambiguities from acoustical distortions such as layover, multiple scattering, diffraction, dispersion and penetration.
+
+%Thus, the sonar image contains incomplete object information, and only contains partial object can only describe the object partially, can't be used to infer the object class unambiguously.
+
+
+%
+%Information is lost in the 
+%
+%Inferring the object class from the sonar image ambiguous, the sonar image ambiguous,  sonar image an ambiguous and suboptimal source to infer the object class from.
+
+% This makes the sonar image represent the object ambiguously, and makes the class estimation unreliable.\todo{Not happy with this sentence}
+
+
+
+%
+%Object information is partially lost in the process, 
+%
+%Inferring object class from incomplete information.
+%
+%Since object information is lost in the process, 
+
+%
+%Thus, the sonar image ambiguously represent the object class Thus, the object class 
+%
+%
+%Object ambiguously represented by the sonar image, and can't be inferred from it reliably.
+%
+%Sonar image represent the object ambiguously, making inference of 
+%Inferring the object class from the sonar image is difficult, because it 
+%
+%Information is lost making the sonar image ambiguous, and inferring the object class hard.
+%
+
+%As a result the sonar image provide an ambiguous representation of the object.
+
+%Information lost
+%Sonar image ambiguous
+%Inferring object class hard. 
+
+% ambiguouslyInformation is lost in the process, preventing the object class can not be inferred unambiguously from the sonar image  The sonar image ambiguously describes the object class, and object class Inferring the object class from the sonar Information is partially lost in the process, making the sonar image an ambiguous representation of the object.\todo{bloated?}
+
+%Inferring the object class from the sonar image
+
+%Object information is irrevocably lost in the process, thus can no be inferred reliably from and  The resulting image e process is irreversible; No amount of guesswork To interpret and extract the needed information from these The image sought after may not be there, or take a form inconcievable for humans.
+
+% Ideal parameters are unique and intrinsic---such type, shape, and size---, and independent of extrinsic features such as alignment, burial depth, degeneration level, or view angle.
+
+
+
+ 
+
+%The challenge is to find unique and intrinsic object properties, such as type, shape and size, independent of extrinsic properties such as alignment, burial depth, degeneration level or view angle. 
+
+%  comparable to optical cameras, but are harder to interpret; Acoustic effects such as layover, multiple scattering, diffraction, dispersion and penetration distort the image, making it an ambiguous representation of the object.
+
+% Instead of trying to To bypass the intricacies of identifying a 3D object from an ambiguous 2D image, 
+
+% Say how the templates come into existence first
+
+% Instead of inferring object class from image, make a guess and compare simulation.
+
+%Template matching bypass the problem of inferring the object class from the image, by guessing which object it is, 
+
+%1. 3D model
+%2. Acoustic simulation
+%3. 
+%
+%An alternative approach consists of computing image templates for each object and orientation that may be 
+
+% An alternative, called template matching, compares...
+% Template matching differs by comparing the object...
+
+Template matching offers an alternative to feature extraction: Comparing the object with image templates of relevant classes and orientations, and assigning it the class that fits best. The problem is to find a suitable set of templates that\todo{to?} represent the objects. A densely sampled feature for every degree of freedom would be ideal, but require too many templates. Therefore, practical implementations resort to a few sparsely sampled features, yielding inaccurate results~\cite{Midelfart2010}.
+
+%
+%Numerous templates are required for each object, since every degree of freedom needed to describe it adds a dimension to the template solution space\todo{simplify}. 
+%
+%
+%
+%Feature for every degree of freedom - unmanageable 
+
+% exponentially with every degree of freedom needed to represent the objects, adds number of templates needed to represent an object well grows exponentially with its number of degrees of freedom\todo{some way to simplify here?}.
+
+
+
+% assuming similar sampling granularity of each parameter. 
+
+
+%Template matching bypass the feature extraction by comparing the detected object with a set of simulated object templates, and assign it the class of the template with the best fit.\todo{reword somehow}  
+
+%Template matching targets the ambiguity by instead starts with 3D models of relevant objects and orientations, simulates acoustic image templates for each, correlates them with detections\todo{vague} in the actual image, and estimates the class to be that of the template yielding the highest score.\todo{long, heavy, vague}   
+
+%Template matching instead starts with 3D models acoustical image templates of probable objects and orientations, correlates them with detections\todo{vague} in the actual image, and estimates the class to be that of the template yielding the highest score.\todo{too heavy, vague} 
+
+%Template matching instead starts with 3D models acoustical image templates of probable objects and orientations, correlates them with detections\todo{vague} in the actual image, and estimates the class to be that of the template yielding the highest score.\todo{too heavy, vague} 
+
+%assigns records the scores. After iteration through all object classes and parameter configurations, the each detection is 
+
+%roduce a template simulate how it would appears in a sonar image, and search the actual sonar image for similarities.  
+
+%the deterministic acoustical effects distortions to produce an image template, and see if this resembles anything in the sonar image. This is called template matching.
+
+
+%Template matching offers an alternative approach: Here an isolated image segment is compared to a set of template images covering the relevant object classes and orientations, and assigned to the class of the template with the best fit. Since the templates are computed from 3D models, this reduces the issue of image ambiguity. 
+
+%However, it is challenging to find a static set of templates covering all suitable configurations of object and seafloor. Another issue is that the size of pre-computed library of templates grows exponentially with the number of parameters needed, assuming similar sampling granularity of each parameter. This limits its use to only a few parameters being coarsely sampled, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 
 % We avoid the problems of conventional template matching by computing the templates on-the-fly as part of the classification process, thereby not needing a precomputed set of templates at all. 
 %  that avoids this problem by running sufficiently fast to create templates adapted to the actual scene as part of the classification process.
 % Classification process
 
-We tackle the problems of conventional template matching by performing:
+
+% Adaptive template matching:
+% - To extract key features off the image
+
+% Simulation of the templates:
+% - To avoid static library of templates.
+% - Less memory, better performance.
+
+
+% To improve the reliability and efficiency, we propose two 
+% reliability and efficient
+
+%- AUV
+%- ATR - feature extraction
+%- ATR - template matching
+
+%reduce feature solution space 
+
+Adaptive template matching is a hybrid solution: Extracting the most reliable statistics from the image, such as shadow and highlight characteristics, and use these to limit the template solution space~\cite{Midelfart2010}. This reduces the computational load and improves accuracy, by accommodating fine-grained search through more features. But better still: remove the need for a precomputed template library by simulating them on-the-fly.
+
+%, to adapt to much broader scenarios.
+
+
+% estimates some To overcome the limitation on In previous work we propose to adaptive  implement adaptive template matching using partial feature extraction. 
+%We implement a hybrid solution by selecting a template based on object and seafloor parameters estimated from the SAS image~\cite{Midelfart2010}.
 %
-\begin{itemize}
-\item \emph{Adaptive template matching}; where a template is selected based on object and seafloor parameters estimated from the SAS image~\cite{Midelfart2010}, and
-\item \emph{Real-time template simulation}; where a template is created tailored to the estimated parameters, improving its accuracy and avoiding the need of a precomputed template library.
-\end{itemize}
+%We address the efficiency and problems of conventional template matching with \emph{adaptive template matching}---selecting a template based on object and seafloor parameters estimated from the SAS image~\cite{Midelfart2010};\todo{   **template selection based on object and seafloor parameters from SAS image***       Takes up a bit too much space, considering it won't be described in great detail} and
+%\emph{real-time template simulation}---creating a template tailored to the estimated parameters, to improve its accuracy and avoid the need of a precomputed template library. 
+
+%
+%\todo{However, only a few simulators for high frequency, side-looking sonar imagery have been published. ***}
+A few simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator~\cite{Coiras2009a, Coiras2009b}. It takes advantage of parallel processing on GPUs, by using OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ includes stochastic effects such as ambient noise, while we consider templates deterministic. Neither is SIGMAS+ easily extended to a adaptive template matcher on the GPU, since OpenGL primarily serve as a computer graphics library.
+
+%is intended for computer graphics; a side-effect of OpenGL due to the limitations of OpenGL, which is intended for computer graphics.
+
+%It also relies on multiple  rendering passes to create the sonar image\\
+
+% Since OpenGL is primarily intended for computer graphics, This is a drawback of OpenGL, which leaves a lot to be desired in terms of flexibility and extensibility---OpenGL is not a general-purpose programming tool.\todo{Trim, too verbose}
+
+% - lack of flexibility
+% - lack of extensibility
+
+% - 
+% This enables fast and flexible general-purpose computing on the GPU.
+% This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
+% on a new full geometrical implementation of the simulator.
+
+Our simulator was designed from the ground up to be an integral part of an GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL, which can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
+
+%The simulator architecture and notation system are described Section~\ref{IV_methods}. Simulation and classification results  Results from  template simulations and classification Section~\ref{IV_results}  Finally, we present classification performance using 
+%
+%, and supply a Python snippet to demonstrate it.Section???
+%In Section . 
+%
+%\todo{Introduce sections}
+
+% Mathematical formulation/notation: Simulation, Robotics
+
+%We will explore the classification performance of these two techniques, but otherwise 
+%In this study we focus on describing the simulator, but compare classification results from both methods to that of standard template matching. 
+% but provide some details on adaptive template matching for completeness where needed. 
+
+
+
+
+
+
+%We will show that:
+%%
+%\begin{itemize}
+%\item Adaptive template matching improves classification performance compared to its conventional peer,
+%\item Improved classification performance by feeding simulator with parameters derived off SAS image,
+%\item Further improved classification by performing a fine-search within a narrow search space around the SAS derived parameters. GPU makes this more powerful.
+%\end{itemize}
+
+% This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and object class into OpenGL and positions the camera at the sonar location. The scene is highlighted using a light tube that extends to infinity along the AUV's axis of probagation. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. The OpenGL rendering produces an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+
+%as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering.
+
+%The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a cylindrical light source placed at the sonar transmit location. 
+
+%We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+
+
+%For lack of a better name, the simulator will be referred to as "FFISim" throughout this article.
+
 %
 
-The methods presented herein will focus on the template simulator, but some details will also be given on adaptive template matching for completeness. More details on this technique can be found in~\cite{Midelfart2010}.
 
 
- This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering. The simulator loads a 3D model of the seafloor and object class into OpenGL and positions the camera at the sonar location. The scene is highlighted using a light tube that extends to infinity along the AUV's axis of probagation. We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. The OpenGL rendering produces an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
+\section{Methods}\label{IV_methods}
 
-as part of the classification process. This is achieved with the aid of the massive computing power in graphics processing units (GPUs) and optimized software libraries for scene rendering.
+%\begin{itemize}
+%\item Unified notation based on Gade.
+%\item Sonar implementation.
+%\end{itemize}
 
-The simulator loads a 3D model of the seafloor and an object class model into OpenGL, where emitted sound waves are modeled with a cylindrical light source placed at the sonar transmit location. 
+%Orthographic (projective) projection - parallel projection with the rays being perpendicular to the image plane.
 
-We assume rough, isotropic surfaces reflecting sound energy equally in all directions. This can be modeled with a Lambertian scattering model~\cite{Blake1993,Bell1995}, where the intensity of the backscattered sound solely depends on the incidence angle of the transmitted signal onto the model surface. When rendering OpenGL is set up to produce an optical 2D intensity image and depth map that reveals the distance from each pixel to the propagation axis. For maximum flexibility this data is finally combined with OpenCL to produce the image templates.
-
-Various simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator in~\cite{Coiras2009a, Coiras2009b}. Similarly to our approach it takes advantage of parallel processing on GPUs, and it uses OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ is still aimed more towards realistically looking images, including effects like ambient noise, which is irrelevant for our purpose of template generation. Also, their simulator superimpose images obtained from multiple OpenGL rendering passes to create the sonar image, while we render once and post-process this result with OpenCL to tailor the sonar image with greater flexibility.
-
-
-For lack of a better name, the simulator will be referred to as "FFISim" throughout this article.
-
-Show:
-\begin{itemize}
-\item Adaptive template matching to avoid large static template libraries,
-\item Improved classification performance by feeding simulator with parameters derived off SAS image,
-\item Further improved classification by performing a fine-search within a narrow search space around the SAS derived parameters. GPU makes this more powerful.
-\end{itemize}
-
-
-\section{Methods}
-
-Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter.  This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of projecting vertices, faces and textures defined in a 3D space onto a suitable 2D image plane. This section explains how we set up OpenGL for this task, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
-
-\begin{itemize}
-\item Load arbitrary complex models
-\item Simulate sonar with OpenGL
-\item Speed considerations
-\end{itemize}
-
-Models are not ROCCAN (???)
-
-
-\subsection{Loading the scene}
-
-Our models are stored in regular 3D model files. The simulator begins by loading these into a tree of nodes, each representing a vertex in the model with corresponding facet and texture information. Then the vertices are placed into a virtual scene in OpenGL, and a camera set up to capture the part of the scene corresponding to the image. When OpenGL renders the image, it first computes which vertex contributes to which pixel in the image, then computes the intensity and color of the pixel based on the node's facet, texture and scattering model. The code that operates on vertices are called a vertex shader, and the code that operates on pixels are called a fragment shader.
-
-Mapping of the vertices from object coordinates to image coordinates happen through a set of transformations:
+%Simulating images of an active 100\,kHz SAS system share many traits to simulating optical images. Setting up the 3 dimensional scene is common to both, with the need to load various object models and setting up their interdependencies. Highlighting a region in the scene with acoustic energy can be modeled with a directional light source of equal beam width. Reflection models of light can be used too, since at 100\,kHz the acoustic waves mainly bounce off objects at their surface instead of penetrating them, and diffraction plays only a minor role. Finally, the resolution of modern SAS systems extend into the centimeter range in either direction. Combined these similarities can make it hard for an untrained eye to differentiate between a SAS and optical image.
 %
-\begin{align*}
-\bmat{x\\y\\0\\1}_\text{image} = \boldsymbol{P} \cdot \boldsymbol{V} \cdot \boldsymbol{M} \cdot \bmat{x\\y\\z\\1}_\text{model},
-\end{align*}
+%The big difference lies in what data is collected. A camera image represent a two-dimensional projection of a region of the scene onto an image plane. A sonar image, on the other hand, represent data from one fixed spatial dimension and range. 
 %
-where $\bmat{\cdot}_\text{model}$ is the loaded model, $\bmat{\cdot}_\text{image}$ is the output image, and $\M$, $\V$ and $\P$ are model, view and transformation matrices, respectively. These will be described next.
+%is that while an optical image is a projection plane purely in space, nsional space, the active sonar image is a projection of along-track an active sonar is a ranged sensor. With a phased array it captures data  It captures data 
+%The main difference is the data format. While optical image represent the projection of all visible points in the camera view onto a projection plane, a sonar image captures data 
+%
+%
+% in both along-track and cross-track, does not penetrate into the object  behave like that of light at 100\,kHz, with little penetration and  is high enough for waves not to penetrate into objects and Modeling reflections follow predominantly the same pattern, how sound reflect off various surfaces is dominantly similar to that of light,   with and comparable resolution. To make sure no Only letting the parts of the scene that is visible from the sconar The parts of the scene that is out of view Similar to an optical camera, an active sonar mainly receives echoes from the parts of the scene that is visible from the sonar. 
+%
+%In addition, SAS systems have high resolution making images look almost like optical ones. 
+%
+%sees the part of the scene that the A camera captures a represent a view-port on which that captures  The same way a camera only captures the part of the scene visible a part of the image with occluded parts being invisible, does Only the parts of the scene visible from from the camera and sonar pixels visible from the sonar will 
+%
+%
+% is a sonar image is in many ways similar to those 
+%Creating a 2D view of an arbitrary complex 3D scene is a non-trivial matter.  This is why we decided to use the core OpenGL pipeline to do this for us. OpenGL is a popular, well-matured and multi-platform application programming interface (API) for rendering 2D and 3D vector graphics. It relieves us from the intricacies of projecting vertices, faces and textures defined in a 3D space onto a suitable 2D image plane. This section explains how we set up OpenGL for this task, and then proceeds to describe how we post process the OpenGL images with OpenCL to form the final sonar image.
+%
+%\begin{itemize}
+%\item Load arbitrary complex models
+%\item Simulate sonar with OpenGL
+%\item Speed considerations
+%\end{itemize}
+%
+%Models are not ROCCAN (???)
 
-The model matrix $\M$ is the first transform applied to the object, and is defined as:
+
+
+
+% Euler angles
+%    3 values
+%    If few degrees of freedom, store only the ones needed
+%    Gimbal lock
+
+% Rotation matrices:
+%    Allow transformation composition (sequence of multiplications)
+%    9 values (for 3 degrees of freedom)
+%    Easy to do e.g. strafing
+%    Normalization necessary, but simulator recreates the matrices from scratch for each frame.
+%    No Gimbal lock
+%    Can include scaling, shear, reflection and translation (if 4x4)
+%    4x4 matrices can also handle projective geometry.
+%    Easy to work with and understand with a bit of linear algebra
+%    Affine transformations. Nice analytical properties. Convenient.
+
+% Axis-angle
+%    Easy to interpolate angles
+%    Hard to interpolate axes
+
+% Quaternions
+%%    Allow transformation composition (sequence of multiplications)
+%    Specifies rotation through an axis and cos 0/2
+%    4 values
+%    Any two quaternions can be smoothly interpolated (blending) (just find the average)
+%    If framerate drops below sampling rate (lag), then easy interpolation between two arbitrary frames is key.
+%    No Gimbal lock
+%    Faster (reference needed)
+%    Easy to normalize / better numerical properties
+%    Usually go-to solution for e.g. animations or games
+
+% Rotors
+%    Quaternions (4D complex numbers), thought of as 3D multivectors.
+
+% More questions:
+% - How to illustrate similar axes, e.g. system A shares first two basis vectors, but not last?
+
+% Generally:
+%    Semantics that prevent errors and force heightened awareness
+%    Linting rules can be written to avoid errors
+
+% Problems P V M
+%    Where to put what? M or V?
+%    How to relate physical quantities?
+%    How to deal with a number of reference frames?
+%    Too focused on editing individual axes / elements.
+%    "If it doesn't work, flip some signs until it does"
+%    Time-sink!
+
+% T_AB
+%    Every frame / coordinate system is has its own matrix. No need to think about where to put what. 
+%    Decomposition is implicitly given.
+%    Combines rotations, (scales,) and translations in one go. Higher abstraction to simplify design - hides the intricate details.
+%    Hardly any trigonometric functions needed
+%    Homogeneous coordinates - common formulation for both ordinary vectors and position vectors
+%    Syntax relate allowed frames. Can't by mistake relate two incompatible systems without the notation revealing it.
+% - Max/min syntax? Iŷẑ
+% - xyz-coordinate of - say - I? Ix, Iy, Iz? Or, x_I, y_I, z_I?
+% - L for linear 3x3 transforms?
+%   
+% - Need to standardize sets. I set of _I? How to denote size of dimensions?
+% - Parallel, perpendicular? p||AB?
+% - How to write out subscripts? 
+% - Camelback in code for writing out letters? E.g. p_SonarClip_Sonar?
+% - p_OI_xy, not working
+
+
+% Blender internal is a biased rasterization engine, which means that it works by calculating which objects are visible to the camera and not by simulating the behavior of light.
+
+%Models with rigid bodies - affine transformations preserve collinear properties.
+
+% Future:
+%   Cycles perform ray-tracing. Does this makes sense?
+
+% Notation strategy
+%   Avoid decomposed metrics if possible
+%   Avoid working with individual axes is possible
+%   Avoid use of Euler angles if possible
+%   Keep notation as simple as possible without it being ambiguous
+%   Linear ops change superscripts, translations change subscripts. Transformations change both.
+
+% Quaternions: More computationally efficient, better numerical properties and simplifies interpolations.
+
+% Homogeneous coordinates:
+%   3x3: Linear operations such as rotations, scaling, shear, reflections
+%   4x4: Include the 3x3, but also translation and perspective projection
+
+
+%Vector based 
+%aided with elegant, rigid and uniform notation system, based on points and reference frames.
+%care is taken to define all needed points and reference frames, we 
+
+% Huge scene, many object - ATR needed.
+
+%Coordinates - unnecessarily details
+%Frames and transforms, better abstraction level. Less errors.
+%Not clear what coordinates in transformation mean. 
+%
+%
+%Computer graphics 
+%
+%A common pitfall in computer graphics is to define geometries in terms of coordinates. 
+
+
+%One of the most challenging aspects of computer graphics is dealing with geometries. We often need 3D models with different coordinate systems, where the vertices can represent either facets or quads, and their order and normals affect visibility (culling) and lighting. When smaller objects constitute bigger ones, they need geometrical interdependencies, applied such that the constituent's intrinsic properties remain intact and edible. Several cameras may be placed in the scene, but acting on these lead to an opposite effect in the scene; a camera moving right corresponds to the scene moving left. Finally, one need to decide how points in the scene are projected onto the image plane, keeping track of depth scaling, coordinate normalization and clipping. For games and animation timing also play a key role, with synchronization and interpolation challenges related to displaying the image on a screen. Yet, we have not touched advanced topics such as modeling realistic mechanics, materials, particles, or lighting---all requiring a strict grip on the scene's geometry.\todo{Too verbose}
+%
+%{\color{blue}Cherie: Bit wordy here as well... The point I just need to make is that computer graphics has complex geometrical dependencies, and to deal with these best one should work on a level of abstraction that doesn't involve dealing with coordinates whenever possible.}
+%
+%Traditional computer graphics literature express these geometrical relationships in terms of a model, view and perspective matrix---$\mat{M}$, $\mat{V}$ and $\mat{P}$, respectively. $\mat{M}$ is unique to each 3D model, and describes its placement in the scene. $\mat{V}$ represents the camera or observer, and describes how the scene moves when viewed differently. Finally, $\mat{P}$ describes how points visible to the camera projects onto a viewing plane\todo{A bit of overlap here with former paragraph. Perhaps drop this paragraph}. This is conceptually a good starting point, but provides no aid in defining the aforementioned complex effects.\todo{Too vague}
+
+We will demonstrate how arbitrary complex geometries can be defined in a uniform manner by defining the scene---shown in \Fig{IV_simulator_coordinate_system}---in terms of reference frames and transitions between them. To do this in an clear, organized and robust manner, we will adhere to---and extend---a navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}.
+
+
+
+
+%Thinking in terms of these matrices are fine in the beginning, but for more complex scenes it is not clear when to use which. The issues arise when trying to deal with complex scenes with the aforementioned effects.
+
+% is easy to understand, but where does fine initially, but but the real challenge lies in defining these matrices---say if you try to model a physical system with multiple reference frames, physical constraints and some non-linear features\todo{Awkward. Not convincing.}.
+ 
+%
+% 
+%Prefer vectors, 
+%Notation leads the way
+
+%Occlusion 
+%Culling
+%Normals
+%Handedness
+
+%About half the time developing the simulator was spent dealing with the (slightly simplified) geometries illustrated in \Fig{IV_simulator_coordinate_system}; It was far too easy to get lost when compounding transforms, thinking in terms of coordinates rater than vectors, and when dealing with various corner-cases.\todo{Too verbal} However, this was later rectified by adopting and extending the stringent and unified notation system developed by Gade~\cite{Gade2018}. We present a subset of his (simplified) notation here, before extending it to homogeneous coordinates and projective spaces---which are a better fit to computer graphics.
+
+
+
+
+%Reference frames, transitions between them. Leads to uniform process.
+
+% Coordinate based approach
+% - Heavy use of matrices to describe geometric operations
+% - Multiplication with [2,0;0,1] might mean: Changed coordinate system but same geometry, same coordinate system but changed geometry, a map from one domain to another, or it may have no geometric interpretation at all.
+% Without keeping track of coordinate system/spaces, it's easy and common to make mistakes. In particular, to perform geometrically meaningless operations such as combining points or vectors from different spaces.
+
+% Coordinate-free
+% - Address problem of ambiguity and validity by sticking to geometric reasoning.
+% - Geometric objects implementation pixar reference. Ensures that only valid geometrical operations are performed.
+
+% Affine spaces
+% - More general foundation for Euclidean space. Points have the single attribute position, while free vectors have a direction and magnitude.
+% - Subtraction axiom:
+%   v = P-Q     for every P,Q     (no "points at infinity")
+%   P-Q = v     for every Q,v     (no "holes" in the space)
+% - Head-to-tail-axiom
+%   (P-Q)+(Q-R) = P-R
+%
+% Claims:
+% Q-Q = 0 (vector)
+% R-Q = -(Q-R)
+% v+(Q-R) = (v+Q)-R
+% P = Q + (P-Q)
+% (Q+v)-(R+w) = (Q-R)-(v-w)
+
+% Frames
+% - Most familiar (physical) way to coordinatize affine space (one other being simplexes)
+% - The "configuration" of affine space, just like bases in vector space
+
+% Homogeneous coordinates.
+% + Convenient
+% - 4 instead of 3 dimensions
+
+%Geometrical objects: Points. Vectors act on points. Rotation matrices act on vectors.
+
+%The transformation of a rigid body in Euclidean space is uniquely defined by a translation and a rotation. 
+
+Rigid objects. Cloud of points with fixed distances between them. Transform that preserve this property comprised of translation of origins, plus a rotation of bases. Abstract away these and coordinate-specific details. Only talk about transforms.
+
+
+
+\subsection{Unified notation system}
+
+%Jeg har bestemt meg, ytterst ukomfortabelt, om å avslutte boikotten av sosiale medier. Muligens. Kanskje. For å slå et slag for miljøet, samtiden og fremtiden. Forhåpentligvis uten at slag også sendes i retur. :)
+%
+%Kan begynne med interessant lesning fra Pontevedra i Spania der man forbød biler i sentrum. Kort: Barnevennlige gater, forbedret varelevering, lyd av mennesker av dyr og ikke motorer, grønnere, bedre luft og økt tilflytting...
+%
+%https://www.theguardian.com/cities/2018/sep/18/paradise-life-spanish-city-banned-cars-pontevedra
+
+
+
+%
+%To emphasize geometrical reasoning we start with coordinate-free notation. yikes
+%Many geometrical concepts can be described without coordinate systems
+%
+%A rigid implementation of complex geometries demand a rigid mastery of geometrical concepts
+%
+%Many geometrical concepts can be described without coordinate systems. Doing so promotes geometrical reasoning conceptually The fundamental properties of a point or a vector do not depend on A point or line, they exist This promotes conceptual clarity when modeling the physical reality.   
+%
+%Most computer graphics literature describe geometrical concepts using coordinates and matrices. Although readily implementable, a bit of geometrical clarity is lost in the process.  the  in a computer, . Stacked into matrices, the However, many geometrical concepts are independent of the choice of coordinate systems, and cv
+% 
+%
+% The solutions are readily implementable, but The trouble is that Although this provide readily implementable Although However,  coordinates introduce ambiguities many geometrical concepts can be described in a coordinate-free manner. s. We emphasize some of these by first this by first To emphasize this, wecan be do not rely on these are better described using coordinate-free notation. Although While this is certainly needed to implement 
+%Deep conceptual understanding 
+%Conceptual clarity coordinate-free notation first.
+
+ Notation categories: With and without coordinates. First, coordinate-free. Pure geometrical reasoning, geometrical elements and associated operations, higher abstraction, conceptually clear, close relation to physical reality. Then, represent geometrical objects with coordinates. Ambiguities and numerical side effects easier to handle with a firm grasp of geometric reasoning.
+
+
+
+\subsubsection{Coordinate-free notation}\label{IV_sec:free_notation}
+
+%Transition between frames---say, from $\ubar{B}$ to $\ubar{A}$---is expressed by
+Let $\ubar{B} \triangleq (\udot{B},\uvec{B}) \in\mathbb{A}$ be a reference frame attached to a rigid body, with  $\udot{B}\in\mathbb{P}$ denoting the frame's absolute position (point) and $\uvec{B}\triangleq\big(\vec{b}_{B,1},\dots,\vec{b}_{B,N}\big)\in\mathbb{V}$ its absolute orientation (basis vectors that span $\mathbb{R}^N$). %To define a $\ubar{A}$ can be obtained from $\ubar{B}$ with a translation applied to $\udot{B}$ and a rotation  can be obtained from $\ubar{B}$ by applying a translation and a rotation. in terms of a  its takes a translation  we first need to defin
+%
+%A frame A can be defined relative to B, by relating the posisions with a position vector and the orientations with a rotation dyadic.
+%Suppose we  have two frames A position vector going from $\udot{A}$ to $\udot{B}$ $\vec{p}_{AB}$ be a position 
+%
+%
+%Suppose we Now consider the two frames $\ubar{A}$ and $\ubar{B}$. 
+%Let $\vec{p}_{AB} \in \mathbb{V}$,
+%The position vector that relates $\udot{A}$ to $\ubar{B}$
+%To specify a frame $\ubar{A}$ relative to $\ubar{B}$, we define a position vector $\vec{p}_{AB} \in \mathbb{V}$ going from $\udot{A}$ to $\udot{B}$, %\todo{should somehow say that this means *from* A *to* B}
+%A frame $\ubar{A}$ can be defined relative to $\ubar{B}$, by relating the two frame's positions with a position vector $\vec{p}_{AB} \in \mathbb{V}$ going from $\udot{A}$ to $\udot{B}$,
+
+Rigid bodies only the relation between points matters. Described with position vector
+
+%Two affine operations. First subtract $\udot{A}$ to $\udot{B}$ to obtain position vector.
+%and the orientations with a rotation dyadic.
 %
 \begin{align}
-\M = \bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \cdot \bmat{x \\ y \\ z \\ w}_\text{model},
+\vec{p}_{AB} &\triangleq \udot{B} - \udot{A},\label{eq_position_vector}
+\end{align}
+\begin{align}
+\vec{R}_{AB} &\triangleq \uvec{B} \rightarrow \uvec{A},\label{eq_rotation_dyadic}
 \end{align}
 %
-where $\boldsymbol{S}$, $\boldsymbol{R}$ and $\boldsymbol{T}$ are transformation matrices\todo{be explicit on dependencies?} that sets the object's scale, rotation and translation, respectively. Combined these transforms map the object from its local coordinate system to the world's coordinate system. They are provided for reference in Appendix \ref{transformation_matrices}.
+Note symmetry. Subscripts: p = position, R = orientation.
 
-Next the object is mapped into world coordinates with the view matrix $\V$. This involves aligning the camera to precisely fit the image region. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation then take the form of
+Position vectors can either be used to offset points to form new ones
 %
 \begin{align}
-\V &= \mat{T}(x_\text{c}, y_\text{c}, z_\text{c}) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
-&= 
-\bmat{
-1  &  0  &  0  &  x_\text{c} \\
-0  &  1  &  0  &  y_\text{c} \\
-0  &  0  &  1  &  z_\text{c} \\
-0  &  0  &  0  &  1 \\
-} \cdot
-\bmat{
-1  &  0           &  0           &  0 \\
-0  &  \cos\phi_x  &  -\sin\phi_x &  0 \\
-0  &  \sin\phi_x  &  \cos\phi_x  &  0 \\
-0  &  0           &  0           &  1 \\
-},
-\end{align}
-%
-where $(x_\text{c}, y_\text{c}, z_\text{c})$ is the image center coordinates for along track, cross track, and depth, respectively, and $\phi_x$ is the elevation angle\todo{is this correct?} of the sonar. It is given as
-%
-\begin{align*}
-\phi_x &= \arctan\left(\frac{y_\text{mean}}{-z_\text{mean}}\right).
-\end{align*}\todo{use absolute sign?}
-
-Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with the distance to the objects to create a sense of perspective in the image. Orthographic projection, on the other hand, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
-%
-\begin{align}
-\P = \left(\begin{matrix}
-\frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
-0              &  \frac{2}{t-b}  &  0              &  -\frac{t+b}{t-b} \\
-0              &  0              &  \frac{-2}{f-n} &  -\frac{f+n}{f-n} \\
-0              &  0              &  0              &  1
-\end{matrix}\right)
-\end{align}
-%
-where $l,r,b$ and $t$ are the left, right, bottom and top boundaries of the projection plane, respectively, and where $n$ and $f$ is the near and far limits of the cube that encompass the scene. These parameters need to be adapted to provide a 2D image that matches the image size, which we specify in along track and cross track coordinates ($x,y$). This is straightforward for left and right since matches the $x$-axis
-% They define the window through which we observe our scene.
-\begin{align}
-l &= x_\text{min}  &  r &= x_\text{max}
-\end{align}
-%
-For the near and far limits one simply needs to make sure the scene will fit in it, say
-%
-\begin{align}
-n &= 0\;\text{m}   &  f &= 300\;\text{m}.
-\end{align}
-%
-The bottom and top boundaries can be inferred from \Fig{camera_top_bottom}. First we define an origin vector that points to the center of the image
-%
-\begin{align}
-\vec o &= \left[\frac{x_\text{min}+x_\text{max}}{2}, \frac{y_\text{min}+y_\text{max}}{2}, \frac{z_\text{min}+z_\text{max}}{2} \right]\T,
-\end{align}
-%
-and the distance from the image origin to its $y$-boundaries is given as
-%
-\begin{align}
-\Delta y &= \frac{|y_\text{max} - y_\text{min}|}{2}.
-\end{align}
-%
-To find the nearest and farthest point in the image that will be part of the projected scene, $\alpha$ and $\beta$, we must consider the seafloor rotation angle around the $x$-axis, $\Phi_x$ 
-%
-\begin{align}
-\vec\alpha &= \vec 0 - \left[0, \Delta y, \Delta y \cdot \tan\Phi_\text{x} \right] \nn
-\vec\beta &= \vec 0 + \left[0, \Delta y, \Delta y \cdot \tan\Phi_\text{x} \right]
+\udot{A} &= \udot{B}-\vec{p}_{AB} \label{eq_free_transformation}
 \end{align}
 
-\begin{figure}[t]\centering%
-\includegraphics[drawing,width=\linewidth]{gfx/opengl_part.svg}%
-\caption{Setting camera top and bottom boundaries.}\label{camera_top_bottom}%
-\end{figure}
+
+
+%Relative operations more important.  Translation and rotation. Translations operate on points, rotations on vectors. Translation 
+
+%can now relate points.
+
+%Seek to find the affine transformation $f\colon \ubar{B}\to\ubar{A}$. Preserves rigid bodies.
+%
+%Adding position vectors adhere to head-to-tail axiom:
+%%
+%\begin{align}%\nonumber\\[.5\baselineskip]
+%\vec{p}_{\g{AC}{AC}}
+%= \vec{p}_{\g{A1}{A}\r{B1}{B}}
+%+ \vec{p}_{\r{B2}{B}\g{C1}{C}}\label{eq_vector_addition}
+%\\\nonumber\\\nonumber
+%\tikz[overlay,remember picture]{
+%%    scale=0.62, every node/.append style={transform shape}
+%  \coordinate(B) at ($ .5*(B1)    + .5*(B2) $);
+%%  \node(Be)[below = 1.2\baselineskip of B, anchor=center]%
+%%    {\footnotesize\textrm{Cancel}};
+%%    \draw[<->, in=-90, out=-90] (B1.south) to ($ (B2.south) - (0,0ex)$);
+%%    \draw[<-, in=90, out=-90] (B2.south) to ($ (Be.north) - (0,0ex)$);
+%%    \draw[fill] (B2) circle [radius=0.025];
+%%  \node(ACe)[below = 1.5\baselineskip of AC, anchor=center]%
+%%    {\footnotesize\textrm{Remain}};
+%%    \draw[->, in=-90, out=-90] (C1.south) to ($ (C1.south) - (0em,2.5ex) $) to ($ (AC.south) - (0,0ex)$);
+%    \draw[->, in=-90, out=-90] (C1.south) to ($ (AC.south) - (0,0ex)$);
+%    \draw[->, in=-90, out=-90] (A1.south) to ($ (AC.south) - (0,0ex)$);
+%    }
+%\end{align}
+%%
+%
+%
+% 1. Define points & frames
+% 2. Translate/rotate position vectors
+% 3. Increase abstraction: The R3 transform / homogeneous coordinates
+% 
+
+or 
+Rotation dyadic $\vec{R}_{AB}$ aligning $\uvec{B}$ with $\uvec{A}$ (defined in Appendix \ref{IV_sec:free_euler_rodrigues}),
+%
+\begin{align}
+\uvec{A} &\triangleq \vec{R}_{AB}\uvec{B}
+%\uvec{B} \rightarrow \uvec{A}.\label{eq_bases}
+% \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta).
+%\vec{I} + \sin\theta(\hat{r}\times) + (1-\cos\theta)(\hat{r}\times)^2.
+\end{align}
+%
+Definition of R in appendix. $\big(\vec{R}_{AB},\vec{p}_{AB}\big)$ is called the configuration of $\ubar{A}$ relative to $\bar{B}$ and contains $2N$ degrees of freedom. Unique and geometrically clear, but tuples are inconvenient to work with.
+
+No coordinate system. Only one valid geometrical interpretation: point moves. This is active transformations. More common to represent same vector with different frames. Need decomposed notation to do this unambiguously.
+
+% \begin{align}
+% \vec{p}_{AC'} &= \vec{p}_{BC'} - \vec{p}_{AB} \nn
+%  &\triangleq \vec{R}_{AB}\vec{p}_{BC} - \vec{p}_{AB}
+% \end{align}
+
+%Change a point: Add position vector / translation.
+%Change a set of vectors: Rotate each - axis-angle, quaternions, matrices.
+%
+%
+%The rotated vector p' relates to B the same way p relates to A. 
+%
+%Rotations:  All pros cons. Matrices nice formal properties, but ambiguous. How to specify representation? 
+%
+%Active - points physically move.
+%Passive - same physical points represented by different frames.
+
+%
+% Describe points with position vectors. These can be translated and rotated.
+
+% Combining (\ref{eq_origins}) and (\ref{eq_bases}) forms an active transformation from $\ubar{B}$ to $\ubar{A}$,
+% %
+% \begin{align}
+% \uvec{A} &\triangleq \vec{R}_{AB}\uvec{B} \nn
+%          &\triangleq \big(\vec{R}_{AB}\vec{b}_{B,1},\dots,\vec{R}_{AB}\vec{b}_{B,N}\big).\label{eq_free_transformation}
+% \end{align}
+% %
+% such that a point $\udot{\alpha}$ that relates to $\ubar{A}$ the same way $\udot{\beta}$ relates to $\ubar{B}$ is given by:
+% %
+% \begin{align}
+% \vec{p}_{A\alpha} = \vec{R}_{AB}\vec{p}_{B\beta} - \vec{p}_{AB}.\label{eq_free_transformation}
+% \end{align}
+
+%Can now rotate and translate points such that they "follow" their frame. 
+%
+
+
+%\begin{align}
+%\vec{p}_{AC}
+%&= \vec{p}_{AB} + \vec{p}_{BC}
+%&= \vec{p}_{AB} + \vec{p}_{BC}
+%\end{align}
+%
+
+
+%
+%\begin{align}
+%\udot{A} &= \udot{B}-\vec{p}_{AB}\nn
+%\uvec{A} &= \vec{R}_{AB}\uvec{B}.\label{eq_free_transformation}
+%\end{align}
+
+% Rotation not defined. Can use Euler-Rodrigues each basis vector, but rotation matrices preferrable. Need coordinate system. 
+
+%
+%\begin{align}
+%\udot{A} &= \udot{B}-\vec{p}_{AB} \\
+%\uvec{A} &\triangleq \vec{R}_{AB}\uvec{B} \nn
+%         &\triangleq \big(R_{AB}\vec{b}_{B,1},\dots,R_{AB}\vec{b}_{B,N}\big).\label{eq_free_transformation}
+%\end{align}
+
+%Transition between frames---say, from $\ubar{B}$ to $\ubar{A}$---is a two-step procedure where a rotations is applied to the bases, and require an independent update of the origins and the bases. we first  frames, we move The origins of two frames are related by a position vector, $\vec{p}_{AB} \in \mathbb{V}$, %\todo{should somehow say that this means *from* A *to* B}
+%%
+%\begin{align}
+%\vec{p}_{AB} &= \udot{B} - \udot{A},\label{eq_}
+%\end{align}
+%%
+%and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates about an axis $\hat{r}$ by angle $\theta$,
+%%
+%\begin{align}\label{eq:M}
+%\vec{R}_{AB}
+%&=
+%% \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta).
+%\vec{I} + \sin\theta(\hat{r}\times) + (1-\cos\theta)(\hat{r}\times)^2.
+%\end{align}
+%%
+%where $\times$ is the cross-product. $\hat{r}$ and $\theta$ relates to $\uvec{A}$ and $\uvec{B}$ by
+%%
+%\begin{align}
+%\hat{r} = \frac{\uvec{A}\times\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert}
+%\quad\mathrm{and}\quad
+%\theta  = \mathrm{acos}\frac{\uvec{A}\cdot\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert},
+%\end{align}
+%%
+%where $\times$ and $\cdot$ signifies the cross- and dot-product, respectively.
+%
+%and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+%%
+%\begin{align}
+%\theta
+%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\end{align}
+%\begin{align}
+%\theta
+%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\end{align}
+%%
+%The position vector $\vec{p}_{\udot{A}\udot{B}}$ go from $\udot{A}$ to $\udot{B}$ only depends on these points. Similarly, the matrix $\vec{R}_{\uvec{A}\uvec{B}}$ only depends on vectors; $\vec{R}_{\uvec{A}\uvec{B}}\uvec{B}$ rotates $\uvec{B}$ to $\uvec{B}$, $\uvec{A}\vec{R}_{\uvec{A}\uvec{B}}$ rotates $\uvec{A}$ to $\uvec{B}$. 
+%
+%Combining $(\ref{eq_origins})$ and $(\ref{eq_bases})$ yield the full transformation from $\ubar{B}$ to $\ubar{A}$
+%%
+%
+%\begin{align}
+%\udot{A} &= \udot{B}-\vec{p}_{AB}\nn
+%\uvec{A} &= \vec{R}_{AB}\uvec{B}.\label{eq_free_transformation}
+%\end{align}
+ 
+%
+% Denoting the dependencies explicitly with subscript arrows and points is thus redundant for these quantities, and can be omitted.\todo{So what was the point of including them to begin with?} 
+
+% \begin{align}
+% \ubar{A} = (\udot{A},\uvec{A}) &= (\udot{B} - \vec{p}_{\udot{A}\udot{B}}, \vec{R}_{\uvec{A}\uvec{B}}\uvec{B}.
+% \end{align}
+% 27 - 16
+% $\vec{R}_{AB}$ take the form of either can be found in appendix \ref{IV_transformation_matrices}.
+% 
+% Note that position vectors solely depends on points, and rotation matrices on basis vectors. 
+
+%Projections (non-linear) with linear algebra -> homogeneous coordinates
+%Vectors: Linear space - space of vectors - foundation of traditional linear algebra 3D vectors
+%Points: Affine space - space of points - foundation of computer graphics
+%
+%Deal with points, not vectors. Points can only be combined through affine combinations, not linear ones(?)
+%
+%Position vectors - representations
+%
+%Decomposed
+%
+% ADT coordinate-free, conceptually clear, inefficient(?)
+
+\subsubsection{Decomposed notation}\label{IV_sec:decomposed_notation}
+
+% In $\mathbb{R}^3$ 
+
+To relate orientations, need Euclidean space. Lengths, dot and cross product.
+
+When is vector is decomposed (represented) with a set of basis vectors, say $\uvec{D}$, we denote this with a bold symbol and superscript, $\dvec{p}_{AB}^D\in\mathbb{R}^3$.
+
+% Since the subscripts only depends on the frame's origins, and the superscript on its basis vectors, we could---but opt not to---express this explicitly as $\dvec{p}_{\udot{A}\udot{B}}^{\uvec{D}}$; The implicit notation is simpler and leads to no loss of clarity here. 
+
+A set of rules accompany the notation system to validate and describe operations; Subscripts can only be changed by translations, and superscripts by linear transformations. To start with the former, consider the following summation:
+%
+
+\begin{align}\nonumber\\[.5\baselineskip]
+\m{CL}
+\dvec{p}_{\g{AC}{AC}}^\k{D1}{D}
+= \dvec{p}_{\g{A1}{A}\r{B1}{B}}^\k{D2}{D}
++ \dvec{p}_{\r{B2}{B}\g{C1}{C}}^\k{D3}{D}
+\m{CR}\label{eq_vector_addition}
+\\\nonumber\\\nonumber
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(CC) at ($ .5*(CL)  + .5*(CR) $);
+  \coordinate(TC) at ($    (CC)  + (0em,1.3\baselineskip) $);
+  \coordinate(BC) at ($    (CC)  - (0em,1.3\baselineskip) $);
+  % Compute means
+  \coordinate(AB) at ($ .5*(A1)  + .5*(B1) $);
+  \coordinate(BC1) at ($ .5*(B2)  + .5*(C1) $);
+  % Compute arrow via points
+  \path let \p1 = ($.5*(AC) +.5*(A1)$),   \p2 = (BC) in coordinate (A)      at (\x1,\y2);
+  \path let \p1 = ($.5*(AB) +.5*(BC1)$),  \p2 = (BC) in coordinate (AB_BC)  at (\x1,\y2);
+  % Draw arrows and text
+  \node(De)[above = 2\baselineskip of CC, anchor=center]%
+    {\footnotesize\textrm{Same frame}};
+    \draw[<-, in=-90, out=90] (D1.north) to ($ (De.south) + (0,1ex)$);
+    \draw[<-, in=-90, out=90] (D2.north) to ($ (De.south) + (0,1ex)$);
+    \draw[<-, in=-90, out=90] (D3.north) to ($ (De.south) + (0,1ex)$);
+  \node(ACe)[below = 2\baselineskip of CC, anchor=center]%
+    {\footnotesize\textrm{Change of vector}};
+    \draw[->] (C1.south) to[out=-90, in=0] (AB_BC) to[out=180, in=0] (A) to[out=180, in=-90](AC.south);
+    \draw[-] (A1.south) to[out=-90, in=0] ($ (A)+(0em,0ex) $);
+    }
+\end{align}
+%
+Vector-vector operations like summation, dot- and cross-product, only makes sense when the vectors are decomposed in the same vector space---easily verified by the superscripts. The subscripts explain how the vector is altered: The intermediate (closest) frames cancel each other, leaving the start and end frame as subscript for the resulting vector. This mimics the regular rules of vector addition.
+
+To change the decomposition we multiply with some linear transform $\mat{L}\colon\mathbb{R}^3\!\to\!\mathbb{R}^3$. Gade restricts these to rotation matrices, which preserve lengths and cross-products---a prerequisite for rigid body transformations~\cite{Murray1994}. Computer graphics deal with this extensively, but not exclusively; Linear effects such as scaling, shear and reflection are sometimes needed.
+
+%- All terms must have same decomposition (superscript).
+%- Closest points should be identical and cancel (in subscript).
+%- Resulting subscript Decomposition same, and unchanged.
+%
+\begin{align}\nonumber\\[.5\baselineskip]
+\m{CL}
+\dvec{p}_{\k{AB1}{AB}}^{\g{E1}{E}}
+= \mat{L}_{\g{E2}{E}\r{D1}{D}} \; \dvec{p}_{\k{AB2}{AB}}^{\r{D2}{D}}
+\m{CR}\label{eq_vector_multiplication}
+\\[.5\baselineskip]\nonumber % Adjust spacing as necessary
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(CC) at ($ .5*(CL)  + .5*(CR) $);
+  \coordinate(TC) at ($    (CC)  + (0em,1.3\baselineskip) $);
+  \coordinate(BC) at ($    (CC)  - (0em,1.3\baselineskip) $);
+  % Compute arrow via points
+  \path let \p1 = ($.5*(E1) +.5*(E2)$),  \p2 = (TC) in coordinate (E)  at (\x1,\y2);
+  \path let \p1 = ($.5*(D1) +.5*(D2)$),  \p2 = (TC) in coordinate (D)  at (\x1,\y2);
+  \path let \p1 = ($.5*(AB1)+.5*(AB2)$), \p2 = (BC) in coordinate (AB) at (\x1,\y2);
+  % Draw arrows and text
+  \node(Be)[above = 2\baselineskip of CC, anchor=center]%
+        {\footnotesize\textrm{Change of frame}};
+    \draw[->](D2.north)  to[out= 90, in=0] (D)  to[out=180,in= 90] (D1.north);
+    \draw[->](E2.north)  to[out= 90, in=0] (E)  to[out=180,in= 90] (E1.north);
+    \draw[->](AB2.south) to[out=-90, in=0] (AB) to[out=180,in=-90] (AB1.south);
+  \node(ABe)[below = 2\baselineskip of CC, anchor=center]%
+    {\footnotesize\textrm{Same vector}};
+}
+\end{align}
+%
+Since linear transforms generally are non-commutative, the notation system specifies the proper sequence of multiplication in the subscripts of $\mat{L}_{ED}$; Vectors or other linear transformation matrices decomposed in $\uvec{D}$ go to the right, while those in $\uvec{E}$ go to the left.\todo{$\mat{R}_{ED} = \mat{R}_{DE}^T$ (usually)} Note that representing the vector differently does not change it; its direction and magnitude remains unchanged.
+
+\subsection{Extended notation}
+
+Combining the two aforementioned operations---a linear transformation (\ref{eq_vector_multiplication}) and a translation (\ref{eq_vector_addition})---result in an affine transformation. Like the These preserve points, straight lines and planes, and ensure collinearity (parallel lines remain parallel). This is important dealing with rigid objects either in the physical world or as here---virtually. We can produce a single affine transformation as follows\todo{Add some fireworks}\todo{Add a note on projective spaces?}:
+%
+\begin{align}\label{eq:T_definition}
+\mat{T}_{AB}
+= \left[\begin{array}{c c c | c}
+& & &   \\
+& \mat{L}_{AB}  & & \dvec{t}_{AB}^A \\
+& & &  \\\hline
+ 0 &  0  &  0  &  1
+\end{array}\right] \in \mathbb{R}^{4\times4}
+\end{align}
+%= \mat{R}_{AB}\;\mat{S}_{AB}      = \dvec{p}_{AB}^A
+where $\mat{L}_{AB}: \mathbb{R}^3 \to \mathbb{R}^3$ and $\dvec{t}_{AB}^A$ represent the linear map and translation from $\udot{B}$ to $\udot{A}$, respectively.
+
+Note that (\ref{eq:T_definition}) requires an input of the form $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$, where $w\in\mathbb{R}$. This is a homogeneous coordinate with an associated projective space. The value of $w$ controls the translation in (\ref{eq:T_definition}): $w=1$ enables it while $w=0$ disables it. This is handy because it allows specifying whether a coordinate represent a movable point or position vector, or a fixed direction vector\todo{Never actually seen this, hard to imagine a practical use case.}, by setting $w$ to either 1 or 0. Homogeneous coordinates and projective spaces allow dealing with these in a uniform manner.
+
+%  this transformation is only affine as long as the last row reads $[0,0,0,1]$.
+
+To use a transformation matrix like this one combine the rules for translation (\ref{eq_vector_addition}) and transformation (\ref{eq_vector_multiplication}):
+%
+\begin{align}\nonumber\\[.5\baselineskip]
+\dvec{p}_{\g{AC1}{AC}}^{\g{E1}{A}}
+= \mat{T}_{\g{A2}{A}\r{B1}{B}} \; \dvec{p}_{\r{B2}{B}\g{C1}{C}}^{\r{B2}{B}}\label{eq_transform}
+\\[.5\baselineskip]\nonumber
+\tikz[overlay,remember picture]{
+%   \coordinate(A) at  ($ .5*(E1)  + .5*(A2) $);
+  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(A2)$) in coordinate (A) at (\x2,\y1);
+%  \path let \p1 = (E1), \p2 = ($.5*(AC1)+.25*(B2)+.25*(C1)$) in coordinate (AC) at (\x2,\y1);
+  \path let \p1 = (AC1), \p2 = ($.7*(AC1)+.15*(B2)+.15*(C1)$) in coordinate (AC) at (\x2,\y1);
+  \path let \p1 = (E1), \p2 = ($.5*(B1)+.5*(B2)$) in coordinate (B) at (\x2,\y1);
+  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(B2)$) in coordinate (Sup) at (\x2,\y1);
+%  \coordinate(B) at  ($ .5*(B1)  + .5*(B2) $);
+  \coordinate(AB) at ($ .5*(AB1) + .5*(AB2) $);
+ \node(Re)[above = 1.5\baselineskip of B, anchor=center]%
+   {\footnotesize\textrm{Closest frames identical and cancel}};
+    \draw[->](A2.north) to[out=90, in=0] ($ (A)+(0em,3.2ex) $) to[out=180,in=90] (E1.north);
+    \draw[->](B2.north) to[out=90, in=0] ($ (B)+(0em,3.2ex) $) to[out=180,in=90] (B1.north);
+%   \node(ABe)[below = 1.5\baselineskip of AB, anchor=center]%
+%     {\footnotesize\textrm{Unchanged}};
+%    \draw[->] (AB2.south) to[out=-90, in=0]($ (AB)+(0em,-3.2ex) $) to[out=180,in=-90] (AB1.south);
+    \draw[->](C1.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+    \draw[->](A2.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+%    \draw[->, in=-90, out=-90] (A2.south) to ($ (AC.south) - (0,0ex)$);
+}
+\end{align}
+%
+Note that for this operation to be valid the input vector must match the transformation matrix \emph{both} in decomposition (superscript) and closest frame in the subscript.
+
+
+
+%$\mat{L}_{AB}$ and $\mat{S}_{AB}$$\mat{S}_{AB}$ are a rotation and scaling matrix that converts from frame $B$ to $A$,
+% Affine
+% - Preserve points, straight lines and planes.
+% - Sets of parallel lines remain parallel.
+% - Combination of a linear transform and a translation.
+% 
+% Projective space
+% - 
+%
+%
+%      Representation/decomp.       Subscript
+%      Input          Output        Input            Output
+% Add  Same           Unchanged     Closest cancel   Farthest remain
+% Mul  Closest match  Left remain   Don't care       Unchanged
+% T
+
+
+\subsection{Scene setup}
+
+
+
+
+
+
+\subsubsection{General geometry}
+
+To showcase the advantage of using our notation system, observe from \Fig{IV_simulator_coordinate_system} which reference frames we decomposed the virtual scene into: A 3D model $\ubar{M}$, image region $\ubar{I}$, sonar local body $\ubar{S}$, and an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$, respectively. The sequence of affine transforms that a vertex $\udot{V}$% $\dvec{v}^\textit{\tiny{}M}$
+for model $M$ undergo is given as\todo{Condense sequence to improve speed}:
+%
+\begin{align}
+\left[\begin{array}{c}
+\\\dvec{p}_{OV}^{O}\\\\\hline 1
+\end{array}\right]
+= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
+\left[\begin{array}{c}
+\\\dvec{p}_{MV}^{M}\\\\\hline 1
+\end{array}\right]
+\end{align}
+%
+%he transitions between them follow a unified pattern, and it becomes easier to think in terms of vectors instead of coordinates. This keeps even large systems manageable and removes a frequent source of error.
+%
+Every transformation follows the format defined in \eq{eq:T_definition}. For all linear maneuvers in the scene, their contents are summarized in Table \ref{tab_transformation_contents}:
+%
+\begin{table}[h]\normalsize\centering
+\begin{tabular}{r c c r c c}
+	\hline
+	\rowcolor{tabBlue}                     & $\mat{T}_{XC}$      & T$_{CO}$                & $\mat{T}_{OS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
+	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XC})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{OS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
+	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+\end{tabular}%
+\caption{Affine transformation contents}\label{tab_transformation_contents}
+\end{table}
+%
+where
+%
+\begin{align}
+\mat{R}_{IM} &= \mat{R}(\psi,\theta+\pi,\phi), \\
+\mat{S}_{IM} &= \text{diag}(\dvec{s}_{IM}^I),
+\intertext{and}
+\mat{R}_{OS} &= \mat{R}(\uvec{I}_{\,z}^S, \dvec{p}_{SI}^{S}).
+\end{align}
+%
+where $\mat{R}(\psi,\theta,\phi)$ are user specified roll, pitch and yaw,\todo{Update table for Euler-free angles}\todo{How to lose the arrow without this looking like a matrix? It's decomposed...} and $\uvec{I}_{\,z}^S = \mat{T}_{SI}\bmat{0,0,1}\T$.
+
+\subsubsection{Model placement}
+
+When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\protect\ubar{M}$. To position and orient the models into the image frame $\protect\ubar{I}$, we apply the \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+
+\subsubsection{Camera/sonar setup}
+
+To determine what parts of the scene the sonar can see, we place the OpenGL camera at the origin of the sonar frame, $\protect\udot{S}$, pointing at the origin of the image frame, $\protect\udot{I}$. This is achieved with the \emph{sonar (view) matrix} $\mat{T}_\textit{\tiny\!SI}$.
+
+\subsubsection{Orthographic projection}
+
+With the scene and camera set up, the next step is compute how visible points in the scene project onto the viewing plane spanned by $x$ and $\varphi$ in $\ubar{C}$. The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!PS}$.
+
+\subsubsection{OpenGL rendering}
+
+When OpenGL renders the scene it uses a \emph{vertex shader} to apply the model, sonar and perspective matrices to each vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. We also make OpenGL compute the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+
+\subsubsection{OpenCL post-processing}
+
+Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
+
+
+%To get an idea of the geometries involved we refer to \Fig{IV_simulator_coordinate_system}. 
+
+%Our models are stored in regular 3D model files. The simulator loads these into a tree of nodes, each representing a vertex in the model with corresponding facet and texture information. Then the vertices are placed into a virtual scene in OpenGL, and a camera set up to capture the part of the scene corresponding to the image. When OpenGL renders the image, it first computes which vertex contributes to which pixel in the image, then computes the intensity and color of the pixel based on the node's facet, texture and scattering model. In computer graphics terminology, the code that operates on vertices are called a vertex shader, and the code that operates on pixels are called a fragment shader.
+
+%Before we describe the rendering pipeline in further detail, 
+
+%In computer graphics 
+%Contrary to many computer graphics applications, we 
+
+
+
+\subsubsection{Normalization and clipping}
+
+OpenGL clips any coordinate that end up outside the normalized range $[-1,1]$. This means that we need to offset and normalize each axis such that the pixels we want visible end up in this range.
+Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
+
+Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
+%
+\begin{align}
+\left[\begin{array}{c}
+\\\dvec{p}_{XV}^{X}\\\\\hline 1
+\end{array}\right]
+= \mat{T}_{XC}
+\left[\begin{array}{c}
+\\\dvec{p}_{CV}^{C}\\\\\hline 1
+\end{array}\right]
+\end{align}
+%
+where $\ubar{C}$ is in cylindrical coordinates but has the same origin as $\ubar{O}$, $\udot{O} = \udot{C}$, so that\todo{Verify sign of atan()}:
+%
+\begin{align}\label{eq_cart2cyl}
+\dvec{p}^C
+= \bmat{x\\r\\\varphi}
+= \mathrm{T_{CO}}(\dvec{p}^O)
+= \bmat{\dvec{p}_x^O\\
+\sqrt{(\dvec{p}_y^O)^2 + (\dvec{p}_z^O)^2}\\
+\text{atan}\big(\dvec{p}_y^O / \dvec{p}_z^O\big)
+}
+\end{align}
+%
+
+
+Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:\todo{Keep position vector bold, even if an element is indexed?}
+%$\dvec{p}_\Delta = \udot{I}_{
+%
+%\dvec{p}_{I_\Delta} = \big[p_{\Delta,i}\big] &= \big[|p_{I_\mathrm{max},i}-p_{I_\mathrm{min},i}|\big] \quad i\in\{x,y,z\}
+\begin{align}\label{eq:M}
+\dvec{s}_\Delta^I &= \mathrm{abs}\big(\dvec{p}_{I_\mathrm{max}}^I-\dvec{p}_{I_\mathrm{min}}^I\big),
+\end{align}
+%
+where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^C$
+\begin{align}\label{eq:M}
+\dvec{s}_\Delta^C &= \mathrm{T_{CO}}\big(\mat{T}_{OS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
+\end{align}
+%
+Now we have all the information needed to normalize the scene in $\ubar{C}$, i.e. the contents of $\mat{T}_{XC}$:
+%
+\begin{align}
+\mat{L}_{XC}
+&= \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^C\right) \label{eq_L_XC} \\
+\dvec{t}_{XC}
+&= -2\dvec{p}_{CI}^C\oslash\dvec{s}_\Delta^C \label{eq_t_XC}
+\end{align}
+%
+where $\boldsymbol{2}$ is a vector of twos\todo{Too informal?}, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
+
+
+
+% effektivt - høyere grad av abstrakthet
+% serie av projeksjoner, uniform
+
+%
+%$(\psi,\theta,\phi) = (
+%
+%where the position vector $\dvec{p}_\textit{\tiny{}SI}^\textit{\tiny{}S}$ specifies translation to the image ($I$) center in sonar ($S$) coordinates and the linear transformation matrix $\mat{L}_\textit{\tiny{}SM}$ encodes scaling and rotation information. The transformation \eq{eq:M} is also affine as long as the bottom row is $(0,0,0,1)$.
+
+
+%\begin{align}
+%\M = \bmat{
+%  &    &    &   \\
+%  &    &    & \dvec{p}_\textrm{\tiny{}SI}^\textsc{\tiny{$S$}}$ \\
+%  &   &    &   \\
+%0  &  0  &  0  &  1 \\
+%}
+%\end{align}
+
+%$\ubar{I} = (\udot{I},\uvec{I}) = (\udot{S}+o^\textit{S},\uvec{S}$.
+%
+%Where $\dvec{v}_{}^L = [x,y,z,w]\T$ denote vertex $v$ decomposed in reference frame $L$, with the homogeneous coordinates $L$, $v = \bmat{ x\,w & y\,w & z\,w }$ 
+%
+%%Sonar coordinate frame, denoted $\p^S$. Models denoted $\p^M$.
+%
+%
+%
+%
+%The model matrix $\M_\mathrm{WM}$ is applied first to the object to convert it from its local "model" space to world space. It is defined as:
+%
+%\begin{align}
+%\mat{R}_{IM} = \mat{R}_{IM} \mat{S}_{IM}
+%\end{align}
+%
+%where $\boldsymbol{S}$, $\boldsymbol{R}$ and $\boldsymbol{T}$ are transformation matrices that sets the object's scale, rotation and translation, respectively. Combined these transforms map the object from its local coordinate system to the world's coordinate system. They are provided for reference in Appendix \ref{IV_transformation_matrices}.
+
+%Next the object is mapped into world coordinates with the view matrix $\V$. This involves aligning the camera to precisely fit the image region. In our case the camera represents the phase center of the sonar, and it is placed in the world origin. The transformation then take the form of
+%
+%\begin{align}\label{eq:M}
+%\mat{T}_{SI}
+%= \left[\begin{array}{c c c | c}
+%& & &   \\
+%& \mat{R}_{SI}(0,0,0) & & \dvec{p}_{SI}^{S} \\
+%& & &  \\\hline
+% 0 &  0  &  0  &  1
+%\end{array}\right]
+%\end{align}
+%%
+%\begin{align}\label{eq:M}
+%\mat{T}_{OS}
+%= \left[\begin{array}{c c c | c}
+%& & &   \\
+%& \mat{R}_{OS}(\frac{\pi}{2}-\text{atan}\left(\frac{\dvec{p}_{SI,z}^{S}}{\dvec{p}_{SI,y}^{S}}\right),0,0) & & \dvec{p}_{OS}^{O} \\
+%& & &  \\\hline
+% 0 &  0  &  0  &  1
+%\end{array}\right]
+%\end{align}
+%%
+%where
+%%
+%\begin{align}
+%\mat{L}_{SI} = \mat{R}_{SI} \mat{S}_{SI}
+%\end{align}
+
+
+
+%\begin{align}
+%\V &= \mat{T}(\c^\mathrm{W}) \cdot \R_\text{x}(\phi_x, 0, 0) \nonumber\\
+%&= 
+%\bmat{
+%1  &  0  &  0  &  c_\text{x} \\
+%0  &  1  &  0  &  c_\text{y} \\
+%0  &  0  &  1  &  c_\text{z} \\
+%0  &  0  &  0  &  1 \\
+%} \cdot
+%\bmat{
+%1  &  0           &  0           &  0 \\
+%0  &  \cos\phi_x  &  -\sin\phi_x &  0 \\
+%0  &  \sin\phi_x  &  \cos\phi_x  &  0 \\
+%0  &  0           &  0           &  1 \\
+%},
+%\end{align}
+%
+%where $(x_\text{c}, y_\text{c}, z_\text{c})$ is the image center coordinates for along track, cross track, and depth, respectively, and $\phi_x$ is the elevation angle\todo{is this correct?} of the sonar. It is given as
+%%
+%\begin{align*}
+%\phi_x &= \arctan\left(\frac{y_\text{mean}}{-z_\text{mean}}\right).
+%\end{align*}\todo{use absolute sign?}
+
+
+%
+%\begin{align}
+%\P = \left(\begin{matrix}
+%\frac{2}{r-l}  &  0              &  0              &  -\frac{r+l}{r-l} \\
+%0              &  \frac{2}{t-b}  &  0              &  -\frac{t+b}{t-b} \\
+%0              &  0              &  \frac{-2}{f-n} &  -\frac{f+n}{f-n} \\
+%0              &  0              &  0              &  1
+%\end{matrix}\right)
+%\end{align}
+%%
+%where $l,r,b$ and $t$ are the left, right, bottom and top boundaries of the projection plane, respectively, and where $n$ and $f$ is the near and far limits of the cube that encompass the scene. These parameters need to be adapted to provide a 2D image that matches the image size, which we specify in along track and cross track coordinates ($x,y$). This is straightforward for left and right since matches the $x$-axis
+%% They define the window through which we observe our scene.
+%\begin{align}
+%l &= x_\text{min}  &  r &= x_\text{max}
+%\end{align}
+%%
+%For the near and far limits one simply needs to make sure the scene will fit in it, say
+%%
+%\begin{align}
+%n &= 0\;\text{m}   &  f &= 300\;\text{m}.
+%\end{align}
+%%
+%The bottom and top boundaries can be inferred from \Fig{IV_camera_top_bottom}. First we define an origin vector that points to the center of the image
+%%
+%\begin{align}
+%\vec o &= \left[\frac{x_\text{min}+x_\text{max}}{2}, \frac{y_\text{min}+y_\text{max}}{2}, \frac{z_\text{min}+z_\text{max}}{2} \right]\T,
+%\end{align}
+%%
+%and the distance from the image origin to its $y$-boundaries is given as
+%%
+%\begin{align}
+%\Delta y &= \frac{|y_\text{max} - y_\text{min}|}{2}.
+%\end{align}
+%%
+%To find the nearest and farthest point in the image that will be part of the projected scene, $\alpha$ and $\beta$, we must consider the seafloor rotation angle around the $x$-axis, $\Phi_x$ 
+%%
+%\begin{align}
+%\vec\alpha &= \vec 0 - \left[0, \Delta y, \Delta y \cdot \tan\Phi_\text{x} \right] \nn
+%\vec\beta &= \vec 0 + \left[0, \Delta y, \Delta y \cdot \tan\Phi_\text{x} \right]
+%\end{align}
+%
+%\begin{figure}[t]\centering%
+%\includegraphics[drawing,width=\linewidth]{gfx/opengl_part.svg}%
+%\caption{Setting camera top and bottom boundaries.}\label{IV_camera_top_bottom}%
+%\end{figure}
+%
+
 
 
 
@@ -232,56 +1208,76 @@ To produce the sonar templates we assume a rough, isotropic surface that reflect
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
+
+
 \subsection{OpenCL post-processing}
 
 The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us what parts of the scene that are visible from the sonar. OpenGL can also produce a depth map that reveals the distance to each of image pixels. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+
+\begin{align}
+&\text{forall } y,\varphi \nn
+&\quad\text{if }\left\lfloor y_I\right\rfloor == y \nn
+&\qquad\dvec{a}_I[y] \colon= \big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
+&\qquad\dvec{a}_I[y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi]
+\end{align}
+%y_I &= \mat{T}_{IC}\dvec{d}_C[\varphi] \\
+%\dvec{a}_I[y] &= \suml{\forall \varphi} \begin{cases}
+%\big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] & \text{if}\quad \left\lfloor y_I+0.5\right\rfloor == y, \\
+%\big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] & \text{if}\quad \left\lfloor y_I\right\rfloor == y, \\
+%0            & \text{otherwise}
+%\end{cases}
 
 \todo{
 - Kernel tuning.
 - Sharing. PBO. Asynchronous.
 }
 
-\subsection{Template matching}
-
-1. Segmentation
-2. Parameter estimation
-   Available: Range, altitude, resolution => Input to both standard and adaptive. In standard the best fit out of a predefined template database is selected, then resampled to correct resolution.
-   Additional for adaptive, parameters that modify object model: Target aspect angle, seafloor slope, object length and height.
-
-   Target aspect angle computed with Radon Transform, seafloor under object modeled as plane with a slope estimated from bathymetric data, length estimated from longest part of highlight region, and height estimated from the shape of the shadow. The burial depth is n
+%Map from $\mathbb{R}^{MxN} \rightarrow \mathbb{R}^{MxN}$
 
 
-   
-3. 
-
-   Details: \ref{Midelfart2010}.
-
-Let $S(x,y)$ be the isolated part of the
-
-Matching the isolated image segment with the template take the form of
-
-\begin{align}
-c_{h,i} = \underset{x',y'}{\text{argmax}} \sum\limits_{\forall x}\sum\limits_{\forall y} \big| H(x,y) - T(x-x',y-y') \big|
-\end{align}
-
-\begin{align}
-c_i = \frac{c_{h,i} + c_{s,i}}{2}
-\end{align}
-
-And the final template used is the one with the greatest correlation coefficient
-
-\begin{align}
-\underset{T_i(x,y)}{\text{argmax}} C_i\sum\limits_{\forall x}\sum\limits_{\forall y}  S(x,y) T(x-x',y-y')
-\end{align}
-
-Then assign object to class $i$.
 
 
-To narrow down the search space of possible templates we derive some reliable statistics of the seafloor and object from the SAS image. While FFISim accepts an arbitrarily complex seabed, we find that modeling it as a plane wave with the right tilt works well. The object is more difficult. For instance, we estimate its length and height from the shape of its shadow, but this fails if the object is notably immersed into the seabed at one end. 
-
-After the a template is created we decompose it into its highlight and shadow component, and compute a correlation score between these and the corresponding areas in the SAS image. Then the two scores are summed and normalized to form the final correlation score of the template.
-
-We tag the template matchers as either semi- or fully adaptive. The former refers to using the best matching SIGMAS+ generated template out of a precomputed set of templates, while the latter refers to the proposed method of using FFISim to generate templates on the-the-fly. \todo{Should be more precise. How many templates? Parameter span? How finely were the parameters sampled?} 
+%\subsection{Template matching}
+%
+%1. Segmentation
+%2. Parameter estimation
+%   Available: Range, altitude, resolution => Input to both standard and adaptive. In standard the best fit out of a predefined template database is selected, then resampled to correct resolution.
+%   Additional for adaptive, parameters that modify object model: Target aspect angle, seafloor slope, object length and height.
+%
+%   Target aspect angle computed with Radon Transform, seafloor under object modeled as plane with a slope estimated from bathymetric data, length estimated from longest part of highlight region, and height estimated from the shape of the shadow. The burial depth is n
+%
+%
+%   
+%3. 
+%
+%   Details: \cite{Midelfart2010}.
+%
+%Let $S(x,y)$ be the isolated part of the
+%
+%Matching the isolated image segment with the template take the form of
+%
+%\begin{align}
+%c_{h,i} = \underset{x',y'}{\text{argmax}} \sum\limits_{\forall x}\sum\limits_{\forall y} \big| H(x,y) - T(x-x',y-y') \big|
+%\end{align}
+%
+%\begin{align}
+%c_i = \frac{c_{h,i} + c_{s,i}}{2}
+%\end{align}
+%
+%And the final template used is the one with the greatest correlation coefficient
+%
+%\begin{align}
+%\underset{T_i(x,y)}{\text{argmax}} C_i\sum\limits_{\forall x}\sum\limits_{\forall y}  S(x,y) T(x-x',y-y')
+%\end{align}
+%
+%Then assign object to class $i$.
+%
+%
+%To narrow down the search space of possible templates we derive some reliable statistics of the seafloor and object from the SAS image. While FFISim accepts an arbitrarily complex seabed, we find that modeling it as a plane wave with the right tilt works well. The object is more difficult. For instance, we estimate its length and height from the shape of its shadow, but this fails if the object is notably immersed into the seabed at one end. 
+%
+%After the a template is created we decompose it into its highlight and shadow component, and compute a correlation score between these and the corresponding areas in the SAS image. Then the two scores are summed and normalized to form the final correlation score of the template.
+%
+%We tag the template matchers as either semi- or fully adaptive. The former refers to using the best matching SIGMAS+ generated template out of a precomputed set of templates, while the latter refers to the proposed method of using FFISim to generate templates on the-the-fly. \todo{Should be more precise. How many templates? Parameter span? How finely were the parameters sampled?} 
 
 % It is also possible to compute the sonar image using the OpenGL ``blend'' feature.
 
@@ -289,15 +1285,16 @@ We tag the template matchers as either semi- or fully adaptive. The former refer
 
 Using OpenGL and OpenGL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs. However, initializing the OpenGL and OpenCL context and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
-The rendering loop that uses OpenGL and OpenCL to form 
+%The rendering loop that uses OpenGL and OpenCL to form 
 
 \todo{
+Rewrite
 Write to file
 }
 
 %    """
 %    
-%    stm: Standard template matching, made with SIGMAS.
+%    stm: Standard template matching, made with SIGMAS+.
 %    atm: Adaptive template matching, made with FFISim.
 %    atm_bury: Adaptive template matching where a search of bury depths is used.
 %    atm_bury_restr: Restricted?
@@ -357,113 +1354,167 @@ Write to file
 %       
 %  
 %    """
+\newlength\imgspacing\setlength\imgspacing{.5cm}
+\setcounter{topnumber}{1}
+\setcounter{totalnumber}{1}
 
 \section{Results \& Discussion}
 
-\begin{figure*}[!tbp]\centering%
-\includegraphics[width=\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}\label{fig_images_sonar_simulation}%
-\caption{Selected objects. Top row show SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Center row show the best match from a conventional template matcher, and bottom row show the adaptive template matcher. The contour of the SAS object is indicated with red lines. Note that the adaptive technique produce templates with a better fit to the highlight, but that this does not necessarily lead to a better match against the shadow.}
+\begin{figure*}[t]\centering%
+\ifOverLeaf%
+  \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}%
+\else%
+  \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}%
+\fi
+\caption{\emph{Two cylinders and a torpedo in Jesus Bay, Norway.} Top row shows isolated SAS image segment corresponding to the object, while center and bottom row show the template from the conventional and adaptive method, respectively. The contour of the SAS object is indicated with red lines. Observe that the adaptive technique perform better in the highlight, but not necessarily the shadow.}\label{IV_fig_images_sonar_simulation}%
 \end{figure*}
 
-\begin{figure*}[!tbp]\centering%
-\includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}\label{fig_roc_curves}%
-\caption{Receiver operating characteristics (ROC) curves.}
-\end{figure*}
-
-\begin{figure*}[!tbp]\centering%
-\includegraphics[width=\linewidth]{gfx/fig_overlay.pdf}%
+\begin{figure*}[t]\centering%
+\includegraphics[width=.8\linewidth]{gfx/fig_overlay.pdf}%
 % \parbox{\linewidth}{\small\centering\vspace{.5\baselineskip}
 % \newline\centering\newline %\\[.5\baselineskip]
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
 \fbox{\colorbox[HTML]{#1}{\vrule height8.5pt depth3.5pt width0pt\hspace{.5cm}}}\ \ #2\\}}
-\begin{minipage}{.4\linewidth}
+\begin{minipage}{.29\linewidth}\footnotesize
 \cdesc{800000}{Template highlight and image highlight}
 \cdesc{FF1000}{Template highlight only}
 \cdesc{FFEB00}{Image highlight only}
 \cdesc{83FF7C}{Background pixels}
-\end{minipage}%
-\begin{minipage}{.4\linewidth}
+\end{minipage}\mbox{}\hspace{3cm}
+\begin{minipage}{.29\linewidth}\footnotesize
 \cdesc{000083}{Template shadow and image shadow}
 \cdesc{0014FF}{Template shadow only}
 \cdesc{00EFFF}{Image shadow only}
 \cdesc{00A7FF}{Template shadow and image highlight}
 \end{minipage}%}
-\caption{Comparison of classification performance for the standard and adaptive template technique. The three objects were more or less arbitrary picked from the scene. For the roughly 3\,m long cylinders both methods perform similarly, the standard method seemingly with a slight edge. This is no surprise given that the 3\,m long cylinder model that make up the static template database fit the actual object well here. However, for the longer torpedo-like object the adaptive technique is clearly better. This is its merit; for objects and geometries that are not included in the static template database we can expect the adaptive techniques to perform better.}\label{fig_image_simulation}%
+\caption{Comparison of classification performance for the standard and adaptive template technique. The three objects were more or less arbitrary picked from the scene. For the roughly 3\,m long cylinders both methods perform similarly, the standard method seemingly with a slight edge. This is no surprise given that the 3\,m long cylinder model that make up the static template database fit the actual object well here. However, for the longer torpedo-like object the adaptive technique is clearly better. This is its merit; for objects and geometries that are not included in the static template database we can expect the adaptive techniques to perform better.}\label{IV_fig_image_simulation}%
 \end{figure*}
 
-\newlength\imgspacing\setlength\imgspacing{.5cm}
-\setcounter{topnumber}{2}
+\begin{figure*}[t]\centering%
+\includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}%
+\caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
+\end{figure*}
 
-The performance of our simulator and template matching techniques where measured using experimental data from an interferometric HISAS1030 synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$\circ$, and is capable of generating synthetic images with a theoretical resolution of 3-4\,cm in both dimensions. The version of HUGIN used also carries an camera that is used for optical inspection of interesting objects.
+The upcoming results will be based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
-We present data from three different HUGIN runs from the Jesus Bay in Norway. The first two are taken a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. The detections represent mostly cylinder shaped objects such as barrels, pipe mines and torpedoes. Therefore, all templates were based on a basic cylinder model.
+%To test performance of our simulator and template matching techniques where measured using experimental data from 
 
+We present three different HUGIN runs from the Jesus Bay in Norway. The first two a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
+The following three methods will be contrasted:\todo{Poor transition}
+%
+\begin{itemize}
+\item \emph{Standard (SIGMAS+).} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
+\item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
+\end{itemize}
 
+\subsection{Processing speed}
 
-The two template matchers can be visually inspected in \Fig{fig_images_sonar_simulator_tagged}. 
-
-The classification performance is quantified with receiver operating characteristics (ROC) curves from all runs in \Fig{fig_roc_curves}. The 2009 runs proves a greater challenge than that from 2012, with 5 and 3 false positive detections at FPR=20\% in the January 6. and 8. run, respectively. This came as no surprise due to the 2009 runs containing fish trawler tracks and having poorer highlight and shadow quality than the run from 2012. However, for FPR<20\% the adaptive techniques outperform the static template library. For e.g. a mine counter measures (MCM) operation, this is the only region of interest because only a few objects out of the 3000 detections will be visually inspected up close.
-
-- Stm stimulated with length matching test cylinder. Perfect score against this.
-- Atm - not given to improve score. Shadow and highlight both need to match, and overfitting could lead to reduced performance.
-
-In \Fig{fig_images_sonar_simulator_tagged} we compare the SAS image to the templates generated by the conventional and adaptive template matcher. Three typical objects from the 2012 were chosen, all being cylindric. The length two first being estimated to roughly 3\,m and the last 5\,m, likely representing cylinder mines and a torpedo, respectively. 
-
-Selected objects. Top row show SAS images of 2 cylinders and a torpedo located in the Jesus Bay, Norway. Center row show the best match from a conventional template matcher, and bottom row show the adaptive template matcher. The contour of the SAS object is indicated with red lines. Note that the adaptive technique produce templates with a better fit to the highlight, but that this does not necessarily lead to a better match against the shadow.
-
-Rotation around ground range axis: -4,-2,0,2,4 degrees.
-
-Like the majority of objects in the Jesus Bay they are all cylinders with a length of a few meters. The same objects are simulated in \Fig{fig_image_simulation}, one with SIGMAS and the two other with FFISim. Each of these simulations were based on 
-
-
-
-
-
-Good statistics drawn from the image -> adaptive better. Poor statistics -> hit and miss.
+%FFISim was designed to 
+%The key selling point of FFISim is that it is very fast. 
+%Note that FFISim 
+%
+%is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
+Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates very closely imaged objects. In contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.\todo{Rewrite paragraph}
+
+%The edge of FFISim lies in its tighter integration with the classifier
 
 
-1. Comparison with standard template library (ROC enough?)
-   ROC: Adaptive better at FPR<0.2 in all cases.
-2. Comparison with SIGMAS
-   Fairly similar images, performance is similar. 
-   Used to create the standard template library.
-3. Comparison with search space
-   ROC: Additional search always better FPR<0.2.
-   Explain search criterion.
+\subsection{Classification - selected objects}
+
+
+Let us first study simulation and classification performance on three typical objects from the 2012 data: Two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depth and aspect angle. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
+%
+\begin{itemize}
+\item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also near identical (ignoring background level), as expected since they both rely on a Lambertian scattering model.
+\item \emph{Template accuracy} improves when using the adaptive technique; It excels at generating accurate highlight regions, but is less convincing in shadow regions. This advantage grows the more unconventional the object is, since these objects will not be represented in the static database.
+\end{itemize}
+
+%- Template quality FFISim/SIGMAS+, similar. Same size/shape.
+%- Adaptive technique for highlight, tie for shadows. Same seen in segmentation result.
+%- Speed -> FFISim
+
+
+%Note how the adaptive technique excels at reproducing accurate highlights, but that this does not necessarily translate into accurate shadows. 
+
+%In terms of template quality both SIGMAS+ and FFISim produce similar results. 
+
+%\Fig{IV_fig_image_simulation} contrasts the segmentation result of the templates with that of the SAS image---in terms of highlight, shadow and background regions. As expected the adaptive technique generally produce better matching templates, but with a surprising caveat: Improved highlight scores did not necessarily translate to better shadow scores. 
+
+
+%Out of the objects in the scene we selected a 2.6\;m long cylinder that was partly buried in the sea sediments (Fig. \ref{IV_data_cylinder}). The length, immersion depth and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}. 
+
+%Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{IV_sim_cylinder}), which is an almost perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a generic length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for every 10$^\text{th}$ degree of the aspect angle. We believe these assumptions to be typical for a template library for cylinder mines. 
+
+%Note how the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
+
+%The main difference lies in how they integrate into the classification process: While SIGMAS+ generate one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
+
+% FFISim provide templates that better match the true object orientation in this figure, but  
+
+% Different background level. Adaptive technique excels for less normal objects/geometries.
+%Overlap - Provide quantification measure. 
+
+\subsection{Classification - all objects}
+
+We demonstrate classification performance with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. 
+
+Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations because out of 3000 detections only a few will be visually inspected up close.
+
+Above 20\% FPR the results are less clear: The adaptive techniques performed similarly to the static method in 2012, but worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
+
+
+ 
+%- Stm stimulated with length matching test cylinder. Perfect score against this.
+%- Atm - not given to improve score. Shadow and highlight both need to match, and overfitting could lead to reduced performance.
+%
+%
+%
+%
+%Good statistics drawn from the image -> adaptive better. Poor statistics -> hit and miss.
+%
+%
+%1. Comparison with standard template library (ROC enough?)
+%   ROC: Adaptive better at FPR<0.2 in all cases.
+%2. Comparison with SIGMAS+
+%   Fairly similar images, performance is similar. 
+%   Used to create the standard template library.
+%3. Comparison with search space
+%   ROC: Additional search always better FPR<0.2.
+%   Explain search criterion.
 
 
 
-SAS images - look good. Random pick objects. Lengths derived from image.
-Simulated images - look good. Adaptive simulation more accurate. Otherwise similar. Different background level. Adaptive technique excels for less normal objects/geometries.
-Overlap - Provide quantification measure. 
+%SAS images - look good. Random pick objects. Lengths derived from image.
 
 
-1. Adaptive better? Compare with standard. Doing this in ROC
-2. Improved classification? ROCs
-3. Further improvement by doing fine-search? ROC
-
-
-An issue the adaptive technique must deal with when estimating object length 
-
-As the ROC curves indicate, the adaptive template matching techniques both  ROC curves demonstrate the 
-
-The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of three such objects are displayed in \Fig{fig_image_sonar}
-
-
-
-
+%
+%1. Adaptive better? Compare with standard. Doing this in ROC
+%2. Improved classification? ROCs
+%3. Further improvement by doing fine-search? ROC
+%
+%
+%An issue the adaptive technique must deal with when estimating object length 
+%
+%As the ROC curves indicate, the adaptive template matching techniques both  ROC curves demonstrate the 
+%
+%The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of three such objects are displayed in \Fig{IV_fig_image_sonar}
+%
+%
+%
+%
 
 
 % \begin{figure*}[!tbp]\centering%
 % \subfloat[SAS images of 2 cylinders and a torpedo.]{%
 % \includegraphics[width=0.5\linewidth]{gfx/fig_images_sonar_simulation.pdf}%
-% \label{fig_sonar_simulation}}%
+% \label{IV_fig_sonar_simulation}}%
 % \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
 % \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-% \label{sim_cylinder}}%
+% \label{IV_sim_cylinder}}%
 % \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 % \end{figure*}
 % 
@@ -471,10 +1522,10 @@ The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of
 % \begin{figure*}[!tbp]\centering%
 % \subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
 % \includegraphics[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
-% \label{data_cylinder}}%
+% \label{IV_data_cylinder}}%
 % \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
 % \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-% \label{sim_cylinder}}%
+% \label{IV_sim_cylinder}}%
 % \caption{A SAS image of a cylinder and a template simulation adapted to it.}
 % \end{figure*}
 
@@ -489,21 +1540,20 @@ The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of
 % 
 % Creating a GPU-based simulator is attractive since computer is an attractive solution as there are a  graphics traits. For one over a CPU-based standard simulator is two-fold: 
 
-Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates very closely imaged objects. In contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.
-
-This performance was demonstrated on an image from the HISAS 1030 synthetic aperture sonar mounted on the HUGIN AUV. Out of the objects in the scene we selected a 2.6\;m long cylinder that was partly buried in the sea sediments (Fig. \ref{data_cylinder}). The length, immersion depth and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}.  Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{sim_cylinder}), which is an almost perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a generic length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for every 10$^\text{th}$ degree of the aspect angle. We believe these assumptions to be typical for a template library for cylinder mines. 
-
-The standard and adaptive templates were then matched to the HISAS image. This is illustrated in Fig. \ref{overlay_cylinder} for a standard template and in Fig. \ref{overlay_cylinder_adaptive} for an adaptive template. These images were created by segmenting the image and the templates into highlight, shadow, and background regions. The regions from a template were then laid on top of the regions of the image to illustrate how well these regions matched. Note how the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
-
-\begin{itemize}
-\item GPUs low power. Good for integration in AUVs.
-\item Good accuracy even with a real-time constraint in e.g. a AUV.
-\item Improved inertial navigation?
-\item Aid in understanding the key parts of the SAS image and in discovering potential flaws in the SAS image. Anomalies can be flagged to make SAS more robust?
-\end{itemize}
 
 
-\section{Conclusion}\label{conclusion}
+%
+%
+%
+%\begin{itemize}
+%\item GPUs low power. Good for integration in AUVs.
+%\item Good accuracy even with a real-time constraint in e.g. a AUV.
+%\item Improved inertial navigation?
+%\item Aid in understanding the key parts of the SAS image and in discovering potential flaws in the SAS image. Anomalies can be flagged to make SAS more robust?
+%\end{itemize}
+
+
+\section{Conclusion}\label{IV_conclusion}
 
 One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
 
@@ -511,10 +1561,15 @@ To obtain the delayed real-time performance we implemented the simulator on a GP
 
 A final post-processing step is performed in OpenCL, which allow general purpose GPU programming. It interoperates well with OpenGL and adds a lot of flexibility to the simulation process. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
-\begin{itemize}
-\item Motion compensation
-\item 
-\end{itemize}
+With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The standard method of using a static template library generally did well here, . 
+
+In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: While SIGMAS+ generate one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
+ 
+%
+%\begin{itemize}
+%\item Motion compensation
+%\item 
+%\end{itemize}
 
 \ifPhdDoc
 \clearpage
@@ -525,7 +1580,63 @@ A final post-processing step is performed in OpenCL, which allow general purpose
 \fi
 
 
-\section{Transformation matrices}\label{transformation_matrices} 
+
+
+\section{Transformation matrices}\label{IV_transformation_matrices} 
+
+We define $\vec{R}_{AB}$ as a rotation---from $\uvec{A}$ to $\uvec{B}$---by angle $\theta\in\mathbb{R}$ clockwise around unit vector $\hat{r}\in\mathbb{V}$ in $\mathbb{R}^3$ Euclidean space using Euler-Rodrigues' formula,
+
+\subsection{Free Euler-Rodrigues}\label{IV_sec:free_euler_rodrigues}
+%
+\begin{align}\label{eq:M}
+%\uvec{A} = \vec{R}_{\uvec{A}\uvec{B}}\uvec{B} \\
+\vec{R}_{AB}
+&\triangleq %e^{j\overset{\times}{r}\theta}=\nn
+ \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta) \in SO(3),
+\end{align}
+%
+where $\vec{I}$ is the identity, and $\overset{\times}{r}$ is the skew-symmetric (or cross-product) matrix of $\hat{r}$,
+%
+\begin{align}
+\overset{\times}{r}
+&\triangleq \bmat{\hat{r}\times} \triangleq \bmat{
+0 & -\hat{r}_z & \hat{r}_y \\
+\hat{r}_z & 0 & -\hat{r}_x \\
+-\hat{r}_y & \hat{r}_x & 0
+},
+\end{align}
+%
+and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+%
+\begin{align}
+\theta
+&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+\end{align}
+%
+where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.\todo{Mighty long and heavy sentence... Yikes}
+
+$SO(3)$ refers to special (\emph{i.e.} right handed) orthogonal $\mathbb{R}^{3\times3}$ matrices, where the handedness is verified by determinant $\big|R\big|=1$ (as opposed to $\pm1$), and the orthogonality follows from the skew symmetry of $\overset{\times}{r}_{AB}$. $SO(3)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
+
+{\color{blue}Below is the old text}
+
+We restrict our attention to linear transforms of the kind $\mat{L}_{AB} = \mat{R}_{AB}\;\mat{S}_{AB}$ where the former is a rotation matrix and the latter a scaling matrix. The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
+%
+\begin{align}\label{eq:M}
+\mat{R}_{AB} &= \I + \sin\theta_{AB}\;[\dvec{\hat{r}}^A\times] + (1-\cos\theta_{AB})\;[\dvec{\hat{r}}^A\times]^2 \in\mathbb{R}^{3\times3}
+\end{align}
+%
+where $\big[\dvec{\hat{r}}_{AB}^A\big]$ is the open-right cross product matrix of $\dvec{\hat{r}}^A$ and $\mat{I}$ is the identity matrix. 
+
+% %\dvec{\hat{p}}_{A\times{}B}^C
+\begin{align}
+\theta_{AB}
+&= \mathrm{acos}\frac{\dvec{p}_{A}^{C}\cdot\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert} \\
+\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
+\end{align}
+
+% http://lairs.eng.buffalo.edu/pdffiles/pconf/C10.pdf
+% http://www.navlab.net/Publications/Inertial_Navigation_-_Theory_and_Applications.pdf
 
 Each data model that we load into OpenGL is defined in its own local coordinate system. To map them into OpenGL world coordinates a set of common transformation matrices are applied to each model's vertices:
 %
@@ -535,33 +1646,33 @@ Each data model that we load into OpenGL is defined in its own local coordinate 
 %
 Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\boldsymbol{R}$ and finally translated with $\boldsymbol{T}$, resulting in the transformed coordinates $(x_t,y_t,z_t)$. The parameter $w$ defines whether the vertex is a position ($w=1$) or a direction ($w=0$), which need to be handled differently. While these matrices are well-known in the field of computer graphics, there exist several different conventions but we supply them here for completeness.
 
+%Adding some phantom space to align the columns of the next matrices
+\newcommand\pc[1]{\phantom{ml}#1\phantom{ml}}
 The scaling and translation matrices are simple:
 %
 \begin{align}
-\boldsymbol{S}(s_x,s_y,s_z) &= \bmat{
-   s_x  &  0    &  0    &  0 \\
+\boldsymbol{S}(\s) &= \bmat{
+   s_x  &  0   & 0  & 0 \\
    0    &  s_y  &  0    &  0 \\
    0    &  0    &  s_z  &  0 \\
-   0    &  0    &  0    &  1 \\
+   \pc{0}    &  \pc{0}    &  \pc{0}    & \pc{1} \\
   },
   \end{align}
 %
 and
-
-TZF64LJO2AUK2XEM
 %
 \begin{align}
-\boldsymbol{T}(dx,dy,dz) &= \bmat{
-	1  &  0  &  0  &  dx \\
-	0  &  1  &  0  &  dy \\
-	0  &  0  &  1  &  dz \\
-	0  &  0  &  0  &  1 \\
+\boldsymbol{T(\vec\Delta}) &= \bmat{
+	1  &  0  &  0  &  \Delta_x \\
+	0  &  1  &  0  &  \Delta_y \\
+	0  &  0  &  1  &  \Delta_z \\
+ \pc{0}  &   \pc{0}  &   \pc{0}  &   \pc{1} \\
 },
 \end{align}
 %
-where ($s_x$, $s_y$, $s_z$) and ($dx$, $dy$, $dz$) is scaling and translation factors.
+where $\s = (s_x, s_y, s_z)$ and $\vec\Delta = (\Delta_x, \Delta_y, \Delta_z)$ are the scaling and translation factors.
 
-Rotations will be specified using intrinsic Euler angles, i.e. as yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the $z$-, $y$- and $x$-axis, respectively. The Brian-Tait $Z$-$Y'$-$X''$ convention is used for rotation order, in which roll is applied first, then pitch and finally yaw:
+Rotations will be specified using yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. Rotation order follow the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, in which roll is applied first, then pitch and finally yaw:
 %
 \begin{align}
 \R(\phi_x) = \R_z(\phi)\R_y(\theta)\R_x(\psi),
@@ -571,46 +1682,37 @@ where
 %
 \begin{align}
 \R_x(\psi) &= \bmat{
-1  &  0           &  0           &  0 \\
-0  &  \cos\psi  &  -\sin\psi &  0 \\
-0  &  \sin\psi  &  \cos\psi  &  0 \\
-0  &  0           &  0           &  1 \\
-},
-\end{align}
-%
-\begin{align}
+    1  &   0        &  0         &  0 \\
+    0  &  \cos\psi  &  -\sin\psi &  0 \\
+    0  &  \sin\psi  &  \cos\psi  &  0 \\
+\pc{0} &  \pc{0}    &  \pc{0}    &  \pc{1} \\
+}, \\[.5\baselineskip]
 \R_y(\theta) & = \bmat{
 \cos\theta	& 0          & \sin\theta & 0 \\
-0					& 1                   & 0          & 0          &  \\
--\sin\theta  & 0                   & \cos\theta & 0          &  \\
-0            & 0                   & 0          & 1          &  \\
-},           &
-\end{align}
-%
-and
-%
-\begin{align}
+0				& 1          & 0          & 0  \\
+-\sin\theta & 0          & \cos\theta & 0  \\
+\pc{0}      &  \pc{0}    & \pc{0}     & \pc{1} \\
+},
+%\\[0\baselineskip]
+\intertext{and}
+%\\[0\baselineskip]
 \R_z(\phi) &= \bmat{
-\cos\phi  &  -\sin\phi &  0  &  0 \\
-\sin\phi  &  \cos\phi  &  0  &  0 \\
-0				&  0           &  1  &  0 \\
-0           &  0           &  0  &  1 \\
+\cos\phi	&  -\sin\phi   &  0      &  0 \\
+\sin\phi	&  \cos\phi    &  0      &  0 \\
+0			&  0           &  1      &  0 \\
+\pc{0}	&  \pc{0}      &  \pc{0} &  \pc{1} \\
 }.
 \end{align}
 %
-Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. Hence, one degree of freedom is lost at these points, an effect known as Gimbal lock. This can be solved by avoiding Eulean angles, e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter is the most common, due to added benefits such as reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. However, in for our application this is not needed.
-%
+Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Adding a fourth parameter can resolve the issue. e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter has the added benefit of reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. An alternative used extensively at FFI that is non-singular and practical is the $\vec n$-vector notation~\cite{Gade2010}. However, we stick with the Euler-angle representation here due to their simplicity.
+
+
+%xyz - system space coordinates (fixed unmoving)
+%XYZ - system body coordinates (body fixed moving)
+
+
 Translation is performed last. 
-%
 
-
-
-
-% \section{MVDR Complexity Formulas}\label{mvdr_formulas}
-% 
-% \section{GPU Throughput}\label{throughput}
-% 
-% bs bs
 
 % use section* for acknowledgement
 \ifCLASSOPTIONcompsoc% % This command fixes abstract positioning for compsoc articles:
@@ -634,7 +1736,6 @@ Translation is performed last.
 
 The authors would like to express their gratitude to the Norwegian Defence Research Establishment (FFI) for funding the development of the simulator.
 
-
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
 \ifCLASSOPTIONcaptionsoff
@@ -642,16 +1743,18 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
 \fi
 
 \ifPhdDoc
-   \printbibliography[title=References,heading=subbibliography]
+%   \printbibliography[title=References,heading=subbibliography]
 %    \bibliographysty
 %    \bibliography{library.bib}
 %    \print
 \else
    \ifBuildBibliography
+      \typeout{===Mybib===}
       \bibliographystyle{IEEEtran}
       \bibliography{references}
 
    \else
+      \typeout{===MyStaticbib===}
       % Paste here
    \fi
 
@@ -686,3 +1789,135 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
    \input{derivations}
 
 \fi
+
+
+
+
+%\begin{align}\label{eq:M}\setlength{\extrarowheight}{-1.5ex}%\renewcommand{\arraystretch}{1.5}
+%\mat{T}_{IM}
+%= \left[
+%\begin{tabularx}{.8\linewidth}{*{3}{>{\centering\arraybackslash}X} | c}
+%	\multicolumn{3}{c|}{
+%   $\diag\left(\dfrac{2}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}\right)$}
+%   & 
+%   $\dfrac{-2\dvec{p}_{OI}^O}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}$
+%    \\\multicolumn{3}{c|}{}\\\hline\multicolumn{3}{c|}{}\\
+%   0 & 0 & 0  & 1
+%\end{tabularx}\right]
+%\end{align}
+%%\multicolumn{1}{|c}{\multirow{1}{*}{
+%
+%%\begin{align}\label{eq:M}
+%%\mat{T}_{IM}
+%%= \left[\begin{array}{c c c | c}
+%%& & &   \\
+%%& \mat{R}_{IM}(\psi,\theta+\pi,\phi)\;\mat{S}_{IM} & & \dvec{p}_{IM}^{I} \\
+%%& & &  \\\hline
+%% 0 &  0  &  0  &  1
+%%\end{array}\right]
+%%\end{align}
+%
+%\begin{align}\label{eq:M}
+%\mat{T}_{XO}
+%= \left[\begin{array}{c c c | c}
+%%& & & \\
+%\multicolumn{3}{l|}{\diag\left(\dfrac{2}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}\right)} &
+%%&&&
+%\dfrac{-2\dvec{p}_{OI}^O}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|} \\
+%%& & & \\
+%%& & & \\
+%%& & & \\
+%\multicolumn{3}{l|}{0 \hfill 0 \hfill 0} & 1
+%%0 & 0 & 0 & 1
+%\end{array}\right]
+%\end{align}
+
+
+
+%
+%\begin{table}[h]\centering
+%\begin{center}
+%\begin{tabular}{l r r r}
+%	                   & $\mat{T}_{OS}$                                                                     & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
+%	$\theta$           & acos$\frac{\uvec{I}_{\,z}^S\cdot\dvec{p}_{SI}^{S}}{\lVert\dvec{p}_{SI}^{S}\rVert}$ & 0                   & $\psi$              \\
+%	$\dvec{\hat{r}}\T$ & $\uvec{I}_{\,z}^S \times \dvec{p}_{SI}^{S}$                                        &                     & $\big(0,1,0\big)$   \\
+%	$\Phi_y$           & 0                                                                                  & 0                   & $\pi+\theta$        \\
+%	$\Phi_y$           & 0                                                                                  & 0                   & $\pi+\theta$        \\
+%	$\Phi_z$           & 0                                                                                  & 0                   & $\phi$              \\
+%	$\mat{L}$          & $\mat{R}(\uvec{I}_{\,z}^S, \dvec{p}_{SI}^{S})$                                     & 0                   & $\mat{R}(\psi,\theta,\phi)\mat{S}$              \\
+%   $\mat{S}$
+%	$\s_x$             & 1                                                                                  & 1                   & 1                   \\
+%	$\s_y$             & 1                                                                                  & 1                   & 1                   \\
+%	$\s_z$             & 1                                                                                  & 1                   & 1                   \\
+%	$\vec{t}$          & $\dvec{p}_{OS}^{O}$                                                                & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+%\end{tabular}
+%%\end{table}
+%\end{center}
+
+%\begin{table}[h]\centering
+%\begin{center}
+%\begin{tabular}{l r r r}
+%	          & $\mat{T}_{OS}$                                                                          & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
+%	$\theta$  & $\frac{\pi}{2}-\text{atan}\left(\frac{\dvec{p}_{SI,z}^{S}}{\dvec{p}_{SI,y}^{S}}\right)$ & 0                   & $\psi$              \\
+%	$\Phi_y$  & 0                                                                                       & 0                   & $\pi+\theta$        \\
+%	$\Phi_y$  & 0                                                                                       & 0                   & $\pi+\theta$        \\
+%	$\Phi_z$  & 0                                                                                       & 0                   & $\phi$              \\
+%	$\s_x$    & 1                                                                                       & 1                   & 1                   \\
+%	$\s_y$    & 1                                                                                       & 1                   & 1                   \\
+%	$\s_z$    & 1                                                                                       & 1                   & 1                   \\
+%	$\vec{p}$ & $\dvec{p}_{OS}^{O}$                                                                     & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+%\end{tabular}
+%%\end{table}
+%\end{center}
+
+%\begin{align}
+%\theta_{OS}
+%\dvec{\hat{r}} = \frac{\dvec{\hat{n}}_I\times\dvec{p}_{SI,z}^{S}}{\lVert\dvec{p}_{SI,z}^{S}\rVert})
+%\end{align}
+%$\frac{\pi}{2}-\text{atan}\left(\frac{\dvec{p}_{SI,z}^{S}}{\dvec{p}_{SI,y}^{S}}\right)$
+%
+
+
+
+%\begin{align}\label{eq:M}\setlength{\extrarowheight}{-1.5ex}%\renewcommand{\arraystretch}{1.5}
+%\mat{T}_{IM}
+%= \left[
+%\begin{tabularx}{.8\linewidth}{*{3}{>{\centering\arraybackslash}X} | c}
+%	\multicolumn{3}{c|}{
+%   $\diag\left(\dfrac{2}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}\right)$}
+%   & 
+%   $\dfrac{-2\dvec{p}_{OI}^O}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}$
+%    \\\multicolumn{3}{c|}{}\\\hline\multicolumn{3}{c|}{}\\
+%   0 & 0 & 0  & 1
+%\end{tabularx}\right]
+%\end{align}
+%\multicolumn{1}{|c}{\multirow{1}{*}{
+
+%\begin{align}\label{eq:M}
+%\mat{T}_{IM}
+%= \left[\begin{array}{c c c | c}
+%& & &   \\
+%& \mat{R}_{IM}(\psi,\theta+\pi,\phi)\;\mat{S}_{IM} & & \dvec{p}_{IM}^{I} \\
+%& & &  \\\hline
+% 0 &  0  &  0  &  1
+%\end{array}\right]
+%\end{align}
+
+%\begin{align}\label{eq:M}
+%\mat{T}_{XO}
+%= \left[\begin{array}{c c c | c}
+%%& & & \\
+%\multicolumn{3}{l|}{\diag\left(\dfrac{2}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}\right)} &
+%%&&&
+%\dfrac{-2\dvec{p}_{OI}^O}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|} \\
+%%& & & \\
+%%& & & \\
+%%& & & \\
+%\multicolumn{3}{l|}{0 \hfill 0 \hfill 0} & 1
+%%0 & 0 & 0 & 1
+%\end{array}\right]
+%\end{align}
+%%&                                                                                                          \\
+%	  & \diag\left(\dfrac{2}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|}\right) &   & \dfrac{-2\dvec{p}_{OI}^O}{|\dvec{p}_{OI_{\check{x}\check{y}}}-\dvec{p}_{OI_{\hat{x}\hat{y}}}|} \\
+%	  &                                                                                                            &   &                                                                                                          \\ \hline
+%	0 & 0                                                                                                          & 0 & 1

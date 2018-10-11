@@ -12,55 +12,105 @@
 
 \chapter{Discussion and Outlook}
 
+Constrain attention to beamformers and simulators (not ATR?).
+
+\section{Trends}
+
+The future is faster, smarter.
+
+\subsection{Hardware}
+
 \begin{itemize}
-\item Improving imaging systems by making them smarter.
-\item Big data - more processing power.
-\item Processing speed
+\item Ever increasing processing speed.
 \begin{itemize}
 	\item Choose the best tool (algorithm) for the job
 	\item More complex not always better, but slower
 	\item Extracting the essential information is key 
 	\item Exploit hardware resources available
+   \item Intel entering the discrete graphics stage
+   \end{itemize}
+\item Software defined transceiver/receivers
+\begin{itemize}
+\item System on Chips with integrated ADCs/DACs. Big power in small package.
+\item Compact, flexible, direct conversion
+\item Software defined signal generation, filtering, synchronization, rate-conversion and mixing.
+\item Multipurpose, hardware reuse, easier implementation of advanced signal processing, faster development and lower price.
+\item 
+\item Compact multi-band Wifi
+\item MIMO (in new wifi). Breaks array SNR boost. Not viable for long range.
+\item Phones: Wifi 2.4-2.5G, 5G (massive MIMO, heavy SDR, 600M-6G), LTE (4G, Long Term Evolution 800M), GSM (2G, Global System for Mobile communications 900M,1.8-1.9M), UMTS (3G, Universal Mobile Telecommunications System 1.9-2.1M), GPS (Global Positioning System 1.5G), Bluetooth (2.4G), NFC (Near-Field Communications 13.56M), FM (100M). Multi-radio in a single SDR package!
 \end{itemize}
-\item Faster IS smarter
- \begin{itemize}
- 	\item Short feedback loops allow real-time adaptivity
- 	\item More data contains more information
- 	\item Faster learning
- \end{itemize}
-\item Smarter IS better
- \begin{itemize}
-	\item Better image quality
-	\item Improved autonomy
+\item Short feedback loops allow real-time adaptivity
 \end{itemize}
+
+
+\subsection{Algorithms}
+
+\begin{itemize}
+\item Intelligence - Ability to process data fast, and retain key information
+\item Adaptive methods ever more attractive.
+   \begin{itemize}
+   \item Processing more data to increase significance of extracted information
+   \item Reducing reaction time: Act when the data is fresh/valid.
+   \end{itemize}
+\item Better image quality
+\item Improved autonomy
 \end{itemize}
+
+
+\subsection{Connectivity}
+
+\begin{itemize}
+\item Internet of Things
+\item Big data
+\item Intelligent mesh of nodes
+\end{itemize}
+
+\section{Risks \& Challenges}
 
 
 
 \begin{itemize}
 \item Improving imaging systems by making them smarter.
 \item Big data - more processing power.
-\item IV - Simulator
-\begin{itemize}
-	\item Incredibly fast template matching possible.
-	\item Possibly a powerful tool to pass prior knowledge to deep learning
-	\item Extracting the essential information is key 
-	\item Exploit hardware resources available
-\end{itemize}
 \item Faster IS smarter
  \begin{itemize}
  	\item Short feedback loops allow real-time adaptivity
  	\item More data contains more information
  	\item Faster learning
  \end{itemize}
-\item Smarter IS better
- \begin{itemize}
-	\item Better image quality
-	\item Improved autonomy
-\end{itemize}
 \end{itemize}
 
 
 
+%Discussion and future work
+%   Summary and discussion
+%      Simulator:
+%      - The way to train and constrain deep learning algorithms?
+%      MVDR:
+%      - Analytical optimization - full adaptivity.
+%      - Heavy on computations
+%      LCA:
+%      - Optimization by trial and error - discrete solution space.
+%      - Works almost as well as MVDR in most cases
+%      - Fast!
+%      - Well suited for hardware
+%      
+%      Lessions from deep learning:
+%      - 
+%      
+%   Future work
+
+
+\section{MVDR}
+
+Recent developments:
+- A low complexity minimum variance beamformer for ultrasound imaging using dominant mode rejection~\cite{Jiang2016}
+- Google deep beamforming
+
+\begin{itemize}
+\item SDR - Entirely software defined radio, radar and sonar, bigger potential for adaptive methods
+\item Cognitive radar/sonar. 1. Adaptive signal processing, learn from data. 2. Feedback from receiver to transmitter. 3. Preservation of the information in received data. All of this is present in bats.
+\end{itemize}
 
 \end{document}
