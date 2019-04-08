@@ -21,7 +21,8 @@ function(compile file) # optional: deps
               "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
               cd ${CMAKE_SOURCE_DIR} &&
 #               latexmk -output-directory=${CMAKE_BINARY_DIR} -xelatex --synctex=1 -interaction=nonstopmode -file-line-error --shell-escape ${file}.tex &&
-              latexmk -output-directory=${CMAKE_BINARY_DIR} -xelatex --synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape ${file}.tex &&
+#               latexmk -output-directory=${CMAKE_BINARY_DIR} -xelatex --synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape ${file}.tex &&
+              latexmk -output-directory=${CMAKE_BINARY_DIR} -pdf --synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape ${file}.tex &&
 #               ${BUILD_COMMAND} ${BUILD_ARGS} ${file}.tex &&
               "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.pdf        ${CMAKE_SOURCE_DIR}/${file}.pdf &&
               "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/${file}.synctex.gz ${CMAKE_SOURCE_DIR}/${file}.synctex.gz &&

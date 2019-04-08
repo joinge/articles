@@ -59,6 +59,9 @@
 %\addbibresource{references.bib}
 
 \RequirePackage{amsfonts}
+% \usepackage[makeroom]{cancel}
+% \usepackage{cancel}
+% \usepackage{ulem}
 \usepackage{cite}
 
 \ifCLASSINFOpdf
@@ -116,7 +119,7 @@
 \usepackage{url}                                % Support for handling and breaking URLs
 
 \usepackage{accents}
-
+\usepackage{moresize}
 
 % NOTE: PDF hyperlink and bookmark features are not required in IEEE
 %       papers and their use requires extra complexity and work.
@@ -152,14 +155,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \usepackage{tikz}
-\usetikzlibrary{calc,positioning,shapes,snakes}
+\usetikzlibrary{arrows.meta,calc,positioning,shapes,snakes}
 %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
 \newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
+%\newcommand{\tikzmark}[2][]{\tikz[remember picture,overlay]\coordinate[#1](#2);}
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
             
+\tikzset{-{to[length=.5em,width=.5em]}}
+            
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{collcell}
+\usepackage{booktabs}
+\usepackage{calc}
 
 %\usepackage[active,float]{preview}
 %\PreviewEnvironment{gather} 
@@ -220,6 +229,109 @@
 \else
    \definecolor{tabBlue}{HTML}{CCCCCC}
 \fi
+
+% The below line commands ensure proper fill color along with the booktabs package
+% \specialrule[width]{abovespace}{belowspace}
+\colorlet{tableheadcolor}{tabBlue}
+\newlength\arulesep\setlength\arulesep{\aboverulesep}
+\newlength\brulesep\setlength\brulesep{\belowrulesep}
+\setlength{\aboverulesep}{0pt}
+\setlength{\belowrulesep}{0pt}  
+\newcommand\topline{\arrayrulecolor{black}\specialrule{\heavyrulewidth}{\arulesep}{0pt}%
+            \arrayrulecolor{tableheadcolor}\specialrule{\brulesep}{0pt}{0pt}%
+            \arrayrulecolor{black}}
+\newcommand\midline{\arrayrulecolor{tableheadcolor}\specialrule{\arulesep}{0pt}{0pt}%
+            \arrayrulecolor{black}\specialrule{\lightrulewidth}{0pt}{0pt}%
+            \arrayrulecolor{white}\specialrule{\brulesep}{0pt}{0pt}%
+            \arrayrulecolor{black}}
+\newcommand\cmidline[2][]{\arrayrulecolor{tableheadcolor}\cmidrule[\arulesep]{#2}%
+                        \arrayrulecolor{black}\cmidrule[\lightrulewidth]{#2}%
+                        \arrayrulecolor{tableheadcolor}\cmidrule[\brulesep]{#2}%
+%                         \arrayrulecolor{tableheadcolor}\cmidrule[\belowrulesep]{#1}%
+%                         \vspace{-\belowrulesep}
+%                         \arrayrulecolor{black}\cmidrule[\lightrulewidth]{#1}
+%                         \arrayrulecolor{tableheadcolor}\cmidrule[\belowrulesep]{#1}%
+%                        \arrayrulecolor{black}\cmidrule[\lightrulewidth]{#1}%\specialrule{\lightrulewidth}{0pt}{0pt}%
+%                        \arrayrulecolor{white}\cmidrule[0\belowrulesep]{#1}%
+                        \arrayrulecolor{black}}
+%\newcommand\cbmidline[1]{\arrayrulecolor{tableheadcolor}\cmidrule[0\aboverulesep]{#1}%
+%                        \arrayrulecolor{black}\cmidrule[\lightrulewidth]{#1}%\specialrule{\lightrulewidth}{0pt}{0pt}%
+%                        \arrayrulecolor{white}\cmidrule[0\belowrulesep]{#1}%
+%                        \arrayrulecolor{black}}
+%\newlength\arulesep{}\setlength\arulesep{\aboverulesep}\addtolength\arulesep{\lightrulewidth}
+%\newcommand\cmidline[1]{\arrayrulecolor{tableheadcolor}\specialrule{\aboverulesep}{0pt}{-\aboverulesep}%
+%            \arrayrulecolor{black}\ule{#1}
+%            \arrayrulecolor{tableheadcolor}\specialrule{\belowrulesep}{-\belowrulesep}{0pt}%
+%            \arrayrulecolor{black}}
+%\newlength\trulesep{}\setlength  \trulesep{\aboverulesep}
+%                     \addtolength\trulesep{\lightrulewidth}
+%                     \addtolength\trulesep{\belowrulesep}
+%\newlength\brulesep{}\setlength  \brulesep{\lightrulewidth}
+%                     \addtolength\brulesep{\belowrulesep}
+%\newlength\mrulesep{}\setlength  \mrulesep{\aboverulesep}
+%                     \addtolength\mrulesep{\belowrulesep}
+%\newcommand*{\cmidline}[1]{\cmidrule(rl){#1}}%
+%                      \arrayrulecolor{tableheadcolor}\specialrule{\trulesep}{0pt}{-\trulesep}\arrayrulecolor{black}
+%                      \cmidrule(rl){#1}
+%%                      \arrayrulecolor{white}\specialrule{0pt}{-\mrulesep}{0pt}%
+%                      \arrayrulecolor{black}
+%}  
+
+
+
+%\newcommand*\cmidwrap[1]{\cmidrule(rl){#1}}%
+%                      \arrayrulecolor{tableheadcolor}\specialrule{\trulesep}{0pt}{-\trulesep}\arrayrulecolor{black}
+%                      \cmidrule(rl){#1}
+%%                      \arrayrulecolor{white}\specialrule{0pt}{-\mrulesep}{0pt}%
+%                      \arrayrulecolor{black}
+%}  
+                  
+%             \arrayrulecolor{tableheadcolor} \specialrule{6pt}{0pt}{-6pt} \arrayrulecolor{black}
+%             
+%             \headcol Blue & Red & Yellow\\
+%\newcommand\cmidline[1]{\arrayrulecolor{tableheadcolor}\specialrule{\aboverulesep}{0pt}{0pt}%
+%                        \arrayrulecolor{black}\specialrule{\lightrulewidth}{0pt}{0pt}%
+%                        \arrayrulecolor{white}\specialrule{\belowrulesep}{0pt}{0pt}%
+%                        \arrayrulecolor{black}}
+%            
+%\cmidrule(lr){2-3}
+%
+%\usepackage{xparse}
+%\newcommand{\cmidline}{\noalign\bgroup\CMidRuleZaux{}}
+%
+%\ExplSyntaxOn
+%\makeatletter
+%\NewDocumentCommand{\CMidRuleZaux}{
+%    m % Material to reinsert before cmidrule.
+%%    O{0.0ex} % #1 = left adjust
+%%    O{0.0ex} % #1 = right adjust
+%    m  %   #3 = columns to span
+%}{
+%    \peek_meaning_remove_ignore_spaces:NTF \cmidline
+%      { \CMidRuleZaux { #1 \beforerule\cmidrule[\cmidrulewidth](lr){#2} } }%(l{#2}r{#3})
+%      { \egroup #1 \cmidrule[\cmidrulewidth](lr){#2} }
+%}
+%\makeatother
+%\ExplSyntaxOff
+%
+%                     
+%\newcommand*\beforerule{\arrayrulecolor{tableheadcolor}\specialrule{\trulesep}{0pt}{-\trulesep}\arrayrulecolor{black}}
+%\newcommand*\afterrule{\arrayrulecolor{white}\specialrule{0pt}{-\mrulesep}{0pt}\arrayrulecolor{black}}
+
+\newlength\trulesep{}\setlength  \trulesep{\arulesep}
+                     \addtolength\trulesep{\lightrulewidth}
+                     \addtolength\trulesep{\brulesep}
+\newcommand\cmidwrap[1]{%\arrayrulecolor{tableheadcolor}\specialrule{\trulesep}{0pt}{-\trulesep}%
+                        \arrayrulecolor{tableheadcolor}\specialrule{\arulesep}{0pt}{0pt}%
+                        \arrayrulecolor{tableheadcolor}\specialrule{\lightrulewidth}{0pt}{-\lightrulewidth}%
+%                        \arrayrulecolor{black}\cmidrule[\lightrulewidth]{#2}%
+%                        \arrayrulecolor{tableheadcolor}\cmidrule[\brulesep]{#2}%
+                        \arrayrulecolor{black}#1
+                        \arrayrulecolor{tableheadcolor}\specialrule{\brulesep}{0pt}{0pt}%
+%            \setlength{\aboverulesep}{10pt}
+%            \setlength{\belowrulesep}{10pt}
+%            #1
+            }
 
 %%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % MACROS %       

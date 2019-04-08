@@ -1,6 +1,9 @@
 %% !TeX root = IIII_simulator
 % !TeX root = article
 
+% Disallow floats on the first page
+\suppressfloats
+
 %Design, notation and application
 
 \title{Real-Time Synthetic Aperture Sonar Simulation for Automatic Target Recognition: Notation and application}
@@ -65,22 +68,44 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{topnumber}{1}
 \setcounter{dbltopnumber}{1}
 
-\providecommand\m*{}\renewcommand*\m[2][\phantom{|}]{{\tikzmark{#2}{#1}}}
-\providecommand\k*{}\renewcommand*\k[2]{{\color{black}\tikzmark{#1}{#2}}}
-\providecommand\g*{}\renewcommand*\g[2]{{\color{Green}\tikzmark{#1}{#2}}}
-\providecommand\r*{}\renewcommand*\r[2]{{\color{Red}\tikzmark{#1}{#2}}}
-\providecommand\b*{}\renewcommand*\b[2]{{\color{blue}\tikzmark{#1}{#2}}}
+\providecommand\cancel*{}\renewcommand*\cancel[1]{%
+\tikz[font=\scriptsize,baseline=(char.base)]{%
+\node[](char){$#1$};%
+% \begin{scope}[overlay]%
+% \coordinate(offsett) at (0.3em,1.5ex);%
+% \draw[-] ($(char.center) - (offsett)$) to ($(char.center) + (offsett)$);%
+% \end{scope}%
+}}
 
+
+\providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{#1}}
+\providecommand\k*{}\renewcommand*\k[2]{{\scriptsize\color{black}\tikzmark{#1}{$#2$}}}
+\providecommand\g*{}\renewcommand*\g[2]{{\scriptsize\color{Green}\tikzmark{#1}{$#2$}}}
+\providecommand\r*{}\renewcommand*\r[2]{{\scriptsize\color{Red}\tikzmark{#1}{$\cancel{#2}$}}}
+\providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{blue}\tikzmark{#1}{$#2$}}}
+
+% \draw[-{Latex[length=.5em,width=.5em]}]
+%                         ($(C.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%       to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
+
+\newlength\tpad\setlength\tpad{.2ex}
+%\begin{tikzpicture}
+%\coordinate(__) at ($ (0em,0ex) $);
+%\end{tikzpicture}
+
+% \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{\Green{#1}}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
+\newcommand\figstep[2]{\tikz[baseline=(char.base)]{%
+            \node[shape=circle,draw,color=Green,inner sep=0.5pt] (char) {#1};}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}} 
 \begin{figure*}[t]\centering%
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
 \else
   \includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
 \fi
-\caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor, and some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} choose parameters from a predefined set, while the \emph{adaptive} approach estimate them from the sonar image. All processing happens on a GPU, with OpenGL rendering a scene and OpenCL enabling general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allow a much wider range of object parameters to be searched for an optimal template, yielding better results at a fraction of the time.}\label{IV_buildup}%
+\caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor, and some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} (static) approach pick parameters from a predefined set, whereas the \emph{adaptive} approach estimate them from the sonar image. The implementation reside entirely on the GPU, with OpenGL performing scene rendering and OpenCL general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allow a much wider range of object parameters to be searched for an optimal template, yielding better results in a lesser time.}\label{IV_buildup}%
 \end{figure*}
 
-\newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
+% \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
 \begin{figure*}[t]\centering%
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
@@ -88,18 +113,33 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
   \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
-\figstep{1}{\emph{Model placement.} When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\protect\ubar{M}$. To position and orient the models into the image frame $\protect\ubar{I}$, we apply the \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+%
+\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\protect\ubar{M}$. The image region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
-\figstep{2}{\emph{Camera/sonar setup.} To determine what parts of the scene the sonar can see, we place the OpenGL camera at the origin of the sonar frame, $\protect\udot{S}$, pointing at the origin of the image frame, $\protect\udot{I}$. This is achieved with the \emph{sonar (view) matrix} $\mat{T}_\textit{\tiny\!SI}$.
+%
+\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
-\figstep{3}{\emph{Projection and clipping}. With the scene and camera set up, the next step is compute how visible points in the scene project onto the viewing plane spanned by $x$ and $\varphi$ in $\ubar{C}$. The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
+%
+\figstep{3}{\emph{Orthogonal rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $z$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with a \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
-\figstep{4}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply the model, sonar and perspective matrices to each vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. We also make OpenGL compute the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+%
+\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane that the image points can be projected onto. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $\uvec{O}=(x,y_O,z_O)$ to cylindrical $\uvec{C}=(x,\phi_C,r_C)$ with the non-linear function T$_{CO}$.
 }\\[.5\baselineskip]
-\figstep{5}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
+%
+\figstep{5}{\emph{Projection}. OpenGL unly renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
+% 
+% The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
+}\\[.5\baselineskip]
+%
+\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+}\\[.5\baselineskip]
+%
+\figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
 }%
 }\label{IV_simulator_coordinate_system}%
 \end{figure*}
+
+
 
 
 % \IEEEPARstart{W}{hen} 
@@ -108,15 +148,13 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 % - Adapt simulation to its behaviour, see if they still match.
 
 
-\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are advancing the exploration of our underwater frontiers. Equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with the unforeseen, such as resolving poor imaging conditions, blocked paths, corrupted data or fascinating objects. One reason for this is the lack of reliable and adaptive system for automatic target recognition (ATR).
+\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are vital in the exploration of our underwater frontiers. When equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with unforeseen events, such as poor imaging conditions, blocked paths, corrupted data or rare objects. One reason is their lack of a reliable and adaptive system for automatic target recognition (ATR).
 
 %However, Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to create better images.
  
 % Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, compare it with a set of template images of the relevant object classes, and assign it to the class of the template with the the best fit.
 
-
-
-Conventional ATR isolates an object of interest, extracts its key features, and use these to estimate the object's class. The challenge is to find features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle. Such features are rare in SAS, despite best-in-class resolution and dynamic range, due to image ambiguities from acoustical distortions such as layover, multiple scattering, diffraction, dispersion and penetration.
+A conventional ATR system isolates an object of interest, extracts its key features, and uses these to estimate the object's class. The challenge is to find features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle. Such features are rare in SAS, despite its best-in-class resolution and dynamic range, due to image ambiguities from acoustical distortions such as layover, multiple scattering, diffraction, dispersion and penetration.
 
 %Thus, the sonar image contains incomplete object information, and only contains partial object can only describe the object partially, can't be used to infer the object class unambiguously.
 
@@ -188,7 +226,7 @@ Conventional ATR isolates an object of interest, extracts its key features, and 
 % An alternative, called template matching, compares...
 % Template matching differs by comparing the object...
 
-Template matching offers an alternative to feature extraction: Comparing the object with image templates of relevant classes and orientations, and assigning it the class that fits best. The problem is to find a suitable set of templates that\todo{to?} represent the objects. A densely sampled feature for every degree of freedom would be ideal, but require too many templates. Therefore, practical implementations resort to a few sparsely sampled features, yielding inaccurate results~\cite{Midelfart2010}.
+Template matching offers an alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign the object to the class that fits best. The problem is to find a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 %
 %Numerous templates are required for each object, since every degree of freedom needed to describe it adds a dimension to the template solution space\todo{simplify}. 
@@ -246,7 +284,7 @@ Template matching offers an alternative to feature extraction: Comparing the obj
 
 %reduce feature solution space 
 
-Adaptive template matching is a hybrid solution: Extracting the most reliable statistics from the image, such as shadow and highlight characteristics, and use these to limit the template solution space~\cite{Midelfart2010}. This reduces the computational load and improves accuracy, by accommodating fine-grained search through more features. But better still: remove the need for a precomputed template library by simulating them on-the-fly.
+Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, and use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating the templates on-the-fly.
 
 %, to adapt to much broader scenarios.
 
@@ -259,7 +297,9 @@ Adaptive template matching is a hybrid solution: Extracting the most reliable st
 
 %
 %\todo{However, only a few simulators for high frequency, side-looking sonar imagery have been published. ***}
-A few simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. However, most implementations have prioritized accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator~\cite{Coiras2009a, Coiras2009b}. It takes advantage of parallel processing on GPUs, by using OpenGL to render a 2D image from a 3D model, under the assumption of Lambertian scattering. However, SIGMAS+ includes stochastic effects such as ambient noise, while we consider templates deterministic. Neither is SIGMAS+ easily extended to a adaptive template matcher on the GPU, since OpenGL primarily serve as a computer graphics library.
+A few simulators for high frequency, side-looking sonar imagery have been published, e.g.~\cite{Bell1997,Sammelm2003}. We seek a fast simulator for creating simple templates, but most implementations prioritize accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator~\cite{Coiras2009a, Coiras2009b}, which is accelerated by the parallel computing power of graphics processing units (GPUs). Aligning with our goals, it assumes Lambertian scattering and creates the sonar image from a 3D model with multiple renderings by the OpenGL computer graphics library. However, it includes stochastic effects such as ambient noise, which we deem irrelevant for templates, and its OpenGL-centric nature makes it suboptimal as an adaptive template matcher.
+
+%while we consider templates deterministic. Neither is
 
 %is intended for computer graphics; a side-effect of OpenGL due to the limitations of OpenGL, which is intended for computer graphics.
 
@@ -275,7 +315,7 @@ A few simulators for high frequency, side-looking sonar imagery have been publis
 % This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
 % on a new full geometrical implementation of the simulator.
 
-Our simulator was designed from the ground up to be an integral part of an GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL, which can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
+Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; Two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
 
 %The simulator architecture and notation system are described Section~\ref{IV_methods}. Simulation and classification results  Results from  template simulations and classification Section~\ref{IV_results}  Finally, we present classification performance using 
 %
@@ -466,9 +506,533 @@ Our simulator was designed from the ground up to be an integral part of an GPU-a
 %
 %Traditional computer graphics literature express these geometrical relationships in terms of a model, view and perspective matrix---$\mat{M}$, $\mat{V}$ and $\mat{P}$, respectively. $\mat{M}$ is unique to each 3D model, and describes its placement in the scene. $\mat{V}$ represents the camera or observer, and describes how the scene moves when viewed differently. Finally, $\mat{P}$ describes how points visible to the camera projects onto a viewing plane\todo{A bit of overlap here with former paragraph. Perhaps drop this paragraph}. This is conceptually a good starting point, but provides no aid in defining the aforementioned complex effects.\todo{Too vague}
 
-We will demonstrate how arbitrary complex geometries can be defined in a uniform manner by defining the scene---shown in \Fig{IV_simulator_coordinate_system}---in terms of reference frames and transitions between them. To do this in an clear, organized and robust manner, we will adhere to---and extend---a navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}.
+
+%The scene we seek to simulate 
+%The scene we seek to simulate is 
+%
+%The first order of business is to define the 
+%The simulator was designed with a certain set of functional requirements in mind: Sonar with monostatic Monostatic sonar, 
+%The scene shown in \Fig{IV_simulator_coordinate_system} fulfills these criteria.
+%
+%Monostatic sonar
+%Arbitrary position
+%
+%
+%
+%The 
+%Scenes 
+%We seek the Transitions involving a rotation and a translation are called affine transformations, and are of key interest because they preserve rigid bodies.
+
+%\Fig{IV_buildup}
+
+%The scene that underpins our simulator---shown in \Fig{IV_simulator_coordinate_system}---is .
+
+%\begin{table}[b!]\centering
+%\caption{Reference frames and their transitions.}\label{IV_tab_frames_transitions}
+%%
+%\newcommand\shiftdown[1]{\smash{\raisebox{-.5\normalbaselineskip}{#1}}}
+%\newcolumntype{R}{>{\collectcell\shiftdown}r<{\endcollectcell}}
+%\providecommand\t*{}\renewcommand*\t[1]{{\tikzmark{#1}{$#1$}}}
+%%	\hline
+%%%
+%\def\arraystretch{1.25}
+%\setlength{\belowrulesep}{0pt}
+%%\setlength{\extrarowheight}{0.5ex}
+%\newcommand\pt[1]{\parbox[c]{1.5em}{text}}
+%%\cellcolor[gray]{.9}
+%\begin{tabular}{R c l l}
+%	\topline\rowcolor{tabBlue} 
+%	\multicolumn{1}{c}{Transition} & Symbol & Name            & Space                                       \\\midline
+%	                        Affine & \t{M}  & Model           & Scale                        \\
+%	                        Affine & \t{I}  & Image           & \cellcolor[gray]{.9}                        \\
+%	                        Affine & \t{S}  & Sonar           & \cellcolor[gray]{.9}                        \\
+%	                    Non-linear & \t{O}  & Orthogonal view & \cellcolor[gray]{.9}                        \\
+%	                    Projective & \t{C}  & Cylindric view  & \multirow{-5}{*}{\cellcolor[gray]{.9}World} \\
+%	                               & \t{X}  & Clip            & NDC$^1$                                     \\\bottomrule
+%	\multicolumn{4}{l}{$^1$Normalized Device Coordinates}
+%\end{tabular}
+%\begin{tikzpicture}[overlay,remember picture, shorten >=-3pt]
+%%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
+%\coordinate(IM) at ($(I)!0.5!(M)$);
+%\coordinate(SI) at ($(S)!0.5!(I)$);
+%\coordinate(OS) at ($(O)!0.5!(S)$);
+%\coordinate(CO) at ($(C)!0.5!(O)$);
+%\coordinate(XC) at ($(X)!0.5!(C)$);
+%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
+%%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                          ($(C.west) - (.5em, 0ex)$) to[out=180, in=90] ($(XC) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(X.west) - (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]},draw=red]                
+%                          ($(O.west) - (.5em, 0ex)$) to[out=180, in=90] ($(CO) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(C.west) - (0.8em,-0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                          ($(M.west) - (.5em, 0ex)$) to[out=180, in=90]  ($(IM) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(I.west) - (0.7em,0ex)$) to[out=180, in=90] ($(SI) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(S.west) - (0.7em,0ex)$) to[out=180, in=90] ($(OS) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(O.west) - (0.8em,-0ex)$);
+%%\path[fill=gray,opacity=0.2](TL.north west)--(TL.north east)--(SE)--cycle;
+%%%%\draw[->] ($(I.west) - (.7em,0ex)$) to[out=-180, in=180] ($(S.west) - (.7em,0ex)$);
+%%%%\draw[->] ($(S.west) - (.7em,0ex)$) to[out=-180, in=180] ($(O.west) - (.7em,0ex)$);
+%%%%\draw[->] ($(O.west) - (.7em,0ex)$) to[out=-180, in=180] ($(C.west) - (.7em,0ex)$);
+%%%%\draw[->] ($(C.west) - (.7em,0ex)$) to[out=-180, in=180] ($(X.west) - (.7em,0ex)$);
+%%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
+%\end{tikzpicture}
+%\end{table}
 
 
+%\begin{table}[h]\normalsize\centering
+%\begin{tabular}{r c c r c c}
+%	\hline
+%	\rowcolor{tabBlue}                     & $\mat{T}_{XC}$      & T$_{CO}$                & $\mat{T}_{OS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
+%	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XC})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{OS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
+%	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$ \\
+%   & & & \multicolumn{3}{c}{World space} \\
+%   & & & \multicolumn{3}{c}{Affine} 
+%\end{tabular}%
+%\caption{Affine transformation contents}\label{tab_transformation_contents}
+%\end{table}
+
+%\begin{table*}[b!]\centering
+%\caption{Reference frames and their transitions.}\label{IV_tab_frames_transitions}
+%%
+%{
+%\newcommand\shiftdown[1]{\smash{\raisebox{-.5\normalbaselineskip}{#1}}}
+%\newcolumntype{L}{>{\collectcell\shiftdown}l<{\endcollectcell}}
+%\newcolumntype{C}{>{\collectcell\shiftdown}c<{\endcollectcell}}
+%\providecommand\t*{}\renewcommand*\t[1]{{\tikzmark{#1}{$\ubar{#1}$}}}
+%%	\hline
+%%%
+%\def\arraystretch{1.25}
+%% \setlength{\belowrulesep}{0pt}
+%%\setlength{\extrarowheight}{0.5ex}
+%\newcommand\pt[1]{\parbox[c]{1.5em}{text}}
+%%\cellcolor[gray]{.9}
+%\newcommand\mc[3]{\multicolumn{#1}{#2}{#3}}
+%\providecommand*\T{}\renewcommand*\T[1]{\parbox[l]{2em}{$T_{#1}$}}
+%\begin{tabular}{r c C L}
+%	\topline\rowcolor{tabBlue}
+%   \mc{2}{c}{Frames} & \mc{2}{c}{Transitions} \\
+%	     \bf Frame  & \bf Symbol & & \mc{1}{l}{\bf{}Transition} \\\midline
+%	          Model & \t{M}  & \T{IM} & Affine:          scale,  rotate\phantom{, translate}  \\
+%	          Image & \t{I}  &  & Affine: \phantom{scale, }rotate         , translate   \\
+%	          Sonar & \t{S}  &  & Affine: \phantom{scale, }rotate\phantom{, translate}  \\
+%	Orthogonal view & \t{O}  &  & Non-linear: cartesian $\rightarrow$ cylindric         \\
+%	 Cylindric view & \t{C}  &  & Affine: orthographic projection                       \\
+%	     Clip / NDC & \t{X}  &  &                         \\\bottomrule
+%	\mc{3}{l}{$^1$Normalized Device Coordinates}
+%\end{tabular}
+%\begin{tikzpicture}[overlay,remember picture, shorten >=-3pt]
+%%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
+%\coordinate(IM) at ($(I)!0.5!(M)$);
+%\coordinate(SI) at ($(S)!0.5!(I)$);
+%\coordinate(OS) at ($(O)!0.5!(S)$);
+%\coordinate(CO) at ($(C)!0.5!(O)$);
+%\coordinate(XC) at ($(X)!0.5!(C)$);
+%\coordinate(offset) at (0.7em,0ex);
+%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
+%%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
+%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+%%%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
+%%%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(S.east) - (.7em,0ex)$) to[out=-180, in=180] ($(O.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(O.east) - (.7em,0ex)$) to[out=-180, in=180] ($(C.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(C.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
+%%%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
+%\end{tikzpicture}
+%}
+%\end{table*}
+
+%
+\begin{table*}[thbp]\centering
+%
+{
+\newcommand\shiftup[1]{\raisebox{-.75\normalbaselineskip}{#1}}
+\newcommand\shiftdown[1]{\smash{\raisebox{.75\normalbaselineskip}{#1}}}
+\newcolumntype{L}{>{\collectcell\shiftdown}l<{\endcollectcell}}
+\newcolumntype{C}{>{\collectcell\shiftdown}c<{\endcollectcell}}
+\newcolumntype{O}{>{\collectcell\shiftdown\hspace*{-1.75\tabcolsep}}l<{\endcollectcell}}
+\newcolumntype{Q}{>{\collectcell\shiftdown\hspace*{-1.75\tabcolsep}}c<{\endcollectcell}}
+\newcolumntype{P}[1]{>{\collectcell\shiftdown}p{#1}<{\endcollectcell}}
+\providecommand\t*{}\renewcommand*\t[1]{{\tikzmark{#1}{$\ubar{#1}$}}}
+%	\hline\hspace*{-1.75\tabcolsep}
+%\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+%\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+%\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+%%
+\def\arraystretch{1.5}
+% \setlength{\belowrulesep}{0pt}
+%\setlength{\extrarowheight}{0.5ex}
+\newcommand\pt[1]{\parbox[c]{1.5em}{text}}
+%\cellcolor[gray]{.9}
+\newcommand\mc[3]{\multicolumn{#1}{#2}{#3}}
+\providecommand*\T{}\renewcommand*\T[1]{\parbox[l]{2em}{$\vec{T}_{#1}$}}
+%\providecommand*\Tr{}\renewcommand*\Tr[1]{\parbox[l]{3em}{$\dvec{T}_{#1}($}\parbox[l]{3em}{#2}\parbox[l]{3em}{#3}\parbox[l]{0.75em}{#4})}
+\providecommand*\Tr{}\renewcommand*\Tr[1]{$\dvec{T}_{#1}$}
+\providecommand*\inn{}\renewcommand*\inn[1]{}%\in\mathrm{#1}(3)}
+\providecommand*\TT{}\renewcommand*\TT[1]{\parbox[l]{2em}{T$_{#1}$}}
+\providecommand*\p{}\renewcommand*\p[2]{\parbox[l]{2em}{$\dvec{p}_{#1}^{#2}$}}
+\providecommand*\SIM{}\renewcommand*\SIM{$\mathrm{Sim}(3)$}
+\providecommand*\SE{}\renewcommand*\SE{$\mathrm{SE}(3)$}
+\providecommand*\Emph{}\renewcommand*\Emph[1]{\shiftup{\emph{#1}}}
+\newcommand{\REmph}[1]{\tikz[remember picture,baseline=(#1.base)]\node[transform canvas={yshift=.75\normalbaselineskip},align=center,rotate=30,inner sep=0pt](#1){#1};}
+%\newcommand{\trot}[1]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#1};}
+%\newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#1};}
+% \node(ACe)[below = 2\baselineskip of CC, anchor=center]%
+%    {\footnotesize\textrm{Change of vector}};
+%\setlength{\tabcolsep}{1.5em} @{\extracolsep{0em}}
+\newcommand\mcc[3]{\mc{#1}{#2}{\shiftup{#3}}}
+%\providecommand*\REmph{}\renewcommand*\REmph[1]{{A}}%\raisebox{-1.5ex}{\rotatebox{25}{\emph{#1}}}}}
+\newcommand\addtimes{\hspace*{1.92\tabcolsep}\makebox[0pt]{,}\hspace*{-1.92\tabcolsep}}
+\newcommand\addtimess{\hspace*{\tabcolsep}\makebox[0pt]{$\times$}\hspace*{\tabcolsep}}
+\newcommand\addin{\hspace*{\tabcolsep}\makebox[0pt]{$\in$}}
+\newcommand\const[1]{%\cellcolor{black!64}
+#1}
+%$\mathbb{RP}^3 \to \mathbb{RP}^3\Red{???}$
+%$\mathbb{RP}^3\Red{???}\to \mathrm{NDC}^{(1)}$ 
+%\begin{tabular}{r c c c c c C C C @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
+%	\topline\rowcolor{tabBlue}
+%   \mc{2}{c}{\bf Frame} & \mc{2}{c}{\bf Transformation} & \mc{4}{c}{\bf Configuration space} & \mc{2}{c}{\bf Representation} \\
+%   \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-4}\cmidrule(lr){5-8}\cmidrule(lr){9-10}}\rowcolor{tabBlue} 
+%	\emph{Description} & \emph{Symbol} & \Emph{Symbol} & \Emph{Type} & \mcc{-1em}{Orien-tation} & \mcc{-1em}{Pos-ition} & \mcc{-1em}{Scale} &  \mcc{-.5em}{DoF} & \mc{1}{l}{\emph{Symbol}} & \Emph{Group} \\%\Emph{Sum} \\
+%	\midline
+%	                                           Model & \t{M} & $S^2 \times S^1$\addtimes & $\mathbb{E}^3$\addtimes & $\mathbb{E}^1$ & 7 & \T{IM}  & Affine      & \Tr{IM}     & \SIM                                            \\
+%	                                           Image & \t{I} & $S^2 \times S^1$\addtimes & $\mathbb{E}^3$          &                & 6 & \T{SI}  & Affine      & \Tr{SI}     & \SE                                             \\
+%	                                           Sonar & \t{S} & $S^1$                     &                         &                & 1 & \T{OS}  & Affine      & \Tr{OS}     & \SE                                             \\
+%	                               Orthographic view & \t{O} &                           &                         &                & 0 & \TT{CO} & Non-linear  & \TT{CO}     &      \\
+%	                                  Cylindric view & \t{C} &                           &                         &                & 0 & \T{XC}  & Affine      & \Tr{XC}     & \\
+%	                                        Clipping & \t{X} & $\mathrm{NDC}^{(1)}$      &                         &                &   &         &             & \mc{1}{l}{} &                                                 \\ \bottomrule
+%	\mc{5}{l}{$^{(1)}$Normalized Device Coordinates} &
+%\end{tabular}
+%\mc{3}{c}{\centering\emph{Topology}}
+%\begin{tabular}{r c c c @{\columncolor{black}[0pt][\tabcolsep]\hspace*{\tabcolsep}{$\times$}\hspace*{\tabcolsep}} c @{\hspace*{\tabcolsep}{$\times$}\hspace*{\tabcolsep}} c c C C C @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
+%	\topline\rowcolor{tabBlue}
+%   \mc{3}{c}{\bf Frame} & \mc{4}{c}{\bf Configuration space} & \mc{2}{c}{\bf Transformation}  & \mc{2}{c}{\bf Representation} \\
+%   \cmidwrap{\cmidrule(lr){1-3}\cmidrule(lr){4-7}\cmidrule(lr){7-8}\cmidrule(lr){9-10}}\rowcolor{tabBlue} 
+%	\emph{Description} & \emph{Symbol} &  & \mcc{-.5em}{DoF} & \Emph{Symbol} & \Emph{Type} & \mc{1}{l}{\emph{Symbol}} & \Emph{Group} \\\rowcolor{tabBlue}
+%   \multirow{-2}{*}{} & & Constraints & \ssmall{}Orientation & \ssmall{}Position & \ssmall{} Scale \\%\Emph{Sum} \\
+%	\midline
+%	                                           Model & \t{M} & $\udot{I} = \udot{M}$ & $S^2 \times S^1$ & $\mathbb{E}^3$ & $\mathbb{E}^1$ & 7 & \T{IM}  & Affine     & \Tr{IM}     & \SIM \\
+%	                                           Image & \t{I} &                       & $S^2 \times S^1$ & $\mathbb{E}^3$ &                & 6 & \T{SI}  & Affine     & \Tr{SI}     & \SE  \\
+%	                                           Sonar & \t{S} & $\udot{S} = \udot{O}$ & $S^1$            &                &                & 1 & \T{OS}  & Affine     & \Tr{OS}     & \SE  \\
+%	                               Orthographic view & \t{O} & $\udot{O} = \udot{C}$ &                  &                &                & 0 & \TT{CO} & Non-linear & \TT{CO}     &      \\
+%	                                  Cylindric view & \t{C} &                       &                  & $\mathbb{E}^3$ &                & 0 & \T{XC}  & Affine     & \Tr{XC}     &      \\
+%	                                        Clipping & \t{X} &                       &                  & $[0,1]^3$      &                &   &         &            & \mc{1}{l}{} &      \\ \bottomrule
+%	\mc{5}{l}{$^{(1)}$Normalized Device Coordinates} &       &
+%\end{tabular}
+%
+
+%(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}
+\begin{tabular}{r c >{\hspace*{0em}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
+	\topline\rowcolor{tabBlue}
+   \mc{2}{c}{\bf Frame} & & \mc{5}{c}{\bf Transformation} & \mc{5}{c}{\bf Configuration space} & \mc{11}{c}{\bf Representation} \\
+   \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-8}\cmidrule(lr){9-13}\cmidrule(lr){14-24}}\rowcolor{tabBlue} 
+	\emph{Description} & \emph{Symbol} & \Emph{} & \Emph{$\vec{T}$} & \mc{4}{O}{\Emph{$\colon$ Mapping}} & \Emph{$\mathcal{C}($} & \Emph{$\vec{p}$\addtimes} & \Emph{$\vec{R}$\addtimes} & \Emph{$s)$} &  \Emph{DoF$^{(1)}$} &  \mc{1}{l}{\emph{$\mat{T}$}} & \Emph{$($} & & \Emph{$\dvec{p}$} & \Emph{$\phantom{z},$}  & & \Emph{$\dvec{R}$} & \Emph{$\phantom{\phi},$} &  \Emph{$s$} & \mc{1}{>{\hspace{-1.75\tabcolsep}}l}{$)$} & \Emph{Group} \\%\Emph{Sum} \\
+	\midline
+	                                         Model & \t{M}             &&                                             &          &            &       &                           &  &                &           &                &   & \mcc{1}{L}{}      &                                                                      &      &      &      &         &           &         &     & \mcc{1}{C}{} &      \\
+	                                         Image & \t{I}             &\figstep{1}{}& \T{IM}                                      & $\colon$ & $\ubar{M}$ & $\to$ & $\ubar{I}$                &  & $\mathbb{R}^3$ & $S^2 S$ & $\mathbb{R}^+$ & 7 & \Tr{IM}           & $($                                                                  & $x,$ & $y,$ & $z,$ & $\psi,$ & $\theta,$ & $\phi,$ & $s$ & $)$          & \SIM \\
+	                                         Sonar & \t{S}             &\figstep{2}{}& \T{SI}                                      & $\colon$ & $\udot{I}$ & $\to$ & $\udot{S}$                &  & $\mathbb{R}^3$ &         &                & 3 & \Tr{SI}           & $($                                                                  & $x,$ & $y,$ & $z,$ & 2$\psi,$ & $\theta,$ & $\phi$  &     & $)$          & \SE  \\
+	                             Orthographic view & \t{O}             &\figstep{3}{}& \T{OS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{O}$ &  &                & $S$     &                & 1 & \Tr{OS}           & $($                                                                  &      &      &      & $\psi$  &           &         &     & $)$          & \SE  \\
+                              
+\cmidrule{14-24}\rowcolor{tabBlue}
+   \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{Green}\begin{tabular}{l l}\rowcolor{white}
+   $\Uparrow$ & \emph{Affine manipulations} \\$\Downarrow$ & \emph{Coordinate manipulations}
+   \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{Green}\hline\arrayrulecolor{black}%cline{10-20}
+	                                               &                    \\[0\baselineskip]
+	                                Cylindric view & \t{C}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $\mathrm{T}_{CO}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\phi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
+	                                      Clipping & \t{X}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{XC}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
+                                         %\end{tabular}\parbox[L]{8em}{} $\to$ \parbox[L]{3.8em}{NDC$^{(3)}$} \parbox[L]{1em}{$\in$} $[0,1]^3$}   \\ \bottomrule
+\mc{10}{l}{$^{(1)}$Degrees of Freedom} \\
+\mc{10}{l}{$^{(2)}$Subject to fixed along-track axis} \\
+\mc{10}{l}{$^{(3)}$Normalized Device Coordinates} 
+\end{tabular}
+%	                                Cylindric view & \t{C}             &                                             &                                               &  &                &           &                &   & $\mathrm{T}_{CO}$ & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,y,z)\in\mathbb{R}^3$}&\mc{1}{O}{$\to (x,\phi,r)\in$}&$\mathbb{R}S\mathbb{R}$   \\
+%	                                      Clipping & \t{X}             &                                             &                                               &  &                &           &                &   & \Tr{XC}           & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,\phi,r)\in\mathbb{R}S\mathbb{R}$}&\mc{2}{O}{\hspace*{-\tabcolsep}$\to [0,1]^3$}   \\ \bottomrule
+%	                 \mc{10}{l}{$^{(1)}$Degrees of freedom} &  \\
+%
+%cartesian $\rightarrow$ cylindric
+%orthographic projection
+%\p{MV}{M}
+%\p{IV}{I}
+%\p{SV}{S}
+%& \p{OV}{O}
+%\p{CV}{C}
+%\p{XV}{X}
+\begin{tikzpicture}[overlay,remember picture, shorten >=-3pt]
+%
+\tikzset{
+  c/.style={
+    anchor=south west,
+    node font=\itshape,
+%    draw,
+    align=center,
+    rotate=30,
+    yshift=-.2ex,
+    xshift=-0.5em,
+    align=left
+  }
+}
+%\node[c] at (Rot){\rotatebox{0}{Rotation}};
+%\node[c] at (Tra){\rotatebox{0}{Translation}};
+%\node[c] at (Sca){\rotatebox{0}{Scale}};
+%\node[c] at (Sum){\rotatebox{0}{DoF}};
+%\node[anchor=base,transform canvas={yshift=.75\normalbaselineskip},align=left,rotate=30,inner sep=0pt](Rot){Rotation};
+%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
+\coordinate(IM) at ($(I)!0.5!(M)$);
+\coordinate(SI) at ($(S)!0.5!(I)$);
+\coordinate(OS) at ($(O)!0.5!(S)$);
+\coordinate(CO) at ($(C)!0.5!(O)$);
+\coordinate(XC) at ($(X)!0.5!(C)$);
+\coordinate(offset) at (0.5em,0ex); %5.3em
+%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
+%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
+%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
+%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
+%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
+%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
+%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+% \node(step1)[anchor=center] at ($(X)+(2.8em,-0.2em)$){\figstep{1}{}};
+%\draw[-]
+%                        (FrameL.south) to[out=0, in=180] (FrameR.south);
+\draw[-{Latex[length=.5em,width=.5em]}]
+                        ($(C.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
+\draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
+                        ($(O.center) + (offset) + (1.1em,-0.4ex)$) to[out=-45, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
+\draw[-{Latex[length=.5em,width=.5em]}]
+                        ($(S.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+\draw[-{Latex[length=.5em,width=.5em]}]
+                        ($(I.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(S.center) + (offset) + (0.8em,0ex)$);
+\draw[-{Latex[length=.5em,width=.5em]}]
+                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(I.center) + (offset) + (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$);
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+%%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
+%%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(S.east) - (.7em,0ex)$) to[out=-180, in=180] ($(O.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(O.east) - (.7em,0ex)$) to[out=-180, in=180] ($(C.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(C.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
+%%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
+\end{tikzpicture}
+}
+\caption{Reference frames and their transformations. The upper half is an affine domain where frames are related by displacements defined by some configuration and coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
+\end{table*}
+
+%\begin{table*}[thbp]\centering
+%%
+%{
+%\newcommand\shiftdown[1]{\smash{\raisebox{-.75\normalbaselineskip}{#1}}}
+%\newcolumntype{L}{>{\collectcell\shiftdown}l<{\endcollectcell}}
+%\newcolumntype{C}{>{\collectcell\shiftdown}c<{\endcollectcell}}
+%\providecommand\t*{}\renewcommand*\t[1]{{\tikzmark{#1}{$\ubar{#1}$}}}
+%%	\hline
+%%%
+%\def\arraystretch{1.5}
+%% \setlength{\belowrulesep}{0pt}
+%%\setlength{\extrarowheight}{0.5ex}
+%\newcommand\pt[1]{\parbox[c]{1.5em}{text}}
+%%\cellcolor[gray]{.9}
+%\newcommand\mc[3]{\multicolumn{#1}{#2}{#3}}
+%\providecommand*\T{}\renewcommand*\T[1]{\parbox[l]{2em}{$\mat{T}_{#1}$}}
+%\providecommand*\inn{}\renewcommand*\inn[1]{}%\in\mathrm{#1}(3)}
+%\providecommand*\TT{}\renewcommand*\TT[1]{\parbox[l]{2em}{T$_{#1}$}}
+%\providecommand*\p{}\renewcommand*\p[2]{\parbox[l]{2em}{$\dvec{p}_{#1}^{#2}$}}
+%\providecommand*\SIM{}\renewcommand*\SIM{\parbox[l]{2em}{$\in\mathrm{SO}(3)$}}
+%\begin{tabular}{r c c C L L}
+%	\topline\rowcolor{tabBlue}
+%   \mc{3}{c}{Frame} & \mc{3}{|c}{Transition} \\\rowcolor{tabBlue}
+%  \bf Description  & \bf Symbol &  & \mc{1}{|l}{\bf{}Symbol} & \mc{1}{l}{\bf{}Kind} & \mc{1}{l}{\bf{}Transformation} \\\midline
+%	          Model & \t{M}      & \p{MV}{M} & \T{IM} & & Affine:          scale,  rotate\phantom{, translate}  \\
+%	          Image & \t{I}      & \p{IV}{I} & \T{SI} & & Affine: \phantom{scale, }rotate         , translate   \\
+%	          Sonar & \t{S}      & \p{SV}{S} & \T{OS} & & Affine: \phantom{scale, }rotate\phantom{, translate}  \\
+% Orthographic view & \t{O}      & \p{OV}{O} & \TT{CO}& & Non-linear: cartesian $\rightarrow$ cylindric         \\
+%	 Cylindric view & \t{C}      & \p{CV}{C} & \T{XC} & & Affine: orthographic projection                       \\
+%	     Clip / NDC & \t{X}      & \p{XV}{X} &        & &                         \\\bottomrule
+%%	\mc{3}{l}{$^1$Normalized Device Coordinates}
+%\end{tabular}
+%\begin{picture}[overlay,remember picture, shorten >=-3pt]
+%\matrix [matrix of math nodes](Mat){
+%  &|[minimum width=4em]|& P(x_i) &|[minimum width=4em]| Code &       &|[minimum width=4em]|      &       &|[minimum width=4em]|  &   &|[minimum width=4em]|  &   &\\
+%%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
+%\coordinate(IM) at ($(I)!0.5!(M)$);
+%\coordinate(SI) at ($(S)!0.5!(I)$);
+%\coordinate(OS) at ($(O)!0.5!(S)$);
+%\coordinate(CO) at ($(C)!0.5!(O)$);
+%\coordinate(XC) at ($(X)!0.5!(C)$);
+%\coordinate(offset) at (5.3em,0ex);
+%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
+%%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
+%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
+%\draw[-{Latex[length=.5em,width=.5em]}]
+%                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+%%%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
+%%%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(S.east) - (.7em,0ex)$) to[out=-180, in=180] ($(O.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(O.east) - (.7em,0ex)$) to[out=-180, in=180] ($(C.east) - (.7em,0ex)$);
+%%%%%\draw[->] ($(C.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
+%%%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
+%\end{tikzpicture}
+%}
+%\caption{Reference frames and their transitions.}\label{IV_tab_frames_transitions}
+%\end{table*}
+
+
+
+
+\Fig{IV_buildup} illustrates the basic idea behind the simulator: to use OpenGL to render an intensity and depth image of an object and seafloor model, and OpenCL to convert these into an image template. The input parameters can either be predefined or estimated from the SAS image, which we label the conventional or adaptive approach, respectively.
+
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. We adhere to a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, extend it past affine geometry to handle homogeneous coordinates and projective geometry, and even use it when expressing non-linear effects. This permits expressing all kinds of both affine and projective operations as a single matrix multiplication, to raise the abstraction level to that of the frames.
+
+We describe the transformations that a vertex $\udot{V}$ undergoes, from being represented in the model $\ubar{M}$, to  image $\ubar{I}$, sonar $\ubar{S}$, a orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).   These, and the transitions between them, will be described in greater detail.
+
+%{
+%\setlength\tabcolsep{0pt}%\def\arraystretch{1.5}
+%\begin{align*}
+%	\t{M} \quad Model            \\
+%	\t{I} \quad Image           \\
+%	\t{S} \quad Sonar                                         \\
+%	\t{O} \quad Orthogonal view                               \\
+%	\t{C} \quad Cylindric view                                \\
+%	\t{X} \quad Clip             
+%    \tikz[overlay,remember picture]{}
+%\end{align*}
+
+%\begin{filecontents*}{table.tex}
+%\begin{tabular}{l*{3}{c}}
+%& A & B & C \\
+%\hline
+%1 & blah & blah & blah \\
+%2 & blah & blah & blah \\
+%3 & blah & blah & blah \\
+%\hline
+%\end{tabular}
+%\end{filecontents*}
+%\begin{tikzpicture}
+%\matrix[ampersand replacement=\&] {
+%\node (tables1) [shape=rectangle,draw] {
+%\begin{tabular}{l l}
+%\end{tabular}
+%};
+%};
+%\end{tikzpicture}
+%\node(table) {
+%	\t{M} & Model            \\
+%	\t{I} & Image           \\
+%	\t{S} & Sonar                                         \\
+%	\t{O} & Orthogonal view                               \\
+%	\t{C} & Cylindric view                                \\
+%	\t{X} & Clip };             
+%    \tikz[overlay,remember picture]{}
+
+
+            
+
+
+
+
+
+%}
+%
+%\tikz[overlay,remember picture]{
+%  % Set up some general bounding box markers
+%  \coordinate(CC) at ($ .5*(CL)  + .5*(CR) $);
+%  \coordinate(TC) at ($    (CC)  + (0em,1.3\baselineskip) $);
+%  \coordinate(BC) at ($    (CC)  - (0em,1.3\baselineskip) $);
+%  % Compute means
+%  \coordinate(AB) at ($ .5*(A1)  + .5*(B1) $);
+%  \coordinate(BC1) at ($ .5*(B2)  + .5*(C1) $);
+%  % Compute arrow via points
+%  \path let \p1 = ($.5*(AC) +.5*(A1)$),   \p2 = (BC) in coordinate (A)      at (\x1,\y2);
+%  \path let \p1 = ($.5*(AB) +.5*(BC1)$),  \p2 = (BC) in coordinate (AB_BC)  at (\x1,\y2);
+%  % Draw arrows and text
+%  \node(De)[above = 2\baselineskip of CC, anchor=center]%
+%    {\footnotesize\textrm{Same frame}};
+%    \draw[<-, in=-90, out=90] (D1.north) to ($ (De.south) + (0,1ex)$);
+%    \draw[<-, in=-90, out=90] (D2.north) to ($ (De.south) + (0,1ex)$);
+%    \draw[<-, in=-90, out=90] (D3.north) to ($ (De.south) + (0,1ex)$);
+%  \node(ACe)[below = 2\baselineskip of CC, anchor=center]%
+%    {\footnotesize\textrm{Change of vector}};
+%    \draw[->] (C1.south) to[out=-90, in=0] (AB_BC) to[out=180, in=0] (A) to[out=180, in=-90](AC.south);
+%    \draw[-] (A1.south) to[out=-90, in=0] ($ (A)+(0em,0ex) $);
+%    }
+
+%It relies on reference frames and transitions between these. 
+
+%To showcase the advantage of using our notation system, observe from \Fig{IV_simulator_coordinate_system} which reference frames we decomposed the virtual scene into: A 3D model $\ubar{M}$, image region $\ubar{I}$, sonar local body $\ubar{S}$, and an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$, respectively. The sequence of affine transforms that a vertex $\udot{V}$% $\dvec{v}^\textit{\tiny{}M}$
+%for model $M$ undergo is given as\todo{Condense sequence to improve speed}:
+%
+%
+%It takes as input a "rigid" model of the object and seafloor, and transforms them in several steps to produce the image template.
+%
+%
+%orthogonal to the slant-range; mmodel of a object and seafloor as viewed from the sonar, and OpenCL converts this information into an image template. 
+%
+
+%
+%
+%Referring same points from different locations. frames
+%
+% The models are rigid, meaning
+%
+% ---contains is a fairly complex 
+%
+%Complex scenes containing rigid bodies---such as the one in \Fig{IV_simulator_coordinate_system} that underpins our simulator---
+%
+%can often be described elegantly in terms of reference frames.
+%
+%Given as input an object and seafloor model undergo a set of transformations to produce the image template, described as a transition from one frame to another. In the spatial domain these are usually affine, the kind that involves a rotation and a translation, because they preserve the model structures. 
+
+%Affine transformations can be described in an clear, organized and robust manner with a 
+
+
+%%In computer graphics the geometrical transitions are often expressed as a single transformation We extend Gade's notation to also 
+%However, we extend it to  however, extend it 
+
+%uniformly
 
 
 %Thinking in terms of these matrices are fine in the beginning, but for more complex scenes it is not clear when to use which. The issues arise when trying to deal with complex scenes with the aforementioned effects.
@@ -486,7 +1050,6 @@ We will demonstrate how arbitrary complex geometries can be defined in a uniform
 %Handedness
 
 %About half the time developing the simulator was spent dealing with the (slightly simplified) geometries illustrated in \Fig{IV_simulator_coordinate_system}; It was far too easy to get lost when compounding transforms, thinking in terms of coordinates rater than vectors, and when dealing with various corner-cases.\todo{Too verbal} However, this was later rectified by adopting and extending the stringent and unified notation system developed by Gade~\cite{Gade2018}. We present a subset of his (simplified) notation here, before extending it to homogeneous coordinates and projective spaces---which are a better fit to computer graphics.
-
 
 
 
@@ -523,344 +1086,392 @@ We will demonstrate how arbitrary complex geometries can be defined in a uniform
 % Homogeneous coordinates.
 % + Convenient
 % - 4 instead of 3 dimensions
+%
+% logical spaces
 
 %Geometrical objects: Points. Vectors act on points. Rotation matrices act on vectors.
 
 %The transformation of a rigid body in Euclidean space is uniquely defined by a translation and a rotation. 
 
-Rigid objects. Cloud of points with fixed distances between them. Transform that preserve this property comprised of translation of origins, plus a rotation of bases. Abstract away these and coordinate-specific details. Only talk about transforms.
+%Rigid objects. Cloud of points with fixed distances between them. Transform that preserve this property comprised of translation of origins, plus a rotation of bases. Abstract away these and coordinate-specific details. Only talk about transforms.
 
 
-
-\subsection{Unified notation system}
-
-%Jeg har bestemt meg, ytterst ukomfortabelt, om å avslutte boikotten av sosiale medier. Muligens. Kanskje. For å slå et slag for miljøet, samtiden og fremtiden. Forhåpentligvis uten at slag også sendes i retur. :)
-%
-%Kan begynne med interessant lesning fra Pontevedra i Spania der man forbød biler i sentrum. Kort: Barnevennlige gater, forbedret varelevering, lyd av mennesker av dyr og ikke motorer, grønnere, bedre luft og økt tilflytting...
-%
-%https://www.theguardian.com/cities/2018/sep/18/paradise-life-spanish-city-banned-cars-pontevedra
+%Notation categories: With and without coordinates. First, coordinate-free. Pure geometrical reasoning, geometrical elements and associated operations, higher abstraction, conceptually clear, close relation to physical reality. Then, represent geometrical objects with coordinates. Ambiguities and numerical side effects easier to handle with a firm grasp of geometric reasoning.
 
 
+Gade's notation can be used with or without coordinates. We prefer the latter when emphasizing geometrical reasoning, conceptual clarity, or physical understanding. Coordinates are a practical necessity, but add complexity; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone; strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
-%
-%To emphasize geometrical reasoning we start with coordinate-free notation. yikes
-%Many geometrical concepts can be described without coordinate systems
-%
-%A rigid implementation of complex geometries demand a rigid mastery of geometrical concepts
+\subsection{Free notation}\label{IV_sec:general_notation}
+
+%The configuration of $\mathcal{M}$ can be specified by a vector $\dvec{p}\in\mathbb{R}$ describing $\udot{M}$ with respect to $\udot{I}$, and a rotation matrix, $\mat{R}_{IM}
+%$, whose columns describe the relative orientation of axes of $\ubar{M}$ with respect to those of $\ubar{I}$.
+
+%\begin{tabular}{l l l}
+% model body       & $\mathcal{M}$ & $\ubar{M}$  \\
+% workspace/world  & $\mathcal{W}$ & $\ubar{W}$
+%\end{tabular}
+
 %
 %Many geometrical concepts can be described without coordinate systems. Doing so promotes geometrical reasoning conceptually The fundamental properties of a point or a vector do not depend on A point or line, they exist This promotes conceptual clarity when modeling the physical reality.   
 %
-%Most computer graphics literature describe geometrical concepts using coordinates and matrices. Although readily implementable, a bit of geometrical clarity is lost in the process.  the  in a computer, . Stacked into matrices, the However, many geometrical concepts are independent of the choice of coordinate systems, and cv
-% 
+%Most computer graphics literature describe geometrical concepts using coordinates and matrices. Although readily implementable, a bit of geometrical clarity is lost in the process.  the  in a computer, . Stacked into matrices, the However, many geometrical concepts are independent of the choice of coordinate systems, a
 %
 % The solutions are readily implementable, but The trouble is that Although this provide readily implementable Although However,  coordinates introduce ambiguities many geometrical concepts can be described in a coordinate-free manner. s. We emphasize some of these by first this by first To emphasize this, wecan be do not rely on these are better described using coordinate-free notation. Although While this is certainly needed to implement 
-%Deep conceptual understanding 
-%Conceptual clarity coordinate-free notation first.
 
- Notation categories: With and without coordinates. First, coordinate-free. Pure geometrical reasoning, geometrical elements and associated operations, higher abstraction, conceptually clear, close relation to physical reality. Then, represent geometrical objects with coordinates. Ambiguities and numerical side effects easier to handle with a firm grasp of geometric reasoning.
+%Consider the scene in \Fig{IV_simulator_coordinate_system}, where an object model resides on the seafloor.
+
+% Euclidean
+% Orthonormal  ($\hat{m}_i\in\mathbb{V}$ being the $i$-th orthonormal basis vector)
 
 
-
-\subsubsection{Coordinate-free notation}\label{IV_sec:free_notation}
-
-%Transition between frames---say, from $\ubar{B}$ to $\ubar{A}$---is expressed by
-Let $\ubar{B} \triangleq (\udot{B},\uvec{B}) \in\mathbb{A}$ be a reference frame attached to a rigid body, with  $\udot{B}\in\mathbb{P}$ denoting the frame's absolute position (point) and $\uvec{B}\triangleq\big(\vec{b}_{B,1},\dots,\vec{b}_{B,N}\big)\in\mathbb{V}$ its absolute orientation (basis vectors that span $\mathbb{R}^N$). %To define a $\ubar{A}$ can be obtained from $\ubar{B}$ with a translation applied to $\udot{B}$ and a rotation  can be obtained from $\ubar{B}$ by applying a translation and a rotation. in terms of a  its takes a translation  we first need to defin
-%
-%A frame A can be defined relative to B, by relating the posisions with a position vector and the orientations with a rotation dyadic.
-%Suppose we  have two frames A position vector going from $\udot{A}$ to $\udot{B}$ $\vec{p}_{AB}$ be a position 
+Suppose an $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation.
 %
 %
-%Suppose we Now consider the two frames $\ubar{A}$ and $\ubar{B}$. 
-%Let $\vec{p}_{AB} \in \mathbb{V}$,
-%The position vector that relates $\udot{A}$ to $\ubar{B}$
-%To specify a frame $\ubar{A}$ relative to $\ubar{B}$, we define a position vector $\vec{p}_{AB} \in \mathbb{V}$ going from $\udot{A}$ to $\udot{B}$, %\todo{should somehow say that this means *from* A *to* B}
-%A frame $\ubar{A}$ can be defined relative to $\ubar{B}$, by relating the two frame's positions with a position vector $\vec{p}_{AB} \in \mathbb{V}$ going from $\udot{A}$ to $\udot{B}$,
-
-Rigid bodies only the relation between points matters. Described with position vector
-
-%Two affine operations. First subtract $\udot{A}$ to $\udot{B}$ to obtain position vector.
-%and the orientations with a rotation dyadic.
+%
+%The set of all possible configurations for the model is called its C-space, its dimension matching the number of degrees of freedom and its shape matching the topology. Rigid bodies have $N(N+1)/2$ degrees of freedom, $N$ Euclidean ones for position (topology $\mathbb{E}^N$), and $N(N-1)/2$ angular ones for orientation (topology $S^2S^1$ or $S^1$ for $N=\{3,2\}$, respectively).
+%
+%
+A vertex $\udot{V}$ in the model can be related to the frame by a position vector $\vec{p}_{MV}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
 %
 \begin{align}
-\vec{p}_{AB} &\triangleq \udot{B} - \udot{A},\label{eq_position_vector}
-\end{align}
-\begin{align}
-\vec{R}_{AB} &\triangleq \uvec{B} \rightarrow \uvec{A},\label{eq_rotation_dyadic}
+\vec{p}_{MV} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-Note symmetry. Subscripts: p = position, R = orientation.
-
-Position vectors can either be used to offset points to form new ones
+where $\vec{p}_{MV} = -\vec{p}_{V\!M}$. %According to the Chasles-Mozzi theorem, any rigid body displacement can be composed from a rotation and a translation. 
 %
-\begin{align}
-\udot{A} &= \udot{B}-\vec{p}_{AB} \label{eq_free_transformation}
-\end{align}
-
-
-
-%Relative operations more important.  Translation and rotation. Translations operate on points, rotations on vectors. Translation 
-
-%can now relate points.
-
-%Seek to find the affine transformation $f\colon \ubar{B}\to\ubar{A}$. Preserves rigid bodies.
+% To preserve model rigidity, all the model's vertex-vectors can only be together by a single affine operation; First a rotation (or more generally, a linear transformation) for changing its orientation, followed by a translation for changing its position.
 %
-%Adding position vectors adhere to head-to-tail axiom:
+% $N$ of which defines position with a topology of $\mathbb{E}^3S^2S^1$ ($N=3) or $\mathbb{E}^2S^1$ $N$ of which defines position and the rest orientation. The topology In an $N=2$ dimensions, Its topology 
+%
+%The translation has $N$ linear degrees of freedom, , and .
+%The rotation can either specify orientation, rotate a point, or change representation.
+%
+%The model is rigid, so the ratios of lengths between its points must be constant. This is ensured when the model's vertices
+%
+%
+%
+%The model $\vec{p}_{MV}$ transformed by a combination of a linear shift $\vec{t}$   and rotation $\vec{R}$
 %%
-%\begin{align}%\nonumber\\[.5\baselineskip]
-%\vec{p}_{\g{AC}{AC}}
-%= \vec{p}_{\g{A1}{A}\r{B1}{B}}
-%+ \vec{p}_{\r{B2}{B}\g{C1}{C}}\label{eq_vector_addition}
-%\\\nonumber\\\nonumber
-%\tikz[overlay,remember picture]{
-%%    scale=0.62, every node/.append style={transform shape}
-%  \coordinate(B) at ($ .5*(B1)    + .5*(B2) $);
-%%  \node(Be)[below = 1.2\baselineskip of B, anchor=center]%
-%%    {\footnotesize\textrm{Cancel}};
-%%    \draw[<->, in=-90, out=-90] (B1.south) to ($ (B2.south) - (0,0ex)$);
-%%    \draw[<-, in=90, out=-90] (B2.south) to ($ (Be.north) - (0,0ex)$);
-%%    \draw[fill] (B2) circle [radius=0.025];
-%%  \node(ACe)[below = 1.5\baselineskip of AC, anchor=center]%
-%%    {\footnotesize\textrm{Remain}};
-%%    \draw[->, in=-90, out=-90] (C1.south) to ($ (C1.south) - (0em,2.5ex) $) to ($ (AC.south) - (0,0ex)$);
-%    \draw[->, in=-90, out=-90] (C1.south) to ($ (AC.south) - (0,0ex)$);
-%    \draw[->, in=-90, out=-90] (A1.south) to ($ (AC.south) - (0,0ex)$);
-%    }
+%\begin{align}
+%\vec{p}_{MV'} &= \vec{R}\vec{p}_{MV} + \vec{t}\label{eq_position_vector_translated}
 %\end{align}
+%
+%or rotated with a rotation operator $\vec{R}$
 %%
+%\begin{align}
+%\vec{p}_{MV'} &= \vec{R}\vec{p}_{MV}\label{eq_position_vector_rotated}
+%\end{align}
 %
 %
-% 1. Define points & frames
-% 2. Translate/rotate position vectors
-% 3. Increase abstraction: The R3 transform / homogeneous coordinates
-% 
+%Given a model vertex $\vec{p}_{MV}$, we can use \eq{eq_position_vector} to translate it
+%is applied to a  we can use \eq{eq_position_vector} relative to the model, we define a position vector $\vec{p}_{MV}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
+%
 
-or 
-Rotation dyadic $\vec{R}_{AB}$ aligning $\uvec{B}$ with $\uvec{A}$ (defined in Appendix \ref{IV_sec:free_euler_rodrigues}),
+An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area we want to place the model into. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
-\uvec{A} &\triangleq \vec{R}_{AB}\uvec{B}
-%\uvec{B} \rightarrow \uvec{A}.\label{eq_bases}
-% \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta).
-%\vec{I} + \sin\theta(\hat{r}\times) + (1-\cos\theta)(\hat{r}\times)^2.
+\vec{T}_{IM} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
+\intertext{in terms of a translation $\vec{p}_{IM}$ that relate their positions,}
+\vec{p}_{IM} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
+\intertext{and a rotation $\vec{R}_{IM}$ that relate their orientations,}
+\vec{R}_{IM} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
+\vec{m} &\mapsto \vec{i}.
 \end{align}
 %
-Definition of R in appendix. $\big(\vec{R}_{AB},\vec{p}_{AB}\big)$ is called the configuration of $\ubar{A}$ relative to $\bar{B}$ and contains $2N$ degrees of freedom. Unique and geometrically clear, but tuples are inconvenient to work with.
-
-No coordinate system. Only one valid geometrical interpretation: point moves. This is active transformations. More common to represent same vector with different frames. Need decomposed notation to do this unambiguously.
-
-% \begin{align}
-% \vec{p}_{AC'} &= \vec{p}_{BC'} - \vec{p}_{AB} \nn
-%  &\triangleq \vec{R}_{AB}\vec{p}_{BC} - \vec{p}_{AB}
-% \end{align}
-
-%Change a point: Add position vector / translation.
-%Change a set of vectors: Rotate each - axis-angle, quaternions, matrices.
+We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{IM},\vec{R}_{IM})$.
 %
+%%$\vec{p}_{IM}$ has $N$ degrees of freedom and Euclidean topology $\mathbb{R}^N$. $\vec{R}_{IM}$
 %
-%The rotated vector p' relates to B the same way p relates to A. 
+%%It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, and the rest for orientation. 
+%The translation has $N$ degrees of freedom and topology $\mathbb{R}^N$. The rotation has $N(N-1)/2$ degrees of freedom with topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$.
 %
-%Rotations:  All pros cons. Matrices nice formal properties, but ambiguous. How to specify representation? 
+It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit from now on. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
+
+% lists every frame configuration s the configuration of every frame transition, along with constraints and representation.
+
+% Thus, $\mathcal{C}_M\in\mathbb{R}^N\times{}S^2\times{}S^1$, where $\times$ denotes the cartesian product of sets. 
+
+% The configuration space $\mathcal{C}_{IM}=(\vec{p}_{IM},\vec{R}_{IM})\in \mathbb{R}^N\times{}S^2\times{}S^1$.
 %
-%Active - points physically move.
-%Passive - same physical points represented by different frames.
-
-%
-% Describe points with position vectors. These can be translated and rotated.
-
-% Combining (\ref{eq_origins}) and (\ref{eq_bases}) forms an active transformation from $\ubar{B}$ to $\ubar{A}$,
-% %
-% \begin{align}
-% \uvec{A} &\triangleq \vec{R}_{AB}\uvec{B} \nn
-%          &\triangleq \big(\vec{R}_{AB}\vec{b}_{B,1},\dots,\vec{R}_{AB}\vec{b}_{B,N}\big).\label{eq_free_transformation}
-% \end{align}
-% %
-% such that a point $\udot{\alpha}$ that relates to $\ubar{A}$ the same way $\udot{\beta}$ relates to $\ubar{B}$ is given by:
-% %
-% \begin{align}
-% \vec{p}_{A\alpha} = \vec{R}_{AB}\vec{p}_{B\beta} - \vec{p}_{AB}.\label{eq_free_transformation}
-% \end{align}
-
-%Can now rotate and translate points such that they "follow" their frame. 
-%
-
-
-%\begin{align}
-%\vec{p}_{AC}
-%&= \vec{p}_{AB} + \vec{p}_{BC}
-%&= \vec{p}_{AB} + \vec{p}_{BC}
-%\end{align}
-%
-
-
-%
-%\begin{align}
-%\udot{A} &= \udot{B}-\vec{p}_{AB}\nn
-%\uvec{A} &= \vec{R}_{AB}\uvec{B}.\label{eq_free_transformation}
-%\end{align}
-
-% Rotation not defined. Can use Euler-Rodrigues each basis vector, but rotation matrices preferrable. Need coordinate system. 
-
-%
-%\begin{align}
-%\udot{A} &= \udot{B}-\vec{p}_{AB} \\
-%\uvec{A} &\triangleq \vec{R}_{AB}\uvec{B} \nn
-%         &\triangleq \big(R_{AB}\vec{b}_{B,1},\dots,R_{AB}\vec{b}_{B,N}\big).\label{eq_free_transformation}
-%\end{align}
-
-%Transition between frames---say, from $\ubar{B}$ to $\ubar{A}$---is a two-step procedure where a rotations is applied to the bases, and require an independent update of the origins and the bases. we first  frames, we move The origins of two frames are related by a position vector, $\vec{p}_{AB} \in \mathbb{V}$, %\todo{should somehow say that this means *from* A *to* B}
+%The image frame $\ubar{I}$ can be defined relative to $\ubar{M}$, by relating their positions by a position vector $\vec{p}_{IM}$ going from $\udot{I}$ to $\udot{M}$,
 %%
 %\begin{align}
-%\vec{p}_{AB} &= \udot{B} - \udot{A},\label{eq_}
+%\vec{p}_{IM} \triangleq \udot{M} - \udot{I},\label{eq_position_vector}
 %\end{align}
 %%
-%and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates about an axis $\hat{r}$ by angle $\theta$,
-%%
-%\begin{align}\label{eq:M}
-%\vec{R}_{AB}
-%&=
-%% \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta).
-%\vec{I} + \sin\theta(\hat{r}\times) + (1-\cos\theta)(\hat{r}\times)^2.
-%\end{align}
-%%
-%where $\times$ is the cross-product. $\hat{r}$ and $\theta$ relates to $\uvec{A}$ and $\uvec{B}$ by
+%and their orientations by a rotation operator $\vec{R}_{IM}$,
 %%
 %\begin{align}
-%\hat{r} = \frac{\uvec{A}\times\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert}
-%\quad\mathrm{and}\quad
-%\theta  = \mathrm{acos}\frac{\uvec{A}\cdot\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert},
+%\vec{R}_{IM} \colon \uvec{M} &\to \uvec{I}\nn
+%\vec{m} &\mapsto \vec{i}.\label{eq_rotation_dyadic}
 %\end{align}
-%%
-%where $\times$ and $\cdot$ signifies the cross- and dot-product, respectively.
 %
-%and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+
+
+%
+%   $\vec{p}_{IM}$, for instance, specifies the image frame's position $\udot{I}$ relative to $\udot{M}$.
+%
+%It can be  defined relative to $\ubar{M}$, by relating their positions by a position vector $\vec{p}_{IM}$ going from $\udot{I}$ to $\udot{M}$,
 %%
 %\begin{align}
-%\theta
-%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
-%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
-%\end{align}
-%\begin{align}
-%\theta
-%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
-%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\vec{p}_{IM} \triangleq \udot{M} - \udot{I},\label{eq_position_vector}
 %\end{align}
 %%
-%The position vector $\vec{p}_{\udot{A}\udot{B}}$ go from $\udot{A}$ to $\udot{B}$ only depends on these points. Similarly, the matrix $\vec{R}_{\uvec{A}\uvec{B}}$ only depends on vectors; $\vec{R}_{\uvec{A}\uvec{B}}\uvec{B}$ rotates $\uvec{B}$ to $\uvec{B}$, $\uvec{A}\vec{R}_{\uvec{A}\uvec{B}}$ rotates $\uvec{A}$ to $\uvec{B}$. 
-%
-%Combining $(\ref{eq_origins})$ and $(\ref{eq_bases})$ yield the full transformation from $\ubar{B}$ to $\ubar{A}$
+%and their orientations by a rotation operator $\vec{R}_{IM}$,
 %%
-%
 %\begin{align}
-%\udot{A} &= \udot{B}-\vec{p}_{AB}\nn
-%\uvec{A} &= \vec{R}_{AB}\uvec{B}.\label{eq_free_transformation}
+%\vec{R}_{IM} \colon \uvec{M} &\to \uvec{I}, \quad
+%\vec{m} \mapsto \vec{i}.\label{eq_rotation_dyadic}
 %\end{align}
- 
 %
-% Denoting the dependencies explicitly with subscript arrows and points is thus redundant for these quantities, and can be omitted.\todo{So what was the point of including them to begin with?} 
-
-% \begin{align}
-% \ubar{A} = (\udot{A},\uvec{A}) &= (\udot{B} - \vec{p}_{\udot{A}\udot{B}}, \vec{R}_{\uvec{A}\uvec{B}}\uvec{B}.
-% \end{align}
-% 27 - 16
-% $\vec{R}_{AB}$ take the form of either can be found in appendix \ref{IV_transformation_matrices}.
-% 
-% Note that position vectors solely depends on points, and rotation matrices on basis vectors. 
-
-%Projections (non-linear) with linear algebra -> homogeneous coordinates
-%Vectors: Linear space - space of vectors - foundation of traditional linear algebra 3D vectors
-%Points: Affine space - space of points - foundation of computer graphics
-%
-%Deal with points, not vectors. Points can only be combined through affine combinations, not linear ones(?)
-%
-%Position vectors - representations
-%
-%Decomposed
-%
-% ADT coordinate-free, conceptually clear, inefficient(?)
-
-\subsubsection{Decomposed notation}\label{IV_sec:decomposed_notation}
-
-% In $\mathbb{R}^3$ 
-
-To relate orientations, need Euclidean space. Lengths, dot and cross product.
-
-When is vector is decomposed (represented) with a set of basis vectors, say $\uvec{D}$, we denote this with a bold symbol and superscript, $\dvec{p}_{AB}^D\in\mathbb{R}^3$.
-
-% Since the subscripts only depends on the frame's origins, and the superscript on its basis vectors, we could---but opt not to---express this explicitly as $\dvec{p}_{\udot{A}\udot{B}}^{\uvec{D}}$; The implicit notation is simpler and leads to no loss of clarity here. 
-
-A set of rules accompany the notation system to validate and describe operations; Subscripts can only be changed by translations, and superscripts by linear transformations. To start with the former, consider the following summation:
+%If $\vec{p}_{IM}$ defined we can connect Its position is defined by $\vec{p}_{IM}$
+%Frame positions are related similarly. $\vec{p}_{IM}$, for instance, specifies the image frame's position $\udot{I}$ relative to $\udot{M}$.
+% The position vectors share the same $N$ linear degrees of freedom as the positions on which they rely, and must be adressed through parametrization and constraints.
+%When all the scene's frames connect either directly or indirectly through position vectors, any non-existing connection between two points to be made with the head-to-tail axiom,
 %
 
-\begin{align}\nonumber\\[.5\baselineskip]
+
+\subsection{Decomposed notation}\label{IV_decomposed_notation}
+
+Suppose we reference the model's vertices from the image frame $\ubar{I}$,
+%
+\begin{align}\label{IV_eq_free_vector_addition}
 \m{CL}
-\dvec{p}_{\g{AC}{AC}}^\k{D1}{D}
-= \dvec{p}_{\g{A1}{A}\r{B1}{B}}^\k{D2}{D}
-+ \dvec{p}_{\r{B2}{B}\g{C1}{C}}^\k{D3}{D}
-\m{CR}\label{eq_vector_addition}
-\\\nonumber\\\nonumber
+\vec{p}_{\g{IV}{IV}}
+= \vec{p}_{\g{I}{I}\r{M1}{M}}
++ \vec{p}_{\r{M2}{M}\g{V}{V}}.
+\m{CR}
+\\\nonumber
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
-  \coordinate(CC) at ($ .5*(CL)  + .5*(CR) $);
-  \coordinate(TC) at ($    (CC)  + (0em,1.3\baselineskip) $);
-  \coordinate(BC) at ($    (CC)  - (0em,1.3\baselineskip) $);
-  % Compute means
-  \coordinate(AB) at ($ .5*(A1)  + .5*(B1) $);
-  \coordinate(BC1) at ($ .5*(B2)  + .5*(C1) $);
-  % Compute arrow via points
-  \path let \p1 = ($.5*(AC) +.5*(A1)$),   \p2 = (BC) in coordinate (A)      at (\x1,\y2);
-  \path let \p1 = ($.5*(AB) +.5*(BC1)$),  \p2 = (BC) in coordinate (AB_BC)  at (\x1,\y2);
+  \coordinate(_MV) at ($    (V.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IV) at ($    (IV.south) + ( 1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IM) at ($    (I.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IV_IM) at ($ .5*(_IV) + .5*(_IM) $);
   % Draw arrows and text
-  \node(De)[above = 2\baselineskip of CC, anchor=center]%
-    {\footnotesize\textrm{Same frame}};
-    \draw[<-, in=-90, out=90] (D1.north) to ($ (De.south) + (0,1ex)$);
-    \draw[<-, in=-90, out=90] (D2.north) to ($ (De.south) + (0,1ex)$);
-    \draw[<-, in=-90, out=90] (D3.north) to ($ (De.south) + (0,1ex)$);
-  \node(ACe)[below = 2\baselineskip of CC, anchor=center]%
-    {\footnotesize\textrm{Change of vector}};
-    \draw[->] (C1.south) to[out=-90, in=0] (AB_BC) to[out=180, in=0] (A) to[out=180, in=-90](AC.south);
-    \draw[-] (A1.south) to[out=-90, in=0] ($ (A)+(0em,0ex) $);
+    \draw[]                    ($ (V.south)  - (0em,\tpad) $)
+            to[out=-90, in=0]     (_MV)
+            to[out=180, in=0]     (_IV_IM)
+            to[out=180, in=-90]($ (IV.south) - (0em,\tpad) $);
+    \draw[-]                   ($ (I.south)  - (0em,\tpad) $)
+            to[out=-90, in=0]     (_IV_IM);
     }
 \end{align}
 %
-Vector-vector operations like summation, dot- and cross-product, only makes sense when the vectors are decomposed in the same vector space---easily verified by the superscripts. The subscripts explain how the vector is altered: The intermediate (closest) frames cancel each other, leaving the start and end frame as subscript for the resulting vector. This mimics the regular rules of vector addition.
-
-To change the decomposition we multiply with some linear transform $\mat{L}\colon\mathbb{R}^3\!\to\!\mathbb{R}^3$. Gade restricts these to rotation matrices, which preserve lengths and cross-products---a prerequisite for rigid body transformations~\cite{Murray1994}. Computer graphics deal with this extensively, but not exclusively; Linear effects such as scaling, shear and reflection are sometimes needed.
-
-%- All terms must have same decomposition (superscript).
-%- Closest points should be identical and cancel (in subscript).
-%- Resulting subscript Decomposition same, and unchanged.
+This vector addition (and any other vector-vector operation) is numerically possible and valid only if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we may represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
-\begin{align}\nonumber\\[.5\baselineskip]
+\begin{align}
+\dvec{p}_{IV}^{\Green{I}} &= \dvec{p}_{I\cancel{M}}^{\Green{I}} + \dvec{p}_{MV}^{\Green{I}}.\label{eq_head_tail_decomposed}
+\end{align}
+%
+% Inverse $\dvec{R}^{-1} = \dvec{R}^T$\\
+% Closure $\dvec{R}_1\dvec{R}_2 \in\mathrm{SO(3)}$\\
+% Associative but not commutative
+% 
+% 
+To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space of more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
+%
+\begin{align}\nonumber\\
 \m{CL}
-\dvec{p}_{\k{AB1}{AB}}^{\g{E1}{E}}
-= \mat{L}_{\g{E2}{E}\r{D1}{D}} \; \dvec{p}_{\k{AB2}{AB}}^{\r{D2}{D}}
-\m{CR}\label{eq_vector_multiplication}
-\\[.5\baselineskip]\nonumber % Adjust spacing as necessary
+\dvec{p}_{\k{MV1}{MV}}^{\g{I1}{I}}
+= \mat{R}_{\g{I2}{I}\r{M1}{M}} \; \dvec{p}_{\k{MV2}{MV}}^{\r{M2}{M}}.\m{CR}
+\label{eq_passive_rotation}
+%
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
-  \coordinate(CC) at ($ .5*(CL)  + .5*(CR) $);
-  \coordinate(TC) at ($    (CC)  + (0em,1.3\baselineskip) $);
-  \coordinate(BC) at ($    (CC)  - (0em,1.3\baselineskip) $);
+  \coordinate(R) at ($ .5*(CL.north)  + .5*(CR.north) + (0em,1\baselineskip) $);
   % Compute arrow via points
-  \path let \p1 = ($.5*(E1) +.5*(E2)$),  \p2 = (TC) in coordinate (E)  at (\x1,\y2);
-  \path let \p1 = ($.5*(D1) +.5*(D2)$),  \p2 = (TC) in coordinate (D)  at (\x1,\y2);
-  \path let \p1 = ($.5*(AB1)+.5*(AB2)$), \p2 = (BC) in coordinate (AB) at (\x1,\y2);
+  \path let \p1 = ($ (I1) + (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I1)  at (\x1,\y2);
+  \path let \p1 = ($ (I2) - (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I2)  at (\x1,\y2);
+  \path let \p1 = ($.5*(M1) +.5*(M2)$),  \p2 = (R) in coordinate (_M)  at (\x1,\y2);
   % Draw arrows and text
-  \node(Be)[above = 2\baselineskip of CC, anchor=center]%
-        {\footnotesize\textrm{Change of frame}};
-    \draw[->](D2.north)  to[out= 90, in=0] (D)  to[out=180,in= 90] (D1.north);
-    \draw[->](E2.north)  to[out= 90, in=0] (E)  to[out=180,in= 90] (E1.north);
-    \draw[->](AB2.south) to[out=-90, in=0] (AB) to[out=180,in=-90] (AB1.south);
-  \node(ABe)[below = 2\baselineskip of CC, anchor=center]%
-    {\footnotesize\textrm{Same vector}};
+    \draw[]                  ($ (M2.north) + (0em,\tpad) $)
+           to[out= 90, in=0]    (_M)
+           to[out=180, in=90]($ (M1.north) + (0em,\tpad) $);
+    \draw[]                  ($ (I2.north) + (0em,\tpad) $)
+           to[out= 90, in=0]    (_I2)
+           to[out=180, in=0]    (_I1)
+           to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
 }
 \end{align}
 %
-Since linear transforms generally are non-commutative, the notation system specifies the proper sequence of multiplication in the subscripts of $\mat{L}_{ED}$; Vectors or other linear transformation matrices decomposed in $\uvec{D}$ go to the right, while those in $\uvec{E}$ go to the left.\todo{$\mat{R}_{ED} = \mat{R}_{DE}^T$ (usually)} Note that representing the vector differently does not change it; its direction and magnitude remains unchanged.
+When $\dvec{R}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied.  %Embee
+%, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
+%
+Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional case the rotations are about fixed points and lines, respectively.
 
-\subsection{Extended notation}
+The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
-Combining the two aforementioned operations---a linear transformation (\ref{eq_vector_multiplication}) and a translation (\ref{eq_vector_addition})---result in an affine transformation. Like the These preserve points, straight lines and planes, and ensure collinearity (parallel lines remain parallel). This is important dealing with rigid objects either in the physical world or as here---virtually. We can produce a single affine transformation as follows\todo{Add some fireworks}\todo{Add a note on projective spaces?}:
+
+
+\subsection{Homogeneous transformations}
+
+Any transformation in $\mathbb{R}^N$-space can be represented by a transformation matrix $\dvec{T} \in \mathbb{R}^{N+1,N+1}$. In the affine case, it has the form of a special Euclidean matrix $\dvec{T}\in\mathrm{SE}(N)$,
+%
+\begin{align}
+\dvec{T} &= 
+\left[\begin{array}{c c}
+ \mat{R}  & \dvec{p} \\%\hline
+ \dvec{0}^T  &  1
+\end{array}\right] = \mathrm{SE}(N)\label{eq_homogeneous_affine_transform}
+\end{align}
+%
+where $\dvec{p}\in\mathbb{R}^N$, $\mat{R}\in\mathrm{SO}(N)$ and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
+
+There is nothing special with this matrix, it simply combines a rotation and translation into a single operation. If the latter row 
+
+The vertex $\udot{V}$ is now referenced from $\ubar{I}$, but we prefer it referenced from the position of the sonar local body $\udot{S}$, with an orientation $\uvec{O}$ that creates a viewing plane orthogonal to $\vec{p}_{SI}$. This mimics a camera placed at the acoustic source directed at the part of the seafloor we seek to image. For this we seek the These transforms take the form of \eq{eq_homogeneous_transformation} and can be stacked together,
+%
+\begin{align}
+\left[\begin{array}{c}
+\\\dvec{p}_{OV}^{O}\\\\\hline 1
+\end{array}\right]
+= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
+\left[\begin{array}{c}
+\\\dvec{p}_{MV}^{M}\\\\\hline 1
+\end{array}\right]
+\end{align}
+%
+A summary of the configuration space and representation of each transformation matrix is shown in \Tab{IV_tab_frames_transitions}. Visual aid is provided in \Fig{IV_simulator_coordinate_system}. Each line in the table and step in the figure matches a heading in the upcoming text.
+
+
+
+\subsubsection{Model displacement $\dvec{T}_{\!IM}$}
+
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented by a transformation matrix $\dvec{T}_{IM} \in \mathbb{R}^{N+1,N+1}$,
+%
+\begin{align}
+\dvec{T}_{IM} &= 
+\left[\begin{array}{c c}
+ \mat{R}_{IM}  & \dvec{p}_{IM}^I \\%\hline
+ \dvec{0}^T  &  s^{-1}
+\end{array}\right] \nn &\in
+\begin{cases}
+\mathrm{SE}(N) & \mathrm{when}\ s=1,\\
+\mathrm{Sim}(N) & \mathrm{otherwise},
+\end{cases} \label{eq_homogeneous_transformation}
+\end{align}
+%
+where $\dvec{0}^T$ is a row zero-vector of length $N$ and $s$ is a scaling factor. 
+
+Its usage is similar to that of the rotation matrix, except that it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
+%
+\begin{align}
+\dvec{p}_{IV}^I &= \mat{T}_{IM}\; 
+\left[\begin{array}{c}\dvec{p}_{MV}^M \\ 1
+\end{array}\right].
+\end{align}
+%
+When $\mat{T}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
+
+% Analogous to rotation matrices it is associative but not commutative, and closed under . 
+
+% Note that (\ref{eq:T_definition}) requires an  This is a homogeneous coordinate with an associated projective space. The value of $w$ controls the translation in (\ref{eq:T_definition}): $w=1$ enables it while $w=0$ disables it. This is handy because it allows specifying whether a coordinate represent a movable point or position vector, or a fixed direction vector\todo{Never actually seen this, hard to imagine a practical use case.}, by setting $w$ to either 1 or 0. Homogeneous coordinates and projective spaces allow dealing with these in a uniform manner.
+
+
+\subsubsection{Camera displacement $\dvec{T}_{\!IM}$}
+
+The image region can have any position and orientation relative to the sonar, so the configuration $\mathcal{C}_{SI}$ has six degrees of freedom. This is identical to $\mathcal{C}_{IM}$ except for the lack of a scaling factor. We represent the displacement $\vec{T}_{SI}$ in $\uvec{S}$ as,
+%
+\begin{align}
+\dvec{T}_{SI}&\in\mathrm{SE(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3,
+\intertext{which depends on the translation $\vec{p}_{SI}$ in $\uvec{S}$,}
+\dvec{p}_{SI}^S &= [x,y,z]^T\in \mathbb{R}^3,
+\intertext{and the rotation $\vec{R}_{SI}$ in $\uvec{S}$,}
+\dvec{R}_{SI} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\nn
+              &\in\mathrm{SO(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3.
+\end{align}
+%
+%
+%We represent the translation $\vec{p}_{IM}$ in $\uvec{I}$ as
+%%
+%\begin{align}
+%\dvec{p}_{IM}^I&\in \mathbb{R}^3,
+%\intertext{the rotation $\vec{R}_{IM}$ in $\uvec{I}$ as}
+%\dvec{R}_{IM}&\in\mathrm{SO(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3,
+%\intertext{and combine these together into the displacement $\vec{T}_{IM}$ in $\uvec{I}$,}
+%\dvec{T}_{IM}&\in\mathrm{Sim(3)} \colon \mathbb{R}^4 \to \mathbb{R}^4
+%\end{align}
+%
+%
+%
+We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{IM},\vec{R}_{IM})$.
+
+\begin{align}
+\dvec{p}_{IM}^I&\in \mathbb{R}^3 \\
+\dvec{R}_{IM}&\in\mathrm{SO(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3 \\
+\dvec{T}_{IM}&\in\mathrm{Sim(3)} \colon \mathbb{R}^4 \to \mathbb{R}^4
+\end{align}
+
+\begin{align}
+\dvec{T}_{IM} &= 
+\left[\begin{array}{c c}
+ \mat{R}_{IM}  & \dvec{p}_{IM}^I \\%\hline
+ \dvec{0}^T  &  s^{-1}
+\end{array}\right] \nn &\in
+\begin{cases}
+\mathrm{SE}(N) & \mathrm{when}\ s=1,\\
+\mathrm{Sim}(N) & \mathrm{otherwise},
+\end{cases} 
+\end{align}
+
+
+
+
+
+\subsubsection{Projection and clipping}
+
+\begin{align}
+\dvec{R}_{IM} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\label{eq_R_IM}
+\end{align}
+\begin{align}
+\dvec{T}_{XC}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
+\end{align}
+
+\subsubsection{OpenGL rendering}
+
+
+
+\subsubsection{OpenCL post-processing}
+
+
+%%
+%where $s$ is a scaling constant.  e the properties of an inverse have the properties share many properties of the rotation matrix; , such as $\dvec{T}^
+%Its usage mimics that of the rotation matrix,
+%%
+%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% %
+%  Since $\dvec{p}_{MV}'^M$ only differs from $\dvec{p}_{MV}^M$ by the appended one. 
+% This is an affine transformation, one that preserves  the They guarantee the preservation of rigid bodies. Because other linear operations are sometimes needed, such as scaling, reflection and shearing, we may generalize \eq{eq_rotation_translation} by swapping $\dvec{R}_{IM}$ with $\dvec{L}_{IM}$. 
+
+As we proceed, the steps outlined in \Fig{IV_simulator_coordinate_system} will now receive a corresponding subheader in the text.
+
+\subsubsection{Model placement}
+
+Combining the two aforementioned operations---a linear transformation (\ref{eq_vector_multiplication}) and a translation (\ref{eq_vector_addition})---result in an affine transformation. Like the These preserve points, straight lines and planes, and ensure collinearity (parallel lines remain parallel). This is important dealing with rigid objects either in the physical world or as here---virtually. We can produce a single affine transformation as follows$\in\mathrm{SE}(N)$\todo{Add some fireworks}\todo{Add a note on projective spaces?}:
 %
 \begin{align}\label{eq:T_definition}
 \mat{T}_{AB}
@@ -868,43 +1479,134 @@ Combining the two aforementioned operations---a linear transformation (\ref{eq_v
 & & &   \\
 & \mat{L}_{AB}  & & \dvec{t}_{AB}^A \\
 & & &  \\\hline
- 0 &  0  &  0  &  1
-\end{array}\right] \in \mathbb{R}^{4\times4}
+ 0 &  0  &  0  &  w
+\end{array}\right] 
 \end{align}
+%\begin{cases}
+%\in \mathrm{SO}(3)  & \mathrm{if $w\in\{0,1\}$} \\
+%\in \mathrm{Sim}(3) & \mathrm{otherwise.}
+%\end{cases}
 %= \mat{R}_{AB}\;\mat{S}_{AB}      = \dvec{p}_{AB}^A
 where $\mat{L}_{AB}: \mathbb{R}^3 \to \mathbb{R}^3$ and $\dvec{t}_{AB}^A$ represent the linear map and translation from $\udot{B}$ to $\udot{A}$, respectively.
 
-Note that (\ref{eq:T_definition}) requires an input of the form $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$, where $w\in\mathbb{R}$. This is a homogeneous coordinate with an associated projective space. The value of $w$ controls the translation in (\ref{eq:T_definition}): $w=1$ enables it while $w=0$ disables it. This is handy because it allows specifying whether a coordinate represent a movable point or position vector, or a fixed direction vector\todo{Never actually seen this, hard to imagine a practical use case.}, by setting $w$ to either 1 or 0. Homogeneous coordinates and projective spaces allow dealing with these in a uniform manner.
+
+
+
+%Rotations fall into the category of linear transforms. If the model size was incorrect we seek another linear transform: scaling. To generalize  Often we also want other candidates from this category, such as scaling, reflection or shearing. 
+
+%To change the decomposition we multiply with some linear transform $\mat{L}\colon\mathbb{R}^3\!\to\!\mathbb{R}^3$. Gade restricts these to rotation matrices, which preserve lengths and cross-products---a prerequisite for rigid body transformations~\cite{Murray1994}. Computer graphics deal with this extensively, but not exclusively; Linear effects such as scaling, shear and reflection are sometimes needed.
+
+%Since linear transforms generally are non-commutative, the notation system specifies the proper sequence of multiplication in the subscripts of $\mat{L}_{ED}$; Vectors or other linear transformation matrices decomposed in $\uvec{D}$ go to the right, while those in $\uvec{E}$ go to the left.\todo{$\mat{R}_{ED} = \mat{R}_{DE}^T$ (usually)} Note that representing the vector differently does not change it; its direction and magnitude remains unchanged.
+
+% SE(3) Lie group with the axioms:
+% - If A,B   in SE(3), then AB in SE(3)   (set is closed under binary operation)
+% - If A,B,C in SE(3)m then (AB)C = A(BC) (binary operation is associative)
+% - For every A in SE(3) there exist a I in SE(3) such that AI=A
+% - For every A in SE(3) there is an inverse A^-1 in SE(3) such that AA^-1 = I
+% SE(3) is a continuous group, i.e. the binary operation is continuous => if differentiable
+% The inverse of any element in SE(3) is a continuous function of that element
+% A group with a differentiable manifold is called a Lie group.
+
+
+
+%- All terms must have same decomposition (superscript).
+%- Closest points should be identical and cancel (in subscript).
+%- Resulting subscript Decomposition same, and unchanged.
+%
+
+%
+
+%
+%Although this does the job, we combine this into a single operation by using homogeneous coordinates. 
+%
+%Seek a higher abstraction level to unify all these operations.
+
+%Active transformation moves the points. Wish to transform this group of points but retain the relation between them. Need affine transform, consist of a linear transform and a translation.
+%%
+%\begin{align}
+%\vec{p}_{MV} &= \vec{R}\,\vec{p}_{MV} + \vec{t},\label{eq_position_vector}
+%\end{align}
+%%
+%$\vec{R}$ can be defined in various ways, e.g. with Euler-Rodrigues in Euclidean $\mathbb{R}^3$ space which rotates about an axis $\hat{r}$ by angle $\theta$. 
+
+%
+%$V_t$ relates to $\ubar{I}$ as $\udot{V}$ relates to $\ubar{M}$.
+
+%$\big(\vec{R}_{IM},\vec{p}_{IM}\big)$ uniquely specifies how $\ubar{I}$ relates to $\bar{M}$ and contains $2N$ degrees of freedom. Unique and geometrically clear, but tuples are inconvenient to work with. Odd because vector not moving, only representation. Decomposed notation describe this unambiguously.
+%
+%Free:
+%Geometrically unambiguous
+%
+%Decomposed:
+%Matrices instead of tuples
+%Clear on passive/active
+%Better suited for frames
+%
+% - Transformation explicit on being active or passive
+% - Logical validitiy
+% 
+%Suppose we wish to move $\udot{V}$ and the rest of the rigid body. Need translation and rotation. 
+%
+% 1. Define points & frames
+% 2. Translate/rotate position vectors
+% 3. Increase abstraction: The R3 transform / homogeneous coordinates
+% 
+
+%Change a point: Add position vector / translation.
+%Change a set of vectors: Rotate each - axis-angle, quaternions, matrices.
+
+%
+%Rotations:  All pros cons. Matrices nice formal properties, but ambiguous. How to specify representation? 
+%
+%
+
+%Projections (non-linear) with linear algebra -> homogeneous coordinates
+%Vectors: Linear space - space of vectors - foundation of traditional linear algebra 3D vectors
+%Points: Affine space - space of points - foundation of computer graphics
+%
+%Deal with points, not vectors. Points can only be combined through affine combinations, not linear ones(?)
+%
+% ADT coordinate-free, conceptually clear, inefficient(?)
+
+%Suppose we wish to represent our geometric elements in $\mathbb{R}^3$ Euclidean space, to support the notion of lengths, dot- and cross-product.
+
+%A set of rules accompany the notation system to validate and describe operations; Subscripts can only be changed by translations, and superscripts by linear transformations. To start with the former, consider the following summation:
+
+%Vector-vector operations like summation, dot- and cross-product, only makes sense when the vectors are decomposed in the same vector space---easily verified by the superscripts. The subscripts explain how the vector is altered: The intermediate (closest) frames cancel each other, leaving the start and end frame as subscript for the resulting vector. This mimics the regular rules of vector addition.
+
+\subsection{Scene setup}\label{IV_sec:scene_setup}
+
+
 
 %  this transformation is only affine as long as the last row reads $[0,0,0,1]$.
 
-To use a transformation matrix like this one combine the rules for translation (\ref{eq_vector_addition}) and transformation (\ref{eq_vector_multiplication}):
+To use a similar transformation matrix, combine the rules for translation (\ref{eq_vector_addition}) and transformation (\ref{eq_vector_multiplication}):
 %
-\begin{align}\nonumber\\[.5\baselineskip]
-\dvec{p}_{\g{AC1}{AC}}^{\g{E1}{A}}
-= \mat{T}_{\g{A2}{A}\r{B1}{B}} \; \dvec{p}_{\r{B2}{B}\g{C1}{C}}^{\r{B2}{B}}\label{eq_transform}
-\\[.5\baselineskip]\nonumber
-\tikz[overlay,remember picture]{
-%   \coordinate(A) at  ($ .5*(E1)  + .5*(A2) $);
-  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(A2)$) in coordinate (A) at (\x2,\y1);
-%  \path let \p1 = (E1), \p2 = ($.5*(AC1)+.25*(B2)+.25*(C1)$) in coordinate (AC) at (\x2,\y1);
-  \path let \p1 = (AC1), \p2 = ($.7*(AC1)+.15*(B2)+.15*(C1)$) in coordinate (AC) at (\x2,\y1);
-  \path let \p1 = (E1), \p2 = ($.5*(B1)+.5*(B2)$) in coordinate (B) at (\x2,\y1);
-  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(B2)$) in coordinate (Sup) at (\x2,\y1);
-%  \coordinate(B) at  ($ .5*(B1)  + .5*(B2) $);
-  \coordinate(AB) at ($ .5*(AB1) + .5*(AB2) $);
- \node(Re)[above = 1.5\baselineskip of B, anchor=center]%
-   {\footnotesize\textrm{Closest frames identical and cancel}};
-    \draw[->](A2.north) to[out=90, in=0] ($ (A)+(0em,3.2ex) $) to[out=180,in=90] (E1.north);
-    \draw[->](B2.north) to[out=90, in=0] ($ (B)+(0em,3.2ex) $) to[out=180,in=90] (B1.north);
-%   \node(ABe)[below = 1.5\baselineskip of AB, anchor=center]%
-%     {\footnotesize\textrm{Unchanged}};
-%    \draw[->] (AB2.south) to[out=-90, in=0]($ (AB)+(0em,-3.2ex) $) to[out=180,in=-90] (AB1.south);
-    \draw[->](C1.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
-    \draw[->](A2.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
-%    \draw[->, in=-90, out=-90] (A2.south) to ($ (AC.south) - (0,0ex)$);
-}
-\end{align}
+%\begin{align}\nonumber\\[.5\baselineskip]
+%\dvec{p}_{\g{AC1}{AC}}^{\g{E1}{A}}
+%= \mat{T}_{\g{A2}{A}\r{B1}{B}} \; \dvec{p}_{\r{B2}{B}\g{C1}{C}}^{\r{B2}{B}}\label{eq_transform}
+%\\[.5\baselineskip]\nonumber
+%\tikz[overlay,remember picture]{
+%%   \coordinate(A) at  ($ .5*(E1)  + .5*(A2) $);
+%  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(A2)$) in coordinate (A) at (\x2,\y1);
+%%  \path let \p1 = (E1), \p2 = ($.5*(AC1)+.25*(B2)+.25*(C1)$) in coordinate (AC) at (\x2,\y1);
+%  \path let \p1 = (AC1), \p2 = ($.7*(AC1)+.15*(B2)+.15*(C1)$) in coordinate (AC) at (\x2,\y1);
+%  \path let \p1 = (E1), \p2 = ($.5*(B1)+.5*(B2)$) in coordinate (B) at (\x2,\y1);
+%  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(B2)$) in coordinate (Sup) at (\x2,\y1);
+%%  \coordinate(B) at  ($ .5*(B1)  + .5*(B2) $);
+%  \coordinate(AB) at ($ .5*(AB1) + .5*(AB2) $);
+% \node(Re)[above = 1.5\baselineskip of B, anchor=center]%
+%   {\footnotesize\textrm{Closest frames identical and cancel}};
+%    \draw[->](A2.north) to[out=90, in=0] ($ (A)+(0em,3.2ex) $) to[out=180,in=90] (E1.north);
+%    \draw[->](B2.north) to[out=90, in=0] ($ (B)+(0em,3.2ex) $) to[out=180,in=90] (B1.north);
+%%   \node(ABe)[below = 1.5\baselineskip of AB, anchor=center]%
+%%     {\footnotesize\textrm{Unchanged}};
+%%    \draw[->] (AB2.south) to[out=-90, in=0]($ (AB)+(0em,-3.2ex) $) to[out=180,in=-90] (AB1.south);
+%    \draw[->](C1.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+%    \draw[->](A2.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+%%    \draw[->, in=-90, out=-90] (A2.south) to ($ (AC.south) - (0,0ex)$);
+%}
+%\end{align}
 %
 Note that for this operation to be valid the input vector must match the transformation matrix \emph{both} in decomposition (superscript) and closest frame in the subscript.
 
@@ -936,18 +1638,7 @@ Note that for this operation to be valid the input vector must match the transfo
 
 \subsubsection{General geometry}
 
-To showcase the advantage of using our notation system, observe from \Fig{IV_simulator_coordinate_system} which reference frames we decomposed the virtual scene into: A 3D model $\ubar{M}$, image region $\ubar{I}$, sonar local body $\ubar{S}$, and an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$, respectively. The sequence of affine transforms that a vertex $\udot{V}$% $\dvec{v}^\textit{\tiny{}M}$
-for model $M$ undergo is given as\todo{Condense sequence to improve speed}:
-%
-\begin{align}
-\left[\begin{array}{c}
-\\\dvec{p}_{OV}^{O}\\\\\hline 1
-\end{array}\right]
-= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
-\left[\begin{array}{c}
-\\\dvec{p}_{MV}^{M}\\\\\hline 1
-\end{array}\right]
-\end{align}
+
 %
 %he transitions between them follow a unified pattern, and it becomes easier to think in terms of vectors instead of coordinates. This keeps even large systems manageable and removes a frequent source of error.
 %
@@ -958,7 +1649,9 @@ Every transformation follows the format defined in \eq{eq:T_definition}. For all
 	\hline
 	\rowcolor{tabBlue}                     & $\mat{T}_{XC}$      & T$_{CO}$                & $\mat{T}_{OS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
 	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XC})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{OS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
-	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$ \\
+   & & & \multicolumn{3}{c}{World space} \\
+   & & & \multicolumn{3}{c}{Affine} 
 \end{tabular}%
 \caption{Affine transformation contents}\label{tab_transformation_contents}
 \end{table}
@@ -1579,10 +2272,65 @@ In terms of template quality both SIGMAS+ and FFISim are similar. The main diffe
 \appendices
 \fi
 
+\section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
+
+The geometrical intent of an active rotation is to move a point. With our notation this can be expressed as either
+%
+\begin{align}
+\m{CL}
+\vec{p}_{M\g{Vtot}{V}_{\color{Green}\!\textrm{new}}}
+= \vec{R} \; \vec{p}_{M\g{V2}{V}}\m{CR}
+\quad\text{or}\quad
+\m{CL2}
+\dvec{p}_{M\g{Vtot2}{V}_{\color{Green}\!\textrm{new}}}^M
+= \mat{R}^M \dvec{p}_{M\g{V4}{V}}^M,\m{CR2}
+\label{IV_eq_active_rotation}
+ \\\nonumber
+ %\qquad\qquad
+%
+%\\[.5\baselineskip]\nonumber % Adjust spacing as necessary
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(CC) at      ($ .5*(CL)       + .5*(CR)                         $);
+  \coordinate(CC2) at     ($ .5*(CL2)      + .5*(CR2)                        $);
+  \coordinate(_MV) at     ($ (V2.south)    + (-\baselineskip,-\baselineskip) $);
+  \coordinate(_MVtot) at  ($ (Vtot.south)  + ( \baselineskip,-\baselineskip) $);
+  \coordinate(_MV2) at    ($ (V4.south)    + (-\baselineskip,-\baselineskip) $);
+  \coordinate(_MVtot2) at ($ (Vtot2.south) + ( \baselineskip,-\baselineskip) $);
+  % Draw arrows and text
+    \draw[]                    ($ (V2.south)    - (0em,\tpad) $)
+            to[out=-90, in=0]     (_MV)
+            to[out=180, in=0]     (_MVtot)
+            to[out=180, in=-90]($ (Vtot.south)  - (0em,\tpad) $);
+    \draw[]                    ($ (V4.south)    - (0em,\tpad) $) 
+            to[out=-90, in=0]     (_MV2)
+            to[out=180, in=0]     (_MVtot2)
+            to[out=180, in=-90]($ (Vtot2.south) - (0em,\tpad) $);
+}
+\end{align}
+%
+%\begin{align}
+%\vec{R}&\colon \mathbb{V} \to \mathbb{V} \\
+%\vec{R}_{IM}&\colon \uvec{I} \to \uvec{M} \subset \vec{R} \\
+%\dvec{R}&\colon \mathbb{R}^N \to \mathbb{R}^N \\
+%\dvec{R}_{IM}&\colon \uvec{I} \to \uvec{M} \subset \dvec{R} \\
+%\label{IV_eq_active_rotation}
+%\end{align}
+%
+% Implicit representation: (x,y,z) subject to x²+y²+z²=c -> no 
+depending on whether the free or decomposed form is sought, respectively, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, say, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; Either the point changes, or the representation does, but never both.
+
 
 
 
 \section{Transformation matrices}\label{IV_transformation_matrices} 
+
+and their orientations by a rotation dyadic $\vec{R}_{IM}$ mapping any vector in $\uvec{M}$ to $\uvec{I}$ (which includes the basis vectors),
+%
+\begin{align}
+\vec{R}_{IM}\colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\
+\vec{M}_i &\mapsto \vec{I}_i \quad \forall i. \nonumber
+\end{align}
 
 We define $\vec{R}_{AB}$ as a rotation---from $\uvec{A}$ to $\uvec{B}$---by angle $\theta\in\mathbb{R}$ clockwise around unit vector $\hat{r}\in\mathbb{V}$ in $\mathbb{R}^3$ Euclidean space using Euler-Rodrigues' formula,
 
@@ -1712,6 +2460,41 @@ Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{
 
 
 Translation is performed last. 
+
+%and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates about an axis $\hat{r}$ by angle $\theta$,
+%%
+%\begin{align}\label{eq:M}
+%\vec{R}_{AB}
+%&=
+%% \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta).
+%\vec{I} + \sin\theta(\hat{r}\times) + (1-\cos\theta)(\hat{r}\times)^2.
+%\end{align}
+%%
+%where $\times$ is the cross-product. $\hat{r}$ and $\theta$ relates to $\uvec{A}$ and $\uvec{B}$ by
+%%
+%\begin{align}
+%\hat{r} = \frac{\uvec{A}\times\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert}
+%\quad\mathrm{and}\quad
+%\theta  = \mathrm{acos}\frac{\uvec{A}\cdot\uvec{B}}{\lVert\uvec{A}\rVert\lVert\uvec{B}\rVert},
+%\end{align}
+%%
+%where $\times$ and $\cdot$ signifies the cross- and dot-product, respectively.
+%
+%and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+%%
+%\begin{align}
+%\theta
+%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\end{align}
+%\begin{align}
+%\theta
+%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\end{align}
+%%
+%The position vector $\vec{p}_{\udot{A}\udot{B}}$ go from $\udot{A}$ to $\udot{B}$ only depends on these points. Similarly, the matrix $\vec{R}_{\uvec{A}\uvec{B}}$ only depends on vectors; $\vec{R}_{\uvec{A}\uvec{B}}\uvec{B}$ rotates $\uvec{B}$ to $\uvec{B}$, $\uvec{A}\vec{R}_{\uvec{A}\uvec{B}}$ rotates $\uvec{A}$ to $\uvec{B}$. 
+%
 
 
 % use section* for acknowledgement
