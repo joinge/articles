@@ -758,8 +758,8 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 	\midline
 	                                         Model & \t{M}             &&                                             &          &            &       &                           &  &                &           &                &   & \mcc{1}{L}{}      &                                                                      &      &      &      &         &           &         &     & \mcc{1}{C}{} &      \\
 	                                         Image & \t{I}             &\figstep{1}{}& \T{IM}                                      & $\colon$ & $\ubar{M}$ & $\to$ & $\ubar{I}$                &  & $\mathbb{R}^3$ & $S^2 S$ & $\mathbb{R}^+$ & 7 & \Tr{IM}           & $($                                                                  & $x,$ & $y,$ & $z,$ & $\psi,$ & $\theta,$ & $\phi,$ & $s$ & $)$          & \SIM \\
-	                                         Sonar & \t{S}             &\figstep{2}{}& \T{SI}                                      & $\colon$ & $\udot{I}$ & $\to$ & $\udot{S}$                &  & $\mathbb{R}^3$ &         &                & 3 & \Tr{SI}           & $($                                                                  & $x,$ & $y,$ & $z,$ & 2$\psi,$ & $\theta,$ & $\phi$  &     & $)$          & \SE  \\
-	                             Orthographic view & \t{O}             &\figstep{3}{}& \T{OS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{O}$ &  &                & $S$     &                & 1 & \Tr{OS}           & $($                                                                  &      &      &      & $\psi$  &           &         &     & $)$          & \SE  \\
+	                                         Sonar & \t{S}             &\figstep{2}{}& \T{SI}                                      & $\colon$ & $\udot{I}$ & $\to$ & $\udot{S}$                &  & $\mathbb{R}^3$ &         &                & 3 & \Tr{SI}           & $($                                                                  & $x,$ & $y,$ & $z$ &  &  & &     & $)$          & \SE  \\
+	                             Orthographic view & \t{O}             &\figstep{3}{}& \T{OS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{O}$ &  &                & \phantom{$S$}     &                & 0 & \Tr{OS}           & $($                                                                  &      &      &      & $\psi$\makebox[0pt][l]{$^{(2)}$}  &           &         &     & $)$          & \SE  \\
                               
 \cmidrule{14-24}\rowcolor{tabBlue}
    \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{Green}\begin{tabular}{l l}\rowcolor{white}
@@ -770,8 +770,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 	                                      Clipping & \t{X}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{XC}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
                                          %\end{tabular}\parbox[L]{8em}{} $\to$ \parbox[L]{3.8em}{NDC$^{(3)}$} \parbox[L]{1em}{$\in$} $[0,1]^3$}   \\ \bottomrule
 \mc{10}{l}{$^{(1)}$Degrees of Freedom} \\
-\mc{10}{l}{$^{(2)}$Subject to fixed along-track axis} \\
-\mc{10}{l}{$^{(3)}$Normalized Device Coordinates} 
+\mc{10}{l}{$^{(2)}$Subject to $\hat{x}_O = \hat{x}_S$ and $\hat{z}_O \parallel \vec{p}_{SI}$} \\
+\mc{10}{l}{$^{(3)}$Normalized Device Coordinates}
+%\mc{10}{l}{$^{(4)}$Subject to $\hat{x}_O = \hat{x}_S$ and $\hat{z}_O \parallel \vec{p}_{SI}$}
 \end{tabular}
 %	                                Cylindric view & \t{C}             &                                             &                                               &  &                &           &                &   & $\mathrm{T}_{CO}$ & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,y,z)\in\mathbb{R}^3$}&\mc{1}{O}{$\to (x,\phi,r)\in$}&$\mathbb{R}S\mathbb{R}$   \\
 %	                                      Clipping & \t{X}             &                                             &                                               &  &                &           &                &   & \Tr{XC}           & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,\phi,r)\in\mathbb{R}S\mathbb{R}$}&\mc{2}{O}{\hspace*{-\tabcolsep}$\to [0,1]^3$}   \\ \bottomrule
@@ -1369,7 +1370,7 @@ As we dive into the specification on each transformation, look to \Tab{IV_tab_fr
 
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented in $\ubar{I}$ by inserting\todo{This word has become such a distraction! ;)} $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform},
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. However, as in \Tab{IV_tab_frames_transitions} we also add a scaling factor $s$ to allow resizing the model. The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented in $\ubar{I}$ by inserting\todo{This word has become such a distraction! ;)} $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform},
 %
 \begin{align}
 \dvec{T}_{IM}^I &= 
@@ -1383,7 +1384,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 \end{cases} \label{eq_homogeneous_transformation}
 \end{align}
 %
-where $s$ is a scaling factor. If the model needs to be scaled, this is a good way to do it, and the transform is then said to be similar (Sim). Note that, unlike the rotation matrix, we generally have that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$, so the superscript must be specified.
+A transform that scales an object but otherwise preserve it is called a similarity transform (Sim). Note that, unlike the rotation matrix, we generally have that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$, so the superscript must be specified.
 
 The transformation matrix usage is similar to that of the rotation matrix, except that it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
