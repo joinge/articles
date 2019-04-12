@@ -1,1 +1,202 @@
 - Template matching - brukes sum of absolute differences SAD?
+
+
+
+
+
+%Rotations fall into the category of linear transforms. If the model size was incorrect we seek another linear transform: scaling. To generalize  Often we also want other candidates from this category, such as scaling, reflection or shearing. 
+
+%To change the decomposition we multiply with some linear transform $\mat{L}\colon\mathbb{R}^3\!\to\!\mathbb{R}^3$. Gade restricts these to rotation matrices, which preserve lengths and cross-products---a prerequisite for rigid body transformations~\cite{Murray1994}. Computer graphics deal with this extensively, but not exclusively; Linear effects such as scaling, shear and reflection are sometimes needed.
+
+%Since linear transforms generally are non-commutative, the notation system specifies the proper sequence of multiplication in the subscripts of $\mat{L}_{ED}$; Vectors or other linear transformation matrices decomposed in $\uvec{D}$ go to the right, while those in $\uvec{E}$ go to the left.\todo{$\mat{R}_{ED} = \mat{R}_{DE}^T$ (usually)} Note that representing the vector differently does not change it; its direction and magnitude remains unchanged.
+
+% SE(3) Lie group with the axioms:
+% - If A,B   in SE(3), then AB in SE(3)   (set is closed under binary operation)
+% - If A,B,C in SE(3)m then (AB)C = A(BC) (binary operation is associative)
+% - For every A in SE(3) there exist a I in SE(3) such that AI=A
+% - For every A in SE(3) there is an inverse A^-1 in SE(3) such that AA^-1 = I
+% SE(3) is a continuous group, i.e. the binary operation is continuous => if differentiable
+% The inverse of any element in SE(3) is a continuous function of that element
+% A group with a differentiable manifold is called a Lie group.
+
+
+
+%- All terms must have same decomposition (superscript).
+%- Closest points should be identical and cancel (in subscript).
+%- Resulting subscript Decomposition same, and unchanged.
+%
+
+%
+
+%
+%Although this does the job, we combine this into a single operation by using homogeneous coordinates. 
+%
+%Seek a higher abstraction level to unify all these operations.
+
+%Active transformation moves the points. Wish to transform this group of points but retain the relation between them. Need affine transform, consist of a linear transform and a translation.
+%%
+%\begin{align}
+%\vec{p}_{MV} &= \vec{R}\,\vec{p}_{MV} + \vec{t},\label{eq_position_vector}
+%\end{align}
+%%
+%$\vec{R}$ can be defined in various ways, e.g. with Euler-Rodrigues in Euclidean $\mathbb{R}^3$ space which rotates about an axis $\hat{r}$ by angle $\theta$. 
+
+%
+%$V_t$ relates to $\ubar{I}$ as $\udot{V}$ relates to $\ubar{M}$.
+
+%$\big(\vec{R}_{IM},\vec{p}_{IM}\big)$ uniquely specifies how $\ubar{I}$ relates to $\bar{M}$ and contains $2N$ degrees of freedom. Unique and geometrically clear, but tuples are inconvenient to work with. Odd because vector not moving, only representation. Decomposed notation describe this unambiguously.
+%
+%Free:
+%Geometrically unambiguous
+%
+%Decomposed:
+%Matrices instead of tuples
+%Clear on passive/active
+%Better suited for frames
+%
+% - Transformation explicit on being active or passive
+% - Logical validitiy
+% 
+%Suppose we wish to move $\udot{V}$ and the rest of the rigid body. Need translation and rotation. 
+%
+% 1. Define points & frames
+% 2. Translate/rotate position vectors
+% 3. Increase abstraction: The R3 transform / homogeneous coordinates
+% 
+
+%Change a point: Add position vector / translation.
+%Change a set of vectors: Rotate each - axis-angle, quaternions, matrices.
+
+%
+%Rotations:  All pros cons. Matrices nice formal properties, but ambiguous. How to specify representation? 
+%
+%
+
+%Projections (non-linear) with linear algebra -> homogeneous coordinates
+%Vectors: Linear space - space of vectors - foundation of traditional linear algebra 3D vectors
+%Points: Affine space - space of points - foundation of computer graphics
+%
+%Deal with points, not vectors. Points can only be combined through affine combinations, not linear ones(?)
+%
+% ADT coordinate-free, conceptually clear, inefficient(?)
+
+%Suppose we wish to represent our geometric elements in $\mathbb{R}^3$ Euclidean space, to support the notion of lengths, dot- and cross-product.
+
+%A set of rules accompany the notation system to validate and describe operations; Subscripts can only be changed by translations, and superscripts by linear transformations. To start with the former, consider the following summation:
+
+%Vector-vector operations like summation, dot- and cross-product, only makes sense when the vectors are decomposed in the same vector space---easily verified by the superscripts. The subscripts explain how the vector is altered: The intermediate (closest) frames cancel each other, leaving the start and end frame as subscript for the resulting vector. This mimics the regular rules of vector addition.
+
+%\begin{align}\nonumber\\[.5\baselineskip]
+%\dvec{p}_{\g{AC1}{AC}}^{\g{E1}{A}}
+%= \mat{T}_{\g{A2}{A}\r{B1}{B}} \; \dvec{p}_{\r{B2}{B}\g{C1}{C}}^{\r{B2}{B}}\label{eq_transform}
+%\\[.5\baselineskip]\nonumber
+%\tikz[overlay,remember picture]{
+%%   \coordinate(A) at  ($ .5*(E1)  + .5*(A2) $);
+%  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(A2)$) in coordinate (A) at (\x2,\y1);
+%%  \path let \p1 = (E1), \p2 = ($.5*(AC1)+.25*(B2)+.25*(C1)$) in coordinate (AC) at (\x2,\y1);
+%  \path let \p1 = (AC1), \p2 = ($.7*(AC1)+.15*(B2)+.15*(C1)$) in coordinate (AC) at (\x2,\y1);
+%  \path let \p1 = (E1), \p2 = ($.5*(B1)+.5*(B2)$) in coordinate (B) at (\x2,\y1);
+%  \path let \p1 = (E1), \p2 = ($.5*(E1)+.5*(B2)$) in coordinate (Sup) at (\x2,\y1);
+%%  \coordinate(B) at  ($ .5*(B1)  + .5*(B2) $);
+%  \coordinate(AB) at ($ .5*(AB1) + .5*(AB2) $);
+% \node(Re)[above = 1.5\baselineskip of B, anchor=center]%
+%   {\footnotesize\textrm{Closest frames identical and cancel}};
+%    \draw[->](A2.north) to[out=90, in=0] ($ (A)+(0em,3.2ex) $) to[out=180,in=90] (E1.north);
+%    \draw[->](B2.north) to[out=90, in=0] ($ (B)+(0em,3.2ex) $) to[out=180,in=90] (B1.north);
+%%   \node(ABe)[below = 1.5\baselineskip of AB, anchor=center]%
+%%     {\footnotesize\textrm{Unchanged}};
+%%    \draw[->] (AB2.south) to[out=-90, in=0]($ (AB)+(0em,-3.2ex) $) to[out=180,in=-90] (AB1.south);
+%    \draw[->](C1.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+%    \draw[->](A2.south) to[out=-90, in=0]($(AC.south)-(0em,3.2ex)$) to[out=180,in=-90]($ (AC1.south)-(0,0ex)$);
+%%    \draw[->, in=-90, out=-90] (A2.south) to ($ (AC.south) - (0,0ex)$);
+%}
+%\end{align}
+%
+Note that for this operation to be valid the input vector must match the transformation matrix \emph{both} in decomposition (superscript) and closest frame in the subscript.
+
+
+
+%$\mat{L}_{AB}$ and $\mat{S}_{AB}$$\mat{S}_{AB}$ are a rotation and scaling matrix that converts from frame $B$ to $A$,
+% Affine
+% - Preserve points, straight lines and planes.
+% - Sets of parallel lines remain parallel.
+% - Combination of a linear transform and a translation.
+% 
+% Projective space
+% - 
+%
+%
+%      Representation/decomp.       Subscript
+%      Input          Output        Input            Output
+% Add  Same           Unchanged     Closest cancel   Farthest remain
+% Mul  Closest match  Left remain   Don't care       Unchanged
+% T
+
+
+
+\subsubsection{Model placement}
+
+Combining the two aforementioned operations---a linear transformation (\ref{eq_vector_multiplication}) and a translation (\ref{eq_vector_addition})---result in an affine transformation. Like the These preserve points, straight lines and planes, and ensure collinearity (parallel lines remain parallel). This is important dealing with rigid objects either in the physical world or as here---virtually. We can produce a single affine transformation as follows$\in\mathrm{SE}(N)$\todo{Add some fireworks}\todo{Add a note on projective spaces?}:
+%
+\begin{align}\label{eq:T_definition}
+\mat{T}_{AB}
+= \left[\begin{array}{c c c | c}
+& & &   \\
+& \mat{L}_{AB}  & & \dvec{t}_{AB}^A \\
+& & &  \\\hline
+ 0 &  0  &  0  &  w
+\end{array}\right] 
+\end{align}
+%\begin{cases}
+%\in \mathrm{SO}(3)  & \mathrm{if $w\in\{0,1\}$} \\
+%\in \mathrm{Sim}(3) & \mathrm{otherwise.}
+%\end{cases}
+%= \mat{R}_{AB}\;\mat{S}_{AB}      = \dvec{p}_{AB}^A
+where $\mat{L}_{AB}: \mathbb{R}^3 \to \mathbb{R}^3$ and $\dvec{t}_{AB}^A$ represent the linear map and translation from $\udot{B}$ to $\udot{A}$, respectively.
+
+
+
+
+\subsubsection{General geometry}
+
+
+%
+%he transitions between them follow a unified pattern, and it becomes easier to think in terms of vectors instead of coordinates. This keeps even large systems manageable and removes a frequent source of error.
+%
+Every transformation follows the format defined in \eq{eq:T_definition}. For all linear maneuvers in the scene, their contents are summarized in Table \ref{tab_transformation_contents}:
+%
+\begin{table}[h]\normalsize\centering
+\begin{tabular}{r c c r c c}
+	\hline
+	\rowcolor{tabBlue}                     & $\mat{T}_{XC}$      & T$_{CO}$                & $\mat{T}_{OS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
+	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XC})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{OS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
+	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$ \\
+   & & & \multicolumn{3}{c}{World space} \\
+   & & & \multicolumn{3}{c}{Affine} 
+\end{tabular}%
+\caption{Affine transformation contents}\label{tab_transformation_contents}
+\end{table}
+%
+where
+%
+\begin{align}
+\mat{R}_{IM} &= \mat{R}(\psi,\theta+\pi,\phi), \\
+\mat{S}_{IM} &= \text{diag}(\dvec{s}_{IM}^I),
+\intertext{and}
+\mat{R}_{OS} &= \mat{R}(\uvec{I}_{\,z}^S, \dvec{p}_{SI}^{S}).
+\end{align}
+%
+where $\mat{R}(\psi,\theta,\phi)$ are user specified roll, pitch and yaw,\todo{Update table for Euler-free angles}\todo{How to lose the arrow without this looking like a matrix? It's decomposed...} and $\uvec{I}_{\,z}^S = \mat{T}_{SI}\bmat{0,0,1}\T$.
+
+
+
+
+%To get an idea of the geometries involved we refer to \Fig{IV_simulator_coordinate_system}. 
+
+%Our models are stored in regular 3D model files. The simulator loads these into a tree of nodes, each representing a vertex in the model with corresponding facet and texture information. Then the vertices are placed into a virtual scene in OpenGL, and a camera set up to capture the part of the scene corresponding to the image. When OpenGL renders the image, it first computes which vertex contributes to which pixel in the image, then computes the intensity and color of the pixel based on the node's facet, texture and scattering model. In computer graphics terminology, the code that operates on vertices are called a vertex shader, and the code that operates on pixels are called a fragment shader.
+
+%Before we describe the rendering pipeline in further detail, 
+
+%In computer graphics 
+%Contrary to many computer graphics applications, we 
+
