@@ -6,7 +6,7 @@
 
 %Design, notation and application
 
-\title{Real-Time Synthetic Aperture Sonar Simulation for Automatic Target Recognition: Notation and application}
+\title{Real-Time Synthetic Aperture Sonar Simulation for Automatic Target Recognition: Notation and Application}
 
 \author{{Jo~Inge~Buskenes, %
         Herman~Midelfart%, %
@@ -68,20 +68,23 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{topnumber}{1}
 \setcounter{dbltopnumber}{1}
 
-\providecommand\cancel*{}\renewcommand*\cancel[1]{%
-\tikz[font=\scriptsize,baseline=(char.base)]{%
-\node[](char){$#1$};%
-% \begin{scope}[overlay]%
-% \coordinate(offsett) at (0.3em,1.5ex);%
-% \draw[-] ($(char.center) - (offsett)$) to ($(char.center) + (offsett)$);%
-% \end{scope}%
-}}
+\providecommand\cancel{}\renewcommand\cancel[2][char]{%
+% % \tikzmark{#1}{$#2$}%
+% \tikz[font=\scriptsize,overlay,baseline=(char.base)]{%
+\tikz[font=\scriptsize]{%
+\node[inner sep=0pt](#1){$#2$};%
+\begin{scope}[overlay]%
+\coordinate(offsett) at (0.3em,1.2ex);%
+\draw[-] ($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
+\end{scope}%
+}
+}
 
 
 \providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{#1}}
 \providecommand\k*{}\renewcommand*\k[2]{{\scriptsize\color{black}\tikzmark{#1}{$#2$}}}
 \providecommand\g*{}\renewcommand*\g[2]{{\scriptsize\color{Green}\tikzmark{#1}{$#2$}}}
-\providecommand\r*{}\renewcommand*\r[2]{{\scriptsize\color{Red}\tikzmark{#1}{$\cancel{#2}$}}}
+\providecommand\r*{}\renewcommand*\r[2]{{\scriptsize\color{Red}\tikzmark{#1}{$#2$}}}
 \providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{blue}\tikzmark{#1}{$#2$}}}
 
 % \draw[-{Latex[length=.5em,width=.5em]}]
@@ -93,9 +96,11 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 %\coordinate(__) at ($ (0em,0ex) $);
 %\end{tikzpicture}
 
+
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{\Green{#1}}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
-\newcommand\figstep[2]{\tikz[baseline=(char.base)]{%
-            \node[shape=circle,draw,color=Green,inner sep=0.5pt] (char) {#1};}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}} 
+\newcommand\step[1]{\tikz[baseline=(char.base)]{%
+            \node[shape=circle,draw,color=Green,inner sep=0.5pt] (char) {#1};}}
+\newcommand\figstep[2]{\step{#1}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}} 
 \begin{figure*}[t]\centering%
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
@@ -114,19 +119,19 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
-\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\protect\ubar{M}$. The image region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
 %
 \figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{3}{\emph{Orthogonal rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $z$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with a \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
+\figstep{3}{\emph{Orthogonal view rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_O$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with an \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane that the image points can be projected onto. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $\uvec{O}=(x,y_O,z_O)$ to cylindrical $\uvec{C}=(x,\phi_C,r_C)$ with the non-linear function T$_{CO}$.
+\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{CO}$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Projection}. OpenGL unly renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
+\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
 % 
 % The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
 }\\[.5\baselineskip]
@@ -315,7 +320,7 @@ A few simulators for high frequency, side-looking sonar imagery have been publis
 % This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
 % on a new full geometrical implementation of the simulator.
 
-Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; Two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
+Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
 
 %The simulator architecture and notation system are described Section~\ref{IV_methods}. Simulation and classification results  Results from  template simulations and classification Section~\ref{IV_results}  Finally, we present classification performance using 
 %
@@ -845,7 +850,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
 \end{tikzpicture}
 }
-\caption{Reference frames and their transformations. The upper half is an affine domain where frames are related by displacements defined by some configuration and coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
+\caption{Reference frames and their transformations. The upper half is an affine domain where any pair of frames are related by a displacement with a specific configuration and a chosen coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
 \end{table*}
 
 %\begin{table*}[thbp]\centering
@@ -925,9 +930,10 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 \Fig{IV_buildup} illustrates the basic idea behind the simulator: to use OpenGL to render an intensity and depth image of an object and seafloor model, and OpenCL to convert these into an image template. The input parameters can either be predefined or estimated from the SAS image, which we label the conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. We adhere to a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, extend it past affine geometry to handle homogeneous coordinates and projective geometry, and even use it when expressing non-linear effects. This permits expressing all kinds of both affine and projective operations as a single matrix multiplication, to raise the abstraction level to that of the frames.
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. They describe the transformations that a vertex $\udot{V}$ undergoes\todo{undergo?}, from being represented in a model $\ubar{M}$, to an image $\ubar{I}$, a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).   
 
-We describe the transformations that a vertex $\udot{V}$ undergoes, from being represented in the model $\ubar{M}$, to  image $\ubar{I}$, sonar $\ubar{S}$, a orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).   These, and the transitions between them, will be described in greater detail.
+The frame syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. We adhere to it for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This aids us in transitioning between frames in a unified and geometrically valid way.
+
 
 %{
 %\setlength\tabcolsep{0pt}%\def\arraystretch{1.5}
@@ -1124,7 +1130,7 @@ Gade's notation can be used with or without coordinates. We prefer the latter wh
 % Orthonormal  ($\hat{m}_i\in\mathbb{V}$ being the $i$-th orthonormal basis vector)
 
 
-Suppose an $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation.
+Suppose a $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation.
 %
 %
 %
@@ -1171,9 +1177,9 @@ An image frame $\ubar{I}$ specifies the location and orientation of the seafloor
 %
 \begin{align}
 \vec{T}_{IM} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
-\intertext{in terms of a translation $\vec{p}_{IM}$ that relate their positions,}
+\intertext{in terms of a translation $\vec{p}_{IM}$ that relates their positions,}
 \vec{p}_{IM} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
-\intertext{and a rotation $\vec{R}_{IM}$ that relate their orientations,}
+\intertext{and a rotation $\vec{R}_{IM}$ that relates their orientations,}
 \vec{R}_{IM} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
 \vec{m} &\mapsto \vec{i}.
 \end{align}
@@ -1258,10 +1264,10 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$,
     }
 \end{align}
 %
-This vector addition (and any other vector-vector operation) is numerically possible and valid only if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we may represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
+This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we may represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
-\dvec{p}_{IV}^{\Green{I}} &= \dvec{p}_{I\cancel{M}}^{\Green{I}} + \dvec{p}_{MV}^{\Green{I}}.\label{eq_head_tail_decomposed}
+\dvec{p}_{IV}^{\Green{I}} &= \dvec{p}_{I\cancel{M}}^{\Green{I}} + \dvec{p}_{\cancel{M}V}^{\Green{I}}.\label{eq_head_tail_decomposed}
 \end{align}
 %
 % Inverse $\dvec{R}^{-1} = \dvec{R}^T$\\
@@ -1269,7 +1275,7 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % 
 % 
-To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space of more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
+To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
@@ -1303,10 +1309,9 @@ Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
 
-
 \subsection{Homogeneous transformations}
 
-Any transformation in $\mathbb{R}^N$-space can be represented by a transformation matrix $\dvec{T} \in \mathbb{R}^{N+1,N+1}$. In the affine case, it has the form of a special Euclidean matrix $\dvec{T}\in\mathrm{SE}(N)$,
+Any transformation in $\mathbb{R}^N$-space can be represented by a transformation matrix $\dvec{T} \in \mathbb{R}^{N+1,N+1}$. In the affine case, it has the form of a Special Euclidean matrix $\dvec{T}\in\mathrm{SE}(N)$,
 %
 \begin{align}
 \dvec{T} &= 
@@ -1316,32 +1321,58 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 \end{array}\right] = \mathrm{SE}(N)\label{eq_homogeneous_affine_transform}
 \end{align}
 %
-where $\dvec{p}\in\mathbb{R}^N$, $\mat{R}\in\mathrm{SO}(N)$ and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
+where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. %The regular affine version  Steps \step{1} to \step{4} 
 
-There is nothing special with this matrix, it simply combines a rotation and translation into a single operation. If the latter row 
+As we dive into the specification on each transformation, look to \Tab{IV_tab_frames_transitions} for details on the configuration and coordinate representation, and to \Fig{IV_simulator_coordinate_system} for visual aid. Each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
-The vertex $\udot{V}$ is now referenced from $\ubar{I}$, but we prefer it referenced from the position of the sonar local body $\udot{S}$, with an orientation $\uvec{O}$ that creates a viewing plane orthogonal to $\vec{p}_{SI}$. This mimics a camera placed at the acoustic source directed at the part of the seafloor we seek to image. For this we seek the These transforms take the form of \eq{eq_homogeneous_transformation} and can be stacked together,
+
+%  In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
+
+%There is nothing special with this matrix, it simply combines a rotation and translation into a single operation. If the latter row 
 %
-\begin{align}
-\left[\begin{array}{c}
-\\\dvec{p}_{OV}^{O}\\\\\hline 1
-\end{array}\right]
-= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
-\left[\begin{array}{c}
-\\\dvec{p}_{MV}^{M}\\\\\hline 1
-\end{array}\right]
-\end{align}
-%
-A summary of the configuration space and representation of each transformation matrix is shown in \Tab{IV_tab_frames_transitions}. Visual aid is provided in \Fig{IV_simulator_coordinate_system}. Each line in the table and step in the figure matches a heading in the upcoming text.
+%The vertex $\udot{V}$ is now referenced from $\ubar{I}$, but we prefer it referenced from the position of the sonar local body $\udot{S}$, with an orientation $\uvec{O}$ that creates a viewing plane orthogonal to $\vec{p}_{SI}$. This mimics a camera placed at the acoustic source directed at the part of the seafloor we seek to image. For this we seek the These transforms take the form of \eq{eq_homogeneous_transformation} and can be stacked together,
+%%
+%\begin{align}
+%\left[\begin{array}{c}
+%\\\dvec{p}_{OV}^{O}\\\\\hline 1
+%\end{array}\right]
+%= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
+%\left[\begin{array}{c}
+%\\\dvec{p}_{MV}^{M}\\\\\hline 1
+%\end{array}\right]
+%\end{align}
 
+
+%\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+%}\\[.5\baselineskip]
+%%
+%\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
+%}\\[.5\baselineskip]
+%%
+%\figstep{3}{\emph{Orthogonal view rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_O$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with an \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
+%}\\[.5\baselineskip]
+%%
+%\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{CO}$.
+%}\\[.5\baselineskip]
+%%
+%\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
+%% 
+%% The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
+%}\\[.5\baselineskip]
+%%
+%\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+%}\\[.5\baselineskip]
+%%
+%\figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
+%}%
 
 
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented by a transformation matrix $\dvec{T}_{IM} \in \mathbb{R}^{N+1,N+1}$,
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented in $\ubar{I}$ by inserting\todo{This word has become such a distraction! ;)} $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform},
 %
 \begin{align}
-\dvec{T}_{IM} &= 
+\dvec{T}_{IM}^I &= 
 \left[\begin{array}{c c}
  \mat{R}_{IM}  & \dvec{p}_{IM}^I \\%\hline
  \dvec{0}^T  &  s^{-1}
@@ -1352,17 +1383,17 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 \end{cases} \label{eq_homogeneous_transformation}
 \end{align}
 %
-where $\dvec{0}^T$ is a row zero-vector of length $N$ and $s$ is a scaling factor. 
+where $s$ is a scaling factor. If the model needs to be scaled, this is a good way to do it, and the transform is then said to be similar (Sim). Note that, unlike the rotation matrix, we generally have that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$, so the superscript must be specified.
 
-Its usage is similar to that of the rotation matrix, except that it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
+The transformation matrix usage is similar to that of the rotation matrix, except that it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
 \begin{align}
-\dvec{p}_{IV}^I &= \mat{T}_{IM}\; 
+\dvec{p}_{IV}^I &= \mat{T}_{IM}^I\; 
 \left[\begin{array}{c}\dvec{p}_{MV}^M \\ 1
 \end{array}\right].
 \end{align}
 %
-When $\mat{T}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
+When $\mat{T}_{IM}^I$ is left-multiplied as here, it should be interpreted as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
 
 % Analogous to rotation matrices it is associative but not commutative, and closed under . 
 
