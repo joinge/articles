@@ -927,11 +927,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %\end{table*}
 
 
-
-
 \Fig{IV_buildup} illustrates the basic idea behind the simulator: to use OpenGL to render an intensity and depth image of an object and seafloor model, and OpenCL to convert these into an image template. The input parameters can either be predefined or estimated from the SAS image, which we label the conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. They describe the transformations that a vertex $\udot{V}$ undergoes\todo{undergo?}, from being represented in a model $\ubar{M}$, to an image $\ubar{I}$, a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).   
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. They describe the transformations that a vertex $\udot{V}$ undergoes\todo{undergo?}, from being represented in a model $\ubar{M}$, to an image $\ubar{I}$, a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).
 
 The frame syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. We adhere to it for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This aids us in transitioning between frames in a unified and geometrically valid way.
 
@@ -1373,7 +1371,7 @@ As we dive into the specification on each transformation, or step, look to \Tab{
 
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we also add a scaling factor $s$ (see \Tab{IV_tab_frames_transitions}). The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented in $\ubar{I}$ by inserting\todo{This word has become such a distraction! ;)} $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform},
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we also add a scaling factor $s$ (see \Tab{IV_tab_frames_transitions}). The transform that applies this configuration, $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$, can be represented in $\ubar{I}$ by inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform},
 %
 \begin{align}
 \dvec{T}_{IM}^I &= 
@@ -1416,9 +1414,9 @@ and the scaling factor by a positive number that shrinks or enlarges the model d
 
 
 
-\subsubsection{Camera displacement $\dvec{T}_{\!IM}$}
+\subsubsection{Sonar translation $\dvec{T}_{\!IM}$}
 
-The image region can have any position and orientation relative to the sonar, so the configuration $\mathcal{C}_{SI}$ has six degrees of freedom. This is identical to $\mathcal{C}_{IM}$ except for the lack of a scaling factor. We represent the displacement $\vec{T}_{SI}$ in $\uvec{S}$ as,
+The sonar generally does not share the orientation of the to the same orientation of the image region, $\uvec{S}=\uvec{I}$, but has a different position, so the configuration $\mathcal{C}_{SI}$ has three degrees of freedom. This is identical to $\mathcal{C}_{IM}$ except for the lack of a scaling factor. We represent the displacement $\vec{T}_{SI}$ in $\uvec{S}$ as,
 %
 \begin{align}
 \dvec{T}_{SI}&\in\mathrm{SE(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3,
@@ -1428,19 +1426,6 @@ The image region can have any position and orientation relative to the sonar, so
 \dvec{R}_{SI} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\nn
               &\in\mathrm{SO(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3.
 \end{align}
-%
-%
-%We represent the translation $\vec{p}_{IM}$ in $\uvec{I}$ as
-%%
-%\begin{align}
-%\dvec{p}_{IM}^I&\in \mathbb{R}^3,
-%\intertext{the rotation $\vec{R}_{IM}$ in $\uvec{I}$ as}
-%\dvec{R}_{IM}&\in\mathrm{SO(3)} \colon \mathbb{R}^3 \to \mathbb{R}^3,
-%\intertext{and combine these together into the displacement $\vec{T}_{IM}$ in $\uvec{I}$,}
-%\dvec{T}_{IM}&\in\mathrm{Sim(3)} \colon \mathbb{R}^4 \to \mathbb{R}^4
-%\end{align}
-%
-%
 %
 We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{IM},\vec{R}_{IM})$.
 

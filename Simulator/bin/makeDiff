@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+# Creates a diff between the current file and the git tag/SHA commit
+
+git commit -a -m "makeDiff..." || true
+
+sed -i 's/input{result/inut{result/' macros.tex
+latexpand ${1} > tmp/current.tex
+# cp article.tex document.tex macros.tex tmp/
+
+git reset --hard
+git checkout ${2}
+sed -i 's/input{result/inut{result/' macros.tex
+latexpand ${1} > tmp/former.tex
+
+git reset --hard
+git checkout master
+
+latexdiff tmp/former.tex tmp/current.tex > article_diff.tex
+sed -i 's/inut{result/input{result/' article_diff.tex
+
+latexmk -xelatex --synctex=1 -interaction=nonstopmode -file-line-error --shell-escape article_diff.tex
+
+
+exit 0
