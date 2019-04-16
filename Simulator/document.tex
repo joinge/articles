@@ -88,7 +88,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{blue}\tikzmark{#1}{$#2$}}}
 
 % \draw[-{Latex[length=.5em,width=.5em]}]
-%                         ($(C.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%                         ($(C.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XR) + (offset) + (1.6em,0ex)$)
 %       to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
 
 \newlength\tpad\setlength\tpad{.2ex}
@@ -119,24 +119,24 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
-\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+\figstep{1}{\emph{Model displacement.} When 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
 %
 \figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{3}{\emph{Orthogonal view rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_O$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with an \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
+\figstep{3}{\emph{Cartesian camera rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_C$-axis pointing at) the origin of the image frame, $\udot{I}$. While the position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{CO}$.
+\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian $(\hat{y}_C,\hat{z}_C)$ to cylindrical $(\hat{\phi}_R,\hat{r}_R)$ with a non-linear function T$_{RC}$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
+\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XR}$.
 % 
 % The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
 }\\[.5\baselineskip]
 %
-\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
+\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
 }\\[.5\baselineskip]
 %
 \figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
@@ -235,27 +235,27 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
 %\coordinate(IM) at ($(I)!0.5!(M)$);
 %\coordinate(SI) at ($(S)!0.5!(I)$);
-%\coordinate(OS) at ($(O)!0.5!(S)$);
-%\coordinate(CO) at ($(C)!0.5!(O)$);
-%\coordinate(XC) at ($(X)!0.5!(C)$);
-%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
-%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%\coordinate(CS) at ($(O)!0.5!(S)$);
+%\coordinate(RC) at ($(C)!0.5!(O)$);
+%\coordinate(XR) at ($(X)!0.5!(C)$);
+%%\path let \p1 = (TL.west), \p2 = (RC) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (RC) in coordinate (SE) at (\x1,\y2);
 %%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
 %%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
 %%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
-%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%%\node(affine)[left = 5.6em of CS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of RC, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XR, anchor=center]{\footnotesize\textrm{Projective}};
 %\draw[-{Latex[length=.5em,width=.5em]}]
-%                          ($(C.west) - (.5em, 0ex)$) to[out=180, in=90] ($(XC) - (2.0em,0ex)$)
+%                          ($(C.west) - (.5em, 0ex)$) to[out=180, in=90] ($(XR) - (2.0em,0ex)$)
 %      to[out=-90, in=180] ($(X.west) - (0.8em,0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]},draw=red]                
-%                          ($(O.west) - (.5em, 0ex)$) to[out=180, in=90] ($(CO) - (2.0em,0ex)$)
+%                          ($(O.west) - (.5em, 0ex)$) to[out=180, in=90] ($(RC) - (2.0em,0ex)$)
 %      to[out=-90, in=180] ($(C.west) - (0.8em,-0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]}]
 %                          ($(M.west) - (.5em, 0ex)$) to[out=180, in=90]  ($(IM) - (2.0em,0ex)$)
 %      to[out=-90, in=180] ($(I.west) - (0.7em,0ex)$) to[out=180, in=90] ($(SI) - (2.0em,0ex)$)
-%      to[out=-90, in=180] ($(S.west) - (0.7em,0ex)$) to[out=180, in=90] ($(OS) - (2.0em,0ex)$)
+%      to[out=-90, in=180] ($(S.west) - (0.7em,0ex)$) to[out=180, in=90] ($(CS) - (2.0em,0ex)$)
 %      to[out=-90, in=180] ($(O.west) - (0.8em,-0ex)$);
 %%\path[fill=gray,opacity=0.2](TL.north west)--(TL.north east)--(SE)--cycle;
 %%%%\draw[->] ($(I.west) - (.7em,0ex)$) to[out=-180, in=180] ($(S.west) - (.7em,0ex)$);
@@ -270,9 +270,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %\begin{table}[h]\normalsize\centering
 %\begin{tabular}{r c c r c c}
 %	\hline
-%	\rowcolor{tabBlue}                     & $\mat{T}_{XC}$      & T$_{CO}$                & $\mat{T}_{OS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
-%	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XC})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{OS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
-%	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{OS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$ \\
+%	\rowcolor{tabBlue}                     & $\mat{T}_{XR}$      & T$_{RC}$                & $\mat{T}_{CS}$      & $\mat{T}_{SI}$      & $\mat{T}_{IM}$             \\ \hline
+%	$\mat{L}$ in (\ref{eq:T_definition})   & See (\ref{eq_L_XR})      & See (\ref{eq_cart2cyl}) & $\mat{R}_{CS}$      & $\mat{I}$           & $\mat{R}_{IM}\mat{S}_{IM}$ \\
+%	$\dvec{t}$  in (\ref{eq:T_definition}) & $\boldsymbol{0}$ & See (\ref{eq_cart2cyl}) & $\dvec{p}_{CS}^{O}$ & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$ \\
 %   & & & \multicolumn{3}{c}{World space} \\
 %   & & & \multicolumn{3}{c}{Affine} 
 %\end{tabular}%
@@ -312,28 +312,28 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
 %\coordinate(IM) at ($(I)!0.5!(M)$);
 %\coordinate(SI) at ($(S)!0.5!(I)$);
-%\coordinate(OS) at ($(O)!0.5!(S)$);
-%\coordinate(CO) at ($(C)!0.5!(O)$);
-%\coordinate(XC) at ($(X)!0.5!(C)$);
+%\coordinate(CS) at ($(O)!0.5!(S)$);
+%\coordinate(RC) at ($(C)!0.5!(O)$);
+%\coordinate(XR) at ($(X)!0.5!(C)$);
 %\coordinate(offset) at (0.7em,0ex);
-%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
-%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%%\path let \p1 = (TL.west), \p2 = (RC) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (RC) in coordinate (SE) at (\x1,\y2);
 %%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
 %%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
 %%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
-%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%%\node(affine)[left = 5.6em of CS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of RC, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XR, anchor=center]{\footnotesize\textrm{Projective}};
 %\draw[-{Latex[length=.5em,width=.5em]}]
-%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XR) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
-%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
+%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(RC) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]}]
 %                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
-%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(CS) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
 %%%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
 %%%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
@@ -400,9 +400,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %	\midline
 %	                                           Model & \t{M} & $S^2 \times S^1$\addtimes & $\mathbb{E}^3$\addtimes & $\mathbb{E}^1$ & 7 & \T{IM}  & Affine      & \Tr{IM}     & \SIM                                            \\
 %	                                           Image & \t{I} & $S^2 \times S^1$\addtimes & $\mathbb{E}^3$          &                & 6 & \T{SI}  & Affine      & \Tr{SI}     & \SE                                             \\
-%	                                           Sonar & \t{S} & $S^1$                     &                         &                & 1 & \T{OS}  & Affine      & \Tr{OS}     & \SE                                             \\
-%	                               Orthographic view & \t{O} &                           &                         &                & 0 & \TT{CO} & Non-linear  & \TT{CO}     &      \\
-%	                                  Cylindric view & \t{C} &                           &                         &                & 0 & \T{XC}  & Affine      & \Tr{XC}     & \\
+%	                                           Sonar & \t{S} & $S^1$                     &                         &                & 1 & \T{CS}  & Affine      & \Tr{CS}     & \SE                                             \\
+%	                               Orthographic view & \t{O} &                           &                         &                & 0 & \TT{RC} & Non-linear  & \TT{RC}     &      \\
+%	                                  Cylindric view & \t{C} &                           &                         &                & 0 & \T{XR}  & Affine      & \Tr{XR}     & \\
 %	                                        Clipping & \t{X} & $\mathrm{NDC}^{(1)}$      &                         &                &   &         &             & \mc{1}{l}{} &                                                 \\ \bottomrule
 %	\mc{5}{l}{$^{(1)}$Normalized Device Coordinates} &
 %\end{tabular}
@@ -416,9 +416,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %	\midline
 %	                                           Model & \t{M} & $\udot{I} = \udot{M}$ & $S^2 \times S^1$ & $\mathbb{E}^3$ & $\mathbb{E}^1$ & 7 & \T{IM}  & Affine     & \Tr{IM}     & \SIM \\
 %	                                           Image & \t{I} &                       & $S^2 \times S^1$ & $\mathbb{E}^3$ &                & 6 & \T{SI}  & Affine     & \Tr{SI}     & \SE  \\
-%	                                           Sonar & \t{S} & $\udot{S} = \udot{O}$ & $S^1$            &                &                & 1 & \T{OS}  & Affine     & \Tr{OS}     & \SE  \\
-%	                               Orthographic view & \t{O} & $\udot{O} = \udot{C}$ &                  &                &                & 0 & \TT{CO} & Non-linear & \TT{CO}     &      \\
-%	                                  Cylindric view & \t{C} &                       &                  & $\mathbb{E}^3$ &                & 0 & \T{XC}  & Affine     & \Tr{XC}     &      \\
+%	                                           Sonar & \t{S} & $\udot{S} = \udot{O}$ & $S^1$            &                &                & 1 & \T{CS}  & Affine     & \Tr{CS}     & \SE  \\
+%	                               Orthographic view & \t{O} & $\udot{O} = \udot{C}$ &                  &                &                & 0 & \TT{RC} & Non-linear & \TT{RC}     &      \\
+%	                                  Cylindric view & \t{C} &                       &                  & $\mathbb{E}^3$ &                & 0 & \T{XR}  & Affine     & \Tr{XR}     &      \\
 %	                                        Clipping & \t{X} &                       &                  & $[0,1]^3$      &                &   &         &            & \mc{1}{l}{} &      \\ \bottomrule
 %	\mc{5}{l}{$^{(1)}$Normalized Device Coordinates} &       &
 %\end{tabular}
@@ -434,23 +434,23 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 	                                         Model & \t{M}             &&                                             &          &            &       &                           &  &                &           &                &   & \mcc{1}{L}{}      &                                                                      &      &      &      &         &           &         &     & \mcc{1}{C}{} &      \\
 	                                         Image & \t{I}             &\figstep{1}{}& \T{IM}                                      & $\colon$ & $\ubar{M}$ & $\to$ & $\ubar{I}$                &  & $\mathbb{R}^3$ & $S^2 S$ & $\mathbb{R}^+$ & 7 & \Tr{IM}           & $($                                                                  & $x,$ & $y,$ & $z,$ & $\psi,$ & $\theta,$ & $\phi,$ & $s$ & $)$          & \SIM \\
 	                                         Sonar & \t{S}             &\figstep{2}{}& \T{SI}                                      & $\colon$ & $\udot{I}$ & $\to$ & $\udot{S}$                &  & $\mathbb{R}^3$ &         &                & 3 & \Tr{SI}           & $($                                                                  & $x,$ & $y,$ & $z$ &  &  & &     & $)$          & \SE  \\
-	                             Orthographic view & \t{O}             &\figstep{3}{}& \T{OS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{O}$ &  &                & \phantom{$S$}     &                & 0 & \Tr{OS}           & $($                                                                  &      &      &      & $\psi$\makebox[0pt][l]{$^{(2)}$}  &           &         &     & $)$          & \SE  \\
+	                                         Cartesian camera & \t{C}             &\figstep{3}{}& \T{CS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{C}$ &  &                & \phantom{$S$}     &                & 0 & \Tr{CS}           & $($                                                                  &      &      &      & $\psi$\makebox[0pt][l]{$^{(2)}$}  &           &         &     & $)$          & \SE  \\
                               
 \cmidrule{14-24}\rowcolor{tabBlue}
    \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{Green}\begin{tabular}{l l}\rowcolor{white}
    $\Uparrow$ & \emph{Affine manipulations} \\$\Downarrow$ & \emph{Coordinate manipulations}
    \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{Green}\hline\arrayrulecolor{black}%cline{10-20}
 	                                               &                    \\[0\baselineskip]
-	                                Cylindric view & \t{C}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $\mathrm{T}_{CO}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\phi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
-	                                      Clipping & \t{X}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{XC}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
+	                                Radial camera & \t{R}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $\mathrm{T}_{RC}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\varphi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
+	                                      Clipping & \t{X}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{XR}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
                                          %\end{tabular}\parbox[L]{8em}{} $\to$ \parbox[L]{3.8em}{NDC$^{(3)}$} \parbox[L]{1em}{$\in$} $[0,1]^3$}   \\ \bottomrule
 \mc{10}{l}{$^{(1)}$Degrees of Freedom} \\
-\mc{10}{l}{$^{(2)}$Subject to $\hat{x}_O = \hat{x}_S$ and $\hat{z}_O \parallel \vec{p}_{SI}$} \\
+\mc{10}{l}{$^{(2)}$Subject to $\hat{x}_C = \hat{x}_S$ and $\hat{z}_C \parallel \vec{p}_{SI}$} \\
 \mc{10}{l}{$^{(3)}$Normalized Device Coordinates}
 %\mc{10}{l}{$^{(4)}$Subject to $\hat{x}_O = \hat{x}_S$ and $\hat{z}_O \parallel \vec{p}_{SI}$}
 \end{tabular}
-%	                                Cylindric view & \t{C}             &                                             &                                               &  &                &           &                &   & $\mathrm{T}_{CO}$ & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,y,z)\in\mathbb{R}^3$}&\mc{1}{O}{$\to (x,\phi,r)\in$}&$\mathbb{R}S\mathbb{R}$   \\
-%	                                      Clipping & \t{X}             &                                             &                                               &  &                &           &                &   & \Tr{XC}           & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,\phi,r)\in\mathbb{R}S\mathbb{R}$}&\mc{2}{O}{\hspace*{-\tabcolsep}$\to [0,1]^3$}   \\ \bottomrule
+%	                                Cylindric view & \t{C}             &                                             &                                               &  &                &           &                &   & $\mathrm{T}_{RC}$ & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,y,z)\in\mathbb{R}^3$}&\mc{1}{O}{$\to (x,\phi,r)\in$}&$\mathbb{R}S\mathbb{R}$   \\
+%	                                      Clipping & \t{X}             &                                             &                                               &  &                &           &                &   & \Tr{XR}           & \mc{8}{O}{\hspace*{0\tabcolsep}$\colon (x,\phi,r)\in\mathbb{R}S\mathbb{R}$}&\mc{2}{O}{\hspace*{-\tabcolsep}$\to [0,1]^3$}   \\ \bottomrule
 %	                 \mc{10}{l}{$^{(1)}$Degrees of freedom} &  \\
 %
 %cartesian $\rightarrow$ cylindric
@@ -483,30 +483,30 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
 \coordinate(IM) at ($(I)!0.5!(M)$);
 \coordinate(SI) at ($(S)!0.5!(I)$);
-\coordinate(OS) at ($(O)!0.5!(S)$);
-\coordinate(CO) at ($(C)!0.5!(O)$);
-\coordinate(XC) at ($(X)!0.5!(C)$);
+\coordinate(CS) at ($(C)!0.5!(S)$);
+\coordinate(RC) at ($(R)!0.5!(C)$);
+\coordinate(XR) at ($(X)!0.5!(R)$);
 \coordinate(offset) at (0.5em,0ex); %5.3em
-%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
-%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%\path let \p1 = (TL.west), \p2 = (RC) in coordinate (SW) at (\x1,\y2);
+%\path let \p1 = (TL.east), \p2 = (RC) in coordinate (SE) at (\x1,\y2);
 %\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
 %\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
 %\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
-%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
-%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
-%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%\node(affine)[left = 5.6em of CS, anchor=center]{\footnotesize\textrm{Affine}};
+%\node(nonlin)[left = 5.6em of RC, anchor=center]{\footnotesize\textrm{Non-linear}};
+%\node(project)[left = 5.6em of XR, anchor=center]{\footnotesize\textrm{Projective}};
 % \node(step1)[anchor=center] at ($(X)+(2.8em,-0.2em)$){\figstep{1}{}};
 %\draw[-]
 %                        (FrameL.south) to[out=0, in=180] (FrameR.south);
 \draw[-{Latex[length=.5em,width=.5em]}]
-                        ($(C.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+                        ($(R.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(XR) + (offset) + (1.6em,0ex)$)
       to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
 \draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
-                        ($(O.center) + (offset) + (1.1em,-0.4ex)$) to[out=-45, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
-      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
+                        ($(C.center) + (offset) + (1.1em,-0.4ex)$) to[out=-45, in=90] ($(RC) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(R.center) + (offset) + (0.8em,0ex)$);
 \draw[-{Latex[length=.5em,width=.5em]}]
-                        ($(S.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
-      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+                        ($(S.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(CS) + (offset) + (1.6em,0ex)$)
+      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
 \draw[-{Latex[length=.5em,width=.5em]}]
                         ($(I.center) + (offset) + (1.3em,-0.4ex)$) to[out=-30, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
       to[out=-90, in=0] ($(S.center) + (offset) + (0.8em,0ex)$);
@@ -516,13 +516,13 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %\draw[-{Latex[length=.5em,width=.5em]}]
 %                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$);
-%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
-%      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(CS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
 %%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
 %%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
-%%%%\draw[->] ($(S.east) - (.7em,0ex)$) to[out=-180, in=180] ($(O.east) - (.7em,0ex)$);
-%%%%\draw[->] ($(O.east) - (.7em,0ex)$) to[out=-180, in=180] ($(C.east) - (.7em,0ex)$);
-%%%%\draw[->] ($(C.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(S.east) - (.7em,0ex)$) to[out=-180, in=180] ($(C.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(C.east) - (.7em,0ex)$) to[out=-180, in=180] ($(R.east) - (.7em,0ex)$);
+%%%%\draw[->] ($(R.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
 %%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
 \end{tikzpicture}
 }
@@ -555,9 +555,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %  \bf Description  & \bf Symbol &  & \mc{1}{|l}{\bf{}Symbol} & \mc{1}{l}{\bf{}Kind} & \mc{1}{l}{\bf{}Transformation} \\\midline
 %	          Model & \t{M}      & \p{MV}{M} & \T{IM} & & Affine:          scale,  rotate\phantom{, translate}  \\
 %	          Image & \t{I}      & \p{IV}{I} & \T{SI} & & Affine: \phantom{scale, }rotate         , translate   \\
-%	          Sonar & \t{S}      & \p{SV}{S} & \T{OS} & & Affine: \phantom{scale, }rotate\phantom{, translate}  \\
-% Orthographic view & \t{O}      & \p{OV}{O} & \TT{CO}& & Non-linear: cartesian $\rightarrow$ cylindric         \\
-%	 Cylindric view & \t{C}      & \p{CV}{C} & \T{XC} & & Affine: orthographic projection                       \\
+%	          Sonar & \t{S}      & \p{SV}{S} & \T{CS} & & Affine: \phantom{scale, }rotate\phantom{, translate}  \\
+% Orthographic view & \t{O}      & \p{OV}{O} & \TT{RC}& & Non-linear: cartesian $\rightarrow$ cylindric         \\
+%	 Cylindric view & \t{C}      & \p{CV}{C} & \T{XR} & & Affine: orthographic projection                       \\
 %	     Clip / NDC & \t{X}      & \p{XV}{X} &        & &                         \\\bottomrule
 %%	\mc{3}{l}{$^1$Normalized Device Coordinates}
 %\end{tabular}
@@ -567,28 +567,28 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%\draw[->] ($(M.center) - (1.3em,0ex)$) to[out=-90, in=90] ($(O.center) - (1.3em,-.7ex)$);
 %\coordinate(IM) at ($(I)!0.5!(M)$);
 %\coordinate(SI) at ($(S)!0.5!(I)$);
-%\coordinate(OS) at ($(O)!0.5!(S)$);
-%\coordinate(CO) at ($(C)!0.5!(O)$);
-%\coordinate(XC) at ($(X)!0.5!(C)$);
+%\coordinate(CS) at ($(O)!0.5!(S)$);
+%\coordinate(RC) at ($(C)!0.5!(O)$);
+%\coordinate(XR) at ($(X)!0.5!(C)$);
 %\coordinate(offset) at (5.3em,0ex);
-%%\path let \p1 = (TL.west), \p2 = (CO) in coordinate (SW) at (\x1,\y2);
-%%\path let \p1 = (TL.east), \p2 = (CO) in coordinate (SE) at (\x1,\y2);
+%%\path let \p1 = (TL.west), \p2 = (RC) in coordinate (SW) at (\x1,\y2);
+%%\path let \p1 = (TL.east), \p2 = (RC) in coordinate (SE) at (\x1,\y2);
 %%\node[anchor=base,text width=\minWidth,align=\alignment,inner sep=0pt,inner xsep=\tabcolsep,outer sep=0pt] (n) {\strut$#1$}
 %%\node(affine)[left = 5.6em of IM, anchor=center]{\footnotesize\textrm{Affine}};
 %%\node(affine)[left = 5.6em of SI, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(affine)[left = 5.6em of OS, anchor=center]{\footnotesize\textrm{Affine}};
-%%\node(nonlin)[left = 5.6em of CO, anchor=center]{\footnotesize\textrm{Non-linear}};
-%%\node(project)[left = 5.6em of XC, anchor=center]{\footnotesize\textrm{Projective}};
+%%\node(affine)[left = 5.6em of CS, anchor=center]{\footnotesize\textrm{Affine}};
+%%\node(nonlin)[left = 5.6em of RC, anchor=center]{\footnotesize\textrm{Non-linear}};
+%%\node(project)[left = 5.6em of XR, anchor=center]{\footnotesize\textrm{Projective}};
 %\draw[-{Latex[length=.5em,width=.5em]}]
-%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XC) + (offset) + (1.6em,0ex)$)
+%                        ($(C.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(XR) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(X.center) + (offset) + (0.8em,0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]},draw=black,densely dotted]                
-%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(CO) + (offset) + (1.6em,0ex)$)
+%                        ($(O.center) + (offset) + (0.5em,0ex)$) to[out=0, in=90] ($(RC) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(C.center) + (offset) + (0.8em,0ex)$);
 %\draw[-{Latex[length=.5em,width=.5em]}]
 %                        ($(M.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(IM) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(I.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(SI) + (offset) + (1.6em,0ex)$)
-%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(OS) + (offset) + (1.6em,0ex)$)
+%      to[out=-90, in=0] ($(S.center) + (offset) + (0.44em,0ex)$) to[out=0, in=90] ($(CS) + (offset) + (1.6em,0ex)$)
 %      to[out=-90, in=0] ($(O.center) + (offset) + (0.8em,0ex)$);
 %%%\path[fill=gray,opacity=0.2](TL.north east)--(TL.north east)--(SE)--cycle;
 %%%%%\draw[->] ($(I.east) - (.7em,0ex)$) to[out=-180, in=180] ($(S.east) - (.7em,0ex)$);
@@ -604,18 +604,14 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 \Fig{IV_buildup} illustrates the basic idea behind the simulator: to use OpenGL to render an intensity and depth image of an object and seafloor model, and OpenCL to convert these into an image template. The input parameters can either be predefined or estimated from the SAS image, which we label the conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. They describe the transformations that a vertex $\udot{V}$ undergoes\todo{undergo?}, from being represented in a model $\ubar{M}$, to an image $\ubar{I}$, a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. They describe the transformations that a vertex $\udot{V}$ undergoes, from being represented in a model $\ubar{M}$, to an image $\ubar{I}$, a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{X}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 The frame syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. We adhere to it for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This aids us in transitioning between frames in a unified and geometrically valid way.
-
-
 
 
 Gade's notation can be used with or without coordinates. We prefer the latter when emphasizing geometrical reasoning, conceptual clarity, or physical understanding. Coordinates are a practical necessity, but add complexity; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone; strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
 \subsection{Free notation}\label{IV_sec:general_notation}
-
-
 
 
 Suppose a $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation.
@@ -722,7 +718,7 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 When $\dvec{R}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The rotation is associative, generally non-commutative and closed under multiplication.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
-Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional case the rotations are about fixed points and lines, respectively.
+Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are about fixed points and lines, respectively.
 
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
@@ -741,7 +737,7 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 %
 where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. Analogous to rotation matrices it is associative, generally non-commutative and closed under multiplication. %The regular affine version  Steps \step{1} to \step{4} 
 
-As we dive into the specification on each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, and to \Fig{IV_simulator_coordinate_system} for visual aid. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
+As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, and to \Fig{IV_simulator_coordinate_system} for visual aid. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
 
 %  In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
@@ -754,7 +750,7 @@ As we dive into the specification on each transformation, or step, look to \Tab{
 %\left[\begin{array}{c}
 %\\\dvec{p}_{OV}^{O}\\\\\hline 1
 %\end{array}\right]
-%= \mat{T}_{OS}\;\mat{T}_{SI}\;\mat{T}_{IM}
+%= \mat{T}_{CS}\;\mat{T}_{SI}\;\mat{T}_{IM}
 %\left[\begin{array}{c}
 %\\\dvec{p}_{MV}^{M}\\\\\hline 1
 %\end{array}\right]
@@ -773,10 +769,10 @@ As we dive into the specification on each transformation, or step, look to \Tab{
 %\figstep{3}{\emph{Orthogonal view rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_O$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with an \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
 %}\\[.5\baselineskip]
 %%
-%\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{CO}$.
+%\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{RC}$.
 %}\\[.5\baselineskip]
 %%
-%\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XC}$.
+%\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XR}$.
 %% 
 %% The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
 %}\\[.5\baselineskip]
@@ -790,13 +786,13 @@ As we dive into the specification on each transformation, or step, look to \Tab{
 
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we also add a scaling factor $s$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
 %
 \begin{align}
 \dvec{T}_{IM}^I &= 
 \left[\begin{array}{c c}
  \mat{R}_{IM}  & \dvec{p}_{IM}^I \\%\hline
- \dvec{0}^T  &  s^{-1}
+ \dvec{0}^T  &  s_{IM}^{-1}
 \end{array}\right] \nn &\in
 \begin{cases}
 \mathrm{SE}(3) & \mathrm{when}\ s=1,\\
@@ -852,27 +848,36 @@ where $\mat{I}$ is the identity matrix and
 %
 
 
-\subsubsection{Orthogonal view rotation $\dvec{T}_{\!OS}$}
+\subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
 
-The OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene.  
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Because this is a left-handed coordinate system---and we prefer right-handed ones---we define that the $x$-axis points left instead (we will flip it back later). A camera fixed to $\ubar{S}$ would have a correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle given by $\vec{p}_{SI}$. 
 
-
-
-
-\subsubsection{Projection and clipping}
-
+%from the image region, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{I}$ as
+%
 \begin{align}
-\dvec{R}_{IM} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\label{eq_R_IM}
+\dvec{T}_{CS} &= 
+\left[\begin{array}{c c}
+ \mat{R}_{CS}  & \dvec{0} \\%\hline
+ \dvec{0}^T  &  1
+\end{array}\right] \in \mathrm{SE}(3) \label{eq_T_CS}
 \end{align}
+%
+where
+%
 \begin{align}
-\dvec{T}_{XC}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
+\dvec{R}_{CS} &= R_x(\arctan\frac{\dvec{p}_{SI,y}^I}{\dvec{p}_{SI,z}^I})
+\intertext{or equivalently}
+\dvec{R}_{CS} &=
+\left[\begin{array}{c c c}
+ 1 & 0                 & 0                 \\%\hline
+ 0 & \dvec{p}_{SI,z}^I & \dvec{p}_{SI,y}^I \\
+ 0 & \dvec{p}_{SI,y}^I & \dvec{p}_{SI,z}^I 
+\end{array}\right] \in \mathrm{SO}(3) \label{eq_R_CS}
 \end{align}
+%
 
 
-\subsubsection{Normalization and clipping}
-
-OpenGL clips any coordinate that end up outside the normalized range $[-1,1]$. This means that we need to offset and normalize each axis such that the pixels we want visible end up in this range.
-Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
+\subsubsection{Radian camera coordinate conversion T$_{\mathrm{RC}}$}
 
 Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
 %
@@ -880,7 +885,7 @@ Finally the relevant part of the scene is projected onto the image plane with a 
 \left[\begin{array}{c}
 \\\dvec{p}_{XV}^{X}\\\\\hline 1
 \end{array}\right]
-= \mat{T}_{XC}
+= \mat{T}_{XR}
 \left[\begin{array}{c}
 \\\dvec{p}_{CV}^{C}\\\\\hline 1
 \end{array}\right]
@@ -891,13 +896,28 @@ where $\ubar{C}$ is in cylindrical coordinates but has the same origin as $\ubar
 \begin{align}\label{eq_cart2cyl}
 \dvec{p}^C
 = \bmat{x\\r\\\varphi}
-= \mathrm{T_{CO}}(\dvec{p}^O)
+= \mathrm{T_{RC}}(\dvec{p}^O)
 = \bmat{\dvec{p}_x^O\\
 \sqrt{(\dvec{p}_y^O)^2 + (\dvec{p}_z^O)^2}\\
 \text{atan}\big(\dvec{p}_y^O / \dvec{p}_z^O\big)
 }
 \end{align}
 %
+
+
+\subsubsection{Projection} %Normalization and clipping
+
+\begin{align}
+\dvec{R}_{IM} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\label{eq_R_IM}
+\end{align}
+\begin{align}
+\dvec{T}_{XR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
+\end{align}
+
+OpenGL clips any coordinate that end up outside the normalized range $[-1,1]$. This means that we need to offset and normalize each axis such that the pixels we want visible end up in this range.
+Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
+
+
 
 
 Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:\todo{Keep position vector bold, even if an element is indexed?}
@@ -910,16 +930,16 @@ Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent
 %
 where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^C$
 \begin{align}\label{eq:M}
-\dvec{s}_\Delta^C &= \mathrm{T_{CO}}\big(\mat{T}_{OS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
+\dvec{s}_\Delta^C &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
 \end{align}
 %
-Now we have all the information needed to normalize the scene in $\ubar{C}$, i.e. the contents of $\mat{T}_{XC}$:
+Now we have all the information needed to normalize the scene in $\ubar{C}$, i.e. the contents of $\mat{T}_{XR}$:
 %
 \begin{align}
-\mat{L}_{XC}
-&= \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^C\right) \label{eq_L_XC} \\
-\dvec{t}_{XC}
-&= -2\dvec{p}_{CI}^C\oslash\dvec{s}_\Delta^C \label{eq_t_XC}
+\mat{L}_{XR}
+&= \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^C\right) \label{eq_L_XR} \\
+\dvec{t}_{XR}
+&= -2\dvec{p}_{CI}^C\oslash\dvec{s}_\Delta^C \label{eq_t_XR}
 \end{align}
 %
 where $\boldsymbol{2}$ is a vector of twos\todo{Too informal?}, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
@@ -1602,7 +1622,7 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
 %\begin{table}[h]\centering
 %\begin{center}
 %\begin{tabular}{l r r r}
-%	                   & $\mat{T}_{OS}$                                                                     & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
+%	                   & $\mat{T}_{CS}$                                                                     & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
 %	$\theta$           & acos$\frac{\uvec{I}_{\,z}^S\cdot\dvec{p}_{SI}^{S}}{\lVert\dvec{p}_{SI}^{S}\rVert}$ & 0                   & $\psi$              \\
 %	$\dvec{\hat{r}}\T$ & $\uvec{I}_{\,z}^S \times \dvec{p}_{SI}^{S}$                                        &                     & $\big(0,1,0\big)$   \\
 %	$\Phi_y$           & 0                                                                                  & 0                   & $\pi+\theta$        \\
@@ -1613,7 +1633,7 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
 %	$\s_x$             & 1                                                                                  & 1                   & 1                   \\
 %	$\s_y$             & 1                                                                                  & 1                   & 1                   \\
 %	$\s_z$             & 1                                                                                  & 1                   & 1                   \\
-%	$\vec{t}$          & $\dvec{p}_{OS}^{O}$                                                                & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+%	$\vec{t}$          & $\dvec{p}_{CS}^{O}$                                                                & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
 %\end{tabular}
 %%\end{table}
 %\end{center}
@@ -1621,7 +1641,7 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
 %\begin{table}[h]\centering
 %\begin{center}
 %\begin{tabular}{l r r r}
-%	          & $\mat{T}_{OS}$                                                                          & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
+%	          & $\mat{T}_{CS}$                                                                          & $\mat{T}_{SI}$      & $\mat{T}_{IM}$      \\ \hline
 %	$\theta$  & $\frac{\pi}{2}-\text{atan}\left(\frac{\dvec{p}_{SI,z}^{S}}{\dvec{p}_{SI,y}^{S}}\right)$ & 0                   & $\psi$              \\
 %	$\Phi_y$  & 0                                                                                       & 0                   & $\pi+\theta$        \\
 %	$\Phi_y$  & 0                                                                                       & 0                   & $\pi+\theta$        \\
@@ -1629,13 +1649,13 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
 %	$\s_x$    & 1                                                                                       & 1                   & 1                   \\
 %	$\s_y$    & 1                                                                                       & 1                   & 1                   \\
 %	$\s_z$    & 1                                                                                       & 1                   & 1                   \\
-%	$\vec{p}$ & $\dvec{p}_{OS}^{O}$                                                                     & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
+%	$\vec{p}$ & $\dvec{p}_{CS}^{O}$                                                                     & $\dvec{p}_{SI}^{S}$ & $\dvec{p}_{IM}^{I}$
 %\end{tabular}
 %%\end{table}
 %\end{center}
 
 %\begin{align}
-%\theta_{OS}
+%\theta_{CS}
 %\dvec{\hat{r}} = \frac{\dvec{\hat{n}}_I\times\dvec{p}_{SI,z}^{S}}{\lVert\dvec{p}_{SI,z}^{S}\rVert})
 %\end{align}
 %$\frac{\pi}{2}-\text{atan}\left(\frac{\dvec{p}_{SI,z}^{S}}{\dvec{p}_{SI,y}^{S}}\right)$
