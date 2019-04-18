@@ -155,15 +155,52 @@
 %%%%%%%%%%%%%%%%%%%%%%%                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,calc,positioning,shapes,snakes}
+\usetikzlibrary{arrows.meta,calc,positioning,shadows,shadows.blur,shapes,snakes}
 %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
 \newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
 %\newcommand{\tikzmark}[2][]{\tikz[remember picture,overlay]\coordinate[#1](#2);}
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
-            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+            \node[shape=circle,draw,inner sep=2.5pt] (char) {#1};}}
             
 \tikzset{-{to[length=.5em,width=.5em]}}
-            
+
+\newcommand\step[1]{\tikz[baseline=(char.base)]{%
+            \node[shape=circle,draw,color=Green,shade,top color=black!5!white,bottom color=black!15!white,inner sep=.75pt] (char) {\color{Green}#1};}}
+\newcommand\figstep[2]{\step{#1}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
+
+\makeatletter
+\let\@oldseccntformat\@seccntformat
+\DeclareRobustCommand{\@seccntformat}[1]{%
+  \def\temp@@a{#1}%
+  \def\temp@@b{subsubsection}%
+  \ifx\temp@@a\temp@@b
+  \else
+  \@oldseccntformat{#1}
+  \fi
+}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\parindent\step{\normalfont\arabic{subsubsection}}\enskip}{0ex plus 0.1ex minus 0.1ex}{0ex}{\normalfont\normalsize\itshape}}%
+\makeatother
+
+%\titleformat{\subsubsection}[hang]{\itshape}{\thesubsubsection}{0.6em}{}
+
+%\makeatletter
+%\xpatchcmd{\@sect}{%
+%  \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+%}{%
+%  \ifnum0=\pdfstrcmp{#1}{section}%
+%  \def\@svsec{\circlednumber{\number\value{section}}\quad\relax}%
+%  \else
+%  \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+%  \fi
+%  }{}{}
+%\makeatother
+
+%\titleformat{\subsubsection}{\Large\bfseries}{}{0em}{%
+%\begin{picture}(0,0)
+%\put(12,4){\circle{28}}
+%\end{picture}\makebox[1.45em][c]{\thesubsubsection}\quad}
+
+
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{collcell}

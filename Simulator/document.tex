@@ -98,9 +98,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{\Green{#1}}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
-\newcommand\step[1]{\tikz[baseline=(char.base)]{%
-            \node[shape=circle,draw,color=Green,inner sep=0.5pt] (char) {#1};}}
-\newcommand\figstep[2]{\step{#1}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}} 
+
 \begin{figure*}[t]\centering%
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
@@ -122,13 +120,13 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{1}{\emph{Model displacement.} When 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
 %
-\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
+\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. We set its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$, and apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{3}{\emph{Cartesian camera rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_C$-axis pointing at) the origin of the image frame, $\udot{I}$. While the position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!SI}$.
+\figstep{3}{\emph{Cartesian camera rotation.} To see the world as the sonar does, we position the OpenGL camera at the origin of the sonar frame, $\udot{C}=\udot{S}$, lock its horizontal axis to that of the sonar, $\hat{x}_C=\hat{x}_S$, and direct it straight at the origin of the image frame, $\hat{z}_C\parallel\vec{p}_{SI}$. The position is correct after step 2, which leaves applying the rotation of $\uvec{S}$ relative to $\uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian $(\hat{y}_C,\hat{z}_C)$ to cylindrical $(\hat{\phi}_R,\hat{r}_R)$ with a non-linear function T$_{RC}$.
+\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
 \figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!XR}$.
@@ -737,7 +735,7 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 %
 where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. Analogous to rotation matrices it is associative, generally non-commutative and closed under multiplication. %The regular affine version  Steps \step{1} to \step{4} 
 
-As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, and to \Fig{IV_simulator_coordinate_system} for visual aid. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
+As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
 
 %  In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
@@ -784,23 +782,37 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %}%
 
 
+
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
 %
-\begin{align}
-\dvec{T}_{IM}^I &= 
+\begin{align}\nonumber\\
+\dvec{T}_{\g{IM1}{IM}}^{\k{I1}{I}} &= 
 \left[\begin{array}{c c}
- \mat{R}_{IM}  & \dvec{p}_{IM}^I \\%\hline
- \dvec{0}^T  &  s_{IM}^{-1}
+ \k{C}{}\mat{R}_{\g{IM2}{IM}}  & \dvec{p}_{\g{IM3}{IM}}^{\k{I2}{I}} \\%\hline
+ \dvec{0}^T  &  s_{\g{IM4}{IM}}^{-1}
 \end{array}\right] \nn &\in
 \begin{cases}
-\mathrm{SE}(3) & \mathrm{when}\ s=1,\\
+\mathrm{SE}(3) & \mathrm{when}\ s_{IM}=1,\\
 \mathrm{Sim}(3) & \mathrm{otherwise}.
 \end{cases} \label{eq_T_IM}
+%
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(R) at ($ (I2) + (0em,1\baselineskip) $);
+  % Compute arrow via points
+  \path let \p1 = ($ (I1) + (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I1)  at (\x1,\y2);
+  \path let \p1 = ($ (I2) - (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I2)  at (\x1,\y2);
+  % Draw arrows
+    \draw[]                  ($ (I2.north) + (0em,\tpad) $)
+           to[out= 90, in=0]    (_I2)
+           to[out=180, in=0]    (_I1)
+           to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
+}
 \end{align}
 %
-Sim(3) is the group of $\mathbb{R}^{4\times4}$ similarity matrices: a set of transforms that scales an object but otherwise preserves it. Note that, unlike the rotation matrix, we generally have that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$, so here the representation must be specified.
+Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales its input objects but otherwise preserves them like the SE(3) group. Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must generally be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except that it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -830,17 +842,17 @@ and the scaling factor by a positive number that shrinks the model if it is less
 
 \subsubsection{Sonar translation $\dvec{T}_{\!SI}$}
 
-To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position. It lies some distance apart from the image region, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{I}$ as
+The sonar observes the world some distance apart from the image region, $\udot{S}\ne\udot{I}$, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to a translation, $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{S}$,
 %
 \begin{align}
 \dvec{T}_{SI}^S &= 
 \left[\begin{array}{c c}
  \mat{I}  & \dvec{p}_{SI}^S \\%\hline
  \dvec{0}^T  &  1
-\end{array}\right] \in \mathrm{SE}(3) \label{eq_T_SI}
+\end{array}\right] \in \mathrm{SE}(3), \label{eq_T_SI}
 \end{align}
 %
-where $\mat{I}$ is the identity matrix and 
+where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and 
 %
 \begin{align}
 \dvec{p}_{SI}^S &= [x,y,z]\T \in \mathbb{R}^3.
@@ -850,8 +862,12 @@ where $\mat{I}$ is the identity matrix and
 
 \subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed ones---we define the $x$-axis as pointing left instead (we will flip it back later). A camera fixed to $\ubar{S}$ would have a correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle given by $\vec{p}_{SI}$. 
+%To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
 
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer sticking to right-handed ones---we define our camera $\ubar{C}$ to have an $x$-axis pointing left instead (we flip it back as the very last step before rendering). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle $\angle(\hat{z}_S,\vec{p}_{SI})$. We represent $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ in $\ubar{C}$ as
+%
+%This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
+%
 %from the image region, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{I}$ as
 %
 \begin{align}
@@ -862,22 +878,32 @@ An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and t
 \end{array}\right] \in \mathrm{SE}(3) \label{eq_T_CS}
 \end{align}
 %
-where
+and define the rotation that performs the elevation as
 %
 \begin{align}
-\dvec{R}_{CS} &= R_x(\arctan\frac{\dvec{p}_{SI,y}^I}{\dvec{p}_{SI,z}^I})
-\intertext{or equivalently}
+\dvec{R}_{CS} &= \mat{R}_x(\mathrm{atan}\frac{\dvec{p}_{SI,y}^I}{\dvec{p}_{SI,z}^I}),\label{eq_R_CS_angle}
+\end{align}
+%
+or equivalently, if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
+%
+\begin{align}
 \dvec{R}_{CS} &=
 \left[\begin{array}{c c c}
  1 & 0                 & 0                 \\%\hline
- 0 & \dvec{p}_{SI,z}^I & \dvec{p}_{SI,y}^I \\
- 0 & \dvec{p}_{SI,y}^I & \dvec{p}_{SI,z}^I 
-\end{array}\right] \in \mathrm{SO}(3) \label{eq_R_CS}
+ 0 & \hat{\dvec{p}}_{SI,z}^I & -\hat{\dvec{p}}_{SI,y}^I \\
+ 0 & \hat{\dvec{p}}_{SI,y}^I &  \hat{\dvec{p}}_{SI,z}^I 
+\end{array}\right] \in \mathrm{SO}(3). \label{eq_R_CS_coordinate}
 \end{align}
-%
 
 
-\subsubsection{Radian camera coordinate conversion T$_{\mathrm{RC}}$}
+\subsubsection{Radial camera coordinate conversion T$_{\mathrm{RC}}$}
+
+%\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
+%}\\[.5\baselineskip]
+
+%T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
+
+An imaging sonar usually records data along its track, range and optionally elevation. 
 
 Finally the relevant part of the scene is projected onto the image plane with a projection matrix $\P$. There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
 %
@@ -916,8 +942,6 @@ where $\ubar{C}$ is in cylindrical coordinates but has the same origin as $\ubar
 
 OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. This means we need to offset and normalize each axis such that the pixels we want visible end up in this range.
 Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
-
-
 
 
 Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:\todo{Keep position vector bold, even if an element is indexed?}
