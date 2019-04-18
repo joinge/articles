@@ -614,7 +614,7 @@ Gade's notation can be used with or without coordinates. We prefer the latter wh
 \subsection{Free notation}\label{IV_sec:general_notation}
 
 
-Suppose a $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation.
+Suppose a $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length). 
 %
 %
 %
@@ -647,7 +647,7 @@ We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{
 %%It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, and the rest for orientation. 
 %The translation has $N$ degrees of freedom and topology $\mathbb{R}^N$. The rotation has $N(N-1)/2$ degrees of freedom with topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$.
 %
-It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit from now on. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
+It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in all set-multiplications from now on. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
 
 
 
@@ -850,7 +850,7 @@ where $\mat{I}$ is the identity matrix and
 
 \subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Because this is a left-handed coordinate system---and we prefer right-handed ones---we define that the $x$-axis points left instead (we will flip it back later). A camera fixed to $\ubar{S}$ would have a correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle given by $\vec{p}_{SI}$. 
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed ones---we define the $x$-axis as pointing left instead (we will flip it back later). A camera fixed to $\ubar{S}$ would have a correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle given by $\vec{p}_{SI}$. 
 
 %from the image region, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{I}$ as
 %
@@ -914,7 +914,7 @@ where $\ubar{C}$ is in cylindrical coordinates but has the same origin as $\ubar
 \dvec{T}_{XR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
 \end{align}
 
-OpenGL clips any coordinate that end up outside the normalized range $[-1,1]$. This means that we need to offset and normalize each axis such that the pixels we want visible end up in this range.
+OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. This means we need to offset and normalize each axis such that the pixels we want visible end up in this range.
 Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
 
 
@@ -948,7 +948,7 @@ where $\boldsymbol{2}$ is a vector of twos\todo{Too informal?}, $\oslash$ denote
 
 \subsection{OpenGL rendering}
 
-To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits us to use a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
+To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits use of a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
@@ -977,7 +977,7 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 
 \subsection{Speed considerations}
 
-Using OpenGL and OpenGL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs. However, initializing the OpenGL and OpenCL context and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+Using OpenGL and OpenCL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs. However, initializing the OpenGL and OpenCL context and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
 %The rendering loop that uses OpenGL and OpenCL to form 
 
@@ -1093,7 +1093,7 @@ The upcoming results will be based on experimental data from a HISAS1030 interfe
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
-We present three different HUGIN runs from the Jesus Bay in Norway. The first two a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
+We present three different HUGIN runs from Jesus Bay in Norway. The first two a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
 The following three methods will be contrasted:\todo{Poor transition}
 %
@@ -1112,7 +1112,7 @@ The following three methods will be contrasted:\todo{Poor transition}
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
-Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates very closely imaged objects. In contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit of the object in the image even though the object actually is a target of interest.\todo{Rewrite paragraph}
+Our GPU-based simulator is high-speed. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates to very closely imaged objects.\todo{Huh?} By contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit to the object in the image even though the object is actually a target of interest.\todo{Rewrite paragraph}
 
 %The edge of FFISim lies in its tighter integration with the classifier
 
@@ -1120,37 +1120,14 @@ Our GPU-based simulator is very fast. On a computer with a six-core Intel Core i
 \subsection{Classification - selected objects}
 
 
-Let us first study simulation and classification performance on three typical objects from the 2012 data: Two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depth and aspect angle. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
+Let us first study simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depth and aspect angle. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
 %
 \begin{itemize}
 \item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also near identical (ignoring background level), as expected since they both rely on a Lambertian scattering model.
-\item \emph{Template accuracy} improves when using the adaptive technique; It excels at generating accurate highlight regions, but is less convincing in shadow regions. This advantage grows the more unconventional the object is, since these objects will not be represented in the static database.
+\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. This advantage grows the more unconventional the object is, since these objects will not be represented in the static database.
 \end{itemize}
 
-%- Template quality FFISim/SIGMAS+, similar. Same size/shape.
-%- Adaptive technique for highlight, tie for shadows. Same seen in segmentation result.
-%- Speed -> FFISim
 
-
-%Note how the adaptive technique excels at reproducing accurate highlights, but that this does not necessarily translate into accurate shadows. 
-
-%In terms of template quality both SIGMAS+ and FFISim produce similar results. 
-
-%\Fig{IV_fig_image_simulation} contrasts the segmentation result of the templates with that of the SAS image---in terms of highlight, shadow and background regions. As expected the adaptive technique generally produce better matching templates, but with a surprising caveat: Improved highlight scores did not necessarily translate to better shadow scores. 
-
-
-%Out of the objects in the scene we selected a 2.6\;m long cylinder that was partly buried in the sea sediments (Fig. \ref{IV_data_cylinder}). The length, immersion depth and aspect angle of this cylinder were estimated from the SAS image using our  adaptive template matching approach~\cite{Midelfart2010}. 
-
-%Then these parameters were used by the simulator to create an adaptive template (Fig. \ref{IV_sim_cylinder}), which is an almost perfect match of the cylinder. We also created standard templates for a regular template matching approach. In this case, we assumed that the cylinder mine had a generic length of 2\;m (like a MP80 or a Murena mine) and was proud on the seafloor. Moreover, templates were created for every 10$^\text{th}$ degree of the aspect angle. We believe these assumptions to be typical for a template library for cylinder mines. 
-
-%Note how the adaptive template obtained a much closer fit to image than the standard template. This was also reflected in the correlation scores (which were created with the method described in \cite{Midelfart2010}) that were 0.613 for the standard template and 0.813 for the adaptive template. Hence, the standard approach was less likely to classify the cylinder in the image correctly as the standard templates were not created specifically for the target.
-
-%The main difference lies in how they integrate into the classification process: While SIGMAS+ generate one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
-
-% FFISim provide templates that better match the true object orientation in this figure, but  
-
-% Different background level. Adaptive technique excels for less normal objects/geometries.
-%Overlap - Provide quantification measure. 
 
 \subsection{Classification - all objects}
 
@@ -1158,93 +1135,8 @@ We demonstrate classification performance with receiver operating characteristic
 
 Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations because out of 3000 detections only a few will be visually inspected up close.
 
-Above 20\% FPR the results are less clear: The adaptive techniques performed similarly to the static method in 2012, but worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
+Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, but worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 
-
- 
-%- Stm stimulated with length matching test cylinder. Perfect score against this.
-%- Atm - not given to improve score. Shadow and highlight both need to match, and overfitting could lead to reduced performance.
-%
-%
-%
-%
-%Good statistics drawn from the image -> adaptive better. Poor statistics -> hit and miss.
-%
-%
-%1. Comparison with standard template library (ROC enough?)
-%   ROC: Adaptive better at FPR<0.2 in all cases.
-%2. Comparison with SIGMAS+
-%   Fairly similar images, performance is similar. 
-%   Used to create the standard template library.
-%3. Comparison with search space
-%   ROC: Additional search always better FPR<0.2.
-%   Explain search criterion.
-
-
-
-%SAS images - look good. Random pick objects. Lengths derived from image.
-
-
-%
-%1. Adaptive better? Compare with standard. Doing this in ROC
-%2. Improved classification? ROCs
-%3. Further improvement by doing fine-search? ROC
-%
-%
-%An issue the adaptive technique must deal with when estimating object length 
-%
-%As the ROC curves indicate, the adaptive template matching techniques both  ROC curves demonstrate the 
-%
-%The majority of the objects in the Jesus Bay are cylinder shaped. A SAS image of three such objects are displayed in \Fig{IV_fig_image_sonar}
-%
-%
-%
-%
-
-
-% \begin{figure*}[!tbp]\centering%
-% \subfloat[SAS images of 2 cylinders and a torpedo.]{%
-% \includegraphics[width=0.5\linewidth]{gfx/fig_images_sonar_simulation.pdf}%
-% \label{IV_fig_sonar_simulation}}%
-% \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
-% \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-% \label{IV_sim_cylinder}}%
-% \caption{A SAS image of a cylinder and a template simulation adapted to it.}
-% \end{figure*}
-% 
-% 
-% \begin{figure*}[!tbp]\centering%
-% \subfloat[SAS image of a cylinder with 2.6\;m length and 0.53\;m radius.]{%
-% \includegraphics[drawing,width=0.5\linewidth]{gfx/data_cylinder_submerged.svg}%
-% \label{IV_data_cylinder}}%
-% \subfloat[Cylinder simulation with parameters estimated from SAS image: Length 2.6\;m, burial depth 0.263\;m, aspect angle 105$^\circ$.]{
-% \includegraphics[drawing,width=0.5\linewidth]{gfx/sim_cylinder_submerged_adaptive.svg}%
-% \label{IV_sim_cylinder}}%
-% \caption{A SAS image of a cylinder and a template simulation adapted to it.}
-% \end{figure*}
-
-
-% \newcommand\cdesc[2]{#2}
-
-
-% Whenever conventional computer graphics processing can be used to 
-% GPUs are designed to provide the best possible graphics processing performance, and there large ecosystem of tools and libraries  available 
-% Using a GPU to drive a simulator is advantageous since
-% 
-% 
-% Creating a GPU-based simulator is attractive since computer is an attractive solution as there are a  graphics traits. For one over a CPU-based standard simulator is two-fold: 
-
-
-
-%
-%
-%
-%\begin{itemize}
-%\item GPUs low power. Good for integration in AUVs.
-%\item Good accuracy even with a real-time constraint in e.g. a AUV.
-%\item Improved inertial navigation?
-%\item Aid in understanding the key parts of the SAS image and in discovering potential flaws in the SAS image. Anomalies can be flagged to make SAS more robust?
-%\end{itemize}
 
 
 \section{Conclusion}\label{IV_conclusion}
@@ -1310,13 +1202,6 @@ The geometrical intent of an active rotation is to move a point. With our notati
 }
 \end{align}
 %
-%\begin{align}
-%\vec{R}&\colon \mathbb{V} \to \mathbb{V} \\
-%\vec{R}_{IM}&\colon \uvec{I} \to \uvec{M} \subset \vec{R} \\
-%\dvec{R}&\colon \mathbb{R}^N \to \mathbb{R}^N \\
-%\dvec{R}_{IM}&\colon \uvec{I} \to \uvec{M} \subset \dvec{R} \\
-%\label{IV_eq_active_rotation}
-%\end{align}
 %
 % Implicit representation: (x,y,z) subject to x²+y²+z²=c -> no 
 depending on whether the free or decomposed form is sought, respectively, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, say, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; Either the point changes, or the representation does, but never both.
