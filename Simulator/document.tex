@@ -352,13 +352,14 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that will underpin most of the upcoming implementation details. The first four steps detail the transformations that a vertex $\udot{V}$ undergoes, from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$.
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that will underpin most of the upcoming implementation details. The first four steps detail the transformations that a vertex $\udot{V}$ undergoes, from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
 
-The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. It has a coordinate-free form emphasizing geometrical reasoning, conceptual clarity and physical understanding, and\todo{removing this sounds odd?} a decomposed form that prevents errors and ambiguities in coordinate construction, manipulation and interpretation. Without it, a designer has to rely on strict discipline to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. With it, the designer can focus on higher level concepts rather than getting lost in implementation details. 
-
+The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. This allows the designer to focus on higher level concepts rather than getting lost in implementation details.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
+\todo{Summarize rules. Example?}
+%
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
 We adhere Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This facilitates transitioning between frames in a unified and geometrically valid way.
@@ -570,7 +571,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales its input objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must usually\todo{lol you wanted usually instead of generally here...} be specified to avoid ambiguity.
+where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must usually\todo{lol you wanted usually instead of generally here...} be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -649,7 +650,7 @@ where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and
 
 %To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look\todo{huh? look not looks right? singular?} straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$. We apply it with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look\todo{huh? look not looks right? singular?} straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -669,7 +670,7 @@ and define the rotation that performs the elevation as
 \dvec{R}_{CS} &= \mat{R}_x(\mathrm{atan}\frac{\dvec{p}_{SI,y}^I}{\dvec{p}_{SI,z}^I}),\label{eq_R_CS_angle}
 \end{align}
 %
-or equivalently, if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
+or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
 %
 \begin{align}
 \dvec{R}_{CS} &=
@@ -737,7 +738,7 @@ In a ranged imaging device only the propagation axis has Euclidean topology. The
 % \dvec{T}_{NR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
 % \end{align}
 
-OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. After the previous step we can do this by linearly mapping the valid range of the along-track axis, azimuth and elevation angle into this normalized range. Such a map takes the form of an offset and normalization. each axis such that the pixels we want visible end up in this range.
+OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. After the previous step we accomplish this by linearly mapping the valid range of the along-track axis, azimuth and elevation angle into this normalized range. Such a map takes the form of an offset and normalization. each axis such that the pixels we want visible end up in this range.
 Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
 
 \todo{Add references to the cross and check graphics throughout}
@@ -803,7 +804,7 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 
 \subsection{Speed considerations}
 
-Using OpenGL and OpenCL to generate sonar templates on the GPU allows hundreds of sonar templates to be formed per second. While this is sufficient for our needs\todo{Hanging. Weak.}. However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+Using OpenGL and OpenCL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs.\todo{Hanging. Weak.} However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
 %The rendering loop that uses OpenGL and OpenCL to form 
 
@@ -938,7 +939,10 @@ The following three methods will be contrasted:\todo{Poor transition}
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
-Our GPU-based simulator is high-speed. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates to very closely imaged objects.\todo{Huh?} By contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Hence, it may happen that no template in the library is a close fit to the object in the image even though the object is actually a target of interest.\todo{Rewrite paragraph}
+Our GPU-based simulator is high-speed. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates to very closely imaged objects.\todo{Huh?} By contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
+
+
+% Hence, it may happen that no template in the library is a close fit to the object in the image even though the object is actually a target of interest.\todo{Rewrite paragraph}
 
 %The edge of FFISim lies in its tighter integration with the classifier
 
