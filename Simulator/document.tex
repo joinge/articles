@@ -157,7 +157,7 @@ A conventional ATR system isolates an object of interest, extracts its key featu
 Template matching offers an alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign the object to the class that fits best. The problem is to find a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 
-Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, and use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating the templates on-the-fly.
+Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, then use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating the templates on-the-fly.
 
 %, to adapt to much broader scenarios.
 
@@ -188,7 +188,7 @@ A few simulators for high frequency, side-looking sonar imagery have been publis
 % This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
 % on a new full geometrical implementation of the simulator.
 
-Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
+Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple\todo{Would you say ``in a simplified way?''} way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
 
 
 
@@ -352,16 +352,16 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} details the geometry and processing steps that will underpin most of the upcoming implementation details. The first four steps detail the transformations that a vertex $\udot{V}$ undergoes, from being being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$.
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that will underpin most of the upcoming implementation details. The first four steps detail the transformations that a vertex $\udot{V}$ undergoes, from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
 
-The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. It has a coordinate-free form emphasizing geometrical reasoning, conceptual clarity and physical understanding, and a decomposed form that prevents errors and ambiguities in coordinate construction, manipulation and interpretation. Without it, a designer has to rely on strict discipline to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. With it, the designer can focus on higher level concepts rather than getting lost in implementation details. 
+The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}. It has a coordinate-free form emphasizing geometrical reasoning, conceptual clarity and physical understanding, and\todo{removing this sounds odd?} a decomposed form that prevents errors and ambiguities in coordinate construction, manipulation and interpretation. Without it, a designer has to rely on strict discipline to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. With it, the designer can focus on higher level concepts rather than getting lost in implementation details. 
 
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
-We adhere Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This aids us in transitioning between frames in a unified and geometrically valid way.
+We adhere Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This facilitates transitioning between frames in a unified and geometrically valid way.
 
 
 
@@ -369,7 +369,7 @@ We adhere Gade's notation for affine geometry, extend it to handle homogeneous c
 \subsection{Free notation}\label{IV_sec:general_notation}
 
 
-Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length).
+Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length)\todo{Line above not close enough}.
 %
 %
 %
@@ -382,7 +382,7 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 \vec{p}_{MV} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-where $\vec{p}_{MV} = -\vec{p}_{V\!M}$. 
+where $\vec{p}_{MV} = -\vec{p}_{V\!M}$\todo{Only way to change this formatting is to have more text before the next paragraph}. 
 
 An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area we want to place the model into. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
