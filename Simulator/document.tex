@@ -117,7 +117,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
-\figstep{1}{\emph{Model displacement.} When 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+\figstep{1}{\emph{Model displacement.} When 3D models of the seafloor and object are loaded into OpenGL, each has its own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
 %
 \figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. We set its orientation equal to that of the image, $\uvec{S}=\uvec{I}$, and apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
@@ -132,7 +132,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
 }\\[.5\baselineskip]
 %
-\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
+\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
 }\\[.5\baselineskip]
 %
 \figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
@@ -242,8 +242,8 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 #1}
 %
 
-%(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}
-\begin{tabular}{r c >{\hspace*{-0.90em}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
+%(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}-1.15em}
+\begin{tabular}{r c >{\hspace*{-0.9em}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
 	\topline\rowcolor{tabBlue}
    \mc{2}{c}{\bf Frame} & & \mc{5}{c}{\bf Transformation} & \mc{5}{c}{\bf Configuration space} & \mc{11}{c}{\bf Representation} \\
    \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-8}\cmidrule(lr){9-13}\cmidrule(lr){14-24}}\rowcolor{tabBlue} 
@@ -369,7 +369,7 @@ We adhere Gade's notation for affine geometry, extend it to handle homogeneous c
 \subsection{Free notation}\label{IV_sec:general_notation}
 
 
-Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length)\todo{Line above not close enough}.
+Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length)\todo{Line above not close enough?}.
 %
 %
 %
@@ -384,7 +384,7 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 %
 where $\vec{p}_{MV} = -\vec{p}_{V\!M}$\todo{Only way to change this formatting is to have more text before the next paragraph}. 
 
-An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area we want to place the model into. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
+An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
 \vec{T}_{IM} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
@@ -433,8 +433,8 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$,
     }
 \end{align}
 %
-where $\r{M}{M}$ is a s
-This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we may represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
+where $\r{M}{M}$ is a \todo{end sentence}.
+This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
 \dvec{p}_{IV}^{\Green{I}} &= \dvec{p}_{I\r{M1}{M}}^{\Green{I}} + \dvec{p}_{\r{M2}{M}V}^{\Green{I}}.\label{eq_head_tail_decomposed}
@@ -474,7 +474,7 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 When $\dvec{R}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The rotation is associative, generally non-commutative and closed under multiplication.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
-Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are about fixed points and lines, respectively.
+Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are about\todo{around?} fixed points and lines, respectively.
 
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
@@ -570,7 +570,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales its input objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must usually be specified to avoid ambiguity.
+where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales its input objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must usually\todo{lol you wanted usually instead of generally here...} be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -608,7 +608,7 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
     }
 \end{align}
 %
-When $\mat{T}_{IM}^I$ is left-multiplied as here, it should be interpreted as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
+When $\mat{T}_{IM}^I$ is left-multiplied as here, interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
 
 We parametrize the translation in $\dvec{T}_{IM}^I$ by three real numbers,
 %
@@ -627,7 +627,7 @@ and the scaling factor by a positive number that shrinks the model if it is less
 
 \subsubsection{Sonar translation $\dvec{T}_{\!SI}$}
 
-The sonar observes the world some distance from the image region, $\udot{S}\ne\udot{I}$, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to a translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{S}$ as
+The sonar observes the world some distance from the image region, $\udot{S}\ne\udot{I}$, but we let it share its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to a translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{S}$ as
 %
 \begin{align}
 \dvec{T}_{SI}^S &= 
@@ -649,7 +649,7 @@ where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and
 
 %To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ as having an $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look straight into the seafloor. What remains is to elevate it by the angle $\angle(\hat{z}_S,\vec{p}_{SI})$. We represent $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ in $\ubar{C}$ as
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look\todo{huh? look not looks right? singular?} straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$. We apply it with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -660,8 +660,8 @@ An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and t
 \left[\begin{array}{c c}
  \mat{R}_{CS}  & \dvec{0} \\%\hline
  \dvec{0}^T  &  1
-\end{array}\right] \in \mathrm{SE}(3) \label{eq_T_CS}
-\end{align}
+\end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
+\end{align}\todo{comma after that equation?}
 %
 and define the rotation that performs the elevation as
 %
@@ -681,52 +681,66 @@ or equivalently, if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{
 \end{align}
 
 
-\subsubsection{Radial camera coordinate conversion T$_{\mathrm{RC}}$}
+\subsubsection{Radial camera coordinate conversion T$_{\mathrm{RC}}$}\label{IV_sec_radial_camera}
 
 %\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 %}\\[.5\baselineskip]
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-In a ranged imaging device only the propagation axis is inherently Euclidean. The other two axes are angular: azimuth and elevation. To properly specify these boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+In a ranged imaging device only the propagation axis has Euclidean topology. The other two axes are angular: azimuth and elevation. To properly specify these boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
-\dvec{p}^R
-= \bmat{x\\\varphi\\r}
-= \mathrm{T_{RC}}(\dvec{p}^C)
+\dvec{p}^{\k{R1}{R}}
+= \mathrm{T}_{\k{R2}{R}\r{C1}{C}}(\dvec{p}^{\r{C2}{C}})
 = \bmat{{p}_x^C\\
 \text{atan}\big({p}_y^C / {p}_z^C\big)\\
 \sqrt{({p}_y^C)^2 + ({p}_z^C)^2}
 }
+%
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+%  \coordinate(_MV)  at ($   (V.south)    + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_R1)  at ($ (R1.north) + ( 1.0\baselineskip,1.0\baselineskip) $);
+  \path let \p1 = ($ (R2.north) + (-1.0\baselineskip,0ex) $), \p2 = (_R1) in coordinate (_R2)  at (\x1,\y2);
+%   \coordinate(_I3)  at ($ (I3.north) + (-1.0\baselineskip,1.0\baselineskip) $);
+  \coordinate(_R12)  at ($ .5*(_R1) + .5*(_R2) $);
+  % Draw arrows and text
+%           to[out=180, in=0]    (_I1)
+    \draw[]                  ($ (R2.north) + (0em,\tpad) $)
+           to[out= 90, in=0]    (_R12)
+           to[out=180, in=90]($ (R1.north) + (0em,\tpad) $);
+    }
 \end{align}
 %
 
 
 \subsubsection{Normalization of coordinates}
 
-There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
-%
-\begin{align}
-\left[\begin{array}{c}
-\\\dvec{p}_{XV}^{X}\\\\\hline 1
-\end{array}\right]
-= \mat{T}_{NR}
-\left[\begin{array}{c}
-\\\dvec{p}_{CV}^{C}\\\\\hline 1
-\end{array}\right]
-\end{align}
-%
+% There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
+% %
+% \begin{align}
+% \left[\begin{array}{c}
+% \\\dvec{p}_{XV}^{X}\\\\\hline 1
+% \end{array}\right]
+% = \mat{T}_{NR}
+% \left[\begin{array}{c}
+% \\\dvec{p}_{CV}^{C}\\\\\hline 1
+% \end{array}\right]
+% \end{align}
+% %
+% 
+% \begin{align}
+% \dvec{R}_{IM} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\label{eq_R_IM}
+% \end{align}
+% \begin{align}
+% \dvec{T}_{NR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
+% \end{align}
 
-\begin{align}
-\dvec{R}_{IM} &= \dvec{R}_{\mathrm{Euler}}(\psi,\theta,\phi)\label{eq_R_IM}
-\end{align}
-\begin{align}
-\dvec{T}_{NR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
-\end{align}
-
-OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. This means we need to offset and normalize each axis such that the pixels we want visible end up in this range.
+OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. After the previous step we can do this by linearly mapping the valid range of the along-track axis, azimuth and elevation angle into this normalized range. Such a map takes the form of an offset and normalization. each axis such that the pixels we want visible end up in this range.
 Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
 
+\todo{Add references to the cross and check graphics throughout}
 
 Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:\todo{Keep position vector bold, even if an element is indexed?}
 %$\dvec{p}_\Delta = \udot{I}_{
@@ -760,11 +774,13 @@ To produce the sonar templates we assume a rough, isotropic surface that reflect
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
-facets
+\todo{
+- Facets
+}
 
 \subsubsection{OpenCL post-processing}
 
-The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us what parts of the scene that are visible from the sonar. OpenGL can also produce a depth map that reveals the distance to each of image pixels. This information can be converted to a ranged sonar-like image by simply adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us the parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
 
 \begin{align}
 &\text{forall } y,\varphi \nn
@@ -782,11 +798,12 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 \todo{
 - Kernel tuning.
 - Sharing. PBO. Asynchronous.
+- Write interpolation
 }
 
 \subsection{Speed considerations}
 
-Using OpenGL and OpenCL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs. However, initializing the OpenGL and OpenCL context and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+Using OpenGL and OpenCL to generate sonar templates on the GPU allows hundreds of sonar templates to be formed per second. While this is sufficient for our needs\todo{Hanging. Weak.}. However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
 %The rendering loop that uses OpenGL and OpenCL to form 
 
@@ -907,7 +924,7 @@ We present three different HUGIN runs from Jesus Bay in Norway. The first two a 
 The following three methods will be contrasted:\todo{Poor transition}
 %
 \begin{itemize}
-\item \emph{Standard (SIGMAS+).} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Standard (SIGMAS+).}\todo{Inconsistent list formatting and style} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
 \item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
@@ -932,8 +949,8 @@ Our GPU-based simulator is high-speed. On a computer with a six-core Intel Core 
 Let us first study simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depth and aspect angle. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
 %
 \begin{itemize}
-\item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also near identical (ignoring background level), as expected since they both rely on a Lambertian scattering model.
-\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. This advantage grows the more unconventional the object is, since these objects will not be represented in the static database.
+\item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also nearly identical (ignoring background level), as expected since both rely on a Lambertian scattering model.
+\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.\todo{Is this better? Not entirely happy still...}
 \end{itemize}
 
 
@@ -950,15 +967,17 @@ Above 20\% FPR the results are less clear: the adaptive techniques performed sim
 
 \section{Conclusion}\label{IV_conclusion}
 
+\todo{Start with the key selling points first. Inference, not deference}
+
 One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
 
-To obtain the delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator use this framework for most of the scene processing.
+To obtain the delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
 
-A final post-processing step is performed in OpenCL, which allow general purpose GPU programming. It interoperates well with OpenGL and adds a lot of flexibility to the simulation process. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
+A final post-processing step is performed in OpenCL, which allows general-purpose GPU programming. It interoperates well with OpenGL and improves simulation flexibility. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
-With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The standard method of using a static template library generally did well here, . 
+With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The standard method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
 
-In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: While SIGMAS+ generate one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
+In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: while SIGMAS+ generates one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
  
 %
 %\begin{itemize}
@@ -976,7 +995,7 @@ In terms of template quality both SIGMAS+ and FFISim are similar. The main diffe
 
 \section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
 
-The geometrical intent of an active rotation is to move a point. With our notation this can be expressed as either
+The geometrical intent of an active rotation is to move a point, as opposed to the passive version which instead changes the point's representation. With our notation this can be expressed as either
 %
 \begin{align}
 \m{CL}
@@ -1013,8 +1032,7 @@ The geometrical intent of an active rotation is to move a point. With our notati
 %
 %
 % Implicit representation: (x,y,z) subject to x²+y²+z²=c -> no 
-depending on whether the free or decomposed form is sought, respectively, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, say, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; Either the point changes, or the representation does, but never both.
-
+depending on whether the free or decomposed form is sought, respectively, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, for example, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; either the point changes, or the representation does, but never both.
 
 
 
