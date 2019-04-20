@@ -16,7 +16,8 @@ latexpand ${1} > tmp/former.tex
 git reset --hard
 git checkout master
 
-latexdiff tmp/former.tex tmp/current.tex > article_diff.tex
+latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" \
+          tmp/former.tex tmp/current.tex > article_diff.tex
 sed -i 's/inut{result/input{result/' article_diff.tex
 
 latexmk -xelatex --synctex=1 -interaction=nonstopmode -file-line-error --shell-escape article_diff.tex
