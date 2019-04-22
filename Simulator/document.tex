@@ -105,7 +105,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \else
   \includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
 \fi
-\caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor, and some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} (static) approach pick parameters from a predefined set, whereas the \emph{adaptive} approach estimate them from the sonar image. The implementation reside entirely on the GPU, with OpenGL performing scene rendering and OpenCL general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allow a much wider range of object parameters to be searched for an optimal template, yielding better results in a lesser time.}\label{IV_buildup}%
+\caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor with some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} (static) approach picks parameters from a predefined set, whereas the \emph{adaptive} approach estimates them from the sonar image. The implementation resides entirely on the GPU, with OpenGL performing scene rendering and OpenCL general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allows a much wider range of object parameters to be searched for an optimal template, yielding better results in less time.}\label{IV_buildup}%
 \end{figure*}
 
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
@@ -157,7 +157,7 @@ A conventional ATR system isolates an object of interest, extracts its key featu
 Template matching offers an alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign the object to the class that fits best. The problem is to find a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 
-Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, then use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating the templates on-the-fly.
+Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, then use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating templates on-the-fly.
 
 %, to adapt to much broader scenarios.
 
@@ -188,7 +188,7 @@ A few simulators for high frequency, side-looking sonar imagery have been publis
 % This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
 % on a new full geometrical implementation of the simulator.
 
-Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple\todo{Would you say ``in a simplified way?''} way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
+Our simulator was designed from the ground up to be part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows complicated geometries to be expressed in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS  mounted on a HUGIN AUV from Kongsberg Maritime.
 
 
 
@@ -352,9 +352,8 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that will underpin most of the upcoming implementation details. The first four steps detail the transformations that a vertex $\udot{V}$ undergoes, from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
-
 
 
 The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. This allows the designer to focus on higher level concepts rather than getting lost in implementation details.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
@@ -383,7 +382,7 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 \vec{p}_{MV} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-where $\vec{p}_{MV} = -\vec{p}_{V\!M}$\todo{Only way to change this formatting is to have more text before the next paragraph}. 
+where $\vec{p}_{MV} = -\vec{p}_{V\!M}$. 
 
 An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
@@ -403,7 +402,7 @@ We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{
 %%It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, and the rest for orientation. 
 %The translation has $N$ degrees of freedom and topology $\mathbb{R}^N$. The rotation has $N(N-1)/2$ degrees of freedom with topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$.
 %
-It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in set-multiplications from now on. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
+It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
 
 
 
@@ -472,10 +471,10 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 }
 \end{align}
 %
-When $\dvec{R}_{IM}$ is left-multiplied as here, it should be interpreted as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The rotation is associative, generally non-commutative and closed under multiplication.  %Embee
+When $\dvec{R}_{IM}$ is left-multiplied as here, interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
-Note that $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$ because $\dvec{p}_{MV}^M$ is rotated about a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are about\todo{around?} fixed points and lines, respectively.
+We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are around fixed points and lines, respectively.\todo{This sentence is perhaps not needed?}
 
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
@@ -492,7 +491,7 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 \end{array}\right] = \mathrm{SE}(N)\label{eq_homogeneous_affine_transform}
 \end{align}
 %
-where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transformation matrix becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. Analogous to rotation matrices it is associative, generally non-commutative and closed under multiplication. %The regular affine version  Steps \step{1} to \step{4} 
+where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case it shares the multiplicative properties of the rotation matrix of being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
 
 As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
@@ -571,7 +570,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must usually\todo{lol you wanted usually instead of generally here...} be specified to avoid ambiguity.
+where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must generally be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -650,7 +649,7 @@ where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and
 
 %To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis, but look\todo{huh? look not looks right? singular?} straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis but look straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -662,7 +661,7 @@ An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and t
  \mat{R}_{CS}  & \dvec{0} \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
-\end{align}\todo{comma after that equation?}
+\end{align}
 %
 and define the rotation that performs the elevation as
 %
@@ -689,7 +688,7 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-In a ranged imaging device only the propagation axis has Euclidean topology. The other two axes are angular: azimuth and elevation. To properly specify these boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+The inherent topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation. To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\k{R1}{R}}
@@ -765,7 +764,7 @@ Now we have all the information needed to normalize the scene in $\ubar{C}$, i.e
 &= -2\dvec{p}_{CI}^C\oslash\dvec{s}_\Delta^C \label{eq_t_NR}
 \end{align}
 %
-where $\boldsymbol{2}$ is a vector of twos\todo{Too informal?}, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
+where $\boldsymbol{2}=[2,2,2]\T$, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
 
 
 
@@ -781,7 +780,7 @@ The rendered image will appear as if we placed a window at the sonar and looked 
 
 \subsubsection{OpenCL post-processing}
 
-The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us the parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by adding up all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all the calculations on the GPU.
+The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us the parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
 
 \begin{align}
 &\text{forall } y,\varphi \nn
@@ -804,7 +803,7 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 
 \subsection{Speed considerations}
 
-Using OpenGL and OpenCL to generate sonar templates on the GPU allow hundreds of sonar templates to be formed per second. While this is sufficient for our needs.\todo{Hanging. Weak.} However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+Harnessing the massive computation power of GPUs with OpenGL and OpenCL allows thousands of sonar templates to be formed per second. While this is sufficient for our needs.\todo{Hanging. Weak.} However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
 %The rendering loop that uses OpenGL and OpenCL to form 
 
@@ -887,7 +886,7 @@ Write to file
 \else%
   \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}%
 \fi
-\caption{\emph{Two cylinders and a torpedo in Jesus Bay, Norway.} Top row shows isolated SAS image segment corresponding to the object, while center and bottom row show the template from the conventional and adaptive method, respectively. The contour of the SAS object is indicated with red lines. Observe that the adaptive technique perform better in the highlight, but not necessarily the shadow.}\label{IV_fig_images_sonar_simulation}%
+\caption{\emph{Two cylinders and a torpedo in Jesus Bay, Norway.} Top row shows isolated SAS image segment corresponding to the object, while center and bottom rows show the template from the conventional and adaptive method, respectively. The contour of the SAS object is indicated with red lines. Observe that the adaptive technique performs better in highlight but not necessarily in shadow.}\label{IV_fig_images_sonar_simulation}%
 \end{figure*}
 
 \begin{figure*}[t]\centering%
@@ -908,21 +907,24 @@ Write to file
 \cdesc{00EFFF}{Image shadow only}
 \cdesc{00A7FF}{Template shadow and image highlight}
 \end{minipage}%}
-\caption{Comparison of classification performance for the standard and adaptive template technique. The three objects were more or less arbitrary picked from the scene. For the roughly 3\,m long cylinders both methods perform similarly, the standard method seemingly with a slight edge. This is no surprise given that the 3\,m long cylinder model that make up the static template database fit the actual object well here. However, for the longer torpedo-like object the adaptive technique is clearly better. This is its merit; for objects and geometries that are not included in the static template database we can expect the adaptive techniques to perform better.}\label{IV_fig_image_simulation}%
+\caption[zzz]{Classification performance for the standard and adaptive template techniques. Three objects were arbitrary picked from the scene. For two roughly 3\,m long cylinders the performance was similar or slightly in favor of the standard method, which was expected since a 3\,m long cylindric model made up most of its static template database. However, for a longer torpedo-like object the adaptive technique was clearly better, which is its key merit: being able to adapt to uncommon objects not included in the static template database.}\label{IV_fig_image_simulation}%
 \end{figure*}
+
 
 \begin{figure*}[t]\centering%
 \includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}%
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
 \end{figure*}
 
+\todo{Cherie: New caption text in Fig. 4. What do you think?}
+
 The upcoming results will be based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
-We present three different HUGIN runs from Jesus Bay in Norway. The first two a couple days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
+We present three different HUGIN runs from Jesus Bay in Norway. The first two a couple days\todo{Informal perhaps, but don't want to repeat the word ``two''...} apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
-The following three methods will be contrasted:\todo{Poor transition}
+For each run we contrast the three template methods:
 %
 \begin{itemize}
 \item \emph{Standard (SIGMAS+).}\todo{Inconsistent list formatting and style} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
@@ -973,15 +975,15 @@ Above 20\% FPR the results are less clear: the adaptive techniques performed sim
 
 \todo{Start with the key selling points first. Inference, not deference}
 
-One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we have implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
+One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
 
-To obtain the delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
+To obtain delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
 
 A final post-processing step is performed in OpenCL, which allows general-purpose GPU programming. It interoperates well with OpenGL and improves simulation flexibility. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
 With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The standard method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
 
-In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: while SIGMAS+ generates one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. 
+In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: while SIGMAS+ generates one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
  
 %
 %\begin{itemize}
@@ -999,7 +1001,7 @@ In terms of template quality both SIGMAS+ and FFISim are similar. The main diffe
 
 \section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
 
-The geometrical intent of an active rotation is to move a point, as opposed to the passive version which instead changes the point's representation. With our notation this can be expressed as either
+The geometrical intent of an active rotation is to move a point, by contrast the passive version which instead changes the point's representation. With our notation this can be expressed as either
 %
 \begin{align}
 \m{CL}
@@ -1178,7 +1180,7 @@ Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{
 
 Translation is performed last. 
 
-%and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates about an axis $\hat{r}$ by angle $\theta$,
+%and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates around an axis $\hat{r}$ by angle $\theta$,
 %%
 %\begin{align}\label{eq:M}
 %\vec{R}_{AB}
