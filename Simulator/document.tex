@@ -108,6 +108,8 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor with some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} (static) approach picks parameters from a predefined set, whereas the \emph{adaptive} approach estimates them from the sonar image. The implementation resides entirely on the GPU, with OpenGL performing scene rendering and OpenCL general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allows a much wider range of object parameters to be searched for an optimal template, yielding better results in less time.}\label{IV_buildup}%
 \end{figure*}
 
+\newcommand\checkicon{\includegraphics[height=2ex]{gfx/icon_check.svg}}
+\newcommand\crossicon{\includegraphics[height=2ex]{gfx/icon_cross.svg}}
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
 \begin{figure*}[t]\centering%
 \ifOverLeaf%
@@ -117,19 +119,19 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
-\figstep{1}{\emph{Model displacement.} When 3D models of the seafloor and object are loaded into OpenGL, each has its own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
+\figstep{1}{\emph{Model displacement.} When 3D models of the seafloor and object are loaded into OpenGL, each has its own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) $\ubar{M} \to \ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
 %
-\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. We set its orientation equal to that of the image, $\uvec{S}=\uvec{I}$, and apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
+\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. We set its orientation equal to that of the image, $\uvec{S}=\uvec{I}$, and apply the remaining translation of $\udot{I} \to \udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
 }\\[.5\baselineskip]
 %
-\figstep{3}{\emph{Cartesian camera rotation.} To see the world as the sonar does, we position the OpenGL camera at the origin of the sonar frame, $\udot{C}=\udot{S}$, lock its horizontal axis to that of the sonar, $\hat{x}_C=\hat{x}_S$, and direct it straight at the origin of the image frame, $\hat{z}_C\parallel\vec{p}_{SI}$. The position is correct after step 2, which leaves applying the rotation of $\uvec{S}$ relative to $\uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!CS}$.
+\figstep{3}{\emph{Cartesian camera rotation.} To see the world as the sonar does, we position the OpenGL camera at the origin of the sonar frame, $\udot{C}=\udot{S}$, lock its horizontal axis to that of the sonar, $\hat{x}_C=\hat{x}_S$, and direct it at the origin of the image frame, $\hat{z}_C\parallel\vec{p}_{SI}$. Since the position is correct after step 2, we apply the remaining rotation $\uvec{S} \to \uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!CS}$.
 }\\[.5\baselineskip]
 %
-\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
+\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
+\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation (marked with \checkicon) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
 }\\[.5\baselineskip]
 %
 \figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
@@ -356,8 +358,8 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
-The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. This allows the designer to focus on higher level concepts rather than getting lost in implementation details.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
-\todo{Summarize rules. Example?}
+The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. This helps the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing up coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
+\todo{Summarize notation rules}
 %
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
@@ -369,7 +371,7 @@ We adhere Gade's notation for affine geometry, extend it to handle homogeneous c
 \subsection{Free notation}\label{IV_sec:general_notation}
 
 
-Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length)\todo{Line above not close enough?}.
+Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length).
 %
 %
 %
@@ -800,6 +802,33 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 - Sharing. PBO. Asynchronous.
 - Write interpolation
 }
+
+% \begin{tabular}[c]{l l l l}
+% Free                                    & Inverse                        & Decomposed         \\
+% $\vec{p}_{AB} = \udot{B} - \udot{A}$    & $\vec{p}_{BA} = -\vec{p}_{AB}$ & $\dvec{p}_{AB}^A$ \\
+% $\vec{R}_{AB} = \uvec{B} \to \uvec{A}$  &                                & $\mat{R}_{AB}$    \\
+% $\vec{T}_{AB} = \ubar{B} \to \ubar{A}$  &                                & $\mat{T}_{AB}^A$  \\
+% Rule of inversion \\
+% $\dvec{p}_{BA}^B = -\mat{R}_{BA}\dvec{p}_{AB}^A$ \\
+% $\mat{R}_{BA} = \mat{R}_{AB}^{-1} = \mat{R}_{AB}^T$ \\
+% $\mat{T}_{BA}^B = (\mat{T}_{AB}^A)^{-1} = \bmat{\mat{R}_{AB}^T & -\mat{R}_{BA}\dvec{p}_{BA}^B \\ \boldsymbol{0}\T & 1}$
+% \end{tabular}
+
+\subsection{Notation rules}
+
+\subsubsection{Inversion}
+
+
+\subsubsection{Intermediate frame cancellation}
+
+
+
+\subsubsection{Matching closest frame}
+
+$$\dvec{p}_{AC}^A = \dvec{p}_{AB}^A + \dvec{p}_{BC}^A$$
+$$\dvec{p}^A = \mat{R}_{AB} \dvec{p}^B$$
+$$\dvec{p}_{AC}^A = \mat{T}_{AB}^A \dvec{p}_{BC}^B$$
+
 
 \subsection{Speed considerations}
 
