@@ -131,7 +131,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation (marked with \checkicon) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
+\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation (\checkicon~marks valid volume, \crossicon~marks invalid) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
 }\\[.5\baselineskip]
 %
 \figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
@@ -354,7 +354,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
+\Fig{IV_simulator_coordinate_system}\todo{Cherie: Are you happy with the check colors now?} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
@@ -572,7 +572,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must generally be specified to avoid ambiguity.
+where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must be specify to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -690,7 +690,8 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-The inherent topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation. To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+
+The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation. To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\k{R1}{R}}
@@ -740,30 +741,31 @@ The inherent topology of a ranged imaging device is Euclidean for the propagatio
 % \end{align}
 
 OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. After the previous step we accomplish this by linearly mapping the valid range of the along-track axis, azimuth and elevation angle into this normalized range. Such a map takes the form of an offset and normalization. each axis such that the pixels we want visible end up in this range.
-Defining $\udot{I}_{\hat{x}\hat{y}}$ as the point $I(\min,\min,0)$ and $\udot{I}_{\check{x}\check{y}}$ as the point $I(\max,\max,0)$.\todo{Not sold on this syntax...}
+
 
 \todo{Add references to the cross and check graphics throughout}
 
-Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:\todo{Keep position vector bold, even if an element is indexed?}
+Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:
 %$\dvec{p}_\Delta = \udot{I}_{
 %
 %\dvec{p}_{I_\Delta} = \big[p_{\Delta,i}\big] &= \big[|p_{I_\mathrm{max},i}-p_{I_\mathrm{min},i}|\big] \quad i\in\{x,y,z\}
 \begin{align}\label{eq:M}
-\dvec{s}_\Delta^I &= \mathrm{abs}\big(\dvec{p}_{I_\mathrm{max}}^I-\dvec{p}_{I_\mathrm{min}}^I\big),
+\dvec{s}_\Delta^I &= \mathrm{abs}\big(\dvec{p}_{II_1}^I-\dvec{p}_{II_0}^I\big),
 \end{align}
 %
-where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^C$
+where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^R$
 \begin{align}\label{eq:M}
-\dvec{s}_\Delta^C &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
+\dvec{s}_\Delta^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
 \end{align}
 %
-Now we have all the information needed to normalize the scene in $\ubar{C}$, i.e. the contents of $\mat{T}_{NR}$:
+Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e. the contents of $\mat{T}_{NR}$:
 %
 \begin{align}
-\mat{L}_{NR}
-&= \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^C\right) \label{eq_L_NR} \\
-\dvec{t}_{NR}
-&= -2\dvec{p}_{CI}^C\oslash\dvec{s}_\Delta^C \label{eq_t_NR}
+\dvec{T}_{NR}^N &= 
+\left[\begin{array}{c c}
+ \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^R\right)  & -2\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
+ \dvec{0}^T  &  1
+\end{array}\right] \in \mathbb{R}^{4,4}, \label{eq_T_NR}
 \end{align}
 %
 where $\boldsymbol{2}=[2,2,2]\T$, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
@@ -832,7 +834,7 @@ $$\dvec{p}_{AC}^A = \mat{T}_{AB}^A \dvec{p}_{BC}^B$$
 
 \subsection{Speed considerations}
 
-Harnessing the massive computation power of GPUs with OpenGL and OpenCL allows thousands of sonar templates to be formed per second. While this is sufficient for our needs.\todo{Hanging. Weak.} However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
+Harnessing the massive computation power of GPUs with OpenGL and OpenCL allows thousands of sonar templates to be formed per second. While this is sufficient for our needs.\todo{Hanging. Weak. Cherie says promote awesomenewss better} However, initializing OpenGL and OpenCL and loading 3D models from file into it is a slow process, and typically takes several seconds for every invocation. Therefore, to alleviate the simulation performance we either had to supply it with a list of parameters or ensure that it did not have to be shut down for every invocation. 
 
 %The rendering loop that uses OpenGL and OpenCL to form 
 
@@ -945,18 +947,16 @@ Write to file
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
 \end{figure*}
 
-\todo{Cherie: New caption text in Fig. 4. What do you think?}
-
 The upcoming results will be based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
-We present three different HUGIN runs from Jesus Bay in Norway. The first two a couple days\todo{Informal perhaps, but don't want to repeat the word ``two''...} apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
+We present three different HUGIN runs from Jesus Bay in Norway. The first pair of runs were two days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
 For each run we contrast the three template methods:
 %
 \begin{itemize}
-\item \emph{Standard (SIGMAS+).}\todo{Inconsistent list formatting and style} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Standard (SIGMAS+).}\todo{Cherie: My lists throughout the article don't have the same style. Symmetry, remember?} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
 \item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
@@ -970,7 +970,9 @@ For each run we contrast the three template methods:
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
-Our GPU-based simulator is high-speed. On a computer with a six-core Intel Core i7-3930K and a Radeon HD7970 it computes almost 1000 templates per second, each being 1 megapixel large. This makes it possible to tailor the templates to very closely imaged objects.\todo{Huh?} By contrast, in the standard approach a template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
+Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this, contrary to the conventional method, with  minimal memory footprint, full model search space and flexible post-processing. This lays the groundwork for a entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
+
+% for  template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
 
 
 % Hence, it may happen that no template in the library is a close fit to the object in the image even though the object is actually a target of interest.\todo{Rewrite paragraph}
@@ -1028,6 +1030,8 @@ In terms of template quality both SIGMAS+ and FFISim are similar. The main diffe
 \appendices
 \fi
 
+{\color{blue}Cherie: Just wait with the appendix for now. Not yet looked at it.}
+
 \section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
 
 The geometrical intent of an active rotation is to move a point, by contrast the passive version which instead changes the point's representation. With our notation this can be expressed as either
@@ -1067,7 +1071,7 @@ The geometrical intent of an active rotation is to move a point, by contrast the
 %
 %
 % Implicit representation: (x,y,z) subject to x²+y²+z²=c -> no 
-depending on whether the free or decomposed form is sought, respectively, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, for example, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; either the point changes, or the representation does, but never both.
+depending on whether the free or decomposed form is wanted, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, for example, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; either the point changes, or the representation does, but never both.
 
 
 
@@ -1113,8 +1117,6 @@ and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in term
 where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.\todo{Mighty long and heavy sentence... Yikes}
 
 $SO(3)$ refers to special (\emph{i.e.} right handed) orthogonal $\mathbb{R}^{3\times3}$ matrices, where the handedness is verified by determinant $\big|R\big|=1$ (as opposed to $\pm1$), and the orthogonality follows from the skew symmetry of $\overset{\times}{r}_{AB}$. $SO(3)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
-
-{\color{blue}Below is the old text}
 
 We restrict our attention to linear transforms of the kind $\mat{L}_{AB} = \mat{R}_{AB}\;\mat{S}_{AB}$ where the former is a rotation matrix and the latter a scaling matrix. The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
 %
