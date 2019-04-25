@@ -131,7 +131,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation (\checkicon~marks valid volume, \crossicon~marks invalid) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
+\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation---the volume with \checkicon{} inside and \crossicon{} outside---into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
 }\\[.5\baselineskip]
 %
 \figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
@@ -476,7 +476,7 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 When $\dvec{R}_{IM}$ is left-multiplied as here, interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
-We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are around fixed points and lines, respectively.\todo{This sentence is perhaps not needed?}
+We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are around fixed points and lines, respectively.\todo{Cherie: Yes, the former sentence is a generalization of this one. Hence perhaps unnecessary.}
 
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
@@ -572,7 +572,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must be specify to avoid ambiguity.
+where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
 %
@@ -987,7 +987,7 @@ Let us first study simulation and classification performance on three typical ob
 %
 \begin{itemize}
 \item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also nearly identical (ignoring background level), as expected since both rely on a Lambertian scattering model.
-\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.\todo{Is this better? Not entirely happy still...}
+\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.\todo{Cherie: Is this better? No, I changed up all up in a previous edit...}
 \end{itemize}
 
 
