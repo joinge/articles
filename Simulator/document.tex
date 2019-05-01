@@ -147,7 +147,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 % - Adapt simulation to its behaviour, see if they still match.
 
-\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are vital in the exploration of our underwater frontiers. When equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with unforeseen events, such as poor imaging conditions, blocked paths, corrupted data or rare objects. One reason is their lack of a reliable and adaptive system for automatic target recognition (ATR).
+\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are vital in the exploration of underwater frontiers. When equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with unforeseen events, such as poor imaging conditions, blocked paths, corrupted data or rare objects. One reason is their lack of a reliable and adaptive system for automatic target recognition (ATR).
 
 %However, Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to create better images.
  
@@ -354,7 +354,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system}\todo{Cherie: Are you happy with the check colors now?} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
+\Fig{IV_simulator_coordinate_system}\todo{Cherie: Made the colors diagonally identical. Happy? ;)} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
@@ -755,7 +755,9 @@ Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent
 %
 where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^R$
 \begin{align}\label{eq:M}
-\dvec{s}_\Delta^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{s}_\Delta^I\big).
+\dvec{p}_{RI}^R   &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{p}_{II_1}^I\big) \\
+\dvec{p}_{RI_1}^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{p}_{II_1}^I\big) \\
+\dvec{s}_\Delta^R &= \mathrm{abs}(\dvec{p}_{RI_1}^R - \dvec{p}_{RI}^R)
 \end{align}
 %
 Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e. the contents of $\mat{T}_{NR}$:
@@ -763,12 +765,12 @@ Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e
 \begin{align}
 \dvec{T}_{NR}^N &= 
 \left[\begin{array}{c c}
- \diag\left(\boldsymbol{2}\oslash\dvec{s}_\Delta^R\right)  & -2\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
+ \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)  & -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathbb{R}^{4,4}, \label{eq_T_NR}
 \end{align}
 %
-where $\boldsymbol{2}=[2,2,2]\T$, $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
+where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
 
 
 
@@ -800,6 +802,7 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 %\end{cases}
 
 \todo{
+- Version 1.2 - highest supported by Nvidia.
 - Kernel tuning.
 - Sharing. PBO. Asynchronous.
 - Write interpolation
@@ -951,7 +954,7 @@ The upcoming results will be based on experimental data from a HISAS1030 interfe
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
-We present three different HUGIN runs from Jesus Bay in Norway. The first pair of runs were two days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last is from June 2012 and contains roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
+We present three different HUGIN runs from Jesus Bay in Norway. The first pair of runs were two days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last was in June 2012, containing roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
 For each run we contrast the three template methods:
 %
@@ -970,7 +973,7 @@ For each run we contrast the three template methods:
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
-Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this, contrary to the conventional method, with  minimal memory footprint, full model search space and flexible post-processing. This lays the groundwork for a entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
+Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this, contrary to the conventional method\todo{Cherie: Is it clear what my reference is if I don't mention it?}, with  minimal memory footprint, full model search space and flexible post-processing. This lays the groundwork for an entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
 
 % for  template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
 
