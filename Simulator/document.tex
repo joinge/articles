@@ -79,12 +79,17 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 }}
 %\tracingmacros
 
+%\colorlet{cBase}{cBlue}
+%\colorlet{cBaseMark}{cGreen}
+%\colorlet{cBrightText}{cYellow}
+%\colorlet{cDarkText}{cBrown}
+
 
 \providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{#1}}
 \providecommand\k*{}\renewcommand*\k[2]{{\scriptsize\color{black}\tikzmark{#1}{$#2$}}}
-\providecommand\g*{}\renewcommand*\g[2]{{\scriptsize\color{Green}\tikzmark{#1}{$#2$}}}
+\providecommand\g*{}\renewcommand*\g[2]{{\scriptsize\color{cBrightText}\tikzmark{#1}{$#2$}}}
 %\providecommand\r*{}\renewcommand*\r[2]{\scriptsize\color{red}\tikzmark{#1}{$#2$}}
-\providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{blue}\tikzmark{#1}{$#2$}}}
+\providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{cDarkText}\tikzmark{#1}{$#2$}}}
 
 %\newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#1};}
 % \draw[-{Latex[length=.5em,width=.5em]}]
@@ -131,7 +136,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
-\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map valid range for along-track, range and elevation---the volume with \checkicon{} inside and \crossicon{} outside---into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
+\figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates in the range $[-1,1]$. We map valid range for along-track, range and elevation (the volume marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
 }\\[.5\baselineskip]
 %
 \figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
@@ -246,9 +251,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 %(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}-1.15em}
 \begin{tabular}{r c >{\hspace*{-0.9em}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
-	\topline\rowcolor{tabBlue}
+	\topline\rowcolor{cBase}
    \mc{2}{c}{\bf Frame} & & \mc{5}{c}{\bf Transformation} & \mc{5}{c}{\bf Configuration space} & \mc{11}{c}{\bf Representation} \\
-   \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-8}\cmidrule(lr){9-13}\cmidrule(lr){14-24}}\rowcolor{tabBlue} 
+   \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-8}\cmidrule(lr){9-13}\cmidrule(lr){14-24}}\rowcolor{cBase} 
 	\emph{Description} & \emph{Symbol} & \Emph{} & \Emph{$\vec{T}$} & \mc{4}{O}{\Emph{$\colon$ Mapping}} & \Emph{$\mathcal{C}($} & \Emph{$\vec{p}$\addtimes} & \Emph{$\vec{R}$\addtimes} & \Emph{$s)$} &  \Emph{DoF$^{(1)}$} &  \mc{1}{l}{\emph{$\mat{T}$}} & \Emph{$($} & & \Emph{$\dvec{p}$} & \Emph{$\phantom{z},$}  & & \Emph{$\dvec{R}$} & \Emph{$\phantom{\phi},$} &  \Emph{$s$} & \mc{1}{>{\hspace{-1.75\tabcolsep}}l}{$)$} & \Emph{Group} \\%\Emph{Sum} \\
 	\midline
 	                                         Model & \t{M}             &&                                             &          &            &       &                           &  &                &           &                &   & \mcc{1}{L}{}      &                                                                      &      &      &      &         &           &         &     & \mcc{1}{C}{} &      \\
@@ -256,10 +261,10 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 	                                         Sonar & \t{S}             &\figstep{2}{}& \T{SI}                                      & $\colon$ & $\udot{I}$ & $\to$ & $\udot{S}$                &  & $\mathbb{R}^3$ &         &                & 3 & \Tr{SI}           & $($                                                                  & $x,$ & $y,$ & $z$ &  &  & &     & $)$          & \SE  \\
 	                                         Cartesian camera & \t{C}             &\figstep{3}{}& \T{CS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{C}$ &  &                & \phantom{$S$}     &                & 0 & \Tr{CS}           & $($                                                                  &      &      &      & $\psi$\makebox[0pt][l]{$^{(2)}$}  &           &         &     & $)$          & \SE  \\
                               
-\cmidrule{14-24}\rowcolor{tabBlue}
-   \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{Green}\begin{tabular}{l l}\rowcolor{white}
+\cmidrule{14-24}\rowcolor{cBase}
+   \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{cBaseMark}\begin{tabular}{l l}\rowcolor{white}
    $\Uparrow$ & \emph{Affine manipulations} \\$\Downarrow$ & \emph{Coordinate manipulations}
-   \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{Green}\hline\arrayrulecolor{black}%cline{10-20}
+   \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{cBaseMark}\hline\arrayrulecolor{black}%cline{10-20}
 	                                               &                    \\[0\baselineskip]
 	                                Radial camera & \t{R}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $\mathrm{T}_{RC}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\varphi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
 	                                      Normalized coordinates & \t{N}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{NR}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
@@ -281,7 +286,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %& \p{OV}{O}
 %\p{CV}{C}
 %\p{XV}{X}
-\begin{tikzpicture}[overlay,color=Green,remember picture, shorten >=-3pt]
+\begin{tikzpicture}[overlay,color=cBaseMark,remember picture, shorten >=-3pt]
 %
 \tikzset{
   c/.style={
@@ -354,16 +359,16 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 % Depending on whether the input parameters are predefined or estimated from the SAS image, the use the label conventional or adaptive approach, respectively.
 
-\Fig{IV_simulator_coordinate_system}\todo{Cherie: Made the colors diagonally identical. Happy? ;)} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
+\Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps that underpin most of the upcoming implementation details. The steps first detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}, which has a free and decomposed form.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
-The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. This helps the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing up coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
+The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. Together they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing up coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
 \todo{Summarize notation rules}
 %
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
-We adhere Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This facilitates transitioning between frames in a unified and geometrically valid way.
+We adhere to Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This facilitates transitioning between frames in a unified and geometrically valid way.
 
 
 
@@ -414,9 +419,9 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$,
 %
 \begin{align}\label{IV_eq_free_vector_addition}
 \m{CL}
-\vec{p}_{\g{IV}{IV}}
-= \vec{p}_{\g{I}{I}\r{M1}{M}}
-+ \vec{p}_{\r{M2}{M}\g{V}{V}}.
+\vec{p}_{\k{IV}{IV}}
+= \vec{p}_{\k{I}{I}\r{M1}{M}}
++ \vec{p}_{\r{M2}{M}\k{V}{V}}.
 \m{CR}
 \\\nonumber
 \tikz[overlay,remember picture]{
@@ -426,20 +431,37 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$,
   \coordinate(_IM) at ($    (I.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
   \coordinate(_IV_IM) at ($ .5*(_IV) + .5*(_IM) $);
   % Draw arrows and text
-    \draw[]                    ($ (V.south)  - (0em,\tpad) $)
+    \draw[color=cBrightArrow]      ($ (V.south)  - (0em,\tpad) $)
             to[out=-90, in=0]     (_MV)
             to[out=180, in=0]     (_IV_IM)
             to[out=180, in=-90]($ (IV.south) - (0em,\tpad) $);
-    \draw[-]                   ($ (I.south)  - (0em,\tpad) $)
+    \draw[-,color=cBrightArrow]    ($ (I.south)  - (0em,\tpad) $)
             to[out=-90, in=0]     (_IV_IM);
     }
 \end{align}
 %
-where $\r{M}{M}$ is a \todo{end sentence}.
+where $\r{M}{M}$ denotes cancellation of the intermediate frame $\ubar{M}$.
 This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
-\dvec{p}_{IV}^{\Green{I}} &= \dvec{p}_{I\r{M1}{M}}^{\Green{I}} + \dvec{p}_{\r{M2}{M}V}^{\Green{I}}.\label{eq_head_tail_decomposed}
+\m{CL}
+\dvec{p}_{\g{IV}{IV}}^\b{I1}{I} &= \dvec{p}_{\g{II1}{I}\r{M1}{M}}^\b{I2}{I} + \dvec{p}_{\r{M2}{M}\g{V1}{V}}^\b{I3}{I},\label{eq_head_tail_decomposed}
+\m{CR}
+\\\nonumber
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(_MV) at ($    (V1.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IV) at ($    (IV.south) + ( 1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IM) at ($    (II1.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_IV_IM) at ($ .5*(_IV) + .5*(_IM) $);
+  % Draw arrows and text
+    \draw[color=cBrightArrow]      ($ (V1.south)  - (0em,\tpad) $)
+            to[out=-90, in=0]     (_MV)
+            to[out=180, in=0]     (_IV_IM)
+            to[out=180, in=-90]($ (IV.south) - (0em,\tpad) $);
+    \draw[-,color=cBrightArrow]    ($ (II1.south)  - (0em,\tpad) $)
+            to[out=-90, in=0]     (_IV_IM);
+    }
 \end{align}
 %
 % Inverse $\dvec{R}^{-1} = \dvec{R}^T$\\
@@ -447,12 +469,13 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % 
 % 
+where the subscripts describe {\color{cBrightText}actions}, superscripts denote {\color{cDarkText}representations} and arrows highlight changes.  
 To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
-\dvec{p}_{\k{MV1}{MV}}^{\g{I1}{I}}
-= \mat{R}_{\g{I2}{I}\r{M1}{M}} \; \dvec{p}_{\k{MV2}{MV}}^{\r{M2}{M}}.\m{CR}
+\dvec{p}_{\g{MV1}{MV}}^{\b{I1}{I}}
+= \mat{R}_{\b{I2}{I}\r{M1}{M}} \; \dvec{p}_{\g{MV2}{MV}}^{\r{M2}{M}}.\m{CR}
 \label{eq_passive_rotation}
 %
 \tikz[overlay,remember picture]{
@@ -466,17 +489,17 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 %    \draw[]                  ($ (M2.north) + (0em,\tpad) $)
 %           to[out= 90, in=0]    (_M)
 %           to[out=180, in=90]($ (M1.north) + (0em,\tpad) $);
-    \draw[]                  ($ (I2.north) + (0em,\tpad) $)
+    \draw[color=cDarkArrow]      ($ (I2.north) + (0em,\tpad) $)
            to[out= 90, in=0]    (_I2)
            to[out=180, in=0]    (_I1)
            to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
 }
 \end{align}
 %
-When $\dvec{R}_{IM}$ is left-multiplied as here, interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
+When $\dvec{R}_{IM}$ is left-multiplied as here we interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
-We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$. For the two- and three-dimensional cases the rotations are around fixed points and lines, respectively.\todo{Cherie: Yes, the former sentence is a generalization of this one. Hence perhaps unnecessary.}
+We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$.
 
 The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
 
@@ -547,10 +570,10 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 
 We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
 %
-\begin{align}\nonumber\\
-\dvec{T}_{\g{IM1}{IM}}^{\k{I1}{I}} &= 
+\begin{align}%\nonumber\\
+\dvec{T}_{\g{IM1}{IM}}^{\b{I1}{I}} &= 
 \left[\begin{array}{c c}
- \k{C}{}\mat{R}_{\g{IM2}{IM}}  & \dvec{p}_{\g{IM3}{IM}}^{\k{I2}{I}} \\%\hline
+ \k{C}{}\mat{R}_{\g{IM2}{IM}}  & \dvec{p}_{\g{IM3}{IM}}^{\b{I2}{I}} \\%\hline
  \dvec{0}^T  &  s_{\g{IM4}{IM}}^{-1}
 \end{array}\right] \nn &\in
 \begin{cases}
@@ -565,21 +588,23 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
   \path let \p1 = ($ (I1) + (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I1)  at (\x1,\y2);
   \path let \p1 = ($ (I2) - (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I2)  at (\x1,\y2);
   % Draw arrows
-    \draw[]                  ($ (I2.north) + (0em,\tpad) $)
-           to[out= 90, in=0]    (_I2)
-           to[out=180, in=0]    (_I1)
-           to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
+%    \draw[color=cDarkText]      ($ (I2.north) + (0em,\tpad) $)
+%           to[out= 90, in=0]    (_I2)
+%           to[out=180, in=0]    (_I1)
+%           to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
 }
 \end{align}
 %
 where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
 
-The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $[w\dvec{p}_{D\cdot}^E;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1),
+The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1)\todo{Is this ambivalent},
 %
 \begin{align}\nonumber\\
-\dvec{p}_{\g{IV}{IV}}^\k{I1}{I} &= \mat{T}_{\g{I2}{I}\r{M1}{M}}^{\k{I3}{I}}\; 
-\left[\begin{array}{c}\dvec{p}_{\r{M2}{M}\g{V1}{V}}^{\r{M3}{M}} \\ \tikzmark{One}{1}
-\end{array}\right].
+\dvec{\rho}_{\g{IV}{IV}}^\b{I1}{I} &= \mat{T}_{\g{I2}{I}\r{M1}{M}}^{\b{I3}{I}}
+\left[\begin{array}{c}
+\dvec{p}_{\r{M2}{M}\g{V1}{V}}^{\r{M3}{M}} \\ \tikzmark{One}{1}
+\end{array}\right]
+% = \mat{T}_{\g{II2}{I}\r{MM1}{M}}^{\b{II3}{I}}\boldsymbol{\rho}_{MV}^M.
 \\\nonumber
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
@@ -598,19 +623,19 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
 %  \coordinate(_IV_V) at ($ .5*(_IV) + .5*(_One) $);
   % Draw arrows and text
 %           to[out=180, in=0]    (_I1)
-    \draw[]                  ($ (I3.north) + (0em,\tpad) $)
+    \draw[color=cDarkArrow]      ($ (I3.north) + (0em,\tpad) $)
            to[out= 90, in=0]    (_I13)
            to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
-    \draw[]                    ($ (V1.south)  - (0em,\tpad) $)
+    \draw[color=cBrightArrow]      ($ (V1.south)  - (0em,\tpad) $)
             to[out=-90, in=0]     (_One)
             to[out=180, in=0]     (_IV)
             to[out=180, in=-90]($ (IV.south) - (0em,\tpad) $);
-    \draw[-]                   ($ (I2.south) - (0em,\tpad) $)
+    \draw[-,color=cBrightArrow] ($ (I2.south) - (0em,\tpad) $)
             to[out=-90, in=0]     (_I2);
     }
 \end{align}
 %
-When $\mat{T}_{IM}^I$ is left-multiplied as here, interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
+When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
 
 We parametrize the translation in $\dvec{T}_{IM}^I$ by three real numbers,
 %
@@ -651,7 +676,11 @@ where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and
 
 %To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
 
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing into the scene. Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back). If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis but look straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
+%
+Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back).
+%
+If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis but look straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -694,8 +723,8 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation. To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
-\dvec{p}^{\k{R1}{R}}
-= \mathrm{T}_{\k{R2}{R}\r{C1}{C}}(\dvec{p}^{\r{C2}{C}})
+\dvec{p}^{\b{R1}{R}}
+= \mathrm{T}_{\b{R2}{R}\r{C1}{C}}(\dvec{p}^{\r{C2}{C}})
 = \bmat{{p}_x^C\\
 \text{atan}\big({p}_y^C / {p}_z^C\big)\\
 \sqrt{({p}_y^C)^2 + ({p}_z^C)^2}
@@ -710,7 +739,7 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
   \coordinate(_R12)  at ($ .5*(_R1) + .5*(_R2) $);
   % Draw arrows and text
 %           to[out=180, in=0]    (_I1)
-    \draw[]                  ($ (R2.north) + (0em,\tpad) $)
+    \draw[color=cDarkArrow]      ($ (R2.north) + (0em,\tpad) $)
            to[out= 90, in=0]    (_R12)
            to[out=180, in=90]($ (R1.north) + (0em,\tpad) $);
     }
@@ -745,18 +774,18 @@ OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. 
 
 \todo{Add references to the cross and check graphics throughout}
 
-Let ${\dvec{s}_\Delta^I}$ be a tuple of positive scalars that defines the extent of each axis in the image:
+Let $\dvec\Delta_I^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
 %$\dvec{p}_\Delta = \udot{I}_{
 %
 %\dvec{p}_{I_\Delta} = \big[p_{\Delta,i}\big] &= \big[|p_{I_\mathrm{max},i}-p_{I_\mathrm{min},i}|\big] \quad i\in\{x,y,z\}
 \begin{align}\label{eq:M}
-\dvec{s}_\Delta^I &= \mathrm{abs}\big(\dvec{p}_{II_1}^I-\dvec{p}_{II_0}^I\big),
+\dvec{p}_{I_0I_1}^R &= \mathrm{abs}\big(\dvec{p}_{II_1}^R-\dvec{p}_{II_0}^R\big),
 \end{align}
 %
 where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^R$
 \begin{align}\label{eq:M}
-\dvec{p}_{RI}^R   &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{p}_{II_1}^I\big) \\
-\dvec{p}_{RI_1}^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{p}_{II_1}^I\big) \\
+\dvec{p}_{RI}^R   &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
+\dvec{p}_{RI_1}^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
 \dvec{s}_\Delta^R &= \mathrm{abs}(\dvec{p}_{RI_1}^R - \dvec{p}_{RI}^R)
 \end{align}
 %
@@ -819,7 +848,39 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 % $\mat{T}_{BA}^B = (\mat{T}_{AB}^A)^{-1} = \bmat{\mat{R}_{AB}^T & -\mat{R}_{BA}\dvec{p}_{BA}^B \\ \boldsymbol{0}\T & 1}$
 % \end{tabular}
 
+% Reset subsubsection formatting
+\makeatletter
+\let\@seccntformat\@oldseccntformat
+\let\subsubsection\oldsubsubsection
+\makeatother
+
+Vector addition
+- Matching cancelling closest frames (subscripts)
+- All vectors decomposed in same frame
+
+Passive rotation:
+Changing observer. Different perspectives. 
+
+Active rotation:
+Changing point.
+
+
+Addition - cancels subscripts
+Rotation - cancels superscripts
+Transformation - cancels both
+
+Carry over - superscript - above
+Carry over - subscript - below
+
+Blue - yellow/orange
+Purple - orange
+
+
 \subsection{Notation rules}
+
+Cancellation of intermediate frames (subscripts)   - vector addition
+Cancellation of closest frames      (superscripts) - rotation multiplication
+Cancellation of both
 
 \subsubsection{Inversion}
 
@@ -950,7 +1011,7 @@ Write to file
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
 \end{figure*}
 
-The upcoming results will be based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
+Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track.\todo{Asymmetric} Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
@@ -961,7 +1022,7 @@ For each run we contrast the three template methods:
 \begin{itemize}
 \item \emph{Standard (SIGMAS+).}\todo{Cherie: My lists throughout the article don't have the same style. Symmetry, remember?} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
-\item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
+\item \emph{Adaptive, buried (FFISim).}\todo{Coherent naming of methods} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
 
 \subsection{Processing speed}
@@ -973,7 +1034,7 @@ For each run we contrast the three template methods:
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
-Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this, contrary to the conventional method\todo{Cherie: Is it clear what my reference is if I don't mention it?}, with  minimal memory footprint, full model search space and flexible post-processing. This lays the groundwork for an entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
+Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this with minimal memory footprint, full model search space and flexible post-processing, unlike the conventional method. This lays the groundwork for an entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
 
 % for  template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
 
@@ -985,8 +1046,7 @@ Our simulator computes thousands of one-megapixel templates per second on a comp
 
 \subsection{Classification - selected objects}
 
-
-Let us first study simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depth and aspect angle. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
+We analyzed simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depths and aspect angles. We present the SAS image segments and templates for these objects in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to mark the objects' contours. Observe the following:
 %
 \begin{itemize}
 \item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also nearly identical (ignoring background level), as expected since both rely on a Lambertian scattering model.
@@ -1008,6 +1068,8 @@ Above 20\% FPR the results are less clear: the adaptive techniques performed sim
 \section{Conclusion}\label{IV_conclusion}
 
 \todo{Start with the key selling points first. Inference, not deference}
+
+We conclude that the best way to classify SAS images is....
 
 One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
 
@@ -1041,11 +1103,11 @@ The geometrical intent of an active rotation is to move a point, by contrast the
 %
 \begin{align}
 \m{CL}
-\vec{p}_{M\g{Vtot}{V}_{\color{Green}\!\textrm{new}}}
+\vec{p}_{M\g{Vtot}{V}_{\color{cBaseMark}\!\textrm{new}}}
 = \vec{R} \; \vec{p}_{M\g{V2}{V}}\m{CR}
 \quad\text{or}\quad
 \m{CL2}
-\dvec{p}_{M\g{Vtot2}{V}_{\color{Green}\!\textrm{new}}}^M
+\dvec{p}_{M\g{Vtot2}{V}_{\color{cBaseMark}\!\textrm{new}}}^M
 = \mat{R}^M \dvec{p}_{M\g{V4}{V}}^M,\m{CR2}
 \label{IV_eq_active_rotation}
  \\\nonumber
