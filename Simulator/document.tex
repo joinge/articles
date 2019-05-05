@@ -415,13 +415,13 @@ It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean to
 
 \subsection{Decomposed notation}\label{IV_decomposed_notation}
 
-Suppose we reference the model's vertices from the image frame $\ubar{I}$,
+Suppose we reference the model's vertices from the image frame $\ubar{I}$ using the head-to-tail vector rule,
 %
 \begin{align}\label{IV_eq_free_vector_addition}
 \m{CL}
 \vec{p}_{\k{IV}{IV}}
 = \vec{p}_{\k{I}{I}\r{M1}{M}}
-+ \vec{p}_{\r{M2}{M}\k{V}{V}}.
++ \vec{p}_{\r{M2}{M}\k{V}{V}},
 \m{CR}
 \\\nonumber
 \tikz[overlay,remember picture]{
@@ -440,7 +440,7 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$,
     }
 \end{align}
 %
-where $\r{M}{M}$ denotes cancellation of the intermediate frame $\ubar{M}$.
+where $\r{M}{M}$ denotes cancellation of the intermediate frame $\ubar{M}$ and arrows emphasize composition of the output vector.
 This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
@@ -467,9 +467,10 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Inverse $\dvec{R}^{-1} = \dvec{R}^T$\\
 % Closure $\dvec{R}_1\dvec{R}_2 \in\mathrm{SO(3)}$\\
 % Associative but not commutative
+% <<
 % 
-% 
-where the subscripts describe {\color{cBrightText}actions}, superscripts denote {\color{cDarkText}representations} and arrows highlight changes.  
+where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.
+
 To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
@@ -909,7 +910,7 @@ Write to file
 
 %    """
 %    
-%    stm: Standard template matching, made with SIGMAS+.
+%    stm: Conventional template matching, made with SIGMAS+.
 %    atm: Adaptive template matching, made with FFISim.
 %    atm_bury: Adaptive template matching where a search of bury depths is used.
 %    atm_bury_restr: Restricted?
@@ -1002,7 +1003,7 @@ Write to file
 \cdesc{00EFFF}{Image shadow only}
 \cdesc{00A7FF}{Template shadow and image highlight}
 \end{minipage}%}
-\caption[zzz]{Classification performance for the standard and adaptive template techniques. Three objects were arbitrary picked from the scene. For two roughly 3\,m long cylinders the performance was similar or slightly in favor of the standard method, which was expected since a 3\,m long cylindric model made up most of its static template database. However, for a longer torpedo-like object the adaptive technique was clearly better, which is its key merit: being able to adapt to uncommon objects not included in the static template database.}\label{IV_fig_image_simulation}%
+\caption[zzz]{Classification performance for the conventional and adaptive template techniques. Three objects were arbitrary picked from the scene. For two roughly 3\,m long cylinders the performance was similar or slightly in favor of the conventional method, which was expected since a 3\,m long cylindric model made up most of its static template database. However, for a longer torpedo-like object the adaptive technique was clearly better, which is its key merit: being able to adapt to uncommon objects not included in the static template database.}\label{IV_fig_image_simulation}%
 \end{figure*}
 
 
@@ -1011,7 +1012,7 @@ Write to file
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
 \end{figure*}
 
-Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency and 30\,kHz bandwidth. It is 1.2\,m long, has a half-power beamwidth (HPBW) of 23$^\circ$, and is capable of generating SAS images with a theoretical resolution of 3-4\,cm both cross- and along-track.\todo{Asymmetric} Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
+Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
@@ -1020,7 +1021,7 @@ We present three different HUGIN runs from Jesus Bay in Norway. The first pair o
 For each run we contrast the three template methods:
 %
 \begin{itemize}
-\item \emph{Standard (SIGMAS+).}\todo{Cherie: My lists throughout the article don't have the same style. Symmetry, remember?} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Conventional (SIGMAS+).}\todo{Cherie: My lists throughout the article don't have the same style. Symmetry, remember?} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
 \item \emph{Adaptive, buried (FFISim).}\todo{Coherent naming of methods} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
@@ -1077,7 +1078,7 @@ To obtain delayed real-time performance we implemented the simulator on a GPU. T
 
 A final post-processing step is performed in OpenCL, which allows general-purpose GPU programming. It interoperates well with OpenGL and improves simulation flexibility. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
-With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The standard method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
+With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
 
 In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: while SIGMAS+ generates one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
  
