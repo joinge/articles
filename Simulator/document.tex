@@ -12,8 +12,8 @@
         Herman~Midelfart%, %
 %        \O{}ivind~Midtgaard
         } %
-\thanks{J. I. Buskenes is with both the Department of Informatics, University of Oslo, Norway, and the Norwegian Defense Research Establishment (FFI), Norway.}%
-\thanks{H. Midelfart and \O. Midtgaard are with The Norwegian Defence Research Establishment (FFI), Norway.}% <-this % stops a space
+\thanks{J. I. Buskenes is with both the Department of Informatics, University of Oslo, Norway, and the Norwegian Defence Research Establishment (FFI), Norway.}%
+\thanks{H. Midelfart is with The Norwegian Defence Research Establishment (FFI), Norway.}% <-this % stops a space
 % \thanks{Manuscript received April 19, 2005; revised January 11, 2007.}
 }
 
@@ -161,7 +161,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 A conventional ATR system isolates an object of interest, extracts its key features, and uses these to estimate the object's class. The challenge is to find features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle. Such features are rare in SAS, despite its best-in-class resolution and dynamic range, due to image ambiguities from acoustical distortions such as layover, multiple scattering, diffraction, dispersion and penetration.
 
 
-Template matching offers an alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign the object to the class that fits best. The problem is to find a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+Template matching offers an alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign the object to the class that fits best. The problem is finding a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
 
 Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, then use these to limit the template solution space~\cite{Midelfart2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove a template library completely by simulating templates on-the-fly.
@@ -469,7 +469,7 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % <<
 % 
-where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.
+where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.\todo{:-D}
 
 To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
@@ -517,7 +517,7 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 \end{array}\right] = \mathrm{SE}(N)\label{eq_homogeneous_affine_transform}
 \end{align}
 %
-where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case it shares the multiplicative properties of the rotation matrix of being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
+where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case, it shares the multiplicative properties of the rotation matrix by being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
 
 As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
@@ -721,7 +721,7 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
 
-The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation. To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\b{R1}{R}}
@@ -744,7 +744,7 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
            to[out= 90, in=0]    (_R12)
            to[out=180, in=90]($ (R1.north) + (0em,\tpad) $);
     }
-\end{align}
+\end{align}\todo{Chere: This is the color we chose previously.}
 %
 
 
@@ -770,10 +770,41 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 % \dvec{T}_{NR}&\colon (x,\phi,r)\in\mathbb{R}^3 \to [r,l][b,t][n,f]
 % \end{align}
 
-OpenGL clips any coordinate that ends up outside the normalized range $[-1,1]$. After the previous step we accomplish this by linearly mapping the valid range of the along-track axis, azimuth and elevation angle into this normalized range. Such a map takes the form of an offset and normalization. each axis such that the pixels we want visible end up in this range.
+%Therefore every coordinate of interest must fall into this range. 
+
+OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$. Since $\ubar{R}$ is the natural\todo{imprecise?} domain of the parameters, we can linearly map the valid range for along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
+%
+\begin{align}
+\dvec{T}_{NR}^N &= 
+\left[\begin{array}{c c}
+ \mat{L}_{NR}^N  & \dvec{t}_{NR}^N \\%\hline
+ \dvec{0}^T  &  1
+\end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
+\end{align}\\
+%
+where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs the normalization of coordinates,
+%
+\begin{align}
+\dvec{L}_{NR}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)
+\end{align}
+%
+and $\dvec{t}_{NR}^N$ is an offset
+%
+\begin{align}
+\dvec{t}_{NR}^N &= -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R
+\end{align}
 
 
-\todo{Add references to the cross and check graphics throughout}
+The offset 
+
+\begin{align}
+\dvec{T}_{NR}^N &= 
+\left[\begin{array}{c c}
+ \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)  & -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
+ \dvec{0}^T  &  1
+\end{array}\right] \in \mathbb{R}^{4,4}, \label{eq_T_NR}
+\end{align}
+
 
 Let $\dvec\Delta_I^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
 %$\dvec{p}_\Delta = \udot{I}_{
@@ -792,13 +823,7 @@ where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}
 %
 Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e. the contents of $\mat{T}_{NR}$:
 %
-\begin{align}
-\dvec{T}_{NR}^N &= 
-\left[\begin{array}{c c}
- \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)  & -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
- \dvec{0}^T  &  1
-\end{array}\right] \in \mathbb{R}^{4,4}, \label{eq_T_NR}
-\end{align}
+
 %
 where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
 
@@ -876,6 +901,7 @@ Carry over - subscript - below
 Blue - yellow/orange
 Purple - orange
 
+\todo{Cherie: Lol it looks odd because it's notes.}
 
 \subsection{Notation rules}
 
@@ -1060,9 +1086,9 @@ We analyzed simulation and classification performance on three typical objects f
 
 We demonstrate classification performance with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. 
 
-Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations because out of 3000 detections only a few will be visually inspected up close.
+Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
 
-Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, but worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
+Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 
 
 
