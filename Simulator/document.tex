@@ -469,7 +469,7 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % <<
 % 
-where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.\todo{:-D}
+where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.
 
 To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
@@ -519,7 +519,7 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 %
 where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case, it shares the multiplicative properties of the rotation matrix by being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
 
-As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional, and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
+As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
 
 %  In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
@@ -720,6 +720,13 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
+After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming then combine any these data to produce a time-series of intensity values for every pixel in the image. 
+
+beamforming and autofocus to produce an image in seafloor coordinates.
+  
+After receive side matched filtering, homodyning and beamforming the data 
+In the SAS receiver processing records 
+After receive 
 
 The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
@@ -744,9 +751,8 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
            to[out= 90, in=0]    (_R12)
            to[out=180, in=90]($ (R1.north) + (0em,\tpad) $);
     }
-\end{align}\todo{Chere: This is the color we chose previously.}
+\end{align}
 %
-
 
 \subsubsection{Normalization of coordinates}
 
@@ -782,7 +788,7 @@ OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}\\
 %
-where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs the normalization of coordinates,
+where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices. , $\mat{L}_{NR}^N$ performs the normalization of coordinates,
 %
 \begin{align}
 \dvec{L}_{NR}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)
@@ -1047,9 +1053,9 @@ We present three different HUGIN runs from Jesus Bay in Norway. The first pair o
 For each run we contrast the three template methods:
 %
 \begin{itemize}
-\item \emph{Conventional (SIGMAS+).}\todo{Cherie: My lists throughout the article don't have the same style. Symmetry, remember?} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Conventional (SIGMAS+).} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
-\item \emph{Adaptive, buried (FFISim).}\todo{Coherent naming of methods} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
+\item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
 
 \subsection{Processing speed}
