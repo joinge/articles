@@ -471,7 +471,7 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % 
 where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.
 
-To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than the number of degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
+To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
@@ -518,6 +518,8 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 \end{align}
 %
 where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case, it shares the multiplicative properties of the rotation matrix by being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
+
+%\eq{eq_homogeneous_affine_transform} contains six degrees 
 
 As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
@@ -569,7 +571,10 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 
 \subsubsection{Model displacement $\dvec{T}_{\!IM}$}
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting $\boldsymbol{\mathcal{C}}_{IM}^I$ into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
+%The model is subject to no constraints 
+%$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
+
+We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting this into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
 %
 \begin{align}%\nonumber\\
 \dvec{T}_{\g{IM1}{IM}}^{\b{I1}{I}} &= 
@@ -598,7 +603,7 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 %
 where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
 
-The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (typically 1)\todo{Is this ambivalent},
+The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
 \begin{align}\nonumber\\
 \dvec{\rho}_{\g{IV}{IV}}^\b{I1}{I} &= \mat{T}_{\g{I2}{I}\r{M1}{M}}^{\b{I3}{I}}
@@ -650,12 +655,16 @@ the rotation by the Euler angles yaw, pitch and roll $(\psi,\theta,\phi) \in [-\
 \mat{R}_{IM}    &= \mat{R}_{\mathrm{Euler}}(\psi,\theta,\phi) \in SO(3),
 \end{align}
 %
-and the scaling factor by a positive number that shrinks the model if it is less than 1, and \emph{vice versa} if it is greater. For a definition of $\mat{R}_{\mathrm{Euler}}$, see Appendix \ref{IV_transformation_matrices}.
+and the scaling factor by a positive number, $s_{IM}\in\mathbb{R}^+$, that shrinks the model if it is less than 1, and \emph{vice versa} if it is greater. These user-defined parameters are unconstrained, thus add seven degrees of freedom to the system. For a definition of $\mat{R}_{\mathrm{Euler}}$, see Appendix \ref{IV_transformation_matrices}.
 
 
 \subsubsection{Sonar translation $\dvec{T}_{\!SI}$}
 
-The sonar observes the world some distance from the image region, $\udot{S}\ne\udot{I}$, but we let it share its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to a translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{S}$ as
+%$\vec{T}_{SI}$ is subject to three constraints, $\udot{S}=\uvec{I}$, leaving three degrees of freedom, $\mathcal{C}_{SI} = (\vec{p}_{SI})$.
+
+%Three user-defined degrees of freedom, $\mathcal{C}_{SI} = (\vec{p}_{SI})$, three constraints, $\udot{S}=\uvec{I}$.
+
+Suppose the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
 %
 \begin{align}
 \dvec{T}_{SI}^S &= 
@@ -668,20 +677,24 @@ The sonar observes the world some distance from the image region, $\udot{S}\ne\u
 where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and 
 %
 \begin{align}
-\dvec{p}_{SI}^S &= [x,y,z]\T \in \mathbb{R}^3.
+\dvec{p}_{SI}^S &= [x,y,z]\T \in \mathbb{R}^3
 \end{align}
 %
+is user-defined.
 
 
 \subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
 
-%To perceive the world as a sonar would, we need to place our OpenGL camera at the sonar's position.
-
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
+To perceive the world as a sonar would, we let our camera share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
 %
-Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back).
 %
-If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis but look straight onto the seafloor. What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, which we apply with $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ represented in $\ubar{C}$,
+%Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back).
+%
+%If this camera was fixed to $\ubar{S}$, it would have the correct position and $x$-axis but look straight onto the seafloor. 
+%
+%What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, 
+%
+This leaves no degrees of freedom for $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$, which we represent in $\ubar{C}$ as
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -698,7 +711,7 @@ If this camera was fixed to $\ubar{S}$, it would have the correct position and $
 and define the rotation that performs the elevation as
 %
 \begin{align}
-\dvec{R}_{CS} &= \mat{R}_x(\mathrm{atan}\frac{\dvec{p}_{SI,y}^I}{\dvec{p}_{SI,z}^I}),\label{eq_R_CS_angle}
+\dvec{R}_{CS} &= \mat{R}_x(\mathrm{atan}\frac{p_{SI,y}^I}{p_{SI,z}^I}),\label{eq_R_CS_angle}
 \end{align}
 %
 or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
@@ -720,13 +733,14 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming then combine any these data to produce a time-series of intensity values for every pixel in the image. 
+After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. After beamforming, the data are\todo{is?} combined into a time-series of intensity values for every pixel position in the image $\ubar{I}$. For a one-dimensional array parallel to the propagation axis, focus can only be achieved in range and azimuth. 
 
-beamforming and autofocus to produce an image in seafloor coordinates.
-  
-After receive side matched filtering, homodyning and beamforming the data 
-In the SAS receiver processing records 
-After receive 
+%beamforming and autofocus to produce an image in seafloor coordinates.
+%  
+%After receive side matched filtering, homodyning and beamforming the data 
+%In the SAS receiver processing records 
+%After receive 
+{\color{red}Chere: Missing text here. Wasn't happy with what I wrote below.}
 
 The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
@@ -837,6 +851,8 @@ where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) cons
 
 \subsubsection{OpenGL rendering}
 
+An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
+
 To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits use of a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
@@ -906,6 +922,12 @@ Carry over - subscript - below
 
 Blue - yellow/orange
 Purple - orange
+
+Step 1-3 is in the affine domain. Rigid body operations. 6 degrees of freedom, sum of constraints and user defined parameters must sum to 6.
+
+Step 4 is a change of domain from cartesian to polar. Non-linear. Subscripts refer to domain-name.
+
+Step 5 is another change of domain. From metric space to normalized space. Subscripts refer to domain-name.
 
 \todo{Cherie: Lol it looks odd because it's notes.}
 
