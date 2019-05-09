@@ -69,27 +69,96 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{dbltopnumber}{1}
 
 % \tikz[font=\scriptsize,overlay,baseline=(char.base)]{%
-\providecommand\r*{}\renewcommand*\r[2]{%
+\providecommand\c*{}\renewcommand*\c[2][]{%
+%\ifthenelse{\equal{#1}{}}{#2}{%
+%\typeout{---Shape provided}%
+\ifx&#1&
+#2
+\else
 \tikz[font=\scriptsize]{%
-\node[inner sep=0pt](#1){$#2$};%
+\node[inner sep=0pt, text depth=0pt](#1){$#2$};%
 \begin{scope}[overlay]%
 \coordinate(offsett) at (0.3em,1.2ex);%
 \draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
-\end{scope}%
+\end{scope}%}%
+\fi
 }}
+
+\providecommand\cd*{}\renewcommand*\cd[2][]{%
+%\ifthenelse{\equal{#1}{}}{#2}{%
+%\typeout{---Shape provided}%
+\ifx&#1&
+#2
+\else
+\tikz[font=\scriptsize]{%
+\node[inner sep=0pt, text depth=0pt](#1){$\udot{#2}$};%
+\begin{scope}[overlay]%
+\coordinate(offsett) at (0.3em,1.2ex);%
+\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
+\end{scope}%}%
+\fi
+}}
+
+\providecommand\cv*{}\renewcommand*\cv[2][]{%
+%\ifthenelse{\equal{#1}{}}{#2}{%
+%\typeout{---Shape provided}%
+\ifx&#1&
+#2
+\else
+\tikz[font=\scriptsize]{%
+\node[inner sep=0pt, text depth=0pt](#1){$\uvec{#2}$};%
+\begin{scope}[overlay]%
+\coordinate(offsett) at (0.3em,1.2ex);%
+\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
+\end{scope}%}%
+\fi
+}}
+
+\providecommand\cb*{}\renewcommand*\cb[2][]{%
+%\ifthenelse{\equal{#1}{}}{#2}{%
+%\typeout{---Shape provided}%
+\ifx&#1&
+#2
+\else
+\tikz[font=\scriptsize]{%
+\node[inner sep=0pt, text depth=0pt](#1){$\ubar{#2}$};%
+\begin{scope}[overlay]%
+\coordinate(offsett) at (0.3em,1.2ex);%
+\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
+\end{scope}%}%
+\fi
+}}
+
 %\tracingmacros
 
 %\colorlet{cBase}{cBlue}
 %\colorlet{cBaseMark}{cGreen}
 %\colorlet{cBrightText}{cYellow}
 %\colorlet{cDarkText}{cBrown}
+%
+%\providecommand\p*{}\renewcommand*\p[2][\phantom{jf}]{\tikzmark{#2}{#1}}
+%\providecommand\b*{}\renewcommand*\o[2][\phantom{jf}]{\tikzmark{#2}{#1}}
+%\providecommand\f*{}\renewcommand*\f[2][\phantom{jf}]{\tikzmark{#2}{#1}}
 
+\providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{$#1$}}
+%\providecommand\k*{}\renewcommand*\k[2][]{{\color{black}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$#2$}}}}
+%\providecommand\g*{}\renewcommand*\d[2][]{{\color{cBrightText}\tikzmark{#1}{$\udot{#2}$}}}
+%%\providecommand\r*{}\renewcommand*\c[2]{\scriptsize\color{red}\tikzmark{#1}{$#2$}}
+%\providecommand\b*{}\renewcommand*\v[2][]{{\color{cDarkText}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$\ubar{#2}$}}}}
 
-\providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{#1}}
-\providecommand\k*{}\renewcommand*\k[2]{{\scriptsize\color{black}\tikzmark{#1}{$#2$}}}
-\providecommand\g*{}\renewcommand*\g[2]{{\scriptsize\color{cBrightText}\tikzmark{#1}{$#2$}}}
-%\providecommand\r*{}\renewcommand*\r[2]{\scriptsize\color{red}\tikzmark{#1}{$#2$}}
-\providecommand\b*{}\renewcommand*\b[2]{{\scriptsize\color{cDarkText}\tikzmark{#1}{$#2$}}}
+\providecommand\k*{}\renewcommand*\k[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
+\providecommand\d*{}\renewcommand*\d[2][]{{\color{cBrightText}\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
+\providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cBrightText}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{\scriptsize$\udot{#2}\udot{#3}$}\fi}}
+\providecommand\v*{}\renewcommand*\v[2][]{{\color{cDarkText}\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
+\providecommand\vv*{}\renewcommand*\vv[3][]{{\color{cDarkText}\ifx&#1&\uvec{#2}\uvec{#3}\else\scriptsize\tikzmark{#1}{$\uvec{#2}\uvec{#3}$}\fi}}
+\providecommand\b*{}\renewcommand*\b[2][]{{\color{Green}\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
+\providecommand\bb*{}\renewcommand*\bb[3][]{{\color{Green}\ifx&#1&\ubar{#2}\ubar{#3}\else\scriptsize\tikzmark{#1}{$\ubar{#2}\ubar{#3}$}\fi}}
+%\providecommand\td*{}\renewcommand*\td[2][]{{\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
+%\providecommand\ta*{}\renewcommand*\ta[2][]{{\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
+%\providecommand\tb*{}\renewcommand*\tb[2][]{{\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
+\providecommand\td*{}\renewcommand*\td[2][]{\udot{#2}}
+\providecommand\ta*{}\renewcommand*\ta[2][]{\uvec{#2}}
+\providecommand\tb*{}\renewcommand*\tb[2][]{\ubar{#2}}
 
 %\newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#1};}
 % \draw[-{Latex[length=.5em,width=.5em]}]
@@ -383,26 +452,26 @@ Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference f
 %The set of all possible configurations for the model is called its C-space, its dimension matching the number of degrees of freedom and its shape matching the topology. Rigid bodies have $N(N+1)/2$ degrees of freedom, $N$ Euclidean ones for position (topology $\mathbb{E}^N$), and $N(N-1)/2$ angular ones for orientation (topology $S^2S^1$ or $S^1$ for $N=\{3,2\}$, respectively).
 %
 %
-A vertex $\udot{V}$ in the model can be related to the frame by a position vector $\vec{p}_{MV}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
+A vertex $\udot{V}$ in the model can be related to the frame by a position vector $\vec{p}_{\td{M}\td{V}}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
 %
 \begin{align}
-\vec{p}_{MV} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
+\vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-where $\vec{p}_{MV} = -\vec{p}_{V\!M}$. 
+where $\vec{p}_{\td{M}\td{V}} = -\vec{p}_{\td{V}\!\td{M}}$. 
 
-An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the displacement $\vec{T}_{IM}$ of $\ubar{M}$ relative to $\ubar{I}$,
+An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the displacement $\vec{T}_{\tb{I}\tb{M}}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
-\vec{T}_{IM} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
-\intertext{in terms of a translation $\vec{p}_{IM}$ that relates their positions,}
-\vec{p}_{IM} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
-\intertext{and a rotation $\vec{R}_{IM}$ that relates their orientations,}
-\vec{R}_{IM} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
+\vec{T}_{\b{I}\b{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
+\intertext{in terms of a translation $\vec{p}_{\d{I}\d{M}}$ that relates their positions,}
+\vec{p}_{\d{I}\d{M}} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
+\intertext{and a rotation $\vec{R}_{\v{I}\v{M}}$ that relates their orientations,}
+\vec{R}_{\v{I}\v{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
 \vec{m} &\mapsto \vec{i}.
 \end{align}
 %
-We can write the configuration of $\vec{T}_{IM}$ as $\mathcal{C}_{IM}=(\vec{p}_{IM},\vec{R}_{IM})$.
+We can write the configuration of $\vec{T}_{\tb{I}\tb{M}}$ as $\mathcal{C}_{\tb{I}\tb{M}}=(\vec{p}_{\td{I}\td{M}},\vec{R}_{\ta{I}\ta{M}})$.
 %
 %%$\vec{p}_{IM}$ has $N$ degrees of freedom and Euclidean topology $\mathbb{R}^N$. $\vec{R}_{IM}$
 %
@@ -419,33 +488,34 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$ using 
 %
 \begin{align}\label{IV_eq_free_vector_addition}
 \m{CL}
-\vec{p}_{\k{IV}{IV}}
-= \vec{p}_{\k{I}{I}\r{M1}{M}}
-+ \vec{p}_{\r{M2}{M}\k{V}{V}},
+\vec{p}_{\dd[IV]{I}{V}}
+= \vec{p}_{\d[I]{I}\cd[M1]{M}}
++ \vec{p}_{\cd[M2]{M}\d[V]{V}},
 \m{CR}
 \\\nonumber
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
+%  \coordinate(IV)  at ($ .5*(I1.south) + .5*(V1.south)  $);
   \coordinate(_MV) at ($    (V.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
   \coordinate(_IV) at ($    (IV.south) + ( 1.0\baselineskip,-1.0\baselineskip) $);
   \coordinate(_IM) at ($    (I.south)  + (-1.0\baselineskip,-1.0\baselineskip) $);
   \coordinate(_IV_IM) at ($ .5*(_IV) + .5*(_IM) $);
   % Draw arrows and text
-    \draw[color=cBrightArrow]      ($ (V.south)  - (0em,\tpad) $)
+    \draw[color=cBrightArrow]  ($ (V.south)  - (0em,\tpad) $)
             to[out=-90, in=0]     (_MV)
             to[out=180, in=0]     (_IV_IM)
             to[out=180, in=-90]($ (IV.south) - (0em,\tpad) $);
-    \draw[-,color=cBrightArrow]    ($ (I.south)  - (0em,\tpad) $)
+    \draw[-,color=cBrightArrow]($ (I.south)  - (0em,\tpad) $)
             to[out=-90, in=0]     (_IV_IM);
     }
 \end{align}
 %
-where $\r{M}{M}$ denotes cancellation of the intermediate frame $\ubar{M}$ and arrows emphasize composition of the output vector.
-This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^I\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
+where $\c[M]{M}$ denotes cancellation of the intermediate frame $\ubar{M}$ and arrows emphasize composition of the output vector.
+This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^{\v{I}}\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
 \m{CL}
-\dvec{p}_{\g{IV}{IV}}^\b{I1}{I} &= \dvec{p}_{\g{II1}{I}\r{M1}{M}}^\b{I2}{I} + \dvec{p}_{\r{M2}{M}\g{V1}{V}}^\b{I3}{I},\label{eq_head_tail_decomposed}
+\dvec{p}_{\d[IV]{IV}}^{\v[I1]{I}} &= \dvec{p}_{\d[II1]{I}\cd[M1]{M}}^{\v[I2]{I}} + \dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\v[I3]{I}},\label{eq_head_tail_decomposed}
 \m{CR}
 \\\nonumber
 \tikz[overlay,remember picture]{
@@ -469,14 +539,14 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % <<
 % 
-where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude}, and superscripts define {\color{cDarkText}representation}. Stated differently, subscripts define geometric features while superscripts define numerical features.
+where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude} in terms of two points, and superscripts define {\color{cDarkText}representation} in terms of a . Stated differently, subscripts define geometric features while superscripts define numerical features.
 
 To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
-\dvec{p}_{\g{MV1}{MV}}^{\b{I1}{I}}
-= \mat{R}_{\b{I2}{I}\r{M1}{M}} \; \dvec{p}_{\g{MV2}{MV}}^{\r{M2}{M}}.\m{CR}
+\dvec{p}_{\dd[MV1]{M}{V}}^{\v[I1]{I}}
+= \mat{R}_{\v[I2]{I}\cv[M1]{M}} \; \dvec{p}_{\dd[MV2]{M}{V}}^{\c[M2]{M}}.\m{CR}
 \label{eq_passive_rotation}
 %
 \tikz[overlay,remember picture]{
@@ -574,13 +644,16 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
 
-We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). By inserting this into \eq{eq_homogeneous_affine_transform} we obtain the transformation $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ represented in $\ubar{I}$,
+Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We can represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
+%
+%We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). 
+% where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
 %
 \begin{align}%\nonumber\\
-\dvec{T}_{\g{IM1}{IM}}^{\b{I1}{I}} &= 
+\dvec{T}_{\b{I}\b{M}}^{\v[I1]{I}} &= 
 \left[\begin{array}{c c}
- \k{C}{}\mat{R}_{\g{IM2}{IM}}  & \dvec{p}_{\g{IM3}{IM}}^{\b{I2}{I}} \\%\hline
- \dvec{0}^T  &  s_{\g{IM4}{IM}}^{-1}
+ \k[C]{}\mat{R}_{\vv[IM2]{I}{M}}  & \dvec{p}_{\dd[IM3]{I}{M}}^{\v[I2]{I}} \\%\hline
+ \dvec{0}^T  &  1/s_{\vv[IM4]{I}{M}}
 \end{array}\right] \nn &\in
 \begin{cases}
 \mathrm{SE}(3) & \mathrm{when}\ s_{IM}=1,\\
@@ -601,16 +674,34 @@ We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ 
 }
 \end{align}
 %
-where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group). Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
+$\vec{p}_{IM}$ in $\ubar{I}$ by user-defined Cartesian coordinates,
+%
+\begin{align}
+\dvec{p}_{\dd[IM]{I}{M}}^{\v[I1]{I}} &= [x,y,z]\T \in \mathbb{R}^3
+\end{align}
+%
+$\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \in (-\pi,\pi]^3$,
+%
+\begin{align}
+\mat{R}_{\vv{I}{M}}    &= \mat{R}_{\mathrm{Euler}}(\psi,\theta,\phi) \in SO(3),
+\end{align}
+%
+and $s_{IM}$ by a user-defined positive number,
+%
+\begin{align}
+s_{\vv{I}{M}}\in\mathbb{R}^+,
+\end{align}
+%
+that shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
 \begin{align}\nonumber\\
-\dvec{\rho}_{\g{IV}{IV}}^\b{I1}{I} &= \mat{T}_{\g{I2}{I}\r{M1}{M}}^{\b{I3}{I}}
+\dvec{\rho}_{\dd[IV]{I}{V}}^{\v[I1]{I}} &= \mat{T}_{\b[I2]{I}\cb[M1]{M}}^{\v[I3]{I}}
 \left[\begin{array}{c}
-\dvec{p}_{\r{M2}{M}\g{V1}{V}}^{\r{M3}{M}} \\ \tikzmark{One}{1}
+\dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
 \end{array}\right]
-% = \mat{T}_{\g{II2}{I}\r{MM1}{M}}^{\b{II3}{I}}\boldsymbol{\rho}_{MV}^M.
+% = \mat{T}_{\d[II2]{I}\c[MM1]{M}}^{\v[II3]{I}}\boldsymbol{\rho}_{MV}^M.
 \\\nonumber
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
@@ -641,21 +732,8 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
     }
 \end{align}
 %
-When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. 
+When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
 
-We parametrize the translation in $\dvec{T}_{IM}^I$ by three real numbers,
-%
-\begin{align}
-\dvec{p}_{IM}^I &= [x,y,z]\T \in \mathbb{R}^3,
-\end{align}
-%
-the rotation by the Euler angles yaw, pitch and roll $(\psi,\theta,\phi) \in [-\pi,\pi]^3$,
-%
-\begin{align}
-\mat{R}_{IM}    &= \mat{R}_{\mathrm{Euler}}(\psi,\theta,\phi) \in SO(3),
-\end{align}
-%
-and the scaling factor by a positive number, $s_{IM}\in\mathbb{R}^+$, that shrinks the model if it is less than 1, and \emph{vice versa} if it is greater. These user-defined parameters are unconstrained, thus add seven degrees of freedom to the system. For a definition of $\mat{R}_{\mathrm{Euler}}$, see Appendix \ref{IV_transformation_matrices}.
 
 
 \subsubsection{Sonar translation $\dvec{T}_{\!SI}$}
@@ -664,23 +742,29 @@ and the scaling factor by a positive number, $s_{IM}\in\mathbb{R}^+$, that shrin
 
 %Three user-defined degrees of freedom, $\mathcal{C}_{SI} = (\vec{p}_{SI})$, three constraints, $\udot{S}=\uvec{I}$.
 
-Suppose the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
+%If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
+
+We can represent $\vec{T}_{SI}\colon \ubar{I}\to\ubar{S}$ in $\ubar{S}$ by
 %
 \begin{align}
-\dvec{T}_{SI}^S &= 
+\dvec{T}_{\bb{S}{I}}^{\v{S}} &= 
 \left[\begin{array}{c c}
- \mat{I}  & \dvec{p}_{SI}^S \\%\hline
+ \mat{R}_{\vv{S}{I}} & \dvec{p}_{\dd{S}{I}}^{\v{S}} \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_SI}
 \end{align}
 %
+If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
+
 where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and 
 %
+and $\dvec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
+%
 \begin{align}
-\dvec{p}_{SI}^S &= [x,y,z]\T \in \mathbb{R}^3
+\dvec{p}_{\dd{S}{I}}^{\v{S}} &= [x,y,z]\T \in \mathbb{R}^3.
 \end{align}
 %
-is user-defined.
+%is user-defined.
 
 
 \subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
@@ -733,7 +817,7 @@ or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. After beamforming, the data are\todo{is?} combined into a time-series of intensity values for every pixel position in the image $\ubar{I}$. For a one-dimensional array parallel to the propagation axis, focus can only be achieved in range and azimuth. 
+After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. After beamforming, the data is combined into a time-series of intensity values for every pixel position in the image $\ubar{I}$. For a one-dimensional array parallel to the propagation axis, focus can only be achieved in range and azimuth. 
 
 %beamforming and autofocus to produce an image in seafloor coordinates.
 %  
@@ -745,8 +829,8 @@ After being recorded, motion compensated and match filtered, the acoustic echoes
 The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
-\dvec{p}^{\b{R1}{R}}
-= \mathrm{T}_{\b{R2}{R}\r{C1}{C}}(\dvec{p}^{\r{C2}{C}})
+\dvec{p}^{\v[R1]{R}}
+= \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
 = \bmat{{p}_x^C\\
 \text{atan}\big({p}_y^C / {p}_z^C\big)\\
 \sqrt{({p}_y^C)^2 + ({p}_z^C)^2}
@@ -1116,7 +1200,7 @@ We demonstrate classification performance with receiver operating characteristic
 
 Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
 
-Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse January 6. and better January 8. 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
+Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2019 and better 8 January 2009\todo{This is how IEEE JOE dates articles online. Does it read ok?}---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 
 
 
@@ -1132,9 +1216,11 @@ To obtain delayed real-time performance we implemented the simulator on a GPU. T
 
 A final post-processing step is performed in OpenCL, which allows general-purpose GPU programming. It interoperates well with OpenGL and improves simulation flexibility. This is valuable as the simulator is still being actively developed and will likely see new features that can not be easily implemented in OpenGL alone.
 
-With good image quality or low FRP, or both, the adaptive methods did better. However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
+With good image quality, low FRP, or both, the adaptive methods performed better.
 
-In terms of template quality both SIGMAS+ and FFISim are similar. The main difference lies in how they integrate into the classification process: while SIGMAS+ generates one template for each invocation, FFISim can iterate through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
+% However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
+
+Template quality was similar with both SIGMAS+ and FFISim. The main difference lies in how they integrate into the classification process: SIGMAS+ generates one template for each\todo{every?} invocation, FFISim iterates through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
  
 %
 %\begin{itemize}
@@ -1158,12 +1244,12 @@ The geometrical intent of an active rotation is to move a point, by contrast the
 %
 \begin{align}
 \m{CL}
-\vec{p}_{M\g{Vtot}{V}_{\color{cBaseMark}\!\textrm{new}}}
-= \vec{R} \; \vec{p}_{M\g{V2}{V}}\m{CR}
+\vec{p}_{M\d[Vtot]{V}_{\color{cBaseMark}\!\textrm{new}}}
+= \vec{R} \; \vec{p}_{M\d[V2]{V}}\m{CR}
 \quad\text{or}\quad
 \m{CL2}
-\dvec{p}_{M\g{Vtot2}{V}_{\color{cBaseMark}\!\textrm{new}}}^M
-= \mat{R}^M \dvec{p}_{M\g{V4}{V}}^M,\m{CR2}
+\dvec{p}_{M\d[Vtot2]{V}_{\color{cBaseMark}\!\textrm{new}}}^M
+= \mat{R}^M \dvec{p}_{M\d[V4]{V}}^M,\m{CR2}
 \label{IV_eq_active_rotation}
  \\\nonumber
  %\qquad\qquad
