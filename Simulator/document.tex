@@ -68,66 +68,25 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \setcounter{topnumber}{1}
 \setcounter{dbltopnumber}{1}
 
-% \tikz[font=\scriptsize,overlay,baseline=(char.base)]{%
-\providecommand\c*{}\renewcommand*\c[2][]{%
-%\ifthenelse{\equal{#1}{}}{#2}{%
-%\typeout{---Shape provided}%
-\ifx&#1&
-#2
-\else
+\newcommand\tikzdrawcancel[2]{%
 \tikz[font=\scriptsize]{%
 \node[inner sep=0pt, text depth=0pt](#1){$#2$};%
 \begin{scope}[overlay]%
-\coordinate(offsett) at (0.3em,1.2ex);%
-\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
+\coordinate(offsett) at (0.3em,0.8ex);%
+\draw[-, color=black]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
 \end{scope}%}%
-\fi
 }}
 
-\providecommand\cd*{}\renewcommand*\cd[2][]{%
-%\ifthenelse{\equal{#1}{}}{#2}{%
-%\typeout{---Shape provided}%
-\ifx&#1&
-#2
-\else
-\tikz[font=\scriptsize]{%
-\node[inner sep=0pt, text depth=0pt](#1){$\udot{#2}$};%
-\begin{scope}[overlay]%
-\coordinate(offsett) at (0.3em,1.2ex);%
-\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
-\end{scope}%}%
-\fi
-}}
 
-\providecommand\cv*{}\renewcommand*\cv[2][]{%
+% \tikz[font=\scriptsize,overlay,baseline=(char.base)]{%
 %\ifthenelse{\equal{#1}{}}{#2}{%
-%\typeout{---Shape provided}%
-\ifx&#1&
-#2
-\else
-\tikz[font=\scriptsize]{%
-\node[inner sep=0pt, text depth=0pt](#1){$\uvec{#2}$};%
-\begin{scope}[overlay]%
-\coordinate(offsett) at (0.3em,1.2ex);%
-\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
-\end{scope}%}%
-\fi
-}}
+\providecommand\c*{}\renewcommand*\c[2][]{\ifx&#1&#2\else\tikzdrawcancel{#1}{#2}\fi}
 
-\providecommand\cb*{}\renewcommand*\cb[2][]{%
-%\ifthenelse{\equal{#1}{}}{#2}{%
-%\typeout{---Shape provided}%
-\ifx&#1&
-#2
-\else
-\tikz[font=\scriptsize]{%
-\node[inner sep=0pt, text depth=0pt](#1){$\ubar{#2}$};%
-\begin{scope}[overlay]%
-\coordinate(offsett) at (0.3em,1.2ex);%
-\draw[-]($(#1.center) - (offsett)$) to ($(#1.center) + (offsett)$);%
-\end{scope}%}%
-\fi
-}}
+\providecommand\cd*{}\renewcommand*\cd[2][]{\ifx&#1&#2\else\tikzdrawcancel{#1}{\udot{#2}}\fi}
+
+\providecommand\cv*{}\renewcommand*\cv[2][]{\ifx&#1&#2\else\tikzdrawcancel{#1}{\uvec{#2}}\fi}
+
+\providecommand\cb*{}\renewcommand*\cb[2][]{\ifx&#1&#2\else\tikzdrawcancel{#1}{\ubar{#2}}\fi}
 
 %\tracingmacros
 
@@ -458,15 +417,15 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 \vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-where $\vec{p}_{\td{M}\td{V}} = -\vec{p}_{\td{V}\!\td{M}}$. 
+where $\vec{p}_{MV} = -\vec{p}_{\udot{V}\udot{M}}$. 
 
-An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the displacement $\vec{T}_{\tb{I}\tb{M}}$ of $\ubar{M}$ relative to $\ubar{I}$,
+An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{displacement} $\vec{T}_{\ubar{I}\ubar{M}}$ of $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
 \vec{T}_{\b{I}\b{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
-\intertext{in terms of a translation $\vec{p}_{\d{I}\d{M}}$ that relates their positions,}
+\intertext{in terms of a translation $\vec{p}_{\udot{I}\udot{M}}$ that relates their \emph{positions},}
 \vec{p}_{\d{I}\d{M}} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
-\intertext{and a rotation $\vec{R}_{\v{I}\v{M}}$ that relates their orientations,}
+\intertext{and a rotation $\vec{R}_{\uvec{I}\uvec{M}}$ that relates their \emph{orientations},}
 \vec{R}_{\v{I}\v{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
 \vec{m} &\mapsto \vec{i}.
 \end{align}
@@ -567,7 +526,7 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 }
 \end{align}
 %
-When $\dvec{R}_{IM}$ is left-multiplied as here we interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
+When $\dvec{R}_{IM}$ is left-multiplied as here, we interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
 We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$.
@@ -584,17 +543,17 @@ Any transformation in $\mathbb{R}^N$-space can be represented by a transformatio
 \left[\begin{array}{c c}
  \mat{R}  & \dvec{p} \\%\hline
  \dvec{0}^T  &  1
-\end{array}\right] = \mathrm{SE}(N)\label{eq_homogeneous_affine_transform}
+\end{array}\right] = \mathrm{SE}(N)\label{IV_eq_T_decomposed}
 \end{align}
 %
 where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ are decomposed in the same frame, and $\dvec{0}^T$ is a row zero-vector of length $N$. If the last row is altered in any way, the transform becomes real projective, $\mat{T}\in\mathbb{RP}(N)$. In any case, it shares the multiplicative properties of the rotation matrix by being associative, generally non-commutative and closed. %The regular affine version  Steps \step{1} to \step{4} 
 
-%\eq{eq_homogeneous_affine_transform} contains six degrees 
+%\eq{IV_eq_T_decomposed} contains six degrees 
 
 As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
 
-%  In regular world space we use the affine version in \eq{eq_homogeneous_affine_transform}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{eq_homogeneous_affine_transform}
+%  In regular world space we use the affine version in \eq{IV_eq_T_decomposed}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{IV_eq_T_decomposed}
 
 %There is nothing special with this matrix, it simply combines a rotation and translation into a single operation. If the latter row 
 %
@@ -639,12 +598,12 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 
 
 
-\subsubsection{Model displacement $\dvec{T}_{\!IM}$}
+\subsubsection{Model displacement \texorpdfstring{$\vec{T}_{IM}$}{T\_IM}}
 
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
 
-Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We can represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
+Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
 %
 %We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). 
 % where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
@@ -653,7 +612,7 @@ Recall that a rigid object in three-dimensional space has six degrees of freedom
 \dvec{T}_{\b{I}\b{M}}^{\v[I1]{I}} &= 
 \left[\begin{array}{c c}
  \k[C]{}\mat{R}_{\vv[IM2]{I}{M}}  & \dvec{p}_{\dd[IM3]{I}{M}}^{\v[I2]{I}} \\%\hline
- \dvec{0}^T  &  1/s_{\vv[IM4]{I}{M}}
+ \dvec{0}^T  &  1/s_{IM}
 \end{array}\right] \nn &\in
 \begin{cases}
 \mathrm{SE}(3) & \mathrm{when}\ s_{IM}=1,\\
@@ -689,10 +648,10 @@ $\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \i
 and $s_{IM}$ by a user-defined positive number,
 %
 \begin{align}
-s_{\vv{I}{M}}\in\mathbb{R}^+,
+s_{IM}\in\mathbb{R}^+.
 \end{align}
 %
-that shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}.
+The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
@@ -700,7 +659,7 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
 \dvec{\rho}_{\dd[IV]{I}{V}}^{\v[I1]{I}} &= \mat{T}_{\b[I2]{I}\cb[M1]{M}}^{\v[I3]{I}}
 \left[\begin{array}{c}
 \dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
-\end{array}\right]
+\end{array}\right].
 % = \mat{T}_{\d[II2]{I}\c[MM1]{M}}^{\v[II3]{I}}\boldsymbol{\rho}_{MV}^M.
 \\\nonumber
 \tikz[overlay,remember picture]{
@@ -736,7 +695,7 @@ When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{di
 
 
 
-\subsubsection{Sonar translation $\dvec{T}_{\!SI}$}
+\subsubsection{Image position \texorpdfstring{$\vec{T}_{\!SI}$}{T\_SI}}
 
 %$\vec{T}_{SI}$ is subject to three constraints, $\udot{S}=\uvec{I}$, leaving three degrees of freedom, $\mathcal{C}_{SI} = (\vec{p}_{SI})$.
 
@@ -744,7 +703,15 @@ When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{di
 
 %If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
 
-We can represent $\vec{T}_{SI}\colon \ubar{I}\to\ubar{S}$ in $\ubar{S}$ by
+Suppose the image lies some distance from the sonar ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$), resulting in the configuration $\mathcal{C}_{SI} = (\vec{p}_{SI},\vec{R}_{SI}=\vec{I})$.
+%
+%Following the same procedure as before we 
+%the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$)
+%
+%Similarly to the model we have $\mathcal{C}_{SI} = (\vec{p}_{SI},\vec{R}_{SI})$.
+%
+% \eq{IV_eq_T_decomposed}
+We represent $\vec{T}_{SI}$ in $\ubar{S}$ by a special Euclidean matrix,
 %
 \begin{align}
 \dvec{T}_{\bb{S}{I}}^{\v{S}} &= 
@@ -754,22 +721,41 @@ We can represent $\vec{T}_{SI}\colon \ubar{I}\to\ubar{S}$ in $\ubar{S}$ by
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_SI}
 \end{align}
 %
-If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
-
-where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and 
+$\vec{R}_{SI} = \vec{I}$ by an identity matrix,
 %
-and $\dvec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
+\begin{align}
+\mat{R}_{\vv{S}{I}} &= \mat{I}\in\mathbb{R}^{3,3}.
+\end{align}
+%
+and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
 %
 \begin{align}
 \dvec{p}_{\dd{S}{I}}^{\v{S}} &= [x,y,z]\T \in \mathbb{R}^3.
 \end{align}
+
+
+
+%where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and  
+%rotation by zero degrees by an identity matrix,
+
+%If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
+%
+%where $\mat{I}\in\mathbb{R}^3$ is the identity matrix and 
+%%
+
 %
 %is user-defined.
 
 
-\subsubsection{Cartesian camera rotation $\dvec{T}_{\!CS}$}
+\subsubsection{Sonar orientation \texorpdfstring{$\vec{T}_{CS}$}{T\_CS}}
 
-To perceive the world as a sonar would, we let our camera share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
+%The OpenGL projects points onto the $xy$-plane
+%
+%The sonar highlights the scene 
+
+% An OpenGL camera $\ubar{G}$ has $\hat{x}_G$ pointing right, $\hat{y}_G$ pointing up and $\hat{z}_G$ pointing into the camera. We can elevate the sonar frame by $\angle(\hat{z}_S,\vec{p}_{SI})$ 
+
+In the rendering process OpenGL projects points onto an $xy$-plane. We set up a suitable camera $\ubar{C}$ must share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
 %
 %
 %Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back).
@@ -778,39 +764,72 @@ To perceive the world as a sonar would, we let our camera share the sonar's posi
 %
 %What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, 
 %
-This leaves no degrees of freedom for $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$, which we represent in $\ubar{C}$ as
+This leaves no degrees of freedom for $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$, which we represent in $\ubar{C}$ as\todo{Cherie: This paragraph still doesn't make sense.}
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
 %from the image region, but shares its orientation, $\uvec{S}=\uvec{I}$. This reduces the transformation to $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$, which we represent in $\ubar{I}$ as
 %
+% \begin{align}
+% \dvec{T}_{\bb{C}{S}} &= 
+% \left[\begin{array}{c c}
+%  \mat{R}_{\vv{C}{S}}  & \dvec{0} \\%\hline
+%  \dvec{0}^T  &  1
+% \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
+% \end{align}
+% %
+% and define the rotation that performs the elevation as
+% %
+% \begin{align}
+% \dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{S}{I},y}^{\v{S}}}{p_{\dd{S}{I},z}^{\v{S}}}),\label{eq_R_CS_angle}
+% \end{align}
+% %
+% or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
+% %
+% \begin{align}
+% \dvec{R}_{\vv{C}{S}} &=
+% \left[\begin{array}{c c c}
+%  1 & 0                 & 0                 \\%\hline
+%  0 & \hat{{p}}_{\dd{S}{I},z}^I & -\hat{{p}}_{\dd{S}{I},y}^I \\
+%  0 & \hat{{p}}_{\dd{S}{I},y}^I &  \hat{{p}}_{\dd{S}{I},z}^I 
+% \end{array}\right] \in \mathrm{SO}(3). \label{eq_R_CS_coordinate}
+% \end{align}
+
+We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
+%
 \begin{align}
-\dvec{T}_{CS} &= 
+\dvec{T}_{\bb{C}{S}}^{\v{C}} &= 
 \left[\begin{array}{c c}
- \mat{R}_{CS}  & \dvec{0} \\%\hline
+ \mat{R}_{\vv{C}{S}} & \dvec{p}_{\dd{C}{S}}^{\v{C}} \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-and define the rotation that performs the elevation as
+$\vec{R}_{CS}=\angle(\hat{z}_C,\vec{p}_{CI})$ in $\ubar{C}$ by an Euler rotation matrix around $\hat{x}_C$,
 %
 \begin{align}
-\dvec{R}_{CS} &= \mat{R}_x(\mathrm{atan}\frac{p_{SI,y}^I}{p_{SI,z}^I}),\label{eq_R_CS_angle}
+\dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{C}{I},y}^{\v{C}}}{p_{\dd{C}{I},z}^{\v{C}}})\label{eq_R_CS_angle}
 \end{align}
 %
-or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
+or equivalently (if $\hat{\dvec{p}}_{CI}^C$ is the normalized version of $\dvec{p}_{CI}^C$)
 %
 \begin{align}
-\dvec{R}_{CS} &=
+\dvec{R}_{\vv{C}{S}} &=
 \left[\begin{array}{c c c}
  1 & 0                 & 0                 \\%\hline
- 0 & \hat{{p}}_{SI,z}^I & -\hat{{p}}_{SI,y}^I \\
- 0 & \hat{{p}}_{SI,y}^I &  \hat{{p}}_{SI,z}^I 
-\end{array}\right] \in \mathrm{SO}(3). \label{eq_R_CS_coordinate}
+ 0 & \hat{{p}}_{\dd{C}{I},z}^{\v{C}} & -\hat{{p}}_{\dd{C}{I},y}^{\v{C}} \\
+ 0 & \hat{{p}}_{\dd{C}{I},y}^{\v{C}} &  \hat{{p}}_{\dd{C}{I},z}^{\v{C}} 
+\end{array}\right] \in \mathrm{SO}(3), \label{eq_R_CS_coordinate}
+\end{align}
+%
+and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
+%
+\begin{align}
+\dvec{p}_{\dd{C}{S}}^{\v{C}} &= \boldsymbol{0}\T \in \mathbb{R}^3.
 \end{align}
 
 
-\subsubsection{Radial camera coordinate conversion T$_{\mathrm{RC}}$}\label{IV_sec_radial_camera}
+\subsubsection{Camera coordinate conversion \texorpdfstring{T$_{RC}$}{T\_RC}}\label{IV_sec_radial_camera}
 
 %\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 %}\\[.5\baselineskip]
@@ -831,9 +850,9 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\v[R1]{R}}
 = \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
-= \bmat{{p}_x^C\\
-\text{atan}\big({p}_y^C / {p}_z^C\big)\\
-\sqrt{({p}_y^C)^2 + ({p}_z^C)^2}
+= \bmat{{p}_x^{\v{C}}\\
+\text{atan}\big({p}_y^{\v{C}} / {p}_z^{\v{C}}\big)\\
+\sqrt{({p}_y^{\v{C}})^2 + ({p}_z^{\v{C}})^2}
 }
 %
 \tikz[overlay,remember picture]{
@@ -852,7 +871,7 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 \end{align}
 %
 
-\subsubsection{Normalization of coordinates}
+\subsubsection{Normalization of coordinates \texorpdfstring{$\vec{T}_{NR}$}{T\_NR}}
 
 % There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
 % %
@@ -879,9 +898,9 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$. Since $\ubar{R}$ is the natural\todo{imprecise?} domain of the parameters, we can linearly map the valid range for along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
 %
 \begin{align}
-\dvec{T}_{NR}^N &= 
+\dvec{T}_{N\b{R}}^N &= 
 \left[\begin{array}{c c}
- \mat{L}_{NR}^N  & \dvec{t}_{NR}^N \\%\hline
+ \mat{L}_{N\v{R}}^N  & \dvec{t}_{N\d{R}}^N \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}\\
@@ -1189,7 +1208,7 @@ We analyzed simulation and classification performance on three typical objects f
 %
 \begin{itemize}
 \item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are also nearly identical (ignoring background level), as expected since both rely on a Lambertian scattering model.
-\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.\todo{Cherie: Is this better? No, I changed up all up in a previous edit...}
+\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.
 \end{itemize}
 
 
@@ -1200,7 +1219,7 @@ We demonstrate classification performance with receiver operating characteristic
 
 Below 20\% false positive rate (FPR) the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
 
-Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2019 and better 8 January 2009\todo{This is how IEEE JOE dates articles online. Does it read ok?}---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
+Above 20\% FPR the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 
 
 
