@@ -161,7 +161,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \figstep{3}{\emph{Cartesian camera rotation.} To see the world as the sonar does, we position the OpenGL camera at the origin of the sonar frame, $\udot{C}=\udot{S}$, lock its horizontal axis to that of the sonar, $\hat{x}_C=\hat{x}_S$, and direct it at the origin of the image frame, $\hat{z}_C\parallel\vec{p}_{SI}$. Since the position is correct after step 2, we apply the remaining rotation $\uvec{S} \to \uvec{C}$ with a \emph{Cartesian camera matrix} $\mat{T}_\textit{\tiny\!CS}$.
 }\\[.5\baselineskip]
 %
-\figstep{4}{\emph{Radial camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
+\figstep{4}{\emph{"Range" camera coordinate conversion.} The $\hat{x}_C$ and $\hat{y}_C$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from Cartesian to "ranged" (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \to (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 }\\[.5\baselineskip]
 %
 \figstep{5}{\emph{Normalization of coordinates}. OpenGL only renders coordinates in the range $[-1,1]$. We map valid range for along-track, range and elevation (the volume marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with a \emph{normalization matrix} $\mat{T}_\textit{\tiny\!NR}$.
@@ -603,7 +603,7 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
 
-Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; exception of seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
+Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; with the exception of seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
 %
 %We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). 
 % where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
@@ -703,7 +703,7 @@ When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{di
 
 %If the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$). We represent the remaining translation $\vec{T}_{SI}\colon \udot{I}\to\udot{S}$ in $\ubar{S}$ as
 
-Suppose the image lies some distance from the sonar ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$), resulting in the configuration $\mathcal{C}_{SI} = (\vec{p}_{SI},\vec{R}_{SI}=\vec{I})$.
+Suppose the image lies some distance from the sonar ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$), resulting in the configuration $\mathcal{C}_{SI} = (\vec{p}_{SI},\vec{I})$.
 %
 %Following the same procedure as before we 
 %the sonar observes the world some distance from the image region ($\udot{S}\ne\udot{I}$) but shares its orientation ($\uvec{S}=\uvec{I}$)
@@ -754,9 +754,10 @@ and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
 %The sonar highlights the scene 
 
 
-An OpenGL camera $\ubar{C}$ has $\hat{x}_C$ pointing right, $\hat{y}_C$ pointing up and $\hat{z}_C$ pointing into the camera. We can elevate the sonar frame by $\angle(\hat{z}_S,\vec{p}_{SI})$ 
-
-In the rendering process OpenGL projects points onto an $xy$-plane. We set up a suitable camera $\ubar{C}$ must share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
+An OpenGL camera has $\hat{x}$ pointing right, $\hat{y}$ pointing up and $\hat{z}$ pointing into the camera. Ultimately we must adhere to this, but to keep things familiar we instead define $\ubar{C}$ with $\hat{x}_C$ and $\hat{z}_C$ pointing in the opposite direction compared the OpenGL camera. It differs from $\ubar{S}$ only by the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, leaving no degrees of freedom, $\mathcal{C}_{CS} = \big(\vec{0},\angle(\hat{z}_C,\vec{p}_{CI})\big)$.
+%
+%
+%In the rendering process OpenGL projects points onto an $xy$-plane. We set up a suitable camera $\ubar{C}$ must share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
 %
 %
 %Since this is a left-handed coordinate system---and we prefer right-handed---we define our camera $\ubar{C}$ with the $x$-axis pointing left instead (as the last step before rendering we flip it back).
@@ -765,7 +766,7 @@ In the rendering process OpenGL projects points onto an $xy$-plane. We set up a 
 %
 %What lacks is the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, 
 %
-This leaves no degrees of freedom for $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$, which we represent in $\ubar{C}$ as\todo{Cherie: This paragraph still doesn't make sense.}
+%We represent $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$ in $\ubar{C}$ as
 %
 %This implies that $\hat{x}_C=\hat{x}_S$ and $\hat{z}_C\parallel\vec{p}_{SI}$.
 %
@@ -795,7 +796,6 @@ This leaves no degrees of freedom for $\vec{T}_{CS}\colon \udot{S}\to\udot{C}$, 
 %  0 & \hat{{p}}_{\dd{S}{I},y}^I &  \hat{{p}}_{\dd{S}{I},z}^I 
 % \end{array}\right] \in \mathrm{SO}(3). \label{eq_R_CS_coordinate}
 % \end{align}
-
 We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 %
 \begin{align}
@@ -837,23 +837,27 @@ and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After being recorded, motion compensated and match filtered, the acoustic echoes are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. After beamforming, the data is combined into a time-series of intensity values for every pixel position in the image $\ubar{I}$. For a one-dimensional array parallel to the propagation axis, focus can only be achieved in range and azimuth. 
+After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Through beamforming and autofocus the data is then\todo{if I remove ``then'' - how is it clear that this step comes after the previously listed ones?} coherently combined into a time-series of echo intensity values for every pixel position in the image $\ubar{I}$. A one-dimensional hydrophone-array parallel to the propagation axis allows focus along-track, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
+
+
 
 %beamforming and autofocus to produce an image in seafloor coordinates.
 %  
 %After receive side matched filtering, homodyning and beamforming the data 
 %In the SAS receiver processing records 
 %After receive 
-{\color{red}Chere: Missing text here. Wasn't happy with what I wrote below.}
 
-The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} To ease the specification of these parameter boundaries (in the next step) we convert the coordinate representation from Cartesian to radial (cylindrical) with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+%The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} 
+
+
+To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ("ranged") with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\v[R1]{R}}
 = \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
 = \bmat{{p}_x^{\v{C}}\\
 \text{atan}\big({p}_y^{\v{C}} / {p}_z^{\v{C}}\big)\\
-% \text{sign}(p_z^{\v{C}})
+\text{sign}(p_z^{\v{C}})
 \sqrt{({p}_y^{\v{C}})^2 + ({p}_z^{\v{C}})^2}
 }
 %
@@ -897,7 +901,9 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 
 %Therefore every coordinate of interest must fall into this range. 
 
-OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$. Since $\ubar{R}$ is the natural\todo{imprecise?} domain of the parameters, we can linearly map the valid range for along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
+OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$.
+%Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
+We can linearly map along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
 %
 \begin{align}
 \dvec{T}_{N\b{R}}^N &= 
@@ -907,52 +913,41 @@ OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}\\
 %
-where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices. , $\mat{L}_{NR}^N$ performs the normalization of coordinates,
+where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs coordinate normalization,
 %
 \begin{align}
-\dvec{L}_{NR}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)
+\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
 \end{align}
 %
 and $\dvec{t}_{NR}^N$ is an offset
 %
 \begin{align}
-\dvec{t}_{NR}^N &= -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R
-\end{align}
-
-
-The offset 
-
-\begin{align}
-\dvec{T}_{NR}^N &= 
-\left[\begin{array}{c c}
- \diag\left(\boldsymbol{1}\oslash\dvec{s}_\Delta^R\right)  & -\dvec{p}_{RI}^R\oslash\dvec{s}_\Delta^R \\%\hline
- \dvec{0}^T  &  1
-\end{array}\right] \in \mathbb{R}^{4,4}, \label{eq_T_NR}
-\end{align}
-
-
-Let $\dvec\Delta_I^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
-%$\dvec{p}_\Delta = \udot{I}_{
-%
-%\dvec{p}_{I_\Delta} = \big[p_{\Delta,i}\big] &= \big[|p_{I_\mathrm{max},i}-p_{I_\mathrm{min},i}|\big] \quad i\in\{x,y,z\}
-\begin{align}\label{eq:M}
-\dvec{p}_{I_0I_1}^R &= \mathrm{abs}\big(\dvec{p}_{II_1}^R-\dvec{p}_{II_0}^R\big),
+\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\d{R}{I}}^{\v{R}}\oslash\dvec{p}_{\d{I}{E}}^{\v{R}}
 \end{align}
 %
-where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^R$
-\begin{align}\label{eq:M}
-\dvec{p}_{RI}^R   &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
-\dvec{p}_{RI_1}^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
-\dvec{s}_\Delta^R &= \mathrm{abs}(\dvec{p}_{RI_1}^R - \dvec{p}_{RI}^R)
-\end{align}
-%
-Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e. the contents of $\mat{T}_{NR}$:
+where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector.
 %
 
+%Let $\dvec{s}_\Delta^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
+%%$\dvec{p}_\Delta = \udot{I}_{
+%%
+%%\dvec{p}_{I_\Delta} = \big[p_{\Delta,i}\big] &= \big[|p_{I_\mathrm{max},i}-p_{I_\mathrm{min},i}|\big] \quad i\in\{x,y,z\}
+%\begin{align}\label{eq:M}
+%\dvec{p}_{I_0I_1}^R &= \mathrm{abs}\big(\dvec{p}_{II_1}^R-\dvec{p}_{II_0}^R\big),
+%\end{align}
+%%
+%where abs($\cdot$) denotes element-wise absolute value. Then we obtain $\dvec{s}_\Delta^R$
+%\begin{align}\label{eq:M}
+%\dvec{p}_{RI}^R   &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
+%\dvec{p}_{RI_1}^R &= \mathrm{T_{RC}}\big(\mat{T}_{CS}\mat{T}_{SI}\dvec{\rho}_{II_1}^I\big) \\
+%\dvec{s}_\Delta^R &= \mathrm{abs}(\dvec{p}_{RI_1}^R - \dvec{p}_{RI}^R)
+%\end{align}
+%%
+%Now we have all the information needed to normalize the scene in $\ubar{R}$, i.e. the contents of $\mat{T}_{NR}$:
+%%
 %
-where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector. 
-
-
+%%
+ 
 
 \subsubsection{OpenGL rendering}
 
@@ -967,6 +962,8 @@ The rendered image will appear as if we placed a window at the sonar and looked 
 }
 
 \subsubsection{OpenCL post-processing}
+
+Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us the parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
 
