@@ -603,7 +603,7 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
 
-Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
+Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; exception of seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
 %
 %We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). 
 % where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
@@ -724,7 +724,7 @@ We represent $\vec{T}_{SI}$ in $\ubar{S}$ by a special Euclidean matrix,
 $\vec{R}_{SI} = \vec{I}$ by an identity matrix,
 %
 \begin{align}
-\mat{R}_{\vv{S}{I}} &= \mat{I}\in\mathbb{R}^{3,3}.
+\mat{R}_{\vv{S}{I}} &= \mat{I}\in\mathbb{R}^{3,3},
 \end{align}
 %
 and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
@@ -753,7 +753,8 @@ and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
 %
 %The sonar highlights the scene 
 
-% An OpenGL camera $\ubar{G}$ has $\hat{x}_G$ pointing right, $\hat{y}_G$ pointing up and $\hat{z}_G$ pointing into the camera. We can elevate the sonar frame by $\angle(\hat{z}_S,\vec{p}_{SI})$ 
+
+An OpenGL camera $\ubar{C}$ has $\hat{x}_C$ pointing right, $\hat{y}_C$ pointing up and $\hat{z}_C$ pointing into the camera. We can elevate the sonar frame by $\angle(\hat{z}_S,\vec{p}_{SI})$ 
 
 In the rendering process OpenGL projects points onto an $xy$-plane. We set up a suitable camera $\ubar{C}$ must share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
 %
@@ -852,6 +853,7 @@ The topology of a ranged imaging device is Euclidean for the propagation axis an
 = \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
 = \bmat{{p}_x^{\v{C}}\\
 \text{atan}\big({p}_y^{\v{C}} / {p}_z^{\v{C}}\big)\\
+% \text{sign}(p_z^{\v{C}})
 \sqrt{({p}_y^{\v{C}})^2 + ({p}_z^{\v{C}})^2}
 }
 %
@@ -1031,6 +1033,12 @@ Step 1-3 is in the affine domain. Rigid body operations. 6 degrees of freedom, s
 Step 4 is a change of domain from cartesian to polar. Non-linear. Subscripts refer to domain-name.
 
 Step 5 is another change of domain. From metric space to normalized space. Subscripts refer to domain-name.
+
+Don't need coordinates to talk about geometrical operations. Text with, standalone equations with coordinates.
+
+Geometry of rigid object manipulations. Joints, anchors. Arm, different joints. Prismatic, revolute, spherical, cylindrical, universal. Common concept in real-world modeling and graphics processing.
+
+
 
 \todo{Cherie: Lol it looks odd because it's notes.}
 
