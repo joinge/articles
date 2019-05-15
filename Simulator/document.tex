@@ -691,7 +691,7 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
     }
 \end{align}
 %
-When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, its representation must generally be specified to avoid ambiguity.
+When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, we specify its representation to avoid ambiguity.
 
 
 
@@ -754,7 +754,7 @@ and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
 %The sonar highlights the scene 
 
 
-An OpenGL camera has $\hat{x}$ pointing right, $\hat{y}$ pointing up and $\hat{z}$ pointing into the camera. Ultimately we must adhere to this, but to keep things familiar we instead define $\ubar{C}$ with $\hat{x}_C$ and $\hat{z}_C$ pointing in the opposite direction compared the OpenGL camera. It differs from $\ubar{S}$ only by the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, leaving no degrees of freedom, $\mathcal{C}_{CS} = \big(\vec{0},\angle(\hat{z}_C,\vec{p}_{CI})\big)$.
+An OpenGL camera has $\hat{x}$ pointing right, $\hat{y}$ pointing up and $\hat{z}$ pointing into the camera. Ultimately we must adhere to this, but to keep things familiar we instead define $\ubar{C}$ with $\hat{x}_C$ and $\hat{z}_C$ pointing in opposite directions of the respective OpenGL camera axes. It only differs from $\ubar{S}$ by the elevation angle $\angle(\hat{z}_S,\vec{p}_{SI})$, leaving no degrees of freedom, $\mathcal{C}_{CS} = \big(\vec{0},\angle(\hat{z}_C,\vec{p}_{CI})\big)$.
 %
 %
 %In the rendering process OpenGL projects points onto an $xy$-plane. We set up a suitable camera $\ubar{C}$ must share the sonar's position ($\udot{C}=\udot{S}$) and x-axis ($\hat{x}_C=\hat{x}_S$), and\todo{but/while/and?} direct it at the image center ($\hat{z}_C\parallel\vec{p}_{SI}$) through a rotation by $\angle(\hat{z}_S,\vec{p}_{SI})$. 
@@ -806,7 +806,7 @@ We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS}=\angle(\hat{z}_C,\vec{p}_{CI})$ in $\ubar{C}$ by an Euler rotation matrix around $\hat{x}_C$,
+$\vec{R}_{CS}=\angle(\hat{z}_C,\vec{p}_{CI})$\todo{Inaccurate} in $\ubar{C}$ by an Euler rotation matrix around $\hat{x}_C$,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{C}{I},y}^{\v{C}}}{p_{\dd{C}{I},z}^{\v{C}}})\label{eq_R_CS_angle}
@@ -837,7 +837,7 @@ and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Through beamforming and autofocus the data is then\todo{if I remove ``then'' - how is it clear that this step comes after the previously listed ones?} coherently combined into a time-series of echo intensity values for every pixel position in the image $\ubar{I}$. A one-dimensional hydrophone-array parallel to the propagation axis allows focus along-track, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
+After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Through beamforming and autofocus these are coherently combined into time-series of echo intensities for every pixel position in the image $\ubar{I}$. A one-dimensional hydrophone-array parallel to the propagation axis allows acoustic focus along-track, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 
 
@@ -879,7 +879,7 @@ To prepare for this computation and ease specification of spatial system boundar
 
 \subsubsection{Normalization of coordinates \texorpdfstring{$\vec{T}_{NR}$}{T\_NR}}
 
-% There are two main types of projection, perspective and orthographic. Perspective projection scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, in contrast, maps all the scene's vertices to a squared cube where each dimension has the range [-1,1]. This will render all objects equally large whether they are in the distance or up close. The matrix that gives orthographic projection is defined as
+
 % %
 % \begin{align}
 % \left[\begin{array}{c}
@@ -901,7 +901,13 @@ To prepare for this computation and ease specification of spatial system boundar
 
 %Therefore every coordinate of interest must fall into this range. 
 
-OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$.
+%OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$. 
+
+%The OpenGL 
+
+There are different ways to project the scene's points onto the camera surface spanned by $\hat{x}_C$ and $\hat{y}_C$. Perspective projection, modeling the human eye, scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, by contrast, maps relevant scene vertices to a squared cube with topology $[-1,1]^3$, rendering objects with their true size irrespective of their distance. 
+
+
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 We can linearly map along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
 %
@@ -922,11 +928,14 @@ where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\
 and $\dvec{t}_{NR}^N$ is an offset
 %
 \begin{align}
-\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\d{R}{I}}^{\v{R}}\oslash\dvec{p}_{\d{I}{E}}^{\v{R}}
+\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
 \end{align}
 %
-where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) constructs a diagonal matrix from its input vector.
-%
+Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
+
+
+
+
 
 %Let $\dvec{s}_\Delta^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
 %%$\dvec{p}_\Delta = \udot{I}_{
@@ -950,6 +959,8 @@ where $\oslash$ denotes Hadamard (element-wise) division, and diag($\cdot$) cons
  
 
 \subsubsection{OpenGL rendering}
+
+%When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
 
 An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
 
@@ -1234,7 +1245,7 @@ Above 20\% FPR the results are less clear: the adaptive techniques performed sim
 
 We conclude that the best way to classify SAS images is....
 
-One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. In our studies this improves the match between the SAS objects and their corresponding template significantly in most cases.
+One way to automatically classify objects in SAS images is to compare the imaged objects with a predefined set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. Our studies show this improves the match between SAS objects and their corresponding template significantly in most cases.
 
 To obtain delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
 
