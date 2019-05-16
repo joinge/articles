@@ -806,13 +806,7 @@ We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS}=\angle(\hat{z}_C,\vec{p}_{CI})$\todo{Inaccurate} in $\ubar{C}$ by an Euler rotation matrix around $\hat{x}_C$,
-%
-\begin{align}
-\dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{C}{I},y}^{\v{C}}}{p_{\dd{C}{I},z}^{\v{C}}})\label{eq_R_CS_angle}
-\end{align}
-%
-or equivalently (if $\hat{\dvec{p}}_{CI}^C$ is the normalized version of $\dvec{p}_{CI}^C$)
+$\vec{R}_{CS}\colon \hat{z}_C \to \hat{p}_{CI}$ (subject to $\hat{x}_C=\hat{x}_S$) in $\ubar{C}$ by a regular rotation matrix,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &=
@@ -837,20 +831,12 @@ and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Through beamforming and autofocus these are coherently combined into time-series of echo intensities for every pixel position in the image $\ubar{I}$. A one-dimensional hydrophone-array parallel to the propagation axis allows acoustic focus along-track, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
-
-
-
-%beamforming and autofocus to produce an image in seafloor coordinates.
-%  
-%After receive side matched filtering, homodyning and beamforming the data 
-%In the SAS receiver processing records 
-%After receive 
+After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming and autofocus coherently combine these into echo intensities for every pixel position in the image. A typical one-dimensional hydrophone array extending along-track allows acoustic focus in this direction, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 %The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} 
 
 
-To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ("ranged") with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ($\ubar{R}$ for "ranged-device") with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\v[R1]{R}}
@@ -876,6 +862,8 @@ To prepare for this computation and ease specification of spatial system boundar
     }
 \end{align}
 %
+where 
+
 
 \subsubsection{Normalization of coordinates \texorpdfstring{$\vec{T}_{NR}$}{T\_NR}}
 
@@ -905,35 +893,58 @@ To prepare for this computation and ease specification of spatial system boundar
 
 %The OpenGL 
 
-There are different ways to project the scene's points onto the camera surface spanned by $\hat{x}_C$ and $\hat{y}_C$. Perspective projection, modeling the human eye, scales all $x$ and $y$ coordinates inversely with distance to create a sense of perspective in the image. Orthographic projection, by contrast, maps relevant scene vertices to a squared cube with topology $[-1,1]^3$, rendering objects with their true size irrespective of their distance. 
-
+There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, maps relevant scene vertices to a squared cube with topology $[-1,1]^3$, rendering objects with their true size irrespective of their distance. Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
 
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
-We can linearly map along-track, cross-track and elevation (the volume in \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside) into this normalized range with the affine transform
+
+The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside.  into this normalized range with the affine transform
+%
+%\begin{align}
+%\dvec{T}_{N\b{R}}^N &= 
+%\left[\begin{array}{c c}
+% \mat{L}_{N\v{R}}^N  & \dvec{t}_{N\d{R}}^N \\%\hline
+% \dvec{0}^T  &  1
+%\end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
+%\end{align}
+%%
+%where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs coordinate normalization,
+%%
+%\begin{align}
+%\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
+%\end{align}
+%%
+%and $\dvec{t}_{NR}^N$ is an offset
+%%
+%\begin{align}
+%\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
+%\end{align}
+%%
+%Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
+%
+%
+We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a special Euclidean matrix,
 %
 \begin{align}
 \dvec{T}_{N\b{R}}^N &= 
 \left[\begin{array}{c c}
- \mat{L}_{N\v{R}}^N  & \dvec{t}_{N\d{R}}^N \\%\hline
+ \mat{L}_{N\v{R}}^N  & \dvec{p}_{N\d{R}}^N \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
-\end{align}\\
+\end{align}
 %
-where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs coordinate normalization,
+$\vec{L}_{NR} = \frac{\vec{I}}{\lVert\vec{p}_{IE}\cdot\hat{u }\rVert}$ in $\ubar{N}$ by a scaling matrix,
 %
 \begin{align}
 \dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
 \end{align}
 %
-and $\dvec{t}_{NR}^N$ is an offset
+and $\vec{p}_{NR} = \frac{\vec{p}_{RI}}{\lVert\vec{p}_{IE}\cdot\hat{u}\rVert}$ in $\ubar{N}$ by coordinates,
 %
 \begin{align}
-\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
+\dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
 \end{align}
 %
 Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
-
-
 
 
 
@@ -964,7 +975,7 @@ Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constr
 
 An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
 
-To produce the sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits use of a Lambertian scattering model where the backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but for the purpose of creating templates this is not needed.   
+To produce sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits use of a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.   
 
 The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
 
@@ -1255,7 +1266,7 @@ With good image quality, low FRP, or both, the adaptive methods performed better
 
 % However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
 
-Template quality was similar with both SIGMAS+ and FFISim. The main difference lies in how they integrate into the classification process: SIGMAS+ generates one template for each\todo{every?} invocation, FFISim iterates through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
+Template quality was similar with both SIGMAS+ and FFISim. The main difference lies in how they integrate into the classification process: SIGMAS+ generates one template for each invocation, FFISim iterates through a space of parameters on the GPU before returning control to the CPU. This speeds up the template matching dramatically, allowing it to assess thousands of templates per second instead of, say, one. \todo{lol, I will}
  
 %
 %\begin{itemize}
