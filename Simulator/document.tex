@@ -651,7 +651,7 @@ and $s_{IM}$ by a user-defined positive number,
 s_{IM}\in\mathbb{R}^+.
 \end{align}
 %
-The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}.
+The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}. Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
@@ -691,7 +691,7 @@ The transformation matrix usage is similar to that of the rotation matrix, excep
     }
 \end{align}
 %
-When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, we specify its representation to avoid ambiguity.
+When $\mat{T}_{IM}^I$ is left-multiplied as here we interpret it as the \emph{displacement} of $\ubar{M}$ \emph{represented} in $\ubar{I}$, and \emph{vice versa} if it is right-multiplied. This is analogous to the rotation matrix.
 
 
 
@@ -806,7 +806,7 @@ We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS}\colon \hat{z}_C \to \hat{p}_{CI}$ (subject to $\hat{x}_C=\hat{x}_S$) in $\ubar{C}$ by a regular rotation matrix,
+$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a regular rotation matrix,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &=
@@ -893,13 +893,13 @@ where
 
 %The OpenGL 
 
-There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, maps relevant scene vertices to a squared cube with topology $[-1,1]^3$, rendering objects with their true size irrespective of their distance. Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
+There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, collapses the depth dimension thereby preserving object size.  Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
 
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
 The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside.  into this normalized range with the affine transform
 %
-%\begin{align}
+%\begin{align} maps relevant scene vertices to a squared cube with topology $[-1,1]^3$,
 %\dvec{T}_{N\b{R}}^N &= 
 %\left[\begin{array}{c c}
 % \mat{L}_{N\v{R}}^N  & \dvec{t}_{N\d{R}}^N \\%\hline
@@ -922,7 +922,7 @@ The along-track, cross-track and elevation boundaries form a cylindrical slice, 
 %Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
 %
 %
-We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a special Euclidean matrix,
+We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a general linear (invertible) matrix,
 %
 \begin{align}
 \dvec{T}_{N\b{R}}^N &= 
@@ -932,7 +932,7 @@ We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a special Euclidean matrix,
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}
 %
-$\vec{L}_{NR} = \frac{\vec{I}}{\lVert\vec{p}_{IE}\cdot\hat{u }\rVert}$ in $\ubar{N}$ by a scaling matrix,
+$\vec{L}_{NR} = \vec{I}\,\lVert\vec{p}_{IE}\cdot\hat{u}\rVert^{-1}$ in $\ubar{N}$ by a scaling matrix,
 %
 \begin{align}
 \dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
@@ -1284,6 +1284,79 @@ Template quality was similar with both SIGMAS+ and FFISim. The main difference l
 
 {\color{blue}Cherie: Just wait with the appendix for now. Not yet looked at it.}
 
+
+\section{Rotations}\label{IV_transformation_matrices}
+
+Rotations are special forms of linear operations that can be expressed in either free or decomposed form. We focus on the Euler-Rodrigues rotation formula, an axis-angle representation introduced by Euler in 1775 that still finds new areas of use e.g. in e.g. the study of coordinate free geometry, quaternions and Lie algebra~\cite{Dai2015}. 
+
+
+\subsection{Free notation}\label{IV_sec:free_euler_rodrigues}
+
+The Euler-Rodrigues formua has the following free form
+%
+\begin{align}\label{eq:p_rot_free}
+\vec{p}_\mathrm{rot} =  \vec{p} + 2a(\vec{\omega}\times\vec{p}) + 2(\vec\omega \times (\vec\omega \times \vec{p}))
+\end{align}
+
+and their orientations by a rotation dyadic $\vec{R}_{IM}$ mapping any vector in $\uvec{M}$ to $\uvec{I}$ (which includes the basis vectors),
+%
+\begin{align}
+\vec{R}_{IM}\colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\
+\vec{M}_i &\mapsto \vec{I}_i \quad \forall i. \nonumber
+\end{align}
+
+We define $\vec{R}_{AB}$ as a rotation---from $\uvec{A}$ to $\uvec{B}$---by angle $\theta\in\mathbb{R}$ clockwise around unit vector $\hat{r}\in\mathbb{V}$ in $\mathbb{R}^3$ Euclidean space using Euler-Rodrigues' formula,
+
+
+
+%
+\begin{align}\label{eq:M}
+%\uvec{A} = \vec{R}_{\uvec{A}\uvec{B}}\uvec{B} \\
+\vec{R}_{AB}
+&\triangleq %e^{j\overset{\times}{r}\theta}=\nn
+ \vec{I} + \sin\theta \vec{S}(\vec{r}_{AB}) + (1-\cos\theta)\vec{r}_{AB}\vec{r}_{AB},
+\end{align}
+%
+where $\vec{I}$ is the identity, and $S(\vec{r}_{AB})$ is the skew-symmetric dyadic form of $\vec{r}_{AB}$,
+%
+\begin{align}
+\overset{\times}{r}
+&\triangleq \bmat{\hat{r}\times} \triangleq \bmat{
+0 & -\hat{r}_z & \hat{r}_y \\
+\hat{r}_z & 0 & -\hat{r}_x \\
+-\hat{r}_y & \hat{r}_x & 0
+},
+\end{align}
+%
+and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+%
+\begin{align}
+\theta
+&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+\end{align}
+%
+where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.\todo{Mighty long and heavy sentence... Yikes}
+
+$SO(3)$ refers to special (\emph{i.e.} right handed) orthogonal $\mathbb{R}^{3\times3}$ matrices, where the handedness is verified by determinant $\big|R\big|=1$ (as opposed to $\pm1$), and the orthogonality follows from the skew symmetry of $\overset{\times}{r}_{AB}$. $SO(3)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
+
+We restrict our attention to linear transforms of the kind $\mat{L}_{AB} = \mat{R}_{AB}\;\mat{S}_{AB}$ where the former is a rotation matrix and the latter a scaling matrix. The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
+%
+\begin{align}\label{eq:M}
+\mat{R}_{AB} &= \I + \sin\theta_{AB}\;[\dvec{\hat{r}}^A\times] + (1-\cos\theta_{AB})\;[\dvec{\hat{r}}^A\times]^2 \in\mathbb{R}^{3\times3}
+\end{align}
+%
+where $\big[\dvec{\hat{r}}_{AB}^A\big]$ is the open-right cross product matrix of $\dvec{\hat{r}}^A$ and $\mat{I}$ is the identity matrix. 
+
+% %\dvec{\hat{p}}_{A\times{}B}^C
+\begin{align}
+\theta_{AB}
+&= \mathrm{acos}\frac{\dvec{p}_{A}^{C}\cdot\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert} \\
+\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
+\end{align}
+
+
+
 \section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
 
 The geometrical intent of an active rotation is to move a point, by contrast the passive version which instead changes the point's representation. With our notation this can be expressed as either
@@ -1327,63 +1400,7 @@ depending on whether the free or decomposed form is wanted, and where $\vec{R}\c
 
 
 
-\section{Transformation matrices}\label{IV_transformation_matrices} 
 
-and their orientations by a rotation dyadic $\vec{R}_{IM}$ mapping any vector in $\uvec{M}$ to $\uvec{I}$ (which includes the basis vectors),
-%
-\begin{align}
-\vec{R}_{IM}\colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\
-\vec{M}_i &\mapsto \vec{I}_i \quad \forall i. \nonumber
-\end{align}
-
-We define $\vec{R}_{AB}$ as a rotation---from $\uvec{A}$ to $\uvec{B}$---by angle $\theta\in\mathbb{R}$ clockwise around unit vector $\hat{r}\in\mathbb{V}$ in $\mathbb{R}^3$ Euclidean space using Euler-Rodrigues' formula,
-
-\subsection{Free Euler-Rodrigues}\label{IV_sec:free_euler_rodrigues}
-%
-\begin{align}\label{eq:M}
-%\uvec{A} = \vec{R}_{\uvec{A}\uvec{B}}\uvec{B} \\
-\vec{R}_{AB}
-&\triangleq %e^{j\overset{\times}{r}\theta}=\nn
- \vec{I} + \overset{\times}{r}\sin\theta + \overset{\times}{r}{}^2(1-\cos\theta) \in SO(3),
-\end{align}
-%
-where $\vec{I}$ is the identity, and $\overset{\times}{r}$ is the skew-symmetric (or cross-product) matrix of $\hat{r}$,
-%
-\begin{align}
-\overset{\times}{r}
-&\triangleq \bmat{\hat{r}\times} \triangleq \bmat{
-0 & -\hat{r}_z & \hat{r}_y \\
-\hat{r}_z & 0 & -\hat{r}_x \\
--\hat{r}_y & \hat{r}_x & 0
-},
-\end{align}
-%
-and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
-%
-\begin{align}
-\theta
-&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
-\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
-\end{align}
-%
-where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.\todo{Mighty long and heavy sentence... Yikes}
-
-$SO(3)$ refers to special (\emph{i.e.} right handed) orthogonal $\mathbb{R}^{3\times3}$ matrices, where the handedness is verified by determinant $\big|R\big|=1$ (as opposed to $\pm1$), and the orthogonality follows from the skew symmetry of $\overset{\times}{r}_{AB}$. $SO(3)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
-
-We restrict our attention to linear transforms of the kind $\mat{L}_{AB} = \mat{R}_{AB}\;\mat{S}_{AB}$ where the former is a rotation matrix and the latter a scaling matrix. The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
-%
-\begin{align}\label{eq:M}
-\mat{R}_{AB} &= \I + \sin\theta_{AB}\;[\dvec{\hat{r}}^A\times] + (1-\cos\theta_{AB})\;[\dvec{\hat{r}}^A\times]^2 \in\mathbb{R}^{3\times3}
-\end{align}
-%
-where $\big[\dvec{\hat{r}}_{AB}^A\big]$ is the open-right cross product matrix of $\dvec{\hat{r}}^A$ and $\mat{I}$ is the identity matrix. 
-
-% %\dvec{\hat{p}}_{A\times{}B}^C
-\begin{align}
-\theta_{AB}
-&= \mathrm{acos}\frac{\dvec{p}_{A}^{C}\cdot\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert} \\
-\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
-\end{align}
 
 % http://lairs.eng.buffalo.edu/pdffiles/pconf/C10.pdf
 % http://www.navlab.net/Publications/Inertial_Navigation_-_Theory_and_Applications.pdf
