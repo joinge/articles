@@ -92,8 +92,8 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 %\colorlet{cBase}{cBlue}
 %\colorlet{cBaseMark}{cGreen}
-%\colorlet{cBrightText}{cYellow}
-%\colorlet{cDarkText}{cBrown}
+%\colorlet{cPoint}{cYellow}
+%\colorlet{cBasis}{cBrown}
 %
 %\providecommand\p*{}\renewcommand*\p[2][\phantom{jf}]{\tikzmark{#2}{#1}}
 %\providecommand\b*{}\renewcommand*\o[2][\phantom{jf}]{\tikzmark{#2}{#1}}
@@ -101,17 +101,17 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 \providecommand\m*{}\renewcommand*\m[2][\phantom{jf}]{\tikzmark{#2}{$#1$}}
 %\providecommand\k*{}\renewcommand*\k[2][]{{\color{black}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$#2$}}}}
-%\providecommand\g*{}\renewcommand*\d[2][]{{\color{cBrightText}\tikzmark{#1}{$\udot{#2}$}}}
+%\providecommand\g*{}\renewcommand*\d[2][]{{\color{cPoint}\tikzmark{#1}{$\udot{#2}$}}}
 %%\providecommand\r*{}\renewcommand*\c[2]{\scriptsize\color{red}\tikzmark{#1}{$#2$}}
-%\providecommand\b*{}\renewcommand*\v[2][]{{\color{cDarkText}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$\ubar{#2}$}}}}
+%\providecommand\b*{}\renewcommand*\v[2][]{{\color{cBasis}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$\ubar{#2}$}}}}
 
 \providecommand\k*{}\renewcommand*\k[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
-\providecommand\d*{}\renewcommand*\d[2][]{{\color{cBrightText}\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
-\providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cBrightText}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{\scriptsize$\udot{#2}\udot{#3}$}\fi}}
-\providecommand\v*{}\renewcommand*\v[2][]{{\color{cDarkText}\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
-\providecommand\vv*{}\renewcommand*\vv[3][]{{\color{cDarkText}\ifx&#1&\uvec{#2}\uvec{#3}\else\scriptsize\tikzmark{#1}{$\uvec{#2}\uvec{#3}$}\fi}}
-\providecommand\b*{}\renewcommand*\b[2][]{{\color{Green}\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
-\providecommand\bb*{}\renewcommand*\bb[3][]{{\color{Green}\ifx&#1&\ubar{#2}\ubar{#3}\else\scriptsize\tikzmark{#1}{$\ubar{#2}\ubar{#3}$}\fi}}
+\providecommand\d*{}\renewcommand*\d[2][]{{\color{cPoint}\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
+\providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cPoint}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{\scriptsize$\udot{#2}\udot{#3}$}\fi}}
+\providecommand\v*{}\renewcommand*\v[2][]{{\color{cBasis}\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
+\providecommand\vv*{}\renewcommand*\vv[3][]{{\color{cBasis}\ifx&#1&\uvec{#2}\uvec{#3}\else\scriptsize\tikzmark{#1}{$\uvec{#2}\uvec{#3}$}\fi}}
+\providecommand\b*{}\renewcommand*\b[2][]{{\color{cFrame}\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
+\providecommand\bb*{}\renewcommand*\bb[3][]{{\color{cFrame}\ifx&#1&\ubar{#2}\ubar{#3}\else\scriptsize\tikzmark{#1}{$\ubar{#2}\ubar{#3}$}\fi}}
 %\providecommand\td*{}\renewcommand*\td[2][]{{\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
 %\providecommand\ta*{}\renewcommand*\ta[2][]{{\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
 %\providecommand\tb*{}\renewcommand*\tb[2][]{{\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
@@ -150,7 +150,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \else
   \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
 \fi
-\caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, five steps are needed to obtain the sonar template:\\[.5\baselineskip]
+\caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, seven steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
 \figstep{1}{\emph{Model displacement.} When 3D models of the seafloor and object are loaded into OpenGL, each has its own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) $\ubar{M} \to \ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
 }\\[.5\baselineskip]
@@ -391,7 +391,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
 
-The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. Together they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing up coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
+The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. Together they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
 \todo{Summarize notation rules}
 %
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
@@ -419,17 +419,19 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 %
 where $\vec{p}_{MV} = -\vec{p}_{\udot{V}\udot{M}}$. 
 
-An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{displacement} $\vec{T}_{\ubar{I}\ubar{M}}$ of $\ubar{M}$ relative to $\ubar{I}$,
+An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{displacement} $\vec{T}_{\ubar{I}\ubar{M}}$ of {\color{cFrame}frame} $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
-\vec{T}_{\b{I}\b{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
-\intertext{in terms of a translation $\vec{p}_{\udot{I}\udot{M}}$ that relates their \emph{positions},}
-\vec{p}_{\d{I}\d{M}} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
-\intertext{and a rotation $\vec{R}_{\uvec{I}\uvec{M}}$ that relates their \emph{orientations},}
-\vec{R}_{\v{I}\v{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
+\vec{T}_{\bb{I}{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
+\intertext{in terms of a \emph{translation} $\vec{p}_{\udot{I}\udot{M}}$ that relates their {\color{cPoint}positions},}
+\vec{p}_{\dd{I}{M}} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
+\intertext{and a \emph{rotation} $\vec{R}_{\uvec{I}\uvec{M}}$ that relates their {\color{cBasis}orientations},}
+\vec{R}_{\vv{I}{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
 \vec{m} &\mapsto \vec{i}.
 \end{align}
 %
+% Vector subscripts define {\color{cPoint}direction} and {\color{cPoint}magnitude} in terms of two points, and superscripts define {\color{cBasis}representation} in terms of a 
+% 
 We can write the configuration of $\vec{T}_{\tb{I}\tb{M}}$ as $\mathcal{C}_{\tb{I}\tb{M}}=(\vec{p}_{\td{I}\td{M}},\vec{R}_{\ta{I}\ta{M}})$.
 %
 %%$\vec{p}_{IM}$ has $N$ degrees of freedom and Euclidean topology $\mathbb{R}^N$. $\vec{R}_{IM}$
@@ -439,6 +441,7 @@ We can write the configuration of $\vec{T}_{\tb{I}\tb{M}}$ as $\mathcal{C}_{\tb{
 %
 It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
 
+% \dvec{p} vector subscripts define {\color{cPoint}direction} and {\color{cPoint}magnitude} in terms of two points, and superscripts define {\color{cBasis}representation} in terms of a . Stated differently, subscripts define geometric features while superscripts define numerical features.
 
 
 \subsection{Decomposed notation}\label{IV_decomposed_notation}
@@ -470,11 +473,11 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$ using 
 \end{align}
 %
 where $\c[M]{M}$ denotes cancellation of the intermediate frame $\ubar{M}$ and arrows emphasize composition of the output vector.
-This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^{\v{I}}\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
+This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^{\,\v{I}}\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
 \m{CL}
-\dvec{p}_{\d[IV]{IV}}^{\v[I1]{I}} &= \dvec{p}_{\d[II1]{I}\cd[M1]{M}}^{\v[I2]{I}} + \dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\v[I3]{I}},\label{eq_head_tail_decomposed}
+\dvec{p}_{\d[IV]{IV}}^{\,\v[I1]{I}} &= \dvec{p}_{\d[II1]{I}\cd[M1]{M}}^{\,\v[I2]{I}} + \dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\,\v[I3]{I}},\label{eq_head_tail_decomposed}
 \m{CR}
 \\\nonumber
 \tikz[overlay,remember picture]{
@@ -498,13 +501,13 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % <<
 % 
-where vector subscripts define {\color{cBrightText}direction} and {\color{cBrightText}magnitude} in terms of two points, and superscripts define {\color{cDarkText}representation} in terms of a . Stated differently, subscripts define geometric features while superscripts define numerical features.
+where bold symbols without accents denote decomposed elements such as vectors and matrices. 
 
-To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, the representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
+To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{R}\dvec{R}^T = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, a suitable representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
-\dvec{p}_{\dd[MV1]{M}{V}}^{\v[I1]{I}}
+\dvec{p}_{\dd[MV1]{M}{V}}^{\,\v[I1]{I}}
 = \mat{R}_{\v[I2]{I}\cv[M1]{M}} \; \dvec{p}_{\dd[MV2]{M}{V}}^{\c[M2]{M}}.\m{CR}
 \label{eq_passive_rotation}
 %
@@ -526,7 +529,7 @@ To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. 
 }
 \end{align}
 %
-When $\dvec{R}_{IM}$ is left-multiplied as here, we interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. The multiplication is associative, generally non-commutative and closed.  %Embee
+When $\dvec{R}_{IM} = \bmat{\boldsymbol{\hat{x}}_M^S & \boldsymbol{\hat{y}}_M^S & \boldsymbol{\hat{z}}_M^S}$ is left-multiplied as here, we interpret it as the \emph{orientation} of $\uvec{M}$ \emph{represented} in $\uvec{I}$, and \emph{vice versa} if it is right-multiplied. Multiplication by a $\mathrm{SO}(N)$ matrix is associative, generally non-commutative and closed.  %Embee
 %, and the orthogonality follows from the skew symmetry of the axis of rotation. %SO$(N)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
 %
 We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$.
@@ -609,9 +612,9 @@ Recall that a rigid object in three-dimensional space has six degrees of freedom
 % where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
 %
 \begin{align}%\nonumber\\
-\dvec{T}_{\b{I}\b{M}}^{\v[I1]{I}} &= 
+\dvec{T}_{\b{I}\b{M}}^{\,\v[I1]{I}} &= 
 \left[\begin{array}{c c}
- \k[C]{}\mat{R}_{\vv[IM2]{I}{M}}  & \dvec{p}_{\dd[IM3]{I}{M}}^{\v[I2]{I}} \\%\hline
+ \k[C]{}\mat{R}_{\vv[IM2]{I}{M}}  & \dvec{p}_{\dd[IM3]{I}{M}}^{\,\v[I2]{I}} \\%\hline
  \dvec{0}^T  &  1/s_{IM}
 \end{array}\right] \nn &\in
 \begin{cases}
@@ -626,7 +629,7 @@ Recall that a rigid object in three-dimensional space has six degrees of freedom
   \path let \p1 = ($ (I1) + (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I1)  at (\x1,\y2);
   \path let \p1 = ($ (I2) - (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I2)  at (\x1,\y2);
   % Draw arrows
-%    \draw[color=cDarkText]      ($ (I2.north) + (0em,\tpad) $)
+%    \draw[color=cBasis]      ($ (I2.north) + (0em,\tpad) $)
 %           to[out= 90, in=0]    (_I2)
 %           to[out=180, in=0]    (_I1)
 %           to[out=180, in=90]($ (I1.north) + (0em,\tpad) $);
@@ -636,10 +639,10 @@ Recall that a rigid object in three-dimensional space has six degrees of freedom
 $\vec{p}_{IM}$ in $\ubar{I}$ by user-defined Cartesian coordinates,
 %
 \begin{align}
-\dvec{p}_{\dd[IM]{I}{M}}^{\v[I1]{I}} &= [x,y,z]\T \in \mathbb{R}^3
+\dvec{p}_{\dd[IM]{I}{M}}^{\,\v[I1]{I}} &= [x,y,z]\T \in \mathbb{R}^3
 \end{align}
 %
-$\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \in (-\pi,\pi]^3$,
+$\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \in [0,\pi]^3$,
 %
 \begin{align}
 \mat{R}_{\vv{I}{M}}    &= \mat{R}_{\mathrm{Euler}}(\psi,\theta,\phi) \in SO(3),
@@ -651,16 +654,16 @@ and $s_{IM}$ by a user-defined positive number,
 s_{IM}\in\mathbb{R}^+.
 \end{align}
 %
-The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. A definition of $\mat{R}_{\mathrm{Euler}}$ is provided in Appendix \ref{IV_transformation_matrices}. Note that $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, so the representation must be specified to avoid ambiguity.
+The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. $\mat{R}_{\mathrm{Euler}}$ is defined in Appendix \ref{IV_transformation_matrices}. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, the representation of transformation matrices must be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
 \begin{align}\nonumber\\
-\dvec{\rho}_{\dd[IV]{I}{V}}^{\v[I1]{I}} &= \mat{T}_{\b[I2]{I}\cb[M1]{M}}^{\v[I3]{I}}
+\dvec{\rho}_{\dd[IV]{I}{V}}^{\,\v[I1]{I}} &= \mat{T}_{\b[I2]{I}\cb[M1]{M}}^{\,\v[I3]{I}}
 \left[\begin{array}{c}
 \dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
 \end{array}\right].
-% = \mat{T}_{\d[II2]{I}\c[MM1]{M}}^{\v[II3]{I}}\boldsymbol{\rho}_{MV}^M.
+% = \mat{T}_{\d[II2]{I}\c[MM1]{M}}^{\,\v[II3]{I}}\boldsymbol{\rho}_{MV}^M.
 \\\nonumber
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
@@ -714,9 +717,9 @@ Suppose the image lies some distance from the sonar ($\udot{S}\ne\udot{I}$) but 
 We represent $\vec{T}_{SI}$ in $\ubar{S}$ by a special Euclidean matrix,
 %
 \begin{align}
-\dvec{T}_{\bb{S}{I}}^{\v{S}} &= 
+\dvec{T}_{\bb{S}{I}}^{\,\v{S}} &= 
 \left[\begin{array}{c c}
- \mat{R}_{\vv{S}{I}} & \dvec{p}_{\dd{S}{I}}^{\v{S}} \\%\hline
+ \mat{R}_{\vv{S}{I}} & \dvec{p}_{\dd{S}{I}}^{\,\v{S}} \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_SI}
 \end{align}
@@ -730,7 +733,7 @@ $\vec{R}_{SI} = \vec{I}$ by an identity matrix,
 and $\vec{p}_{SI}^S$ in $\uvec{I}$ by user-defined coordinates,
 %
 \begin{align}
-\dvec{p}_{\dd{S}{I}}^{\v{S}} &= [x,y,z]\T \in \mathbb{R}^3.
+\dvec{p}_{\dd{S}{I}}^{\,\v{S}} &= [x,y,z]\T \in \mathbb{R}^3.
 \end{align}
 
 
@@ -783,7 +786,7 @@ An OpenGL camera has $\hat{x}$ pointing right, $\hat{y}$ pointing up and $\hat{z
 % and define the rotation that performs the elevation as
 % %
 % \begin{align}
-% \dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{S}{I},y}^{\v{S}}}{p_{\dd{S}{I},z}^{\v{S}}}),\label{eq_R_CS_angle}
+% \dvec{R}_{\vv{C}{S}} &= \mat{R}_x(\mathrm{atan}\frac{p_{\dd{S}{I},y}^{\,\v{S}}}{p_{\dd{S}{I},z}^{\,\v{S}}}),\label{eq_R_CS_angle}
 % \end{align}
 % %
 % or equivalently if $\hat{\dvec{p}}_{SI}^I$ is the normalized version of $\dvec{p}_{SI}^I$,
@@ -799,28 +802,28 @@ An OpenGL camera has $\hat{x}$ pointing right, $\hat{y}$ pointing up and $\hat{z
 We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 %
 \begin{align}
-\dvec{T}_{\bb{C}{S}}^{\v{C}} &= 
+\dvec{T}_{\bb{C}{S}}^{\,\v{C}} &= 
 \left[\begin{array}{c c}
- \mat{R}_{\vv{C}{S}} & \dvec{p}_{\dd{C}{S}}^{\v{C}} \\%\hline
+ \mat{R}_{\vv{C}{S}} & \dvec{p}_{\dd{C}{S}}^{\,\v{C}} \\%\hline
  \dvec{0}^T  &  1
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a regular rotation matrix,
+$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a rotation matrix having $\vec{p}_{CI}$ as its bases,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &=
 \left[\begin{array}{c c c}
  1 & 0                 & 0                 \\%\hline
- 0 & \hat{{p}}_{\dd{C}{I},z}^{\v{C}} & -\hat{{p}}_{\dd{C}{I},y}^{\v{C}} \\
- 0 & \hat{{p}}_{\dd{C}{I},y}^{\v{C}} &  \hat{{p}}_{\dd{C}{I},z}^{\v{C}} 
+ 0 & \hat{{p}}_{\dd{C}{I},z}^{\,\v{C}} & -\hat{{p}}_{\dd{C}{I},y}^{\,\v{C}} \\
+ 0 & \hat{{p}}_{\dd{C}{I},y}^{\,\v{C}} &  \hat{{p}}_{\dd{C}{I},z}^{\,\v{C}} 
 \end{array}\right] \in \mathrm{SO}(3), \label{eq_R_CS_coordinate}
 \end{align}
 %
 and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 %
 \begin{align}
-\dvec{p}_{\dd{C}{S}}^{\v{C}} &= \boldsymbol{0}\T \in \mathbb{R}^3.
+\dvec{p}_{\dd{C}{S}}^{\,\v{C}} &= \boldsymbol{0}\T \in \mathbb{R}^3.
 \end{align}
 
 
@@ -839,12 +842,12 @@ After the sonar has recorded, motion compensated and match filtered the acoustic
 To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ($\ubar{R}$ for "ranged-device") with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
-\dvec{p}^{\v[R1]{R}}
+\dvec{p}^{\,\v[R1]{R}}
 = \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
-= \bmat{{p}_x^{\v{C}}\\
-\text{atan}\big({p}_y^{\v{C}} / {p}_z^{\v{C}}\big)\\
-\text{sign}(p_z^{\v{C}})
-\sqrt{({p}_y^{\v{C}})^2 + ({p}_z^{\v{C}})^2}
+= \bmat{{p}_x^{\,\v{C}}\\
+\text{atan}\big({p}_y^{\,\v{C}} / {p}_z^{\,\v{C}}\big)\\
+\text{sign}(p_z^{\,\v{C}})
+\sqrt{({p}_y^{\,\v{C}})^2 + ({p}_z^{\,\v{C}})^2}
 }
 %
 \tikz[overlay,remember picture]{
@@ -910,13 +913,13 @@ The along-track, cross-track and elevation boundaries form a cylindrical slice, 
 %where $\textrm{GL}_4(\mathbb{R})$ is the (general linear) group of invertible $\mathbb{R}^{4,4}$ matrices, $\mat{L}_{NR}^N$ performs coordinate normalization,
 %%
 %\begin{align}
-%\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
+%\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}\right)
 %\end{align}
 %%
 %and $\dvec{t}_{NR}^N$ is an offset
 %%
 %\begin{align}
-%\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
+%\dvec{t}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}.
 %\end{align}
 %%
 %Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
@@ -935,13 +938,13 @@ We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a general linear (invertible) matri
 $\vec{L}_{NR} = \vec{I}\,\lVert\vec{p}_{IE}\cdot\hat{u}\rVert^{-1}$ in $\ubar{N}$ by a scaling matrix,
 %
 \begin{align}
-\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}\right)
+\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}\right)
 \end{align}
 %
 and $\vec{p}_{NR} = \frac{\vec{p}_{RI}}{\lVert\vec{p}_{IE}\cdot\hat{u}\rVert}$ in $\ubar{N}$ by coordinates,
 %
 \begin{align}
-\dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\v{R}}.
+\dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}.
 \end{align}
 %
 Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
@@ -987,7 +990,7 @@ The rendered image will appear as if we placed a window at the sonar and looked 
 
 Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
-The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us the parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
+The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us all parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
 
 \begin{align}
 &\text{forall } y,\varphi \nn
@@ -1282,82 +1285,138 @@ Template quality was similar with both SIGMAS+ and FFISim. The main difference l
 \appendices
 \fi
 
-{\color{blue}Cherie: Just wait with the appendix for now. Not yet looked at it.}
-
-
 \section{Rotations}\label{IV_transformation_matrices}
 
-Rotations are special forms of linear operations that can be expressed in either free or decomposed form. We focus on the Euler-Rodrigues rotation formula, an axis-angle representation introduced by Euler in 1775 that still finds new areas of use e.g. in e.g. the study of coordinate free geometry, quaternions and Lie algebra~\cite{Dai2015}. 
+Rotations are special linear operations with many possible free and decomposed formulations. A common one is Euler-Rodrigues formula and parameter, an axis-angle representation introduced by Euler in 1775 with many modern developments~\cite{Dai2015}. % in e.g. the study of coordinate free geometry, quaternions and Lie algebra.
+%It parametrizes the rotation in terms of a half-angle  
 
 
 \subsection{Free notation}\label{IV_sec:free_euler_rodrigues}
 
-The Euler-Rodrigues formua has the following free form
+Euler-Rodrigues formula rotates a vector $\vec{p}$ by angle $\theta$ clockwise around unit-vector $\hat{r}$ in $\mathbb{R}^3$ Euclidean space,
 %
-\begin{align}\label{eq:p_rot_free}
+\begin{align}\label{IV_eq_euler_rodrigues_free}
 \vec{p}_\mathrm{rot} =  \vec{p} + 2a(\vec{\omega}\times\vec{p}) + 2(\vec\omega \times (\vec\omega \times \vec{p}))
 \end{align}
-
-and their orientations by a rotation dyadic $\vec{R}_{IM}$ mapping any vector in $\uvec{M}$ to $\uvec{I}$ (which includes the basis vectors),
 %
-\begin{align}
-\vec{R}_{IM}\colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\
-\vec{M}_i &\mapsto \vec{I}_i \quad \forall i. \nonumber
-\end{align}
-
-We define $\vec{R}_{AB}$ as a rotation---from $\uvec{A}$ to $\uvec{B}$---by angle $\theta\in\mathbb{R}$ clockwise around unit vector $\hat{r}\in\mathbb{V}$ in $\mathbb{R}^3$ Euclidean space using Euler-Rodrigues' formula,
-
-
-
+where $\times$ denotes cross product, and
 %
-\begin{align}\label{eq:M}
-%\uvec{A} = \vec{R}_{\uvec{A}\uvec{B}}\uvec{B} \\
-\vec{R}_{AB}
-&\triangleq %e^{j\overset{\times}{r}\theta}=\nn
- \vec{I} + \sin\theta \vec{S}(\vec{r}_{AB}) + (1-\cos\theta)\vec{r}_{AB}\vec{r}_{AB},
+\begin{align}\label{eq:p_rot_free}
+a = \cos\frac{\theta}{2} \quad \text{and} \quad
+\vec\omega = \hat{r}\sin\frac{\theta}{2}
 \end{align}
 %
-where $\vec{I}$ is the identity, and $S(\vec{r}_{AB})$ is the skew-symmetric dyadic form of $\vec{r}_{AB}$,
+are Euler-Rodrigues axis-angle parameters. Substituting these into \eq{IV_eq_euler_rodrigues_free} and recognizing the trigonometric identities $\sin^2\theta = \frac{1}{2}(1-\cos2\theta)$ and $\cos\theta\sin\theta=\frac{1}{2}\sin2\theta$ yields the alternative form
+%
+\begin{align}\label{IV_eq_euler_rodrigues2}
+\vec{p}_\mathrm{rot} =  \vec{p} + \sin\theta(\hat{r}\times\vec{p}) + (1-\cos\theta)(\hat{r} \times (\hat{r} \times \vec{p})),
+\end{align}
+%
+where $\hat{r}$ and $\theta$ are Euler axis-angle parameters. Factoring out $\vec{p}$ from this equation yields a \emph{rotation dyadic} $\vec{R}$,
+%
+\begin{align}\label{IV_eq_euler_rodrigues2}
+\vec{R}(\hat{r},\theta) =  \vec{I} + \sin\theta{}S(\hat{r}) + (1-\cos\theta)S^2(\hat{r}),
+\end{align}
+%
+where $\vec{I}$ is an identity dyadic and $S(\hat{r}) = [\hat{r}\times]$ is the skew-symmetric dyadic form of $\hat{r}$. Dyadics are tensors of rank 2 with a vector-like notation. They act like matrices but are basis-vector independent, ideal for free notation. 
+
+If we define the rotation from $\uvec{A}$ to $\uvec{B}$, we denote this with subscripts: $\vec{R}_{AB}$, $\hat{r}_{AB}$ and $\theta_{AB}$.
+
+\subsection{Decomposed notation}
+
+Euler-Rodrigues' formula take on a very similar decomposed form,
 %
 \begin{align}
-\overset{\times}{r}
-&\triangleq \bmat{\hat{r}\times} \triangleq \bmat{
+\mat{R}
+&= \I + \sin\theta{}\mat{S}(\boldsymbol{\hat{r}}) + (1-\cos\theta)\mat{S}^2(\boldsymbol{\hat{r}})\label{IV_eq_euler_rodrigues_decomposed} \\
+&= e^{\theta{}\mat{S}(\boldsymbol{\hat{r}})} \in\mathrm{SO}(3)\label{IV_eq_euler_rodrigues_exponential},
+\end{align}
+%
+where $\mat{S}(\boldsymbol{\hat{r}})$ denotes the skew-symmetric matrix form of $\boldsymbol{\hat{r}}$,
+%
+\begin{align}
+\mat{S}
+&= \bmat{
 0 & -\hat{r}_z & \hat{r}_y \\
 \hat{r}_z & 0 & -\hat{r}_x \\
 -\hat{r}_y & \hat{r}_x & 0
+} \in\mathfrak{so}(3).
+\end{align}
+%
+That the complex matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} equals the trigonometric formulation in \eq{IV_eq_euler_rodrigues_decomposed} may be verified by Taylor expansion about $\theta=0$. The result is interesting because it states that the axis-angle parameters are related to the rotation matrix by an exponential map. In Lie terms, it maps the Lie algebra $\mathfrak{so}(3)$ to the Lie group $\mathrm{SO}(3)$.
+
+(TODO: Elaborate on robotics advantage of using matrix exponential)
+
+(TODO: Quaternions, simply insert the Euler-Rodrigues parameters)
+%
+\begin{align}
+\dvec{q} = \bmat{a & \boldsymbol\omega^T}
+\end{align}
+
+
+
+%%
+%and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
+%%
+%\begin{align}
+%\theta
+%&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
+%\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
+%\end{align}
+%%
+%where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.
+
+
+%~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
+
+%The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
+%%
+%%
+%where $\big[\dvec{\hat{r}}_{AB}^A\big]$ is the open-right cross product matrix of $\dvec{\hat{r}}^A$ and $\mat{I}$ is the identity matrix. 
+%
+%% %\dvec{\hat{p}}_{A\times{}B}^C
+%\begin{align}
+%\theta_{AB}
+%&= \mathrm{acos}\frac{\dvec{p}_{A}^{C}\cdot\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert} \\
+%\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
+%\end{align}
+
+\subsection{Euler-angles}
+
+End-users often prefer Euler-angles over axis-angle parametrizations. These are yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. Rotation order follow the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, in which roll is applied first, then pitch and finally yaw:
+%
+\begin{align}
+\R(\phi_x) = \R_z(\phi)\R_y(\theta)\R_x(\psi),
+\end{align}
+%
+where
+%
+\begin{align}
+\R_x(\psi) &= \bmat{
+    1  &   0        &  0         \\
+    0  &  \cos\psi  &  -\sin\psi \\
+    0  &  \sin\psi  &  \cos\psi 
+}, \\[.5\baselineskip]
+\R_y(\theta) & = \bmat{
+\cos\theta	& 0          & \sin\theta \\
+0				& 1          & 0          \\
+-\sin\theta & 0          & \cos\theta 
 },
+%\\[0\baselineskip]
+\intertext{and}
+%\\[0\baselineskip]
+\R_z(\phi) &= \bmat{
+\cos\phi	&  -\sin\phi   &  0       \\
+\sin\phi	&  \cos\phi    &  0       \\
+0			&  0           &  1       
+}.
 \end{align}
 %
-and the angle $\theta$ and rotation axis $\hat{r}_{AB}$ can be expressed in terms of $\vec{p}_A$ and $\vec{p}_{B}$,
-%
-\begin{align}
-\theta
-&= \mathrm{acos}\frac{\vec{p}_{A}\cdot\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert} \\
-\hat{r}_{AB} &=  \frac{\vec{p}_{A}\times\vec{p}_{B}}{\lVert\vec{p}_{A}\rVert\lVert\vec{p}_{B}\rVert}
-\end{align}
-%
-where $\cdot$ and $\times$ denotes the dot- and cross-product, respectively.\todo{Mighty long and heavy sentence... Yikes}
-
-$SO(3)$ refers to special (\emph{i.e.} right handed) orthogonal $\mathbb{R}^{3\times3}$ matrices, where the handedness is verified by determinant $\big|R\big|=1$ (as opposed to $\pm1$), and the orthogonality follows from the skew symmetry of $\overset{\times}{r}_{AB}$. $SO(3)$ are also known as rigid transformations, because they preserve the distance and orientation between points~\cite{Murray1994}\footnote{Pages 26-27}\todo{Valid page specification?}.
-
-We restrict our attention to linear transforms of the kind $\mat{L}_{AB} = \mat{R}_{AB}\;\mat{S}_{AB}$ where the former is a rotation matrix and the latter a scaling matrix. The rotations are performed with Euler-Rodrigues formula~\cite{Dai2015} using a unit length rotation axis $\dvec{\hat{r}}_{AB}^A$ and angle $\theta_{AB}$:
-%
-\begin{align}\label{eq:M}
-\mat{R}_{AB} &= \I + \sin\theta_{AB}\;[\dvec{\hat{r}}^A\times] + (1-\cos\theta_{AB})\;[\dvec{\hat{r}}^A\times]^2 \in\mathbb{R}^{3\times3}
-\end{align}
-%
-where $\big[\dvec{\hat{r}}_{AB}^A\big]$ is the open-right cross product matrix of $\dvec{\hat{r}}^A$ and $\mat{I}$ is the identity matrix. 
-
-% %\dvec{\hat{p}}_{A\times{}B}^C
-\begin{align}
-\theta_{AB}
-&= \mathrm{acos}\frac{\dvec{p}_{A}^{C}\cdot\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert} \\
-\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
-\end{align}
+Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Adding a fourth parameter can resolve the issue. e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter has the added benefit of reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. An alternative used extensively at FFI that is non-singular and practical is the $\vec n$-vector notation~\cite{Gade2010}. However, we stick with the Euler-angle representation here due to their simplicity.
 
 
 
-\section{Active rotations and transforms}\label{IV_active_rotations_transforms} 
+\subsection{Active vs passive rotations}\label{IV_active_rotations_transforms} 
 
 The geometrical intent of an active rotation is to move a point, by contrast the passive version which instead changes the point's representation. With our notation this can be expressed as either
 %
@@ -1405,80 +1464,13 @@ depending on whether the free or decomposed form is wanted, and where $\vec{R}\c
 % http://lairs.eng.buffalo.edu/pdffiles/pconf/C10.pdf
 % http://www.navlab.net/Publications/Inertial_Navigation_-_Theory_and_Applications.pdf
 
-Each data model that we load into OpenGL is defined in its own local coordinate system. To map them into OpenGL world coordinates a set of common transformation matrices are applied to each model's vertices:
-%
-\begin{align}
-\bmat{x_t \\ y_t \\ z_t \\ w}_\text{\parbox{1cm}{\setlength\baselineskip{0.3cm}transformed\\model}} &= \boldsymbol{T} \cdot \boldsymbol{R} \cdot \boldsymbol{S} \cdot \bmat{x \\ y \\ z \\ w}_\text{model}.
-\end{align}
-%
-Here a model vertex at position $(x,y,z)$ is first scaled with $\boldsymbol{S}$, then rotated with $\boldsymbol{R}$ and finally translated with $\boldsymbol{T}$, resulting in the transformed coordinates $(x_t,y_t,z_t)$. The parameter $w$ defines whether the vertex is a position ($w=1$) or a direction ($w=0$), which need to be handled differently. While these matrices are well-known in the field of computer graphics, there exist several different conventions but we supply them here for completeness.
 
-%Adding some phantom space to align the columns of the next matrices
-\newcommand\pc[1]{\phantom{ml}#1\phantom{ml}}
-The scaling and translation matrices are simple:
-%
-\begin{align}
-\boldsymbol{S}(\s) &= \bmat{
-   s_x  &  0   & 0  & 0 \\
-   0    &  s_y  &  0    &  0 \\
-   0    &  0    &  s_z  &  0 \\
-   \pc{0}    &  \pc{0}    &  \pc{0}    & \pc{1} \\
-  },
-  \end{align}
-%
-and
-%
-\begin{align}
-\boldsymbol{T(\vec\Delta}) &= \bmat{
-	1  &  0  &  0  &  \Delta_x \\
-	0  &  1  &  0  &  \Delta_y \\
-	0  &  0  &  1  &  \Delta_z \\
- \pc{0}  &   \pc{0}  &   \pc{0}  &   \pc{1} \\
-},
-\end{align}
-%
-where $\s = (s_x, s_y, s_z)$ and $\vec\Delta = (\Delta_x, \Delta_y, \Delta_z)$ are the scaling and translation factors.
-
-Rotations will be specified using yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. Rotation order follow the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, in which roll is applied first, then pitch and finally yaw:
-%
-\begin{align}
-\R(\phi_x) = \R_z(\phi)\R_y(\theta)\R_x(\psi),
-\end{align}
-%
-where
-%
-\begin{align}
-\R_x(\psi) &= \bmat{
-    1  &   0        &  0         &  0 \\
-    0  &  \cos\psi  &  -\sin\psi &  0 \\
-    0  &  \sin\psi  &  \cos\psi  &  0 \\
-\pc{0} &  \pc{0}    &  \pc{0}    &  \pc{1} \\
-}, \\[.5\baselineskip]
-\R_y(\theta) & = \bmat{
-\cos\theta	& 0          & \sin\theta & 0 \\
-0				& 1          & 0          & 0  \\
--\sin\theta & 0          & \cos\theta & 0  \\
-\pc{0}      &  \pc{0}    & \pc{0}     & \pc{1} \\
-},
-%\\[0\baselineskip]
-\intertext{and}
-%\\[0\baselineskip]
-\R_z(\phi) &= \bmat{
-\cos\phi	&  -\sin\phi   &  0      &  0 \\
-\sin\phi	&  \cos\phi    &  0      &  0 \\
-0			&  0           &  1      &  0 \\
-\pc{0}	&  \pc{0}      &  \pc{0} &  \pc{1} \\
-}.
-\end{align}
-%
-Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Adding a fourth parameter can resolve the issue. e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter has the added benefit of reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. An alternative used extensively at FFI that is non-singular and practical is the $\vec n$-vector notation~\cite{Gade2010}. However, we stick with the Euler-angle representation here due to their simplicity.
 
 
 %xyz - system space coordinates (fixed unmoving)
 %XYZ - system body coordinates (body fixed moving)
 
 
-Translation is performed last. 
 
 %and the bases in terms of a linear operator $\vec{R}_{AB} \in SO(3)$ which rotates around an axis $\hat{r}$ by angle $\theta$,
 %%
