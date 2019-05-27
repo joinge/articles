@@ -534,7 +534,7 @@ When $\dvec{R}_{IM} = \bmat{\boldsymbol{\hat{x}}_M^S & \boldsymbol{\hat{y}}_M^S 
 %
 We can drop the superscript, $\dvec{R}_{IM} = \dvec{R}_{IM}^I = \dvec{R}_{IM}^M$, because $\dvec{p}_{MV}^M$ is rotated around a $\mathbb{R}^{N-2}$-subspace that is fixed in both $\ubar{I}$ and $\ubar{M}$.
 
-The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_active_rotations_transforms}, but only passive transformations will be needed henceforth.
+The rotation in \eq{eq_passive_rotation} is called passive because its geometric intent is to change the representation but leave the absolute position of the point unchanged. An active transformation, by contrast, changes the vector but not the representation. A notational remark on this can be found in Appendix \ref{IV_sec:active_passive_rotations}, but only passive transformations will be needed henceforth.
 
 
 \subsection{Homogeneous transformations}
@@ -809,7 +809,7 @@ We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a rotation matrix having $\vec{p}_{CI}$ as its bases,
+$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a rotation matrix where $\vec{p}_{CI}$ defines $\hat{y}_{CS}$ and $\hat{z}_{CS}$,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &=
@@ -843,7 +843,7 @@ To prepare for this computation and ease specification of spatial system boundar
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\,\v[R1]{R}}
-= \mathrm{T}_{\v[R2]{R}\c[C1]{C}}(\dvec{p}^{\c[C2]{C}})
+= \mathrm{T}_{\v[R2]{R}\cv[C1]{C}}(\dvec{p}^{\cv[C2]{C}})
 = \bmat{{p}_x^{\,\v{C}}\\
 \text{atan}\big({p}_y^{\,\v{C}} / {p}_z^{\,\v{C}}\big)\\
 \text{sign}(p_z^{\,\v{C}})
@@ -1291,7 +1291,7 @@ Rotations are special linear operations with many possible free and decomposed f
 %It parametrizes the rotation in terms of a half-angle  
 
 
-\subsection{Free notation}\label{IV_sec:free_euler_rodrigues}
+\subsection{Free notation}\label{IV_sec:euler_rodrigues_free}
 
 Euler-Rodrigues formula rotates a vector $\vec{p}$ by angle $\theta$ clockwise around unit-vector $\hat{r}$ in $\mathbb{R}^3$ Euclidean space,
 %
@@ -1301,7 +1301,7 @@ Euler-Rodrigues formula rotates a vector $\vec{p}$ by angle $\theta$ clockwise a
 %
 where $\times$ denotes cross product, and
 %
-\begin{align}\label{eq:p_rot_free}
+\begin{align}\label{IV_eq_euler_rodrigues_parameters}
 a = \cos\frac{\theta}{2} \quad \text{and} \quad
 \vec\omega = \hat{r}\sin\frac{\theta}{2}
 \end{align}
@@ -1315,24 +1315,24 @@ are Euler-Rodrigues axis-angle parameters. Substituting these into \eq{IV_eq_eul
 where $\hat{r}$ and $\theta$ are Euler axis-angle parameters. Factoring out $\vec{p}$ from this equation yields a \emph{rotation dyadic} $\vec{R}$,
 %
 \begin{align}\label{IV_eq_euler_rodrigues2}
-\vec{R}(\hat{r},\theta) =  \vec{I} + \sin\theta{}S(\hat{r}) + (1-\cos\theta)S^2(\hat{r}),
+\vec{R}_{\mathrm{er}}(\hat{r},\theta) =  \vec{I} + \sin\theta{}S(\hat{r}) + (1-\cos\theta)S^2(\hat{r}),
 \end{align}
 %
 where $\vec{I}$ is an identity dyadic and $S(\hat{r}) = [\hat{r}\times]$ is the skew-symmetric dyadic form of $\hat{r}$. Dyadics are tensors of rank 2 with a vector-like notation. They act like matrices but are basis-vector independent, ideal for free notation. 
 
-If we define the rotation from $\uvec{A}$ to $\uvec{B}$, we denote this with subscripts: $\vec{R}_{AB}$, $\hat{r}_{AB}$ and $\theta_{AB}$.
+We denote a rotation $\uvec{A}\to\uvec{B}$ with subscripts: $\vec{R}_{\mathrm{er},AB}$, $\hat{r}_{AB}$ and $\theta_{AB}$.
 
-\subsection{Decomposed notation}
+\subsection{Decomposed notation}\label{IV_sec:euler_rodrigues_decomposed}
 
-Euler-Rodrigues' formula take on a very similar decomposed form,
+Euler-Rodrigues' formula takes on a very similar decomposed form,
 %
 \begin{align}
-\mat{R}
-&= \I + \sin\theta{}\mat{S}(\boldsymbol{\hat{r}}) + (1-\cos\theta)\mat{S}^2(\boldsymbol{\hat{r}})\label{IV_eq_euler_rodrigues_decomposed} \\
-&= e^{\theta{}\mat{S}(\boldsymbol{\hat{r}})} \in\mathrm{SO}(3)\label{IV_eq_euler_rodrigues_exponential},
+\mat{R}_{\mathrm{er}}
+&= \I + \sin\theta{}\mat{S}(\dhat{r}) + (1-\cos\theta)\mat{S}^2(\dhat{r})\label{IV_eq_euler_rodrigues_decomposed} \\
+&= e^{\theta{}\mat{S}(\dhat{r})} \in\mathrm{SO}(3)\label{IV_eq_euler_rodrigues_exponential},
 \end{align}
 %
-where $\mat{S}(\boldsymbol{\hat{r}})$ denotes the skew-symmetric matrix form of $\boldsymbol{\hat{r}}$,
+where $\theta\in[0,\pi]$ and $\mat{S}(\dhat{r})$ denotes the skew-symmetric matrix form of $\dhat{r}\in\mathbb{R}^3$,
 %
 \begin{align}
 \mat{S}
@@ -1343,15 +1343,98 @@ where $\mat{S}(\boldsymbol{\hat{r}})$ denotes the skew-symmetric matrix form of 
 } \in\mathfrak{so}(3).
 \end{align}
 %
-That the complex matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} equals the trigonometric formulation in \eq{IV_eq_euler_rodrigues_decomposed} may be verified by Taylor expansion about $\theta=0$. The result is interesting because it states that the axis-angle parameters are related to the rotation matrix by an exponential map. In Lie terms, it maps the Lie algebra $\mathfrak{so}(3)$ to the Lie group $\mathrm{SO}(3)$.
+The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_rodrigues_decomposed} and the matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} may be verified by Taylor expansion about $\theta=0$. Note how axis-angle parameters are related to rotation matrices by the exponential function. Stated in group theory terms: possible rotations make up the Lie group $\mathrm{SO}(3)$, possible axis-angle pair make up the Lie algebra group $\mathfrak{so}(3)$, and an exponential map relates them.
 
-(TODO: Elaborate on robotics advantage of using matrix exponential)
 
-(TODO: Quaternions, simply insert the Euler-Rodrigues parameters)
+% Ordinary exponential function: Special case of the exponential map when G is the multiplicative (symmetry) group of postive real numbers, whose Lie algebra is the additive group of real numbers.
+
+% Action associated with 
+
+
+% continuous domain (no discontinuties) = differentiable
+% SO(3) is diffeomorphic ({N,M} in SO(3), differentiable f: M to N is bijective and has differentible inverse) to the real projective space RP3
+
+% diffeomorphic (both differentiable, bijective map): so(3) -> SO(3), SO(3) -> RP3
+% homomorphic   ( f(X Y) = f(X) f(Y) (same shape)
+% homeomorphic  (continuous map, continuous inverse) 
+% isomorphic:    so(3) -> su(2)
+% (same as homomorphic?)
 %
-\begin{align}
-\dvec{q} = \bmat{a & \boldsymbol\omega^T}
+% homoemorphisms are usually diffeomorphic (exceptions found in 4 or more dimensions)
+% 
+% actions 
+
+% - A group is a collection of symmetrical actions on some mathematical object.
+% - Every group has a certain arthmetic, where one can combine two actions by applying one after the other and asking: what other action from the group gives the same overall effect?
+% - Number can be thought of in two different ways as a group
+%   1. Act by sliding actions 	                   (group arithmetic looks like addition)
+%   2. Act by stretching/squishing/rotating actions (group arithmetic looks like multiplication)
+% Group of actions on a set of mathematical objects
+% Action associated with mathematical object(s).
+% Group of symmetrical sliding actions
+% Group of symmetrical stretching/squishing actions
+% Groups of symmetries acting on some object
+
+\subsection{Quaternions}% and \texorpdfstring{$\hat{n}$-vector}{n-vector}}
+
+Quaternions are a popular alternative to rotation matrices in computer graphics. They represent orientation by the four Euler-Rodrigues parameters in \eq{IV_eq_euler_rodrigues_parameters},
+%
+\begin{align}\label{IV_eq_quaternion}
+\dvec{q} = \bmat{a & \boldsymbol\omega} = \bmat{\cos\frac{\theta}{2} & \dvec\omega^T\sin\frac{\theta}{2}}
 \end{align}
+% 
+subject to $\rVert \dvec{q} \rVert = 1$. Unit length quaternions are called versors and have their own Lie group\todo{details. bijective?}. We denote a rotation $\uvec{A}\to\uvec{B}$ as $\dvec{q} = \dvec{q}_{AB}(\theta_{AB},\dhat{r}_{AB}^A)$ and apply it with 
+%
+\begin{align}\label{IV_eq_quaternion_usage}
+\dvec{p}^{\v{A}} = \dvec{q}\dvec{p}^{\v{B}}\dvec{q}^*,
+\end{align}
+%
+where $\dvec{q}^*$ negates the three last coefficients ($\dvec\omega$). We may use our notation system by wrapping \eq{IV_eq_quaternion_usage} into a function,
+%
+\begin{align}\label{IV_eq_quaternion_function}
+\nonumber\\
+\dvec{p}^{\,\v[R1]{A}}
+= \mathrm{T}_{\mathrm{qu},\v[R2]{A}\c[C1]{B}}(\dvec{p}^{\c[C2]{B}})
+%
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+%  \coordinate(_MV)  at ($   (V.south)    + (-1.0\baselineskip,-1.0\baselineskip) $);
+  \coordinate(_R1)  at ($ (R1.north) + ( 1.0\baselineskip,1.0\baselineskip) $);
+  \path let \p1 = ($ (R2.north) + (-1.0\baselineskip,0ex) $), \p2 = (_R1) in coordinate (_R2)  at (\x1,\y2);
+%   \coordinate(_I3)  at ($ (I3.north) + (-1.0\baselineskip,1.0\baselineskip) $);
+  \coordinate(_R12)  at ($ .5*(_R1) + .5*(_R2) $);
+  % Draw arrows and text
+%           to[out=180, in=0]    (_I1)
+    \draw[color=cDarkArrow]      ($ (R2.north) + (0em,\tpad) $)
+           to[out=90,  in=0]    (_R2)
+           to[out=180, in=0]    (_R1)
+           to[out=180, in=90]($ (R1.north) + (0em,\tpad) $);
+    }
+\end{align}
+%
+Quaternions can reduce computational complexity, improve numerical stability and facilitate efficient spherical interpolations. 
+
+
+%(Quaternions: 4 parameters = 3 user-defined degrees of freedom + 1 constraint (unit length). Called versor. Is a Lie group. Not bijective(?))
+
+
+
+%Another convenient, non-singular and practical alternative is the $\vec n$-vector notation~\cite{Gade2010}. 
+
+%
+%(TODO: Elaborate on robotics advantage of using matrix exponential)
+%
+%(TODO: Quaternions, simply insert the Euler-Rodrigues parameters)
+
+%
+%G = exp(g)
+%
+%G - multiplicative group of positive real numbers
+%g - additive group of all real numbers
+%
+%SO(3) - the multiplicative group of proper rotations
+%so(3) - the additive group of 
+
 
 
 
@@ -1383,10 +1466,10 @@ That the complex matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} eq
 
 \subsection{Euler-angles}
 
-End-users often prefer Euler-angles over axis-angle parametrizations. These are yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. Rotation order follow the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, in which roll is applied first, then pitch and finally yaw:
+End-users often prefer Euler or Tait-Brian angles over axis-angle parametrizations. They specify an orientation composed from three elementary rotations; Euler rotations about the same first and third axis, or Tait-Brian rotations about three unique axes. The rotations can either be intrinsic or extrinsic, depending on whether the coordinate system follows the rotation or stays fixed, respectively. We use the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, with the \emph{nautical angles} yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. In this convention, roll is applied first, then pitch and finally yaw,
 %
 \begin{align}
-\R(\phi_x) = \R_z(\phi)\R_y(\theta)\R_x(\psi),
+\R_{\mathrm{eu}} = \R_z(\phi)\R_y(\theta)\R_x(\psi),
 \end{align}
 %
 where
@@ -1412,11 +1495,11 @@ where
 }.
 \end{align}
 %
-Note that at $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Adding a fourth parameter can resolve the issue. e.g. by direct specification of orientation in terms of a rotation axis and angle. This can be achieved using the Euler-Rodrigues formula or with quaternions. The latter has the added benefit of reduced computational complexity, improved numerical stability and simple ways to perform spherical interpolations. An alternative used extensively at FFI that is non-singular and practical is the $\vec n$-vector notation~\cite{Gade2010}. However, we stick with the Euler-angle representation here due to their simplicity.
+At $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Axis-angle representations like Euler-Rodrigues formula or quaternions avoids this issue by adding a fourth parameter and one constraint: one angle and three parameters for the rotation axis subject to unit length. 
 
 
 
-\subsection{Active vs passive rotations}\label{IV_active_rotations_transforms} 
+\subsection{Active vs passive rotations}\label{IV_sec:active_passive_rotations} 
 
 The geometrical intent of an active rotation is to move a point, by contrast the passive version which instead changes the point's representation. With our notation this can be expressed as either
 %
@@ -1577,10 +1660,10 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
    % WHO's needing processing power
    % - Centre for Maritime Research and Experimentation
    
-   
-   \vfill 
-   
-   \input{derivations}
+%   
+%   \vfill 
+%   
+%   \input{derivations}
 
 \fi
 
