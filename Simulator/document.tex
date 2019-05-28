@@ -809,7 +809,7 @@ We represent $\vec{T}_{CS}$ in $\ubar{C}$ by a special Euclidean matrix,
 \end{array}\right] \in \mathrm{SE}(3), \label{eq_T_CS}
 \end{align}
 %
-$\vec{R}_{CS} = \vec{R}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a rotation matrix where $\vec{p}_{CI}$ defines $\hat{y}_{CS}$ and $\hat{z}_{CS}$,
+$\vec{R}_{CS} = \vec{R}_\mathrm{er}(\hat{x}_C, \angle(\hat{z}_S,\vec{p}_{SI}))$ in $\ubar{C}$ by a rotation matrix where $\vec{p}_{CI}$ defines $\hat{y}_{CS}$ and $\hat{z}_{CS}$,
 %
 \begin{align}
 \dvec{R}_{\vv{C}{S}} &=
@@ -896,7 +896,7 @@ where
 
 %The OpenGL 
 
-There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, collapses the depth dimension thereby preserving object size.  Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
+There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, collapse the depth dimension but preserve object size.  Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
 
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
@@ -1343,7 +1343,7 @@ where $\theta\in[0,\pi]$ and $\mat{S}(\dhat{r})$ denotes the skew-symmetric matr
 } \in\mathfrak{so}(3).
 \end{align}
 %
-The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_rodrigues_decomposed} and the matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} may be verified by Taylor expansion about $\theta=0$. Note how axis-angle parameters are related to rotation matrices by the exponential function. Stated in group theory terms: possible rotations make up the Lie group $\mathrm{SO}(3)$, possible axis-angle pair make up the Lie algebra group $\mathfrak{so}(3)$, and an exponential map relates them.
+The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_rodrigues_decomposed} and the matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} may be verified by Taylor expansion about $\theta=0$. Note how axis-angle parameters are related to rotation matrices by the exponential function. Stated in group theory terms: possible rotations make up the Lie group $\mathrm{SO}(3)$, possible axis-angle pair make up the Lie algebra $\mathfrak{so}(3)$, and an exponential map relates them.
 
 
 % Ordinary exponential function: Special case of the exponential map when G is the multiplicative (symmetry) group of postive real numbers, whose Lie algebra is the additive group of real numbers.
@@ -1380,7 +1380,7 @@ The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_
 Quaternions are a popular alternative to rotation matrices in computer graphics. They represent orientation by the four Euler-Rodrigues parameters in \eq{IV_eq_euler_rodrigues_parameters},
 %
 \begin{align}\label{IV_eq_quaternion}
-\dvec{q} = \bmat{a & \boldsymbol\omega} = \bmat{\cos\frac{\theta}{2} & \dvec\omega^T\sin\frac{\theta}{2}}
+\dvec{q} = \bmat{a & \boldsymbol\omega} = \bmat{\cos\frac{\theta}{2} & \dvec\omega^T\sin\frac{\theta}{2}} \in\mathbb{R}^4
 \end{align}
 % 
 subject to $\rVert \dvec{q} \rVert = 1$. Unit length quaternions are called versors and have their own Lie group\todo{details. bijective?}. We denote a rotation $\uvec{A}\to\uvec{B}$ as $\dvec{q} = \dvec{q}_{AB}(\theta_{AB},\dhat{r}_{AB}^A)$ and apply it with 
@@ -1389,12 +1389,12 @@ subject to $\rVert \dvec{q} \rVert = 1$. Unit length quaternions are called vers
 \dvec{p}^{\v{A}} = \dvec{q}\dvec{p}^{\v{B}}\dvec{q}^*,
 \end{align}
 %
-where $\dvec{q}^*$ negates the three last coefficients ($\dvec\omega$). We may use our notation system by wrapping \eq{IV_eq_quaternion_usage} into a function,
+where $\dvec{q}^*$ negates the three last coefficients ($\dvec\omega$). To use our notation system, we wrap \eq{IV_eq_quaternion_usage} into a function $\mathrm{T}_{\mathrm{qu}}$,
 %
 \begin{align}\label{IV_eq_quaternion_function}
 \nonumber\\
 \dvec{p}^{\,\v[R1]{A}}
-= \mathrm{T}_{\mathrm{qu},\v[R2]{A}\c[C1]{B}}(\dvec{p}^{\c[C2]{B}})
+= \mathrm{T}_{\mathrm{qu},\v[R2]{A}\c[C1]{B}}(\dvec{p}^{\c[C2]{B}}).
 %
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
@@ -1412,7 +1412,7 @@ where $\dvec{q}^*$ negates the three last coefficients ($\dvec\omega$). We may u
     }
 \end{align}
 %
-Quaternions can reduce computational complexity, improve numerical stability and facilitate efficient spherical interpolations. 
+Quaternions can reduce computational complexity, improve numerical stability and facilitate efficient spherical interpolations compared to rotation matrices, but lack the nice formal properties of the latter. 
 
 
 %(Quaternions: 4 parameters = 3 user-defined degrees of freedom + 1 constraint (unit length). Called versor. Is a Lie group. Not bijective(?))
