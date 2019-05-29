@@ -896,7 +896,7 @@ where
 
 %The OpenGL 
 
-There are different ways to project the scene's points onto a camera surface. Perspective projection, mimicking the human eye, scales all $x$ and $y$ coordinates inversely with $z$ to create a sense of perspective in the image. Orthographic projection, by contrast, collapse the depth dimension but preserve object size.  Our method of using an orthographic projection on the cylindrical data is a hybrid: $x$ is kept intact and $y$ is inversely scaled with $r$.
+There are different ways to project the scene's points onto a camera surface, both assuming Cartesian representation. Perspective projection, mimicking the human eye, scales coordinates inversely with depth (the $z$-coordinate) to create a sense of perspective in the image. Orthographic (affine) projection, by contrast, preserves object size by simply collapsing the depth dimension. We apply the orthographic projection, but on the cylindrical data, which keeps $x$ intact and scales $y$ inversely with $\tan(r)$.
 
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
@@ -935,7 +935,7 @@ We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a general linear (invertible) matri
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}
 %
-$\vec{L}_{NR} = \vec{I}\,\lVert\vec{p}_{IE}\cdot\hat{u}\rVert^{-1}$ in $\ubar{N}$ by a scaling matrix,
+$\vec{L}_{NR} = \vec{I}\,\lVert\vec{p}_{IE}\cdot\hat{u}\rVert^{-1}$\todo{probably wrong} in $\ubar{N}$ by a scaling matrix,
 %
 \begin{align}
 \dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}\right)
@@ -993,10 +993,13 @@ Echoes from the same range and along-track are therefore accumulated into the sa
 The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us all parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
 
 \begin{align}
-&\text{forall } y,\varphi \nn
-&\quad\text{if }\left\lfloor y_I\right\rfloor == y \nn
-&\qquad\dvec{a}_I[y] \colon= \big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
-&\qquad\dvec{a}_I[y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi]
+&\text{forall } x_R, r_R, \varphi_r \nn
+%&\quad\text{if }\left\lfloor y_I\right\rfloor == y \nn
+%&\qquad\dvec{a}_I[y] \colon= \big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
+%&\qquad\dvec{a}_I[y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi]
+&\qquad\dvec{o}[x_R, y] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
+&\qquad\dvec{o}[x_R, y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
+\qquad\dvec{o}[x_R, y] = \sum_{\forall \varphi_R} \qquad\dvec{o}[x_R, y]
 \end{align}
 %y_I &= \mat{T}_{IC}\dvec{d}_C[\varphi] \\
 %\dvec{a}_I[y] &= \suml{\forall \varphi} \begin{cases}
