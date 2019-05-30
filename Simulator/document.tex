@@ -606,7 +606,7 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
 
-Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; with the exception of seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. We represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
+Recall that a rigid object in three-dimensional space has six degrees of freedom: three for position and three for orientation. Therefore, for each rigid body transform, the sum of independent constraints and user-defined parameters must be six; with the exception of seven in the case of the model because we add a scaling factor $s_{IM}$ to its configuration, $\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$. For implementation we represent $\vec{T}_{IM}\colon \ubar{M}\to\ubar{I}$ in $\ubar{I}$ by a similarity matrix,
 %
 %We previously found that the representation of $\mathcal{C}_{IM}$ in $\uvec{I}$ can be written $\boldsymbol{\mathcal{C}}_{IM}^I = (\dvec{p}_{IM}^I,\mat{R}_{IM})$. To allow resizing the model, we now also add a scaling factor $s_{IM}$ (see \Tab{IV_tab_frames_transitions}). 
 % where Sim(3) is the set of $\mathbb{R}^{4\times4}$ similarity matrices that scales objects but otherwise preserves them (like the SE(3) group)
@@ -645,7 +645,7 @@ $\vec{p}_{IM}$ in $\ubar{I}$ by user-defined Cartesian coordinates,
 $\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \in [0,\pi]^3$,
 %
 \begin{align}
-\mat{R}_{\vv{I}{M}}    &= \mat{R}_{\mathrm{Euler}}(\psi,\theta,\phi) \in SO(3),
+\mat{R}_{\vv{I}{M}}    &= \mat{R}_{\mathrm{eu}}(\psi,\theta,\phi) \in SO(3),
 \end{align}
 %
 and $s_{IM}$ by a user-defined positive number,
@@ -654,7 +654,7 @@ and $s_{IM}$ by a user-defined positive number,
 s_{IM}\in\mathbb{R}^+.
 \end{align}
 %
-The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. $\mat{R}_{\mathrm{Euler}}$ is defined in Appendix \ref{IV_transformation_matrices}. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, the representation of transformation matrices must be specified to avoid ambiguity.
+The scaling factor shrinks the model if less than 1, \emph{vice versa} if greater. $\mat{R}_{\mathrm{eu}}$ is defined in Appendix \ref{IV_sec_euler_angles}. Since $\mat{T}_{IM}^I \ne \mat{T}_{IM}^M$ whenever a translation is involved, the representation of transformation matrices must be specified to avoid ambiguity.
 
 The transformation matrix usage is similar to that of the rotation matrix, except it requires a homogeneous coordinate $\dvec{\rho}_{MV}^M = [w\dvec{p}_{MV}^M;w]\T\in\mathbb{P}$ as input, where $w\in\mathbb{R}$ (we default to $w=1$),
 %
@@ -834,7 +834,7 @@ and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming and autofocus coherently combine these into echo intensities for every pixel position in the image. A typical one-dimensional hydrophone array extending along-track allows acoustic focus in this direction, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
+After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming and autofocus coherently combine these into echo intensities for every pixel position in the image. A typical one-dimensional hydrophone array extending\todo{TODO} along-track allows acoustic focus in this direction, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 %The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} 
 
@@ -892,15 +892,19 @@ where
 
 %Therefore every coordinate of interest must fall into this range. 
 
-%OpenGL discards any coordinate that ends up outside the normalized range $[-1,1]$. 
+%
 
 %The OpenGL 
 
-There are different ways to project the scene's points onto a camera surface, both assuming Cartesian representation. Perspective projection, mimicking the human eye, scales coordinates inversely with depth (the $z$-coordinate) to create a sense of perspective in the image. Orthographic (affine) projection, by contrast, preserves object size by simply collapsing the depth dimension. We apply the orthographic projection, but on the cylindrical data, which keeps $x$ intact and scales $y$ inversely with $\tan(r)$.
+In the rendering process OpenGL discards any coordinate that ends up outside the range $[-1,1]$, called normalized device coordinates (NDC). The map into this range defines how points project onto the camera surface. Perspective projection, mimicking the human eye, scales coordinates inversely with depth to create a sense of perspective in the image. Orthographic projection, by contrast, is an affine transformation that preserves object size. Neither of these are a good fit for a ranged-sonar.\todo{meh}
 
+%
+%We apply the latter, but on the cylindrical representation instead of Cartesian, which keeps $x_R$ intact and scales $\varphi_R$ inversely with $\tan(r)$.
+%
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
-The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside.  into this normalized range with the affine transform
+The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we can apply an affine transform similar to an orthographic projection, but on the cylindric representation instead of the Cartesian. 
+% .  here It consists of a linear transform $\vec{L}_{NR}$ that scales the volume and a position vector $\vec{p}_{NR}$ that centers it, $\mathcal{C}_{NR} = \big(\vec{p}_{NR},\vec{L}_{NR}\big)$. .  
 %
 %\begin{align} maps relevant scene vertices to a squared cube with topology $[-1,1]^3$,
 %\dvec{T}_{N\b{R}}^N &= 
@@ -925,7 +929,7 @@ The along-track, cross-track and elevation boundaries form a cylindrical slice, 
 %Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
 %
 %
-We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a general linear (invertible) matrix,
+We skip free notation (it carries little merit when manipulating coordinates) and define $\dvec{T}_{NR}^N$ as a general linear (invertible) $\mathbb{R}^{4,4}$ matrix,
 %
 \begin{align}
 \dvec{T}_{N\b{R}}^N &= 
@@ -935,20 +939,25 @@ We represent $\vec{T}_{NR}$ in $\ubar{N}$ by a general linear (invertible) matri
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}
 %
-$\vec{L}_{NR} = \vec{I}\,\lVert\vec{p}_{IE}\cdot\hat{u}\rVert^{-1}$\todo{probably wrong} in $\ubar{N}$ by a scaling matrix,
+where $\mat{L}_{NR}^N$ scales the axes to $\{[a-1,a+1]\colon a\in\mathbb{R}\}$,
 %
 \begin{align}
-\dvec{L}_{N\v{R}}^N &= \diag\left(\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}\right)
-\end{align}
+\dvec{L}_{N\v{R}}^N &= \left[\begin{array}{c c c}
+p_{\dd{I}{E},x}^{\,\v{R}} & 0 & 0 \\
+0 & \varphi_\mathrm{max} - \varphi_\mathrm{min} & 0 \\
+0 & 0 & p_{\dd{I}{E},r}^{\,\v{R}}
+\end{array}\right]^{-1}
+\end{align}%\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}
 %
-and $\vec{p}_{NR} = \frac{\vec{p}_{RI}}{\lVert\vec{p}_{IE}\cdot\hat{u}\rVert}$ in $\ubar{N}$ by coordinates,
+and $\dvec{p}_{NR}^N$ centers them to $[-1,1]$ (removes the $a$),
 %
 \begin{align}
 \dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}.
 \end{align}
 %
-Here $\oslash$ denotes Hadamard (element-wise) division and diag($\cdot$) constructs a diagonal matrix from its input vector.
+Here $\oslash$ denotes Hadamard (element-wise) division.
 
+% and diag($\cdot$) constructs a diagonal matrix from its input vector
 
 
 %Let $\dvec{s}_\Delta^R$ be a tuple of positive scalars that defines the extent of each axis in the image:
@@ -1288,7 +1297,7 @@ Template quality was similar with both SIGMAS+ and FFISim. The main difference l
 \appendices
 \fi
 
-\section{Rotations}\label{IV_transformation_matrices}
+\section{Rotations}\label{IV_sec_transformation_matrices}
 
 Rotations are special linear operations with many possible free and decomposed formulations. A common one is Euler-Rodrigues formula and parameter, an axis-angle representation introduced by Euler in 1775 with many modern developments~\cite{Dai2015}. % in e.g. the study of coordinate free geometry, quaternions and Lie algebra.
 %It parametrizes the rotation in terms of a half-angle  
@@ -1378,7 +1387,7 @@ The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_
 % Group of symmetrical stretching/squishing actions
 % Groups of symmetries acting on some object
 
-\subsection{Quaternions}% and \texorpdfstring{$\hat{n}$-vector}{n-vector}}
+\subsection{Quaternions}\label{IV_sec_quaternions}
 
 Quaternions are a popular alternative to rotation matrices in computer graphics. They represent orientation by the four Euler-Rodrigues parameters in \eq{IV_eq_euler_rodrigues_parameters},
 %
@@ -1467,7 +1476,7 @@ Quaternions can reduce computational complexity, improve numerical stability and
 %\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
 %\end{align}
 
-\subsection{Euler-angles}
+\subsection{Euler-angles}\label{IV_sec_euler_angles}
 
 End-users often prefer Euler or Tait-Brian angles over axis-angle parametrizations. They specify an orientation composed from three elementary rotations; Euler rotations about the same first and third axis, or Tait-Brian rotations about three unique axes. The rotations can either be intrinsic or extrinsic, depending on whether the coordinate system follows the rotation or stays fixed, respectively. We use the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, with the \emph{nautical angles} yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. In this convention, roll is applied first, then pitch and finally yaw,
 %
