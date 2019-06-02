@@ -896,14 +896,14 @@ where
 
 %The OpenGL 
 
-In the rendering process OpenGL discards any coordinate that ends up outside the range $[-1,1]$, called normalized device coordinates (NDC). The map into this range defines how points project onto the camera surface. Perspective projection mimics human eye perspective by scaling coordinates inversely with depth, while orthographic projection preserves object size by simply collapsing the depth dimension through an affine transformation. Neither of these are a good fit for a ranged-sonar.\todo{meh}
+In the rendering process OpenGL discards any coordinate that ends up outside the range $[-1,1]$, called normalized device coordinates (NDC). The map into this range defines how points project onto the camera surface. Perspective projection mimics human eye perspective by scaling coordinates inversely with depth, while orthographic projection preserves object size by simply collapsing the depth dimension through an affine transformation. % We  Neither of these are a good fit for a ranged-sonar.\todo{meh}
 
 %
 %We apply the latter, but on the cylindrical representation instead of Cartesian, which keeps $x_R$ intact and scales $\varphi_R$ inversely with $\tan(r)$.
 %
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
-The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we apply an affine transform similar to an orthographic projection, to the cylindric representation instead of the Cartesian. 
+The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we apply an affine transform to the cylindric representation instead of the Cartesian---yielding an effect akin to perspective projection vertically and orthographic projection horizontally. 
 %
 We skip free notation (it carries less merit when manipulating coordinates) and define $\dvec{T}_{NR}^N$ as a general linear (invertible) $\mathbb{R}^{4,4}$ matrix,
 %
@@ -915,7 +915,7 @@ We skip free notation (it carries less merit when manipulating coordinates) and 
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}
 %
-where $\mat{L}_{NR}^N$ scales the axes to $\{[p_{RI,i}^R\pm1]\colon i\in\{x,\varphi,r\}\}$,
+where $\mat{L}_{NR}^N$ scales the volume to $[p_{RI,i}^R\pm1]^3$ by user-defined image extent $\vec{p}_{IE}$ and elevation boundaries $\{\varphi_\mathrm{max}, \varphi_\mathrm{max}\}$,
 %
 \begin{align}
 \dvec{L}_{N\v{R}}^N &= \left[\begin{array}{c c c}
@@ -925,15 +925,13 @@ p_{\dd{I}{E},x}^{\,\v{R}} & 0 & 0 \\
 \end{array}\right]^{-1}
 \end{align}%\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}
 %
-and $\dvec{p}_{NR}^N$ centers them to $[-1,1]$ (removes $p_{RI}^R$),
+and $\dvec{p}_{NR}^N$ centers it to $[-1,1]$ by subtracting $\dvec{p}_{RI}^R$,
 %
 \begin{align}
 \dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}.
 \end{align}
 %
-Here $\oslash$ denotes Hadamard (element-wise) division.
-
-and diag($\cdot$) constructs a diagonal matrix from its input vector
+$\oslash$ denotes Hadamard (element-wise) division.
 
 % It consists of a linear transform $\vec{L}_{NR}$ with three degrees of freedom that scales the volume and a position vector $\vec{p}_{NR}$ that centers it, $\mathcal{C}_{NR} = \big(\vec{p}_{NR},\vec{L}_{NR}\big)$.  
 % 
@@ -978,21 +976,8 @@ and diag($\cdot$) constructs a diagonal matrix from its input vector
 
 %When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
 
-The vertex shader applies our transformation matrices to every vertex.
+We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume and flip $\hat{x}_R$ and $\hat{r}_R$ to match the OpenGL camera. In the latter we compute intensity values for every surface--or facet---three vertices span. Assuming rough isotropic surfaces that reflects energy equally in all directions, we can a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.
 
-The frament shader computes intensity values for every surface.
-
-
-
-An OpenGL camera has the $x$-axis pointing right, the $y$-axis pointing up and the $z$-axis pointing from the scene into the camera.
-
-To produce sonar templates we assume a rough, isotropic surface that reflects energy equally in all directions. This permits use of a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.   
-
-The rendered image will appear as if we placed a window at the sonar and looked through it in the direction of the image. This window is resized to make sure that the template image perfectly fills it.
-
-\todo{
-- Facets
-}
 
 \subsubsection{OpenCL post-processing}
 
