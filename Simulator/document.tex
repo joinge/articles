@@ -294,7 +294,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
    $\Uparrow$ & \emph{Affine manipulations} \\$\Downarrow$ & \emph{Coordinate manipulations}
    \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{cBaseMark}\hline\arrayrulecolor{black}%cline{10-20}
 	                                               &                    \\[0\baselineskip]
-	                                Radial camera & \t{R}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $\mathrm{T}_{RC}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\varphi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
+	                                Radial camera & \t{R}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $T_{RC}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\varphi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
 	                                      Normalized coordinates & \t{N}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{NR}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
                                          %\end{tabular}\parbox[L]{8em}{} $\to$ \parbox[L]{3.8em}{NDC$^{(3)}$} \parbox[L]{1em}{$\in$} $[0,1]^3$}   \\ \bottomrule
 \mc{10}{l}{$^{(1)}$Degrees of Freedom} \\
@@ -562,42 +562,8 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 %
 %The vertex $\udot{V}$ is now referenced from $\ubar{I}$, but we prefer it referenced from the position of the sonar local body $\udot{S}$, with an orientation $\uvec{O}$ that creates a viewing plane orthogonal to $\vec{p}_{SI}$. This mimics a camera placed at the acoustic source directed at the part of the seafloor we seek to image. For this we seek the These transforms take the form of \eq{eq_homogeneous_transformation} and can be stacked together,
 %%
-%\begin{align}
-%\left[\begin{array}{c}
-%\\\dvec{p}_{OV}^{O}\\\\\hline 1
-%\end{array}\right]
-%= \mat{T}_{CS}\;\mat{T}_{SI}\;\mat{T}_{IM}
-%\left[\begin{array}{c}
-%\\\dvec{p}_{MV}^{M}\\\\\hline 1
-%\end{array}\right]
-%\end{align}
 
 
-%\figstep{1}{\emph{Model displacement.} When the 3D models of seafloor and object are loaded into OpenGL they each have their own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) of $\ubar{M}$ relative to $\protect\ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
-%}\\[.5\baselineskip]
-%
-%When the 3D models of seafloor and object are loaded into OpenGL they each have with their own reference frame $\ubar{M}$. To position and orient the models into the image frame $\protect\ubar{I}$, we apply the \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
-
-%%
-%\figstep{2}{\emph{Sonar translation.} The sonar local body has the reference frame $\ubar{S}$. Its orientation is equal to that of the image, $\uvec{S}=\uvec{I}$. We apply the remaining translation of $\udot{I}$ relative to  $\udot{S}$ with a \emph{sonar matrix} $\mat{T}_\textit{\tiny\!SI}$.
-%}\\[.5\baselineskip]
-%%
-%\figstep{3}{\emph{Orthogonal view rotation.} We want to position the OpenGL camera at the origin of the sonar frame, $\udot{S}$, looking at (i.e. $\hat{z}_O$-axis pointing at) the origin of the image frame, $\udot{I}$. While the  position is correct after step 2, we must apply the rotation of $\uvec{S}$ relative to $\uvec{O}$ with an \emph{orthogonal view matrix} $\mat{T}_\textit{\tiny\!SI}$.
-%}\\[.5\baselineskip]
-%%
-%\figstep{4}{\emph{Coordinate conversion.} The $\hat{x}_O$ and $\hat{y}_O$ axes span an orthogonal viewing plane onto which the scene's points can be projected. However, to simplify the boundary specification of range and elevation in the next step, we convert the coordinate representation from cartesian $(\hat{y}_O,\hat{z}_O)$ to cylindrical $(\hat{\phi}_C,\hat{r}_C)$ with a non-linear function T$_{RC}$.
-%}\\[.5\baselineskip]
-%%
-%\figstep{5}{\emph{Projection}. OpenGL only renders coordinates that fall in the range $[-1,1]$. We map the coordinate boundaries (for along-track, range and elevation) into this normalized range with a \emph{projection matrix} $\mat{T}_\textit{\tiny\!NR}$.
-%% 
-%% The size of this plane is determined by the desired image region on the seafloor. The projection is performed with the \emph{projection matrix} $\mat{T}_\textit{\tiny\!C}$.
-%}\\[.5\baselineskip]
-%%
-%\figstep{6}{\emph{OpenGL rendering.} When OpenGL renders the scene it uses a \emph{vertex shader} to apply our transformation matrices to every vertex, and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: This is called a \emph{depth map}.
-%}\\[.5\baselineskip]
-%%
-%\figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
-%}%
 
 
 
@@ -839,7 +805,7 @@ After the sonar has recorded, motion compensated and match filtered the acoustic
 %The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} 
 
 
-To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ($\ubar{R}$ for "ranged-device") with a non-linear function T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
+To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ($\ubar{R}$ for "ranged-device") with a non-linear function $T_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
 \dvec{p}^{\,\v[R1]{R}}
@@ -896,7 +862,7 @@ where
 
 %The OpenGL 
 
-In the rendering process OpenGL discards any coordinate that ends up outside the range $[-1,1]$, called normalized device coordinates (NDC). The map into this range defines how points project onto the camera surface. Perspective projection mimics human eye perspective by scaling coordinates inversely with depth, while orthographic projection preserves object size by simply collapsing the depth dimension through an affine transformation. % We  Neither of these are a good fit for a ranged-sonar.\todo{meh}
+In the rendering process OpenGL discards any coordinate that ends up outside the range $[-1,1]$, called normalized device coordinates (NDC). The map into this range defines how points project onto the camera surface. Perspective projection mimics human eye perspective by scaling coordinates inversely with depth, while orthographic projection preserves object size by collapsing the depth dimension through an affine transformation. % We  Neither of these are a good fit for a ranged-sonar.\todo{meh}
 
 %
 %We apply the latter, but on the cylindrical representation instead of Cartesian, which keeps $x_R$ intact and scales $\varphi_R$ inversely with $\tan(r)$.
@@ -905,7 +871,7 @@ In the rendering process OpenGL discards any coordinate that ends up outside the
 
 The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we apply an affine transform to the cylindric representation instead of the Cartesian---yielding an effect akin to perspective projection vertically and orthographic projection horizontally. 
 %
-We skip free notation (it carries less merit when manipulating coordinates) and define $\dvec{T}_{NR}^N$ as a general linear (invertible) $\mathbb{R}^{4,4}$ matrix,
+We omit free notation (it carries less merit when manipulating coordinates) and define $\dvec{T}_{NR}^N$ as a general linear (invertible) $\mathbb{R}^{4,4}$ matrix,
 %
 \begin{align}
 \dvec{T}_{N\b{R}}^N &= 
@@ -976,7 +942,15 @@ $\oslash$ denotes Hadamard (element-wise) division.
 
 %When OpenGL renders the scene, it uses a \emph{vertex shader} to apply our transformation matrices to every vertex and a \emph{fragment shader} to compute the intensity values for each point in the image. OpenGL computes the range from each image pixel to its corresponding model facet: this is called a \emph{depth map}.
 
-We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume and flip $\hat{x}_R$ and $\hat{r}_R$ to match the OpenGL camera. In the latter we compute intensity values for every surface--or facet---three vertices span. Assuming rough isotropic surfaces that reflects energy equally in all directions, we can a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.
+We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume,
+%
+\begin{align}
+\dvec\rho_{N\d{V}}^{N}
+= \mat{T}_{N\udot{R}}^{N}\;T_{\uvec{R}\uvec{C}}(\mat{T}_{\udot{C}\udot{S}}^{\v{C}}\;\mat{T}_{\udot{S}\udot{I}}^{\v{S}}\;\mat{T}_{\udot{I}\udot{M}}^{\v{I}}
+\dvec{\rho}_{\udot{M}\d{V}}^{\uvec{M}} )
+\end{align}
+%
+and flip $\hat{x}_R$ and $\hat{r}_R$ to match the OpenGL camera. In the latter we compute intensity values for every surface--or facet---three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.
 
 
 \subsubsection{OpenCL post-processing}
