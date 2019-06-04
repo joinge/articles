@@ -106,6 +106,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 %\providecommand\b*{}\renewcommand*\v[2][]{{\color{cBasis}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$\ubar{#2}$}}}}
 
 \providecommand\k*{}\renewcommand*\k[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
+\providecommand\n*{}\renewcommand*\n[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
 \providecommand\d*{}\renewcommand*\d[2][]{{\color{cPoint}\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
 \providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cPoint}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{\scriptsize$\udot{#2}\udot{#3}$}\fi}}
 \providecommand\v*{}\renewcommand*\v[2][]{{\color{cBasis}\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
@@ -808,13 +809,14 @@ After the sonar has recorded, motion compensated and match filtered the acoustic
 To prepare for this computation and ease specification of spatial system boundaries, we change the representation from Cartesian to cylindrical ($\ubar{R}$ for "ranged-device") with a non-linear function $T_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$,
 %
 \begin{align}\label{eq_T_RC}
-\dvec{p}^{\,\v[R1]{R}}
-= \mathrm{T}_{\v[R2]{R}\cv[C1]{C}}(\dvec{p}^{\cv[C2]{C}})
+\dvec{\rho}^{\,\v[R1]{R}}
+= \mathrm{T}_{\v[R2]{R}\cv[C1]{C}}(\dvec{\rho}^{\cv[C2]{C}})
 = \bmat{{p}_x^{\,\v{C}}\\
 \text{atan}\big({p}_y^{\,\v{C}} / {p}_z^{\,\v{C}}\big)\\
 \text{sign}(p_z^{\,\v{C}})
-\sqrt{({p}_y^{\,\v{C}})^2 + ({p}_z^{\,\v{C}})^2}
-}
+\sqrt{({p}_y^{\,\v{C}})^2 + ({p}_z^{\,\v{C}})^2} \\
+{p}_w^{\,\v{C}}
+}.
 %
 \tikz[overlay,remember picture]{
   % Set up some general bounding box markers
@@ -831,7 +833,7 @@ To prepare for this computation and ease specification of spatial system boundar
     }
 \end{align}
 %
-where 
+We drop the superscript of $T_{RC}$ since this is a pure change of reference.
 
 
 \subsubsection{Normalization of coordinates \texorpdfstring{$\vec{T}_{NR}$}{T\_NR}}
@@ -894,10 +896,10 @@ p_{\dd{I}{E},x}^{\,\v{R}} & 0 & 0 \\
 and $\dvec{p}_{NR}^N$ centers it to $[-1,1]$ by subtracting $\dvec{p}_{RI}^R$,
 %
 \begin{align}
-\dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}.
+\dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}},
 \end{align}
 %
-$\oslash$ denotes Hadamard (element-wise) division.
+where $\oslash$ denotes Hadamard (element-wise) division.
 
 % It consists of a linear transform $\vec{L}_{NR}$ with three degrees of freedom that scales the volume and a position vector $\vec{p}_{NR}$ that centers it, $\mathcal{C}_{NR} = \big(\vec{p}_{NR},\vec{L}_{NR}\big)$.  
 % 
@@ -944,18 +946,43 @@ $\oslash$ denotes Hadamard (element-wise) division.
 
 We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume,
 %
-\begin{align}
-\dvec\rho_{N\d{V}}^{N}
-= \mat{T}_{N\udot{R}}^{N}\;T_{\uvec{R}\uvec{C}}(\mat{T}_{\udot{C}\udot{S}}^{\v{C}}\;\mat{T}_{\udot{S}\udot{I}}^{\v{S}}\;\mat{T}_{\udot{I}\udot{M}}^{\v{I}}
-\dvec{\rho}_{\udot{M}\d{V}}^{\uvec{M}} )
+\begin{align}\nonumber\\
+\dvec{\rho}_{\tikzmark{NV}{$\scriptstyle{}N\color{cPoint}\udot{V}$}}^{\,\n[N1]{N}} &= \mat{T}_{\n[N2]{N}\ubar{R}}^{\,\n[N3]{N}} \;T_{\uvec{R}\uvec{C}}(\mat{T}_{\ubar{C}\ubar{S}}^{\v{C}}\;\mat{T}_{\ubar{S}\ubar{I}}^{\v{S}}\;\mat{T}_{\ubar{I}\ubar{M}}^{\v{I}} \dvec{\rho}_{\udot{M}\d[V1]{V}}^{\uvec{M}} ),
+%\left[\begin{array}{c}
+%\dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
+%\end{array}\right].
+% = \mat{T}_{\d[IN2]{I}\c[MM1]{M}}^{\,\v[IN3]{I}}\boldsymbol{\rho}_{MV}^M.
+\\\nonumber
+\tikz[overlay,remember picture]{
+  % Set up some general bounding box markers
+  \coordinate(_T)  at ($ (N1.north) + ( 0em, 1.0\baselineskip) $);
+  \coordinate(_B)  at ($ (N2.south) + ( 0em,-1.0\baselineskip) $);
+  %
+  \path let \p1 = ($ (N1)+( 1.0\baselineskip,0ex) $), \p2=(_T) in coordinate (_N1)  at (\x1,\y2);
+  \path let \p1 = ($ (N3)+(-1.0\baselineskip,0ex) $), \p2=(_T) in coordinate (_N3)  at (\x1,\y2);
+  \path let \p1 = ($ (NV)+( 1.0\baselineskip,0ex) $), \p2=(_B) in coordinate (_NV)  at (\x1,\y2);
+  \path let \p1 = ($ (N2)+(-1.0\baselineskip,0ex) $), \p2=(_B) in coordinate (_N2)  at (\x1,\y2);
+  \path let \p1 = ($ (V1)+(-1.0\baselineskip,0ex) $), \p2=(_B) in coordinate (_V1)  at (\x1,\y2);
+  % Draw arrows and text
+    \draw[color=cDarkArrow]      ($ (N3.north) + (0em,\tpad) $)
+            to[out= 90, in=0]    (_N3)
+            to[out=180, in=0]    (_N1)
+            to[out=180, in=90]($ (N1.north) + (0em,\tpad) $);
+    \draw[color=cBrightArrow]      ($ (V1.south)  - (0em,\tpad) $)
+            to[out=-90, in=0]     (_V1)
+            to[out=180, in=0]     (_NV)
+            to[out=180, in=-90]($ (NV.south) - (0em,\tpad) $);
+    \draw[-,color=cBrightArrow] ($ (N2.south) - (0em,\tpad) $)
+            to[out=-90, in=0]     (_N2);
+    }
 \end{align}
 %
-and flip $\hat{x}_R$ and $\hat{r}_R$ to match the OpenGL camera. In the latter we compute intensity values for every surface--or facet---three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle or sound frequency, but this is not needed for the purpose of creating templates.
+and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the latter we compute intensity values for every surface (facet) three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle\todo{huh?} or sound frequency, but this is not needed for the purpose of creating templates.
 
 
 \subsubsection{OpenCL post-processing}
 
-Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
+%Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us all parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
 
