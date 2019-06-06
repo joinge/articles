@@ -405,7 +405,7 @@ We adhere to Gade's notation for affine geometry, extend it to handle homogeneou
 \subsection{Free notation}\label{IV_sec:general_notation}
 
 
-Suppose a stationary $N$-dimensional rigid model $\mathcal{M}$ has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length).
+Suppose a stationary $N$-dimensional rigid model has a reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$ attached to it, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\triangleq\big(\hat{x}_{M},\hat{y}_{M},\dots\big)\in\mathbb{V}^N$ its absolute orientation (where $\hat{\cdot}$ denotes unit length).
 %
 %
 %
@@ -871,7 +871,7 @@ In the rendering process OpenGL discards any coordinate that ends up outside the
 %
 %Since $\ubar{R}$ expresses the data explicitly in terms of the parameters we specify boundaries for,
 
-The along-track, cross-track and elevation boundaries form a cylindrical slice, the volume in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we apply an affine transform to the cylindric representation instead of the Cartesian---yielding an effect akin to perspective projection vertically and orthographic projection horizontally. 
+The along-track, cross-track and elevation boundaries form a cylindrical slice: the volume $\mathcal{V}$ in  \Fig{IV_simulator_coordinate_system} marked by \checkicon{}\!s inside and \crossicon{}s outside. Since the boundaries are non-linear in $\ubar{C}$, but linear in $\ubar{R}$, we apply an affine transform to the cylindric representation instead of the Cartesian---yielding an effect akin to perspective projection vertically and orthographic projection horizontally. For a user-defined image extent $\vec{p}_{IE}$ and elevation extent $\{\varphi_\mathrm{max}, \varphi_\mathrm{max}\}$, the volume of valid points can be written $\mathcal{V}^R\in[p_{RI,x}^R\pm p_{IE,x}^R][\varphi_\mathrm{min},\varphi_\mathrm{max}][p_{RI,r}^R\pm p_{IE,r}^R]$.
 %
 We omit free notation (it carries less merit when manipulating coordinates) and define $\dvec{T}_{NR}^N$ as a general linear (invertible) $\mathbb{R}^{4,4}$ matrix,
 %
@@ -883,7 +883,7 @@ We omit free notation (it carries less merit when manipulating coordinates) and 
 \end{array}\right] \in \textrm{GL}_4(\mathbb{R}), \label{eq_T_NR}
 \end{align}
 %
-where $\mat{L}_{NR}^N$ scales the volume to $[p_{RI,i}^R\pm1]^3$ by user-defined image extent $\vec{p}_{IE}$ and elevation boundaries $\{\varphi_\mathrm{max}, \varphi_\mathrm{max}\}$,
+where $\mat{L}_{NR}^N$ scales the volume to $[p_{RI}^R\pm1]^3$,
 %
 \begin{align}
 \dvec{L}_{N\v{R}}^N &= \left[\begin{array}{c c c}
@@ -893,7 +893,7 @@ p_{\dd{I}{E},x}^{\,\v{R}} & 0 & 0 \\
 \end{array}\right]^{-1}
 \end{align}%\boldsymbol{1}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}}
 %
-and $\dvec{p}_{NR}^N$ centers it to $[-1,1]$ by subtracting $\dvec{p}_{RI}^R$,
+and $\dvec{p}_{NR}^N$ centers it to $\mathcal{V}^N\in[-1,1]$,
 %
 \begin{align}
 \dvec{p}_{N\d{R}}^N &= -\dvec{p}_{\dd{R}{I}}^{\,\v{R}}\oslash\dvec{p}_{\dd{I}{E}}^{\,\v{R}},
@@ -947,7 +947,7 @@ where $\oslash$ denotes Hadamard (element-wise) division.
 We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume,
 %
 \begin{align}\nonumber\\
-\dvec{\rho}_{\tikzmark{NV}{$\scriptstyle{}N\color{cPoint}\udot{V}$}}^{\,\n[N1]{N}} &= \mat{T}_{\n[N2]{N}\ubar{R}}^{\,\n[N3]{N}} \;T_{\uvec{R}\uvec{C}}(\mat{T}_{\ubar{C}\ubar{S}}^{\v{C}}\;\mat{T}_{\ubar{S}\ubar{I}}^{\v{S}}\;\mat{T}_{\ubar{I}\ubar{M}}^{\v{I}} \dvec{\rho}_{\udot{M}\d[V1]{V}}^{\uvec{M}} ),
+\dvec{\rho}_{\tikzmark{NV}{$\scriptstyle{}N\color{cPoint}\udot{V}$}}^{\,\n[N1]{N}} &= \mat{T}_{\n[N2]{N}\b{R}}^{\,\n[N3]{N}} \;T_{\vv{R}{C}}(\mat{T}_{\bb{C}{S}}^{\v{C}}\;\mat{T}_{\bb{S}{I}}^{\v{S}}\;\mat{T}_{\bb{I}{M}}^{\v{I}} \dvec{\rho}_{\d{M}\d[V1]{V}}^{\v{M}} ),
 %\left[\begin{array}{c}
 %\dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
 %\end{array}\right].
@@ -982,25 +982,68 @@ and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the 
 
 \subsubsection{OpenCL post-processing}
 
+{
+\renewcommand\v[1]{#1}
 %Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
-The ``camera image'' rendered with OpenGL is not in along-track and cross-track coordinates as we want it to be. It does, however, show us all parts of the scene visible from the sonar. OpenGL can also produce a depth map that reveals the distance from the camera to to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. We perform this computation in OpenCL. It allows general purpose programming on GPUs and can interoperate with OpenGL quite nicely. This way we keep all calculations on the GPU.
-
+The rendered intensity image $\dvec\alpha_n^R$ and depth image $\dvec\beta_n^R$ present the sonar's view of our defined volume. Sub- and superscripts denote indexation by the integers $\dvec{n}^R$,
+%
 \begin{align}
-&\text{forall } x_R, r_R, \varphi_r \nn
-%&\quad\text{if }\left\lfloor y_I\right\rfloor == y \nn
-%&\qquad\dvec{a}_I[y] \colon= \big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
-%&\qquad\dvec{a}_I[y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi]
-&\qquad\dvec{o}[x_R, y] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
-&\qquad\dvec{o}[x_R, y+1] \colon= \big(1 - y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] \nn
-\qquad\dvec{o}[x_R, y] = \sum_{\forall \varphi_R} \qquad\dvec{o}[x_R, y]
+\dvec{n}^{\v{R}} = \bmat{n_x^{\v{R}}\\ n_\varphi^{\v{R}}\\ n_r^{\v{R}}} = (\dvec{p}^{\v{R}} - \underset{\mathcal{V}^R}{\mathrm{arg\,min}}\ \dvec{p}^{\v{R}}) \odot \dvec\Delta^{\!\v{R}},
 \end{align}
-%y_I &= \mat{T}_{IC}\dvec{d}_C[\varphi] \\
-%\dvec{a}_I[y] &= \suml{\forall \varphi} \begin{cases}
-%\big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] & \text{if}\quad \left\lfloor y_I+0.5\right\rfloor == y, \\
-%\big(y_I - \left\lfloor y_I\right\rfloor\big)\dvec{a}^C[\varphi] & \text{if}\quad \left\lfloor y_I\right\rfloor == y, \\
-%0            & \text{otherwise}
-%\end{cases}
+%
+where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
+%
+\begin{align}
+\dvec\Delta^{\!\v{R}} = \dvec{p}_{IE}^{\v{R}} \oslash \bmat{N_x/2\\ N_\varphi/2\\ N_r/2},
+\end{align}
+%
+$\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
+%
+\lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth image into a sonar image., label= }
+\begin{lstlisting}
+$\text{for all } x_R, \varphi_R $
+   $\rlap{\(r\)}\phantom{i^O[x_R, r+1]}  := \Delta_r^R\dvec\beta^R[n_x^R, n_\varphi^R]] $
+   $\dvec\gamma^R[n_x^R, \rlap{\(r\)}\phantom{r+1}]  := (1 - r - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
+   $\dvec\gamma^R[n_x^R, r+1]                        := (\phantom{1 - r}\llap{\(r\)} - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
+\end{lstlisting}%$\mathcal{V}^R
+%
+where $:=$ is an assignment operator. The two last lines 
+
+We perform this computation in OpenCL using a computing kernel (similar to OpenGL shaders). It allows general purpose programming on GPUs and can interoperate with OpenGL nicely. This way we keep all calculations on the GPU.
+
+
+%\begin{table}[h]\centering
+%\begin{tabular}[c]{l l >{\hspace*{-1em}} l}\toprule\\[-1.3ex]
+%\multicolumn{3}{l}{$\text{forall } x_R, r_R, \varphi_R $} \\
+%& $r$                                 & $:= r^R[x_R, \varphi_R]] $ \\
+%& $i^O[x_R, \rlap{$r$}\phantom{r+1}]$ & $:= (1 - r - \left\lfloor r\right\rfloor)i^R[x_R, \varphi_R]] $ \\
+%& $i^O[x_R, r+1]$                     & $:= (\phantom{1 - r}\llap{$r$} - \left\lfloor r\right\rfloor)i^R[x_R, \varphi_R]] $ \\\\[-1.3ex]
+%\bottomrule
+%\end{tabular}\caption{Pseudo-code for combining the OpenGL intensity and depth image into a sonar image.}
+%\end{table}
+
+
+
+%is represented in $[\hat{x} is $
+
+% They do, however,  OpenGL can also produce a depth map that reveals the distance from the camera to each image pixel. This information can be converted to a ranged sonar-like image by summing all the intensity values that share the same depth for each range line. 
+
+
+%not in along-track and cross-track coordinates ($x_I,y_I$) as we want them to be.
+%
+%
+%OpenGL generated images. Indexes 
+%
+%We denote the intensity image $i^R$ and depth image $r^R$. 
+%
+%
+%The index $[x_r,\varphi_r]$ refers to the position $x_R=$, where the index of the at location $(x_R,\varphi_R)$
+
+
+
+
+
 
 \todo{
 - Version 1.2 - highest supported by Nvidia.
@@ -1020,65 +1063,67 @@ The ``camera image'' rendered with OpenGL is not in along-track and cross-track 
 % $\mat{T}_{BA}^B = (\mat{T}_{AB}^A)^{-1} = \bmat{\mat{R}_{AB}^T & -\mat{R}_{BA}\dvec{p}_{BA}^B \\ \boldsymbol{0}\T & 1}$
 % \end{tabular}
 
+}
+
 % Reset subsubsection formatting
 \makeatletter
 \let\@seccntformat\@oldseccntformat
 \let\subsubsection\oldsubsubsection
 \makeatother
 
-Vector addition
-- Matching cancelling closest frames (subscripts)
-- All vectors decomposed in same frame
-
-Passive rotation:
-Changing observer. Different perspectives. 
-
-Active rotation:
-Changing point.
-
-
-Addition - cancels subscripts
-Rotation - cancels superscripts
-Transformation - cancels both
-
-Carry over - superscript - above
-Carry over - subscript - below
-
-Blue - yellow/orange
-Purple - orange
-
-Step 1-3 is in the affine domain. Rigid body operations. 6 degrees of freedom, sum of constraints and user defined parameters must sum to 6.
-
-Step 4 is a change of domain from cartesian to polar. Non-linear. Subscripts refer to domain-name.
-
-Step 5 is another change of domain. From metric space to normalized space. Subscripts refer to domain-name.
-
-Don't need coordinates to talk about geometrical operations. Text with, standalone equations with coordinates.
-
-Geometry of rigid object manipulations. Joints, anchors. Arm, different joints. Prismatic, revolute, spherical, cylindrical, universal. Common concept in real-world modeling and graphics processing.
-
-
-
-\todo{Cherie: Lol it looks odd because it's notes.}
-
-\subsection{Notation rules}
-
-Cancellation of intermediate frames (subscripts)   - vector addition
-Cancellation of closest frames      (superscripts) - rotation multiplication
-Cancellation of both
-
-\subsubsection{Inversion}
+%Vector addition
+%- Matching cancelling closest frames (subscripts)
+%- All vectors decomposed in same frame
+%
+%Passive rotation:
+%Changing observer. Different perspectives. 
+%
+%Active rotation:
+%Changing point.
+%
+%
+%Addition - cancels subscripts
+%Rotation - cancels superscripts
+%Transformation - cancels both
+%
+%Carry over - superscript - above
+%Carry over - subscript - below
+%
+%Blue - yellow/orange
+%Purple - orange
+%
+%Step 1-3 is in the affine domain. Rigid body operations. 6 degrees of freedom, sum of constraints and user defined parameters must sum to 6.
+%
+%Step 4 is a change of domain from cartesian to polar. Non-linear. Subscripts refer to domain-name.
+%
+%Step 5 is another change of domain. From metric space to normalized space. Subscripts refer to domain-name.
+%
+%Don't need coordinates to talk about geometrical operations. Text with, standalone equations with coordinates.
+%
+%Geometry of rigid object manipulations. Joints, anchors. Arm, different joints. Prismatic, revolute, spherical, cylindrical, universal. Common concept in real-world modeling and graphics processing.
+%
 
 
-\subsubsection{Intermediate frame cancellation}
+%\todo{Cherie: Lol it looks odd because it's notes.}
 
-
-
-\subsubsection{Matching closest frame}
-
-$$\dvec{p}_{AC}^A = \dvec{p}_{AB}^A + \dvec{p}_{BC}^A$$
-$$\dvec{p}^A = \mat{R}_{AB} \dvec{p}^B$$
-$$\dvec{p}_{AC}^A = \mat{T}_{AB}^A \dvec{p}_{BC}^B$$
+%\subsection{Notation rules}
+%
+%Cancellation of intermediate frames (subscripts)   - vector addition
+%Cancellation of closest frames      (superscripts) - rotation multiplication
+%Cancellation of both
+%
+%\subsubsection{Inversion}
+%
+%
+%\subsubsection{Intermediate frame cancellation}
+%
+%
+%
+%\subsubsection{Matching closest frame}
+%
+%$$\dvec{p}_{AC}^A = \dvec{p}_{AB}^A + \dvec{p}_{BC}^A$$
+%$$\dvec{p}^A = \mat{R}_{AB} \dvec{p}^B$$
+%$$\dvec{p}_{AC}^A = \mat{T}_{AB}^A \dvec{p}_{BC}^B$$
 
 
 \subsection{Speed considerations}
@@ -1202,10 +1247,10 @@ Our results are based on experimental data from a HISAS1030 interferometric synt
 
 We present three different HUGIN runs from Jesus Bay in Norway. The first pair of runs were two days apart in January 2009, containing roughly 2700 and 3200 detections, respectively. The last was in June 2012, containing roughly 650 detections. Almost all objects here are cylindric---e.g. barrels, pipe mines and torpedoes---with a length of about 3\,m.
 
-For each run we contrast the three template methods:
+For each run we contrast three template methods:
 %
 \begin{itemize}
-\item \emph{Conventional (SIGMAS+).} Picks the best template out of a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
+\item \emph{Conventional (SIGMAS+).} Picks the best template from a set precomputed with SIGMAS+. The templates are tailored to a 3\,m long cylinder; the most frequently occurring object in the scene.
 \item \emph{Adaptive, normal (FFISim).} Creates a single template with FFISim, given estimated seafloor and object orientation, and object length, width and immersion depth~\cite{Midelfart2010}. 
 \item \emph{Adaptive, buried (FFISim).} Finds an "optimal" template with FFISim, given the estimated parameters described above and a search space for burial depth---modeled as rotation by $\{-4,-2,0,2,4\}^\circ$ around the cross track axis $y_\textrm{\tiny$\uvec{I}$}$.
 \end{itemize}
