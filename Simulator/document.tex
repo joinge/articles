@@ -977,7 +977,7 @@ We control the rendering process through two code-snippets called a vertex and f
     }
 \end{align}
 %
-and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the latter we compute intensity values for every surface (facet) three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity depends only on the incidence angle~\cite{Zhang1999}. It does not consider observation angle\todo{huh?} or sound frequency, but this is not needed for the purpose of creating templates.
+and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the latter we compute intensity values for every surface (facet) three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity only depends on incidence angle~\cite{Zhang1999}. It does not consider observation angle\todo{huh?} or sound frequency, but this is not needed to create templates.
 
 
 \subsubsection{OpenCL post-processing}
@@ -998,7 +998,7 @@ where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
 \dvec\Delta^{\!\v{R}} = \dvec{p}_{IE}^{\v{R}} \oslash \bmat{N_x/2\\ N_\varphi/2\\ N_r/2},
 \end{align}
 %
-$\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
+$\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
 %
 \lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth image into a sonar image., label= }
 \begin{lstlisting}
@@ -1008,10 +1008,10 @@ $\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are
 %    $\dvec\gamma^R[n_x^R, r+1]                        := (\phantom{1 - r}\llap{\(r\)} - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
 \end{lstlisting}%\mathcal{V}^R
 %
-where $:=$ is an assignment operator. The two last lines mitigate round-off artifacts by distributing the intensity value linearly between the two neighboring cells of a range value.  
+where $:=$ is an assignment operator. The last two lines mitigate round-off artifacts by distributing the intensity value linearly between the two neighboring cells of a range value.  
 
 
-We perform this computation in OpenCL using a computing kernel (similar to OpenGL shaders). It allows general purpose programming on GPUs and can interoperate with OpenGL nicely. This way we keep all calculations on the GPU.
+We perform this computation in OpenCL using a computing kernel (similar to OpenGL shaders). It allows general purpose programming on GPUs and interoperates with OpenGL effectively. This allows the GPU to perform full simulations without involving the central processing unit (CPU).
 
 
 %\begin{table}[h]\centering
