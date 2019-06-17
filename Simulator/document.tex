@@ -1304,14 +1304,18 @@ We contrast simulation and classification performance on three typical objects f
 
 \subsection{Classification - all objects}
 
-Classification performance on all objects is demonstrated with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. Observe the following:
+Classification performance on all objects is demonstrated with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. They illustrate the classification trade off between true positive rate (TPR) and false positive rate (FPR)---also called sensitivity and (inverse) specificity, or hit rate and alarm rate---as a function of different threshold values. A skillful model assigns higher probability to a positive occurrence than a negative one. Perfect skill is represented at the point $(0,1)$ and no skill at $(0.5,0.5)$. Observe the following:
 %
 \begin{itemize}
-\item \emph{Below 20\% false positive rate (FPR)} the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
+\item \emph{Below 20\% FPR} the adaptive techniques outperforms the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
 \item \emph{Above 20\% FPR} the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 \end{itemize}
+%
 
 
+
+
+ROC plots FPR vs TPR, false alarm vs hit rate, 
 
 % However, this only works well when  The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
 
@@ -1336,41 +1340,37 @@ Classification performance on all objects is demonstrated with receiver operatin
 %   + Flexibility
 %   + Better image quality
 %   + Lower FRP
+
+% Bias vs variance
+% High noise high variance
+% Too simple model high bias
+% Too complex model adapts to noise
+%
+% High variance, overfitting, adaptive method more susceptible
+% High bias, underfitting, conventional method more susceptible
+% Best performance at the ideal compromize between the two.
   
 
 \section{Conclusion}\label{IV_conclusion}
 
-Classification accuracy improves with
+Classification accuracy of adaptive template matching improves relative to conventional static methods with
 %
 \begin{itemize}
-\item on-the-fly simulation, adapting to the scenario at hand;
-\item faster processing speed, exploring a wider and finer range of templates;
-\item increased flexibility, allowing alternative simulation strategies for uncommon scenarios;
-\item improved image quality, because  
-\item lowered FRP, because .
+\item \textit{on-the-fly simulation}, adapting to the scenario at hand;
+\item \textit{faster processing speed}, exploring a wider and finer range of templates;
+\item \textit{increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
+\item \textit{improved image quality}, because adaptivity 
+\item \textit{lowered false positive rate}, .
 \end{itemize}
+
+Unified notation promotes
 
 \begin{itemize}
-\item simulating templates on-the-fly improves classification accuracy and flexibility compared to static template databases.
-\item Processing speed follows from our GPU implementation using OpenGL and OpenCL, which is effective, flexible, portable and overwhelmingly fast.
-\item Classification accuracy of the adaptive methods improves higher image quality, lower FRP, or both.  
-I with unrivaled speed  is an  way to do so. 
-\item A good notation system promotes geometrical understanding, conceptual clarity and 
+\item geometrical reasoning
+\item conceptual clarity
+\item 
+\item less error prone
 \end{itemize}
-
-\begin{itemize}
-\item A good notation system promotes geometrical understanding, conceptual clarity and 
-\item sadf
-\end{itemize}
-
-%
-%The best way to classify objects 
-%
-%We conclude that the best way to classify SAS images is....
-
-
-
-
 
 
 % However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
