@@ -1307,15 +1307,19 @@ We contrast simulation and classification performance on three typical objects f
 Classification performance on all objects is demonstrated with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. They illustrate the classification trade off between true positive rate (TPR) and false positive rate (FPR)---also called sensitivity and (inverse) specificity, or hit rate and alarm rate---as a function of different threshold values. A skillful model assigns higher probability to a positive occurrence than a negative one. Perfect skill is represented at the point $(0,1)$ and no skill at $(0.5,0.5)$. Observe the following:
 %
 \begin{itemize}
-\item \emph{Below 20\% FPR} the adaptive techniques outperforms the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
+\item \emph{Below 20\% FPR} the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
 \item \emph{Above 20\% FPR} the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 \end{itemize}
 %
+A classification model should neither be too simple nor complex, but strike a balance between the two that captures statistically significant details of the object but not the noise. Lower FRP discards most poor quality objects and therefore raises template quality. the adaptive techniques improve their edge as image qualiperform better than the conventional ones   on higher quality objects.  the object detail level generally increase On average the detail level of  The conventional method seems too simple---also called high bias or underfitted---if its performance is unaffected with improves with more data, and too complicated---also called high variance or overfitted----if its performance data.
 
 
 
 
-ROC plots FPR vs TPR, false alarm vs hit rate, 
+The results indicate that 
+Image quality is the key here. The conventional method suffers from high bias and underfits the scene the suffers from high bias  underfitting our adaptive template matcher---when viewed as a form of classifier---underfits 
+
+
 
 % However, this only works well when  The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
 
@@ -1353,14 +1357,14 @@ ROC plots FPR vs TPR, false alarm vs hit rate,
 
 \section{Conclusion}\label{IV_conclusion}
 
-Classification accuracy of adaptive template matching improves relative to conventional static methods with
+Classification accuracy of adaptive template matching improves relative to conventional static methods with:
 %
 \begin{itemize}
-\item \textit{on-the-fly simulation}, adapting to the scenario at hand;
-\item \textit{faster processing speed}, exploring a wider and finer range of templates;
-\item \textit{increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
-\item \textit{improved image quality}, because adaptivity 
-\item \textit{lowered false positive rate}, .
+\item \textit{On-the-fly simulation}, adapting to the scenario at hand;
+\item \textit{Faster processing speed}, exploring a wider and finer range of templates;
+\item \textit{Increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
+\item \textit{Improved image quality}, because adaptivity 
+\item \textit{Lowered false positive rate}, .
 \end{itemize}
 
 Unified notation promotes
@@ -1393,7 +1397,7 @@ Unified notation promotes
 
 \section{Rotations}\label{IV_sec_transformation_matrices}
 
-Rotations are special linear operations with many possible free and decomposed formulations. A common one is Euler-Rodrigues formula and parameter, an axis-angle representation introduced by Euler in 1775 with many modern developments~\cite{Dai2015}. % in e.g. the study of coordinate free geometry, quaternions and Lie algebra.
+Rotations are special linear operations with many possible free and decomposed formulations. A common one is Euler-Rodrigues formula, an axis-angle representation introduced by Euler in 1775 with many modern developments~\cite{Dai2015}. % in e.g. the study of coordinate free geometry, quaternions and Lie algebra.
 %It parametrizes the rotation in terms of a half-angle  
 
 
