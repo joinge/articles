@@ -1311,15 +1311,13 @@ Classification performance on all objects is demonstrated with receiver operatin
 \item \emph{Above 20\% FPR} the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 \end{itemize}
 %
-A classification model should neither be too simple nor complex, but strike a balance between the two that captures statistically significant details of the object but not the noise. Lower FRP discards most poor quality objects and therefore raises template quality. the adaptive techniques improve their edge as image qualiperform better than the conventional ones   on higher quality objects.  the object detail level generally increase On average the detail level of  The conventional method seems too simple---also called high bias or underfitted---if its performance is unaffected with improves with more data, and too complicated---also called high variance or overfitted----if its performance data.
+A classification model should be neither too simple nor complex, but strike a balance between the two that captures statistically significant details of the object but not the noise. Lower FRP discards most poor quality objects which raises detail level. The conventional method appears too simple---also called high bias or underfitted---to fully benefit from this, lagging while  adaptive techniques excel at higher detail levels, but can easily become too complicated---also called high variance or overfitted---unless their adaptivity is constrained.
 
 
-
-
-The results indicate that 
-Image quality is the key here. The conventional method suffers from high bias and underfits the scene the suffers from high bias  underfitting our adaptive template matcher---when viewed as a form of classifier---underfits 
-
-
+% Concetional too simple
+% Higer noise similar
+% Higher true positives better performance
+% yields greater advantage to the adaptive methods
 
 % However, this only works well when  The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
 
@@ -1353,28 +1351,38 @@ Image quality is the key here. The conventional method suffers from high bias an
 % High variance, overfitting, adaptive method more susceptible
 % High bias, underfitting, conventional method more susceptible
 % Best performance at the ideal compromize between the two.
-  
+
 
 \section{Conclusion}\label{IV_conclusion}
 
 Classification accuracy of adaptive template matching improves relative to conventional static methods with:
 %
 \begin{itemize}
-\item \textit{On-the-fly simulation}, adapting to the scenario at hand;
+\item \textit{On-the-fly simulation}, enabling full adaption to the scenario at hand and real-time applications adapting to the scenario at hand;
 \item \textit{Faster processing speed}, exploring a wider and finer range of templates;
 \item \textit{Increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
-\item \textit{Improved image quality}, because adaptivity 
-\item \textit{Lowered false positive rate}, .
+\item \textit{Improved image quality}, because adaptive methods ty 
+\item \textit{Lowered false positive rate}, because .
 \end{itemize}
 
-Unified notation promotes
+Our unified notation system has a
 
 \begin{itemize}
-\item geometrical reasoning
-\item conceptual clarity
-\item 
-\item less error prone
+\item \emph{free form} promoting geometrical reasoning, conceptual clarity and physical clarity, and
+\item \emph{decomposed form} ensuring geometrical validity and clarity when constructing, manipulating and interpreting coordinates,
+\item \emph{unified way} of expressing transformations, linear or otherwise, in terms of
+\item points denoted $\udot{P}$
+\item orientation, denoted $\uvec{V}$, governed by 
+\item subscripts governed by 
+\item transformation through multiplication of homogeneous matrices, under the constraint of identical composition and closest frame,
+\item translation through addition of vectors, under the constraint of identical decomposition and closest frame,
+\item rotation through multiplication of rotation matrices, under the constraint of identical decomposition and closest frame,
+\item vectors must be identically decomposed under addition,
+\item rotation matrices 
+\item nearest frame cancellation.
 \end{itemize}
+
+
 
 
 % However, when this was not the case, it was less clear who the winner was. The conventional method of using a static template library generally did well here.\todo{Meh. Fix fix fix}
@@ -1428,7 +1436,7 @@ where $\hat{r}$ and $\theta$ are Euler axis-angle parameters. Factoring out $\ve
 \vec{R}_{\mathrm{er}}(\hat{r},\theta) =  \vec{I} + \sin\theta{}S(\hat{r}) + (1-\cos\theta)S^2(\hat{r}),
 \end{align}
 %
-where $\vec{I}$ is an identity dyadic and $S(\hat{r}) = [\hat{r}\times]$ is the skew-symmetric dyadic form of $\hat{r}$. Dyadics are tensors of rank 2 with a vector-like notation. They act like matrices but are basis-vector independent, ideal for free notation. 
+where $\vec{I}$ is an identity dyadic and $S(\hat{r}) = [\hat{r}\times]$ is the skew-symmetric dyadic form of $\hat{r}$. Dyadics are tensors of rank 2 with a vector-like notation. They resemble matrices but are basis-vector independent, ideal for free notation. 
 
 We denote a rotation $\uvec{A}\to\uvec{B}$ with subscripts: $\vec{R}_{\mathrm{er},AB}$, $\hat{r}_{AB}$ and $\theta_{AB}$.
 
