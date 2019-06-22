@@ -13,8 +13,8 @@ cmake_minimum_required(VERSION 2.8)
 set(BUILD_COMMAND pdflatex)
 # set(BUILD_COMMAND xelatex)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=nonstopmode)
-# set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=batchmode)
-set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -file-line-error --shell-escape -synctex=1)
+# set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=batchmode) -file-line-error
+set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -interaction=nonstopmode -shell-escape -synctex=1)
 set(DRAFT_ARGS ${BUILD_ARGS} -draftmode)
 set(USE_GLOSSARY true)
 

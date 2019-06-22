@@ -434,8 +434,9 @@
       \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)
       
       \RequirePackage[full]{textcomp}
-     	\RequirePackage[garamond,expert]{mathdesign}
-     	\RequirePackage[swashQ]{garamondx}
+      \RequirePackage[garamond,expert]{mathdesign}
+      \RequirePackage{ebgaramond}
+%       \RequirePackage[swashQ]{garamondx}
 %      \RequirePackage{newunicodechar}
    \fi
    \typeout{++++xcolor+++}

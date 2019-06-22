@@ -33,20 +33,85 @@
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-A common way to automatically classify objects in synthetic aperture sonar (SAS) is to compare them with image templates. When these are precomputed, classification accuracy is These are usually precomputed, yielding good results for common object configurations, but poor classification accuracy deteriorates for less common  objects. We solve this by simulating templates on-the-fly using a graphics processing unit (GPU).
+Autonomous underwater vehicles (AUVs) hit the unknown like a brick wall: seeing but not perceiving it. They lack intuition, experience, curiosity and understanding to do so. We can tell them what to expect, but only for a select few scenarios. This, of course, is hardly an ideal strategy.
 
-Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to correlate an image segment with a set of template images for typical object configurations, and assign it the class of the template yielding the highest correlation coefficient.
+We grant them perception by performing automatic target recognition (ATR) with an acoustic simulator for synthetic aperture sonar (SAS). With it, an AUV can compare its images on-the-fly to vast numbers of objects and configurations, yielding superior classification results and real-time responses. This is validated on experimental data of a few thousand objects from Jesus Bay, Norway, recorded by the Kongsberg Maritime HISAS1030 sonar. Our simulator consistently outperformed a conventional method using predefined images at false positive rates (FRP) below 20\,\%, and tied with it above. Its implementation is on a graphics processing unit (GPU) using OpenGL and OpenCL, a computer graphics and general purpose programming library, respectively. This facilitates a faster and more flexible classification process.
 
-
-For common scenarios it performs well, but for uncommon ones it is inaccurate and inflexible for ucommon ones. The trouble  These can be precomputed only for most common object configurations, classification accuracy deteriorates for less common  objects
-
-Template matching by means of static template databases: Inaccurate, inflexible. 
-
-
-Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to correlate an image segment containing the object with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. Precomputing The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
-
-We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For every object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. The best performance is obtained when these parameters are estimated from the sonar image as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable template generator which can adapt to the characteristics of the current scene on-the-fly.
+We describe the implementation with a new navigational notation system by extending it with topological ideas from robotics and homogeneous coordinates. This ensures geometrical clarity and validity while aiding the designer in focusing on higher level concepts, such as manipulating rigid objects. A supplementary Python script is provided to showcase the notation and implementation concept.
 \end{abstract}
+% 
+%
+%, 
+% Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to correlate an image segment containing an unknown object with template images of common objects, and assign it the class of the object yielding the highest correlation coefficient. The challenge is to find a representative set of templates covering relevant object configurations.
+% 
+% A common way to automatically classify objects in SAS images is to compare the imaged objects with a precomputed set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. Our studies show this improves the match between SAS objects and their corresponding template significantly in most cases.
+% 
+% We target this challenge with a sonar simulator that first takes as input a seabed model derived from the real sonar image. Then it places a 3D object model on the seabed, renders the scene, and adds the resulting image to the template set. For every object type, position, alignment and material, the procedure is repeated, and a correlation coefficient computed. The best performance is obtained when these parameters are estimated from the sonar image as part of the classification process. The simulator is therefore written in OpenGL and OpenCL and runs on graphics processing units (GPUs). The result is a fast performing and portable template generator which can adapt to the characteristics of the current scene on-the-fly.
+% 
+% Got eyes but very visual experience. 
+% See but not not understand.  
+% 
+% 
+% Dont fly blind, but 
+% 
+% Classifying objects in SAS by comparing them to predefined templates is a common, 
+% 
+% 
+% Automatic classification of objects in SAS by means of template matching is 
+% 
+%  
+% 
+% Template matching classifies objects in synthetic aperture sonar (SAS) images
+% 
+% One of way classifying objects in SAS is to compare them with 
+% 
+% Classifying objects in SAS matching them 
+% 
+% - flexible
+% - in tune with real life situations
+% - more dynamic
+% - evolved 
+% - intricate
+% - want it to 
+% - lacks intuition
+% - intuituve instead of adaptive
+% - build some intuition into it
+% 
+% Beware! The next revolution in automatic target detection is here! Presenting the latest and greatest feat of engineering since 
+
+
+
+%A common way to automatically classify objects in synthetic aperture sonar (SAS) is to compare them with image templates. When these are precomputed, classification accuracy is These are usually precomputed, yielding good results for common object configurations, but poor classification accuracy deteriorates for less common  objects. We solve this by simulating templates on-the-fly using a graphics processing unit (GPU).
+
+%For common scenarios it performs well, but for uncommon ones it is inaccurate and inflexible for ucommon ones. The trouble  These can be precomputed only for most common object configurations, classification accuracy deteriorates for less common  objects
+
+%Template matching by means of static template databases: Inaccurate, inflexible. 
+% However, this only works well when  
+
+% A common way to automatically classify objects in SAS images is to compare the imaged objects with a precomputed set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. Our studies show this improves the match between SAS objects and their corresponding template significantly in most cases.
+% 
+% To obtain delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
+
+
+
+
+%Template matching is a common technique for automatic classification of objects in synthetic aperture sonar (SAS) images. The principle is to correlate an image segment containing the object with a set of template images, and assign it to the class of the template yielding the highest correlation coefficient. Precomputing The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
+
+%\begin{itemize}
+%\item \textit{On-the-fly simulation}, adapting better to the scenario at hand;
+%\item \textit{Faster processing speed}, paving the way for better adaptivity and real-time applications;
+%\item \textit{Increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
+%\item \textit{Improved image quality}, because adaptive methods yield a better advantage the more detailed the scene; 
+%\item \textit{Lowered false positive rate}, as it discards low quality objects.
+%\end{itemize}
+%
+%The simulator was described with a rigorous and unified navigational notation system from K. Gade, which we adapt to computer graphics by extending its:
+%%
+%\begin{itemize}
+%\item \emph{Free form}---that promotes geometrical reasoning, conceptual insight and physical understanding---with \emph{topological ideas} from robotics and an abstraction level raised to that of \emph{affine transformations}, and 
+%\item \emph{Decomposed form}---that ensures geometrical validity and clarity when handling coordinates---with \emph{homogeneous coordinates} for affine transformations and usage ideas for arbitrary functions.
+%\end{itemize}
+
 
 
 
@@ -406,11 +471,10 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 
 The free form emphasizes geometrical reasoning, conceptual clarity and physical understanding, while the decomposed form ensures geometrical validity and clarity when constructing, manipulating and interpreting coordinates. Together they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
-\todo{Summarize notation rules}
 %
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
-We adhere to Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and even use it to express non-linear effects. This facilitates transitioning between frames in a unified and geometrically valid way.
+We adhere to Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and suggest a slight tweak for arbitrary functions. This facilitates transitioning between frames in a unified and geometrically valid way. Inspired by modern robotics, we also discuss the topology and Lie group theory of rigid objects~\cite{Lynch2017}. 
 
 
 
@@ -431,7 +495,7 @@ A vertex $\udot{V}$ in the model can be related to the frame by a position vecto
 \vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
 \end{align}
 %
-where $\vec{p}_{MV} = -\vec{p}_{\udot{V}\udot{M}}$. 
+where $\vec{p}_{\udot{M}{V}} = -\vec{p}_{\udot{V}\udot{M}}$. 
 
 An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{displacement} $\vec{T}_{\ubar{I}\ubar{M}}$ of {\color{cFrame}frame} $\ubar{M}$ relative to $\ubar{I}$,
 %
@@ -453,7 +517,7 @@ We can write the configuration of $\vec{T}_{\tb{I}\tb{M}}$ as $\mathcal{C}_{\tb{
 %%It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, and the rest for orientation. 
 %The translation has $N$ degrees of freedom and topology $\mathbb{R}^N$. The rotation has $N(N-1)/2$ degrees of freedom with topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$.
 %
-It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
+It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. We also drop the sub- and superscript accents and colors from symbols in the text, but keep it for comparison in the standalone equations. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
 
 % \dvec{p} vector subscripts define {\color{cPoint}direction} and {\color{cPoint}magnitude} in terms of two points, and superscripts define {\color{cBasis}representation} in terms of a . Stated differently, subscripts define geometric features while superscripts define numerical features.
 
@@ -487,7 +551,7 @@ Suppose we reference the model's vertices from the image frame $\ubar{I}$ using 
 \end{align}
 %
 where $\c[M]{M}$ denotes cancellation of the intermediate frame $\ubar{M}$ and arrows emphasize composition of the output vector.
-This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^{\,\v{I}}\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
+This vector addition (and any other vector-vector operation) is numerically possible and valid if---and only if---all vectors are decomposed, or represented, in the same frame. Since position vectors have Euclidean topology, we represent $\vec{p}$ in $\ubar{I}$ with a real number for each degree of freedom, $\dvec{p}^{I}\in\mathbb{R}^N$, and unambiguously rewrite \eq{IV_eq_free_vector_addition} in decomposed form as
 %
 \begin{align}
 \m{CL}
@@ -567,7 +631,7 @@ where both $\mat{T}$, $\dvec{p}\in\mathbb{R}^N$ and $\mat{R}\in\mathrm{SO}(N)$ a
 
 %\eq{IV_eq_T_decomposed} contains six degrees 
 
-As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. Assume the world as three dimensional and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
+As we dive into the specifics of each transformation, or step, look to \Tab{IV_tab_frames_transitions} for details on its configuration and coordinate representation, to \Fig{IV_simulator_coordinate_system} for visual aid, and to the supplementary Python script for implementation details. We use free notation in the text and decomposed notation in the standalone equations, to emphasize the merits of each. Assume the world as three dimensional and note that each step has a label in the figure, a line in the table, and a matching heading number in the upcoming text.
 
 
 %  In regular world space we use the affine version in \eq{IV_eq_T_decomposed}, but the last step is performing non-linear effects \Tab{IV_tab_frames_transitions} \eq{IV_eq_T_decomposed}
@@ -814,7 +878,7 @@ and $\vec{p}_{CS}=\vec{0}$ by a zero-vector,
 
 %T$_{RC}\colon (\hat{x}_C,\hat{y}_C,\hat{z}_C) \mapsto (\hat{x}_R,\hat{\phi}_R,\hat{r}_R)$ subject to $\hat{x}_R=\hat{x}_C$.
 
-After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming and autofocus coherently combine these into echo intensities for every pixel position in the image. A typical one-dimensional hydrophone array extending\todo{TODO} along-track allows acoustic focus in this direction, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
+After the sonar has recorded, motion compensated and match filtered the acoustic echoes, they are represented as a time-series of impulses for every transmitted pulse and receiving hydrophone. Beamforming and autofocus coherently combine these into echo intensities for every pixel position in the image. A typical one-dimensional hydrophone array extending along-track allows acoustic focus in azimuth, but not in elevation. Echoes from the same range and along-track are therefore accumulated into the same pixel. We compute this effect (called layover) in step \step{7}.
 
 %The topology of a ranged imaging device is Euclidean for the propagation axis and angular for azimuth and elevation.\todo{Imprecise} 
 
@@ -990,7 +1054,7 @@ We control the rendering process through two code-snippets called a vertex and f
     }
 \end{align}
 %
-and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the latter we compute intensity values for every surface (facet) three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity only depends on incidence angle~\cite{Zhang1999}. It does not consider observation angle\todo{huh?} or sound frequency, but this is not needed to create templates.
+and finally flip $\hat{x}_N$ and $\hat{r}_N$ to match the OpenGL camera. In the latter we compute intensity values for every surface (facet) three vertices span. Assuming rough isotropic surfaces that reflect energy equally in all directions, we use a Lambertian scattering model where backscatter intensity only depends on incidence angle~\cite{Zhang1999}. It ignores observation angle and sound frequency, but we consider this non-essential.
 
 
 \subsubsection{OpenCL post-processing}
@@ -1013,17 +1077,17 @@ where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
 %
 $\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
 %
-\lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth image into a sonar image., label= }
+\lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth\\ image into a sonar-line image., label= }
 \begin{lstlisting}
-% $\text{for all } x_R, \varphi_R $
-%    $ \rlap{ \(r\) }\phantom{\dvec\gamma^R[n_x^R, r+1]}  := \Delta_r^R\dvec\beta^R[n_x^R, n_\varphi^R]] $
-%    $\dvec\gamma^R[n_x^R, \rlap{\(r\)}\phantom{r+1}]  := (1 - r - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
-%    $\dvec\gamma^R[n_x^R, r+1]                        := (\phantom{1 - r}\llap{\(r\)} - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
+$\text{for all } x_R, \varphi_R $
+   $ \rlap{ \(r\) }\phantom{\dvec\gamma^R[n_x^R, r+1]}  := \Delta_r^R\dvec\beta^R[n_x^R, n_\varphi^R]] $
+   $\dvec\gamma^R[n_x^R, \rlap{\(r\)}\phantom{r+1}]  := (1 - r - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
+   $\dvec\gamma^R[n_x^R, r+1]                        := (\phantom{1 - r}\llap{\(r\)} - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
 \end{lstlisting}%\mathcal{V}^R
 %
 where $:=$ is an assignment operator. The last two lines mitigate round-off artifacts by distributing the intensity value linearly between the two neighboring cells of a range value.  
 
-We perform this computation in OpenCL which provides general purpose programming and seamless interoperation with OpenGL. The improved flexibility allows the GPU to take on most computations without involving the central processing unit (CPU), such as template matching, classification or advanced acustical effects.
+We perform this computation in OpenCL which provides general purpose programming and seamless interoperation with OpenGL. The improved flexibility allows the GPU to take on most computations without involving the central processing unit (CPU), such as template matching, classification or advanced acoustical effects.
 
 % using a computing kernel similar to OpenGL shaders. , which interoperates with OpenGL effectively 
 % 
@@ -1140,9 +1204,19 @@ We perform this computation in OpenCL which provides general purpose programming
 %$$\dvec{p}_{AC}^A = \mat{T}_{AB}^A \dvec{p}_{BC}^B$$
 
 
+\subsection{Template matching}
+
+Templates are finally matched to the SAS image by isolating the highlight and shadow regions in each, correlating them with each other, and assigning the mean correlation coefficient to the match score~\cite{Midelfart2010}.
+
+%       ROC curves from last run. Computing the mean correlation score of the shadow and highlight/echo.
+%       Early results. Can only check vs. cylinder-like objects.
+%       Standard template library created based on estimation of physical size of known cylinder mines.
+%       Not possible for adaptive method to perform better when hitting such a target.
+
+
 \subsection{Speed considerations}
 
-Once the simulator runs it produces thousands of sonar templates per second. However, loading OpenGL, OpenCL and 3D models from file consumes seconds per invocation. Therefore, the simulator is either run as preloaded server process or as batch run with a list of parameters.
+Once the simulator runs it generates thousands of sonar templates per second. However, loading OpenGL, OpenCL and 3D models from files takes seconds per invocation. Therefore, the simulator is either run as preloaded server process or as batch run with a list of parameters.
 
 
 
@@ -1251,7 +1325,7 @@ Once the simulator runs it produces thousands of sonar templates per second. How
 
 \begin{figure*}[t]\centering%
 \includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}%
-\caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods }\label{IV_fig_roc_curves}%
+\caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods outperform the conventional one below 20\% FRP, with additional adaption to burial depth increasing the advantage. Above 20\% FRP the methods tie. This suggests significant potential for improving performance in this scenario by increasing adaptivity.}\label{IV_fig_roc_curves}%
 \end{figure*}
 
 Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
@@ -1270,24 +1344,13 @@ For each run we contrast three template methods:
 
 \subsection{Processing speed}
 
-%FFISim was designed to 
-%The key selling point of FFISim is that it is very fast. 
-%Note that FFISim 
+
+%The key selling point of FFISim is that it is very fast.  tighter integration with the classifier
 %
 %is used with the adaptive method due to its tighter integration with the classifier, allowing a range of templates to be generated and assessed on the GPU in a single invocation. It can produce thousands of templates per second if need be. This is why FFISim is being used in the adaptive procedure, and SIGMAS+ in the conventional procedure with a static precomputed set of templates.
 
 
 Our simulator computes thousands of one-megapixel templates per second on a computer with six-core Intel Core i7-3930K CPU and Radeon HD7970 GPU. It achieves this with minimal memory footprint, full model search space and flexible post-processing, unlike the conventional method. This lays the groundwork for an entirely GPU-based template matcher and classifier with unrivaled real-time adaptivity.
-
-% for  template library must be created beforehand from a limited set of parameter values. Therefore, it is possible no template in the library closely fits the object in the image even though the object is a target of interest.
-
-
-% Hence, it may happen that no template in the library is a close fit to the object in the image even though the object is actually a target of interest.\todo{Rewrite paragraph}
-
-%The edge of FFISim lies in its tighter integration with the classifier
-
-
-
 
 
 
@@ -1311,7 +1374,11 @@ Classification performance on all objects is demonstrated with receiver operatin
 \item \emph{Above 20\% FPR} the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. From visual inspection we found the cause to be a combination of fish trawler tracks and poor highlight and shadow quality.
 \end{itemize}
 %
-A classification model should be neither too simple nor complex, but strike a balance between the two that captures statistically significant details of the object but not the noise. Lower FRP discards most poor quality objects which raises detail level. The conventional method appears too simple---also called high bias or underfitted---to fully benefit from this, lagging while  adaptive techniques excel at higher detail levels, but can easily become too complicated---also called high variance or overfitted---unless their adaptivity is constrained.
+A classification model should be neither too simple (high bias or underfitted) nor complex (high variance or underfit), but strike a balance between the two that captures statistically significant details of the object but not the noise. Higher detail-to-noise ratios favor more complex models and occur at lower FRP, where poor quality objects are discarded. The added complexity of the adaptive techniques seems beneficial here, yielding greater advantage at higher detail levels without suffering at lower ones. The greatest edge is held by the adaptive technique that also adjusts burial depth. The results suggest significant potential for improving performance by raising adaptivity in this scenario.
+
+
+%
+%The greater the detail, the greater potential advantage of adaptive algorithms.
 
 
 % Concetional too simple
@@ -1319,29 +1386,6 @@ A classification model should be neither too simple nor complex, but strike a ba
 % Higher true positives better performance
 % yields greater advantage to the adaptive methods
 
-% However, this only works well when  The challenge is to come up with a representative set of template images covering the relevant configurations of object and seabed.
-
-% A common way to automatically classify objects in SAS images is to compare the imaged objects with a precomputed set of templates. However, this is suboptimal as it is infeasible to create accurate templates for all the relevant configurations of seabeds and objects. To solve this we implemented a SAS simulator that creates the templates in delayed real-time based on parameters estimated from the current scene. Our studies show this improves the match between SAS objects and their corresponding template significantly in most cases.
-% 
-% To obtain delayed real-time performance we implemented the simulator on a GPU. These devices have a theoretical peak performance that is typically an order of magnitude higher than CPUs in a comparable price range. We found this potential to be effectively utilized with the well matured and highly optimized OpenGL graphics processing API. Our simulator uses this framework for most of the scene processing.
-
-% On-the-fly
-%   + Flexibility
-%   + Classification accuracy
-%     + 
-
-% Speed + adaptivity -> better classification
-% 
-% Notation
-%   + Geometrical reasoning
-%   + Conceptual understanding
-%   + 
-% 
-% Improved classification accuracy
-%   + Faster processing speed
-%   + Flexibility
-%   + Better image quality
-%   + Lower FRP
 
 % Bias vs variance
 % High noise high variance
@@ -1358,30 +1402,64 @@ A classification model should be neither too simple nor complex, but strike a ba
 Classification accuracy of adaptive template matching improves relative to conventional static methods with:
 %
 \begin{itemize}
-\item \textit{On-the-fly simulation}, enabling full adaption to the scenario at hand and real-time applications adapting to the scenario at hand;
-\item \textit{Faster processing speed}, exploring a wider and finer range of templates;
+\item \textit{On-the-fly simulation}, adapting better to the scenario at hand;
+\item \textit{Faster processing speed}, paving the way for better adaptivity and real-time applications;
 \item \textit{Increased flexibility}, allowing alternative simulation strategies for uncommon scenarios;
-\item \textit{Improved image quality}, because adaptive methods ty 
-\item \textit{Lowered false positive rate}, because .
+\item \textit{Improved image quality}, because adaptive methods yield a better advantage the more detailed the scene; 
+\item \textit{Lowered false positive rate}, as it discards low quality objects.
 \end{itemize}
 
-Our unified notation system has a
-
+The simulator was described with a rigorous and unified navigational notation system from K. Gade, which we adapt to computer graphics by extending its:
+%
 \begin{itemize}
-\item \emph{free form} promoting geometrical reasoning, conceptual clarity and physical clarity, and
-\item \emph{decomposed form} ensuring geometrical validity and clarity when constructing, manipulating and interpreting coordinates,
-\item \emph{unified way} of expressing transformations, linear or otherwise, in terms of
-\item points denoted $\udot{P}$
-\item orientation, denoted $\uvec{V}$, governed by 
-\item subscripts governed by 
-\item transformation through multiplication of homogeneous matrices, under the constraint of identical composition and closest frame,
-\item translation through addition of vectors, under the constraint of identical decomposition and closest frame,
-\item rotation through multiplication of rotation matrices, under the constraint of identical decomposition and closest frame,
-\item vectors must be identically decomposed under addition,
-\item rotation matrices 
-\item nearest frame cancellation.
+\item \emph{Free form}---that promotes geometrical reasoning, conceptual insight and physical understanding---with \emph{topological ideas} from robotics and an abstraction level raised to that of \emph{affine transformations}, and 
+\item \emph{Decomposed form}---that ensures geometrical validity and clarity when handling coordinates---with \emph{homogeneous coordinates} for affine transformations and usage ideas for arbitrary functions.
 \end{itemize}
 
+%We abide by a notation system with a:
+%%
+%\begin{itemize}
+%\item \emph{Free form} promoting geometrical reasoning, conceptual clarity and physical clarity, a
+%\item \emph{Decomposed form} ensuring geometrical validity and clarity when constructing, manipulating and interpreting coordinates, and a
+%\end{itemize}
+%
+%\item \emph{Unified way} of expressing transformations in terms of
+%\begin{itemize}
+%\item positions denoted $\udot{P}$
+%\item orientation, denoted $\uvec{V}$, governed by
+%\end{itemize}
+%\item subscripts governed by 
+%\item transformation through multiplication of homogeneous matrices, under the constraint of identical composition and closest frame,
+%\item translation through addition of vectors, under the constraint of identical decomposition and closest frame,
+%\item rotation through multiplication of rotation matrices, under the constraint of identical decomposition and closest frame,
+%\item vectors must be identically decomposed under addition,
+%\item rotation matrices 
+%\item nearest frame cancellation.
+%\end{itemize}
+%
+%
+%
+%The notation system used to describe the simulator has a:
+%%
+%\emph{Free form} promoting geometrical reasoning, conceptual insight and physical understanding, a
+%\emph{Decomposed form} ensuring geometrical validity and clarity when constructing, manipulating and interpreting coordinates, and a
+%\emph{Unified way} of expressing transformations in terms of positions and orientations.
+%% 
+%We extended this 
+%and extended 
+%
+%\begin{itemize}
+%\item positions denoted $\udot{P}$
+%\item orientation, denoted $\uvec{V}$, governed by
+%\end{itemize}
+%\item subscripts governed by 
+%\item transformation through multiplication of homogeneous matrices, under the constraint of identical composition and closest frame,
+%\item translation through addition of vectors, under the constraint of identical decomposition and closest frame,
+%\item rotation through multiplication of rotation matrices, under the constraint of identical decomposition and closest frame,
+%\item vectors must be identically decomposed under addition,
+%\item rotation matrices 
+%\item nearest frame cancellation.
+%\end{itemize}
 
 
 
@@ -1403,7 +1481,7 @@ Our unified notation system has a
 \appendices
 \fi
 
-\section{Rotations}\label{IV_sec_transformation_matrices}
+\section{Euler-Rodrigues rotations}\label{IV_sec_transformation_matrices}
 
 Rotations are special linear operations with many possible free and decomposed formulations. A common one is Euler-Rodrigues formula, an axis-angle representation introduced by Euler in 1775 with many modern developments~\cite{Dai2015}. % in e.g. the study of coordinate free geometry, quaternions and Lie algebra.
 %It parametrizes the rotation in terms of a half-angle  
@@ -1496,7 +1574,7 @@ The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_
 % Group of symmetrical stretching/squishing actions
 % Groups of symmetries acting on some object
 
-\subsection{Quaternions}\label{IV_sec_quaternions}
+\section{Quaternion rotations}\label{IV_sec_quaternions}
 
 Quaternions are a popular alternative to rotation matrices in computer graphics. They represent orientation by the four Euler-Rodrigues parameters in \eq{IV_eq_euler_rodrigues_parameters},
 %
@@ -1585,7 +1663,7 @@ Quaternions can reduce computational complexity, improve numerical stability and
 %\dvec{\hat{r}}_{AB}^C &=  \frac{\dvec{p}_{A}^{C}\times\dvec{p}_{B}^{C}}{\lVert\dvec{p}_{A}^{C}\rVert\lVert\dvec{p}_{A}^{C}\rVert}
 %\end{align}
 
-\subsection{Euler-angles}\label{IV_sec_euler_angles}
+\section{Euler rotations}\label{IV_sec_euler_angles}
 
 End-users often prefer Euler or Tait-Brian angles over axis-angle parametrizations. They specify an orientation composed from three elementary rotations; Euler rotations about the same first and third axis, or Tait-Brian rotations about three unique axes. The rotations can either be intrinsic or extrinsic, depending on whether the coordinate system follows the rotation or stays fixed, respectively. We use the intrinsic Tait-Brian $Z$-$Y'$-$X''$ convention, with the \emph{nautical angles} yaw ($\phi$), pitch ($\theta$) and roll ($\psi$), representing clockwise rotations around the intrinsic $z$-, $y$- and $x$-axis, respectively. In this convention, roll is applied first, then pitch and finally yaw,
 %
@@ -1620,7 +1698,7 @@ At $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ w
 
 
 
-\subsection{Active vs passive rotations}\label{IV_sec:active_passive_rotations} 
+\section{Active vs. passive rotations}\label{IV_sec:active_passive_rotations} 
 
 The geometrical intent of an active rotation is to move a point, by contrast the passive version instead changes the point's representation. With our notation this can be expressed as either
 %

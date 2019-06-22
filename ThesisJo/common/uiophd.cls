@@ -23,6 +23,7 @@
 \ifxetex\else
    \RequirePackage[T1]{fontenc}
    \RequirePackage[utf8]{inputenc}
+%    \RequirePackage{ebgaramond}
 \fi
 
 \ifxetex
@@ -39,18 +40,18 @@
 	}
 \LoadClass[a4paper,twoside,openright,12pt]{report}
 
-%\ifxetex
+\ifxetex
 %   \RequirePackage{fontspec}
 %   \setmainfont[Mapping=tex-text]{EB Garamond}
 %%      \setmainfont[Mapping=tex-text,Numbers={OldStyle},Ligatures{Common},Contextuals=Alternate]{EB Garamond}
-%\else
+\else
 %%     \newif\iftrue\truetrue
 %%     \iftrue
 %%     
 %%     \else
 %% 	\IfFileExists{t1zgmj.fd}
 %% 	{
-%% % 	\usepackage{ebgaramond}
+% 	\RequirePackage{ebgaramond}
 % 	   \RequirePackage[full]{textcomp}
 % 		\RequirePackage[garamond,expert]{mathdesign}
 % 		\RequirePackage[swashQ]{garamondx}
@@ -63,7 +64,7 @@
 %% 	\IfFileExists{beramono.sty}
 %% 	{\RequirePackage[scaled]{beramono}}
 %% 	{\renewcommand{\ttdefault}{pcr}}
-%\fi
+\fi
 \newcommand{\frontmatter}{\cleardoublepage
 	\pagenumbering{roman}}
 \newcommand{\mainmatter}{\cleardoublepage
