@@ -21,9 +21,9 @@
 \typeout{====Start of macro parse====}
 \input{../Simulator/macros}
 
-\renewcommand\includegraphics[2][]{%
-  \immediate\write18{../Simulator/bin/laFigure #2 #1}%
-  \input{result}}%
+% \renewcommand\includegraphics[2][]{%
+%   \immediate\write18{../Simulator/bin/laFigure #2 #1}%
+%   \input{result}}%
 
 \typeout{====Start document parse====}
 
@@ -34,32 +34,43 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{document}
 % 
+% \pagestyle{plain}
 \cleardoublepage
-\pagestyle{empty}
 
-{
-\setlength\parskip{\baselineskip}
-\renewcommand\baselinestretch{1.1}
+\providecommand*\papertitle{}\renewcommand*\papertitle{Real-Time Synthetic Aperture Sonar Simulation for Automatic Target Recognition: Notation and Application}
 
-\chapter{Paper IV}\label{ch:paperIV}
+\mbox{}\hfill
+\begin{minipage}{0.8\linewidth}
+   \setlength\parskip{\baselineskip}
+   \renewcommand\baselinestretch{1.1}
 
-{\Large\bf Real-Time Synthetic Aperture Sonar Simulator for Automatic Target Recognition: Notation and application}
+   \chapter*{Paper IV}\label{ch:paperIV}
+   \addcontentsline{toc}{chapter}{Paper IV: \papertitle}
+   \stepcounter{chapter}
 
-J.I. Buskenes, H. Midelfart
+   {\Large\bf \papertitle}
 
-IEEE Journal of Oceanic Engineering\\
-Submitted DD.MM.2018%\\
-% \vfill
-}
+   J.I. Buskenes, H. Midelfart
+
+   IEEE Journal of Oceanic Engineering\\
+   Submitted DD.MM.2019%\\
+   % \vfill
+   
+\end{minipage}
 
 \cleardoublepage
 \pagestyle{normal}
-\thispagestyle{plain}
-\fancyhead[LE]{\bf Paper II}
-\fancyhead[RO]{\bf\flushright Real-Time Synthetic Aperture Sonar Simulator for Automatic Target Recognition: Notation and application}
+% \thispagestyle{plain}
+% \fancyhead{}
+\fancyhead[LE]{\bf Paper IV}
+\fancyhead[RO]{\bf\flushright \papertitle}
+% \fancyfoot{}
+% \fancyfoot[RO]{\thepage}
+% \fancyfoot[LE]{\thepage}
+
 
 \begin{center}
-{\Large\bf Real-Time Synthetic Aperture Sonar Simulator for Automatic Target Recognition: Notation and application}
+{\Large\bf \papertitle}
 
 \vspace{\baselineskip}
 J.I. Buskenes, H. Midelfart
@@ -74,7 +85,6 @@ J.I. Buskenes, H. Midelfart
    \include{../Simulator/document.tex}
 % \restoregeometry
 }
-   
    
 % \else
 %    Hello \newpage

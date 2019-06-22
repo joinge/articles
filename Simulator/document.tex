@@ -212,22 +212,35 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{\Green{#1}}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
 
 \begin{figure*}[t]\centering%
+\ifPhdDoc
+   \typeout{============PHDDOC============}
+   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
+\else
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
 \else
   \includegraphics[drawing,width=\linewidth]{gfx/simulator.svg}%
-\fi
+\fi\fi
 \caption{\emph{Simulator concept}: Given as input 3D models of the object and seafloor with some parameters for these, the simulator produces an image template, mask and a correlation coefficient. The \emph{conventional} (static) approach picks parameters from a predefined set, whereas the \emph{adaptive} approach estimates them from the sonar image. The implementation resides entirely on the GPU, with OpenGL performing scene rendering and OpenCL general-purpose post-processing. Compared to a CPU, the GPU's superior processing speed allows a much wider range of object parameters to be searched for an optimal template, yielding better results in less time.}\label{IV_buildup}%
 \end{figure*}
 
+\ifPhdDoc
+\newcommand\checkicon{\includegraphics[height=2ex]{gfx/icon_check.pdf}}
+\newcommand\crossicon{\includegraphics[height=2ex]{gfx/icon_cross.pdf}}
+\else
 \newcommand\checkicon{\includegraphics[height=2ex]{gfx/icon_check.svg}}
 \newcommand\crossicon{\includegraphics[height=2ex]{gfx/icon_cross.svg}}
+\fi
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
 \begin{figure*}[t]\centering%
-\ifOverLeaf%
-  \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
+\ifPhdDoc
+   \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
 \else
-  \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
+   \ifOverLeaf%
+      \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
+   \else
+      \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
+   \fi
 \fi
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, seven steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
@@ -311,6 +324,13 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 %
 \begin{table*}[thbp]\centering
+\ifPhdDoc
+\newlength\numhspace\setlength\numhspace{-0.4em}
+\newlength\labelvspace\setlength\labelvspace{-20pt}
+\else
+\newlength\numhspace\setlength\numhspace{-0.9em}
+\newlength\labelvspace\setlength\labelvspace{-12pt}
+\fi
 %
 {
 \newcommand\shiftup[1]{\raisebox{-.75\normalbaselineskip}{#1}}
@@ -355,9 +375,11 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 \newcommand\const[1]{%\cellcolor{black!64}
 #1}
 %
-
+\ifPhdDoc
+\resizebox{\columnwidth}{!}{
+\fi
 %(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}-1.15em}
-\begin{tabular}{r c >{\hspace*{-0.9em}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
+\begin{tabular}{r c >{\hspace*{\numhspace}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
 	\topline\rowcolor{cBase}
    \mc{2}{c}{\bf Frame} & & \mc{5}{c}{\bf Transformation} & \mc{5}{c}{\bf Configuration space} & \mc{11}{c}{\bf Representation} \\
    \cmidwrap{\cmidrule(lr){1-2}\cmidrule(lr){3-8}\cmidrule(lr){9-13}\cmidrule(lr){14-24}}\rowcolor{cBase} 
@@ -369,7 +391,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 	                                         Cartesian camera & \t{C}             &\figstep{3}{}& \T{CS}                                      & $\colon$ & $\uvec{S}$ & $\overset{(2)}{\to}$ & $\uvec{C}$ &  &                & \phantom{$S$}     &                & 0 & \Tr{CS}           & $($                                                                  &      &      &      & $\psi$\makebox[0pt][l]{$^{(2)}$}  &           &         &     & $)$          & \SE  \\
                               
 \cmidrule{14-24}\rowcolor{cBase}
-   \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{-12pt}{\color{cBaseMark}\begin{tabular}{l l}\rowcolor{white}
+   \mc{13}{L}{\cellcolor{white}\hspace{16.7em}\raisebox{\labelvspace}{\color{cBaseMark}\begin{tabular}{l l}\rowcolor{white}
    $\Uparrow$ & \emph{Affine manipulations} \\$\Downarrow$ & \emph{Coordinate manipulations}
    \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{cBaseMark}\hline\arrayrulecolor{black}%cline{10-20}
 	                                               &                    \\[0\baselineskip]
@@ -457,6 +479,9 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%%%\draw[->] ($(R.east) - (.7em,0ex)$) to[out=-180, in=180] ($(X.east) - (.7em,0ex)$);
 %%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
 \end{tikzpicture}
+\ifPhdDoc
+}
+\fi
 }
 \caption{Reference frames and their transformations. The upper half is an affine domain where any pair of frames are related by a displacement with a specific configuration and a chosen coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
 \end{table*}
@@ -644,8 +669,11 @@ As we dive into the specifics of each transformation, or step, look to \Tab{IV_t
 
 
 
-
+\ifPhdDoc
+\subsubsection{Model displacement}
+\else
 \subsubsection{Model displacement \texorpdfstring{$\vec{T}_{IM}$}{T\_IM}}
+\fi
 
 %The model is subject to no constraints 
 %$\mathcal{C}_{IM} = (\vec{p}_{IM},\vec{R}_{IM},s_{IM})$, subject to no constraints, for a seven user-defined degrees of freedom.
@@ -1077,13 +1105,15 @@ where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
 %
 $\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
 %
+% \begin{minipage}{\linewidth}
 \lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth\\ image into a sonar-line image., label= }
-\begin{lstlisting}
+\begin{lstlisting}%[float=h]
 $\text{for all } x_R, \varphi_R $
    $ \rlap{ \(r\) }\phantom{\dvec\gamma^R[n_x^R, r+1]}  := \Delta_r^R\dvec\beta^R[n_x^R, n_\varphi^R]] $
    $\dvec\gamma^R[n_x^R, \rlap{\(r\)}\phantom{r+1}]  := (1 - r - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
    $\dvec\gamma^R[n_x^R, r+1]                        := (\phantom{1 - r}\llap{\(r\)} - \left\lfloor r\right\rfloor)\dvec\alpha^R[x_R, \varphi_R]] $
 \end{lstlisting}%\mathcal{V}^R
+% \end{minipage}
 %
 where $:=$ is an assignment operator. The last two lines mitigate round-off artifacts by distributing the intensity value linearly between the two neighboring cells of a range value.  
 
@@ -1293,11 +1323,14 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 \section{Results \& Discussion}
 
 \begin{figure*}[t]\centering%
+\ifPhdDoc
+  \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}%
+\else
 \ifOverLeaf%
   \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}%
 \else%
   \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.svg}%
-\fi
+\fi\fi
 \caption{\emph{Two cylinders and a torpedo in Jesus Bay, Norway.} Top row shows isolated SAS image segment corresponding to the object, while center and bottom rows show the template from the conventional and adaptive method, respectively. The contour of the SAS object is indicated with red lines. Observe that the adaptive technique performs better in highlight but not necessarily in shadow.}\label{IV_fig_images_sonar_simulation}%
 \end{figure*}
 

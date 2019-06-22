@@ -419,7 +419,7 @@
 %   \RequirePackage{amsmath,amssymb}
     \typeout{++++mathtools++++}
     \RequirePackage{mathtools}
-    \RequirePackage{amsfonts}
+    \RequirePackage{amsfonts,amssymb}
 %    \usepackage{amsfonts}
    
    \ifOPTxelatex%
@@ -433,11 +433,29 @@
       % Loading fontenc first is advisable:           https://tex.stackexchange.com/a/34046
       \RequirePackage[final]{microtype}%            % Enable microtypographic features (avoid silly o.f. boxes)
       
-      \RequirePackage[full]{textcomp}
-      \RequirePackage[garamond,expert]{mathdesign}
-      \RequirePackage{ebgaramond}
+%       \RequirePackage[full]{textcomp}
+%       \RequirePackage[garamond,expert]{mathdesign}
+%       \RequirePackage[swashQ]{garamondx}
+%       \renewcommand{\rmdefault}{ptm}
+%   
+%       \setmathfont{Latin Modern Math}[version=lm]
+%       \RequirePackage[full]{textcomp}
+%       \RequirePackage[expert]{mathdesign}
+%       \RequirePackage[swashQ]{garamondx}
+%       \RequirePackage[garamond,expert]{mathdesign}
+%       \RequirePackage{mathdesign}
+%       \RequirePackage{ebgaramond}
 %       \RequirePackage[swashQ]{garamondx}
 %      \RequirePackage{newunicodechar}
+%       \DeclareSymbolFontAlphabet{\mathrm}    {operators}
+%       \DeclareSymbolFontAlphabet{\mathrm}    {letters}
+%       \DeclareSymbolFontAlphabet{\mathrm}    {symbols}
+%       \DeclareSymbolFontAlphabet{\mathnormal}{letters}
+%       \DeclareSymbolFontAlphabet{\mathcal}   {symbols}
+%       \DeclareSymbolFont{operators}   {OT1}{cmr} {m}{n}
+%       \DeclareSymbolFont{operators}   {OT1}{cmr} {m}{n}
+%       \DeclareSymbolFont{letters}     {OML}{cmm} {m}{it}
+%       \DeclareSymbolFont{symbols}     {OMS}{cmsy}{m}{n}
    \fi
    \typeout{++++xcolor+++}
    \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
@@ -445,8 +463,7 @@
    \RequirePackage{ccaption}                       % For customised captions
    \typeout{++++fancyhdr++++}
    \RequirePackage{fancyhdr}                       % fancyheading deprecated.
-   \typeout{++++hyperref++++}
-   \RequirePackage{hyperref}
+
    \typeout{++++biblatex++++}
    \RequirePackage[
          backend=biber
@@ -504,11 +521,20 @@
               ,underscores=false%   			Emphasize with _abc_
               ]{markdown}
 %   \usepackage[pilcrow]{easylist}
+%    \usepackage{floatrow}
    \usepackage{listings}
    \lstset{
-     basicstyle=\rmfamily,
-     breaklines=true,
-     columns=fullflexible
+         language=bash%
+      , caption=%
+      , label=%
+      , basicstyle=\small
+      , frame=bt
+      , aboveskip=\baselineskip % space above listing
+      , belowskip=\baselineskip % space below listing
+      , framexleftmargin=1em%
+      , xleftmargin=1em%        %To vertically align the box with the rest of the text in the
+      , captionpos=b%     %Caption at bottom
+      , mathescape=true%
    }
 
    \newif\ifTODO\TODOfalse
@@ -539,7 +565,7 @@
    %    \usepackage[disable]{./todonotes} 
       \newcommand\todo[1]{}
    \fi
-   \usepackage{epigraph}
+%    \usepackage{epigraph}
 %   \RequirePackage[
 %      %                   avantgarde
 %      %                   bookman
@@ -553,6 +579,52 @@
 %                        ]{quotchap}               %For customisable chapter/section headings.
 %%      \renewcommand\chapterheadstartvskip{\vspace*{-5\baselineskip}}
 
+   \typeout{++++accents++++}
+   \usepackage{accents}
+   \typeout{++++moresize++++}
+   \usepackage{moresize}
+   \typeout{++++multirow++++}
+   \usepackage{multirow}
+   \typeout{++++tabularx++++}
+   \usepackage{tabularx}
+   \typeout{++++collcell++++}
+   \usepackage{collcell}
+   \typeout{++++booktabs++++}
+   \usepackage{booktabs}
+   \typeout{++++calc++++}
+   \usepackage{calc}
+   
+   % \typeout{++++mylatexformat++++}
+   % \usepackage{mylatexformat}
+   \typeout{++++floatrow++++}
+   \usepackage{floatrow}
+   %\usepackage{bibtex}
+   %\usepackage{comment}
+   \typeout{++++environ++++}
+   \usepackage{environ}
+   %\usepackage[runin]{abstract}
+   \typeout{++++parskip++++}
+   \usepackage[parfill]{parskip}
+   \typeout{++++afterpage++++}
+   \usepackage{afterpage}
+   % \typeout{++++placeins++++}
+   % \usepackage{afterpage}
+   \typeout{++++subfiles++++}
+   \usepackage{subfiles}
+   %\typeout{++++standalone++++}
+   %\usepackage{standalone}
+   \typeout{++++subfig++++}
+   \usepackage[caption=false,font=footnotesize]{subfig}
+   \typeout{--------------}
+
+   \usepackage[margin=0pt,font={it,small},labelfont={bf,it},labelsep=colon]{caption}
+   
+
+   \typeout{++++glossaries++++}
+   \usepackage[nonumberlist,nogroupskip]{glossaries}
+   \typeout{++++hyperref++++}
+   \RequirePackage{hyperref}
+   \RequirePackage{bookmark}
    \typeout{--------------}
 \else
    \let\circledS\undefined 								% To avoid conflicts where this is previously defined
@@ -1264,6 +1336,12 @@
 \fi\fi
 
 \ifOPTuiophd
+
+%       \makeatletter
+%       \let\ps@plain\ps@fancy
+%       \let\ps@empty\ps@fancy
+%       \makeatother
+      
    % Every first page of a chapter is ``plain'' (for some reason).
    % Only print page number on these pages
 	\fancypagestyle{plain}
@@ -1272,8 +1350,10 @@
 		\chead{}
 		\rhead{}
 		\lfoot{}
-		\cfoot{}
-		\rfoot{\thepage}
+		\cfoot{\thepage}
+ 		\rfoot{}
+%       \fancyfoot[RO]{\thepage}
+%       \fancyfoot[LE]{\thepage}
 		\renewcommand\headrulewidth{0pt}
 		\renewcommand\footrulewidth{0pt}
 		%   \setlength{\headrulewidth}{0pt}
@@ -1288,6 +1368,9 @@
       \lfoot{}
       \cfoot{}
       \rfoot{}
+      \rfoot{}
+%       \fancyfoot[RO]{\thepage}
+%       \fancyfoot[LE]{\thepage}
       \renewcommand\headrulewidth{0pt}
       \renewcommand\footrulewidth{0pt}
       %   \setlength{\headrulewidth}{0pt}
@@ -1310,13 +1393,25 @@
 %       \renewcommand\footrulewidth{0pt}
       %   \setlength{\headrulewidth}{0pt}
       %   \setlength{\footrulewidth}{0pt}
+      \fancyhead{}
+      \fancyfoot{}
+      \fancyfoot[C]{\thepage}
+%       \fancyfoot[LE]{\thepage}
+
    }   
 
-   \fancyhead{}
-   \fancyhead[RO]{\rightmark}
-   \fancyfoot{}
-   \fancyfoot[RO]{\thepage}
-   \fancyfoot[LE]{\thepage}
+%    \fancyhead{}
+% %    \fancyhead[RO]{\rightmark}
+%    \fancyfoot{}
+%    \fancyfoot[RO]{\thepage}
+%    \fancyfoot[LE]{\thepage}
+   
+   % \fancyhead{}
+% \fancyhead[LE]{\bf Paper IV}
+% \fancyhead[RO]{\bf\flushright \papertitle}
+% \fancyfoot{}
+% \fancyfoot[RO]{\thepage}
+% \fancyfoot[LE]{\thepage}
 
 \fi
 

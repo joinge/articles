@@ -18,12 +18,11 @@
 
 
 
-\usepackage{tikz}
 \usetikzlibrary{arrows.meta,calc,positioning,shadows,shadows.blur,shapes,snakes}
 %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
-\newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
+\providecommand\tikzmark{}\renewcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
 %\newcommand{\tikzmark}[2][]{\tikz[remember picture,overlay]\coordinate[#1](#2);}
-\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+\providecommand*\circled{}\renewcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=2.5pt] (char) {#1};}}
             
 \tikzset{-{to[length=.5em,width=.5em]}}
@@ -32,6 +31,7 @@
             \node[shape=circle,draw,color=cBaseMark,shade,top color=black!5!white,bottom color=black!15!white,inner sep=.75pt] (char) {\color{cBaseMark}#1};}}
 \newcommand\figstep[2]{\step{#1}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
 
+\ifPhdDoc\else
 \makeatletter
 \let\@oldseccntformat\@seccntformat
 \DeclareRobustCommand{\@seccntformat}[1]{%
@@ -43,9 +43,9 @@
   \fi
 }
 \let\oldsubsubsection\subsubsection
-\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\parindent\step{\normalfont\arabic{subsubsection}}\enskip}{0ex plus 0.1ex minus 0.1ex}{0ex}{\normalfont\normalsize\itshape}}%
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\parindent\normalfont\arabic{subsubsection}\enskip}{0ex plus 0.1ex minus 0.1ex}{0ex}{\normalfont\normalsize\itshape}}%
 \makeatother
-
+\fi
 
 % The below line commands ensure proper fill color along with the booktabs package
 % \specialrule[width]{abovespace}{belowspace}
@@ -240,11 +240,13 @@
 %% MACROS %       
 %%%%%%%%%%%                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
+\ifPhdDoc\else
 \ifOverLeaf\else
 \let\oldincludegraphics\includegraphics
 \renewcommand\includegraphics[2][]{%
   \immediate\write18{../Simulator/bin/laFigure #2 #1}%
   \input{result}}%
+\fi
 \fi
 %  
 %% \DeclareMathOperator*{\argmin}{\text{arg}\;\text{min}}
