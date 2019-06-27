@@ -33,7 +33,7 @@
 % command as these need to go into the title area created by \maketitle.
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-Autonomous underwater vehicles (AUVs) hit the unknown like a brick wall: seeing but not perceiving it. They lack intuition, experience, curiosity and understanding to do so. We can tell them what to expect, but only for a select few scenarios. This, of course, is hardly an ideal strategy.
+Autonomous underwater vehicles (AUVs) hit the unforeseen like a brick wall: seeing but not perceiving it. They lack intuition, experience, curiosity and understanding to do so. We can tell them what to expect, but only for a select few scenarios. This, of course, is hardly an ideal strategy.
 
 We grant them perception by performing automatic target recognition (ATR) with an acoustic simulator for synthetic aperture sonar (SAS). With it, an AUV can compare its images on-the-fly to vast numbers of objects and configurations, yielding superior classification results and real-time responses. This is validated on experimental data of a few thousand objects from Jesus Bay, Norway, recorded by the Kongsberg Maritime HISAS1030 sonar. Our simulator consistently outperformed a conventional method using predefined images at false positive rates (FRP) below 20\,\%, and tied with it above. Its implementation is on a graphics processing unit (GPU) using OpenGL and OpenCL, a computer graphics and general purpose programming library, respectively. This facilitates a faster and more flexible classification process.
 
@@ -214,7 +214,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \begin{figure*}[t]\centering%
 \ifPhdDoc
    \typeout{============PHDDOC============}
-   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
+   \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/simulator.pdf}}%
 \else
 \ifOverLeaf%
   \includegraphics[width=\linewidth]{gfx/simulator.pdf}%
@@ -232,16 +232,23 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 \newcommand\crossicon{\includegraphics[height=2ex]{gfx/icon_cross.svg}}
 \fi
 % \newcommand\figstep[2]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt}{\textbf{#1}}}}\mbox{}\hfill\parbox[t]{.97\linewidth}{#2}}
-\begin{figure*}[t]\centering%
 \ifPhdDoc
-   \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
+\begin{figure*}[tbp]\centering%
+%    \begin{narrow}{-.125\linewidth}{-.125\linewidth}
+   \captionsetup{width=1.3\linewidth,font=scriptsize}
+   \makebox[\linewidth][c]{\includegraphics[width=1.3\linewidth]{gfx/scene_coordinate_system_radial.pdf}}%
+   \renewcommand\emph[1]{\mdseries{#1}}
+   
 \else
+\begin{figure*}[t]\centering%
    \ifOverLeaf%
       \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.pdf}%
    \else
       \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
    \fi
 \fi
+\FloatBarrier
+
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, seven steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
 \figstep{1}{\emph{Model displacement.} When 3D models of the seafloor and object are loaded into OpenGL, each has its own reference frame $\protect\ubar{M}$. The region we seek to image has a position and orientation $\ubar{I}$. We apply the displacement (translation and rotation) $\ubar{M} \to \ubar{I}$ with a \emph{model matrix} $\mat{T}_\textit{\tiny\!IM}$.
@@ -264,7 +271,12 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 %
 \figstep{7}{\emph{OpenCL post-processing.} Finally, the sonar-like image is formed---for some unique azimuth coordinate---by accumulating all intensity values that share the same range. This is our template. %  along with the depth information is finally combined to form a sonar like image. This is our template.
 }%
-}\label{IV_simulator_coordinate_system}%
+% }
+}\label{IV_simulator_coordinate_system}
+\ifPhdDoc
+% \end{narrow}
+\fi
+%
 \end{figure*}
 
 % \IEEEPARstart{W}{hen} 
@@ -323,11 +335,12 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 
 
 %
-\begin{table*}[thbp]\centering
 \ifPhdDoc
+\begin{table*}[t]\centering
 \newlength\numhspace\setlength\numhspace{-0.4em}
 \newlength\labelvspace\setlength\labelvspace{-20pt}
 \else
+\begin{table*}[thbp]\centering
 \newlength\numhspace\setlength\numhspace{-0.9em}
 \newlength\labelvspace\setlength\labelvspace{-12pt}
 \fi
@@ -376,7 +389,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 #1}
 %
 \ifPhdDoc
-\resizebox{\columnwidth}{!}{
+\makebox[\linewidth][c]{\resizebox{1.25\linewidth}{!}{
 \fi
 %(\cdot)\\[-.75\normalbaselineskip]\cmidrule(lr){3-20}\\[-0.75\normalbaselineskip]\rowcolor{tabBlue}-1.15em}
 \begin{tabular}{r c >{\hspace*{\numhspace}} C >{\hspace*{0.5em}} O Q >{\hspace*{-.5em}} Q Q Q C O C C C L >{\hspace*{-2\tabcolsep}}L O O O >{\hspace*{\tabcolsep}} O O O >{\hspace*{\tabcolsep}}  O O @{\hspace*{\tabcolsep}\shiftdown{$\in$}\hspace*{\tabcolsep}} L}
@@ -480,7 +493,7 @@ Our simulator was designed from the ground up to be part of a GPU-accelerated ad
 %%%%\draw[->,yshift=2ex] (pic cs:M) -- (pic cs:I) ;
 \end{tikzpicture}
 \ifPhdDoc
-}
+}}
 \fi
 }
 \caption{Reference frames and their transformations. The upper half is an affine domain where any pair of frames are related by a displacement with a specific configuration and a chosen coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
@@ -516,8 +529,8 @@ Suppose a stationary $N$-dimensional rigid model has a reference frame $\ubar{M}
 %
 A vertex $\udot{V}$ in the model can be related to the frame by a position vector $\vec{p}_{\td{M}\td{V}}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
 %
-\begin{align}
-\vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},\label{eq_position_vector}
+\begin{align}\label{eq_p_MV_free}
+\vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},
 \end{align}
 %
 where $\vec{p}_{\udot{M}{V}} = -\vec{p}_{\udot{V}\udot{M}}$. 
@@ -525,11 +538,11 @@ where $\vec{p}_{\udot{M}{V}} = -\vec{p}_{\udot{V}\udot{M}}$.
 An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{displacement} $\vec{T}_{\ubar{I}\ubar{M}}$ of {\color{cFrame}frame} $\ubar{M}$ relative to $\ubar{I}$,
 %
 \begin{align}
-\vec{T}_{\bb{I}{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_rotation_dyadic}
+\vec{T}_{\bb{I}{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_T_IM_free}
 \intertext{in terms of a \emph{translation} $\vec{p}_{\udot{I}\udot{M}}$ that relates their {\color{cPoint}positions},}
-\vec{p}_{\dd{I}{M}} \triangleq \udot{M} &- \udot{I},\label{eq_position_vector}
+\vec{p}_{\dd{I}{M}} \triangleq \udot{M} &- \udot{I},\label{eq_p_IM_free}
 \intertext{and a \emph{rotation} $\vec{R}_{\uvec{I}\uvec{M}}$ that relates their {\color{cBasis}orientations},}
-\vec{R}_{\vv{I}{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_rotation_dyadic}\\\nonumber
+\vec{R}_{\vv{I}{M}} \colon \uvec{M} &\to \uvec{I}\label{eq_R_IM_free}\\\nonumber
 \vec{m} &\mapsto \vec{i}.
 \end{align}
 %
@@ -1106,6 +1119,9 @@ where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
 $\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
 %
 % \begin{minipage}{\linewidth}
+\ifPhdDoc
+%\newpage
+\fi
 \lstset{language=bash, caption=Pseudo-code for combining the OpenGL intensity and depth\\ image into a sonar-line image., label= }
 \begin{lstlisting}%[float=h]
 $\text{for all } x_R, \varphi_R $
@@ -1174,10 +1190,12 @@ We perform this computation in OpenCL which provides general purpose programming
 }
 
 % Reset subsubsection formatting
+\ifPhdDoc\else
 \makeatletter
 \let\@seccntformat\@oldseccntformat
 \let\subsubsection\oldsubsubsection
 \makeatother
+\fi
 
 %Vector addition
 %- Matching cancelling closest frames (subscripts)
@@ -1322,10 +1340,11 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 
 \section{Results \& Discussion}
 
-\begin{figure*}[t]\centering%
 \ifPhdDoc
-  \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}%
+\begin{figure*}[!h]\centering%
+  \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}}%
 \else
+\begin{figure*}[t]\centering%
 \ifOverLeaf%
   \includegraphics[width=.8\linewidth]{gfx/fig_images_sonar_simulator_tagged.pdf}%
 \else%
@@ -1335,7 +1354,12 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 \end{figure*}
 
 \begin{figure*}[t]\centering%
-\includegraphics[width=.8\linewidth]{gfx/fig_overlay.pdf}%
+\ifPhdDoc
+  \vspace{-1cm}
+  \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig_overlay.pdf}}
+\else
+   \includegraphics[width=\linewidth]{gfx/fig_overlay.pdf}
+\fi%
 % \parbox{\linewidth}{\small\centering\vspace{.5\baselineskip}
 % \newline\centering\newline %\\[.5\baselineskip]
 \newcommand\cdesc[2]{{\raggedright\setlength\fboxsep{0pt}
@@ -1357,7 +1381,11 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 
 
 \begin{figure*}[t]\centering%
+\ifPhdDoc
+\makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig_rocs.pdf}}
+\else
 \includegraphics[width=\linewidth]{gfx/fig_rocs.pdf}%
+\fi
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods outperform the conventional one below 20\% FRP, with additional adaption to burial depth increasing the advantage. Above 20\% FRP the methods tie. This suggests significant potential for improving performance in this scenario by increasing adaptivity.}\label{IV_fig_roc_curves}%
 \end{figure*}
 
@@ -1396,7 +1424,9 @@ We contrast simulation and classification performance on three typical objects f
 \item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.
 \end{itemize}
 
-
+\ifPhdDoc
+\FloatBarrier
+\fi
 
 \subsection{Classification - all objects}
 
@@ -1507,9 +1537,10 @@ The simulator was described with a rigorous and unified navigational notation sy
 %\end{itemize}
 
 \ifPhdDoc
-\clearpage
+%\clearpage
 \appendix
-\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesection{\Alph{section}}
+\renewcommand\thesubsection{\Alph{section}.\arabic{subsection}}
 \else
 \appendices
 \fi
@@ -1537,13 +1568,13 @@ a = \cos\frac{\theta}{2} \quad \text{and} \quad
 %
 are Euler-Rodrigues axis-angle parameters. Substituting these into \eq{IV_eq_euler_rodrigues_free} and recognizing the trigonometric identities $\sin^2\theta = \frac{1}{2}(1-\cos2\theta)$ and $\cos\theta\sin\theta=\frac{1}{2}\sin2\theta$ yields the alternative form
 %
-\begin{align}\label{IV_eq_euler_rodrigues2}
+\begin{align}
 \vec{p}_\mathrm{rot} =  \vec{p} + \sin\theta(\hat{r}\times\vec{p}) + (1-\cos\theta)(\hat{r} \times (\hat{r} \times \vec{p})),
 \end{align}
 %
 where $\hat{r}$ and $\theta$ are Euler axis-angle parameters. Factoring out $\vec{p}$ from this equation yields a \emph{rotation dyadic} $\vec{R}$,
 %
-\begin{align}\label{IV_eq_euler_rodrigues2}
+\begin{align}
 \vec{R}_{\mathrm{er}}(\hat{r},\theta) =  \vec{I} + \sin\theta{}S(\hat{r}) + (1-\cos\theta)S^2(\hat{r}),
 \end{align}
 %
@@ -1851,8 +1882,10 @@ The authors would like to express their gratitude to the Norwegian Defence Resea
   \newpage
 \fi
 
+
 \ifPhdDoc
-%   \printbibliography[title=References,heading=subbibliography]
+   \printbibliography[title=References,heading=subbibliography]
+   \addcontentsline{toc}{section}{References}
 %    \bibliographysty
 %    \bibliography{library.bib}
 %    \print

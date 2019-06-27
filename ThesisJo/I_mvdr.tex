@@ -35,7 +35,7 @@
    \renewcommand\baselinestretch{1.1}
 
 
-   \chapter{Paper I}\label{ch:paperI}
+   \chapter*{Paper I}\label{ch:paperI}
    \addcontentsline{toc}{chapter}{Paper I: \papertitle}
 %    \stepcounter{chapter}
 
@@ -68,20 +68,24 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng
 % \graphicspath{{../HowtoHowtoCapon/submission/final/}}
 {
 
+\ifMonolithic
 % \newgeometry{headheight=50pt}
 %   \vbadness=99999 % Mute underfull vboxes, these are already reviewed
+   \begin{refsection}[../HowtoHowtoCapon/library.bib]
    \input{../HowtoHowtoCapon/document}
+   \end{refsection}
+
+\else
+%    Hello \newpage
+
+%    \pagestyle{fancy}
+
+%    \cleardoublepage
+   \includepdf[pagecommand={\thispagestyle{fancy}}, pages=-]{build/I_mvdr.pdf}
+\fi
 % \restoregeometry
 }
    
-% \else
-%    Hello \newpage
-% 
-%    \pagestyle{fancy}
-% 
-%    \cleardoublepage
-%    \includepdf[pagecommand={\thispagestyle{fancy}}, pages=-]{build/2_mvdr.pdf}
-% \fi
 
 
 \end{document}

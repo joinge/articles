@@ -10,11 +10,16 @@ cmake_minimum_required(VERSION 2.8)
 # # set(BUILD_ARGS -outdir=${CMAKE_CURRENT_BINARY_DIR} -pdf [=[-pdflatex=xelatex -synctex=1 -interaction=nonstopmode]=])
 # set(BUILD_ARGS -outdir=${CMAKE_CURRENT_BINARY_DIR} -pdf [=[-pdflatex=pdflatex -synctex=1 -interaction=nonstopmode]=])
 
-set(BUILD_COMMAND pdflatex)
+# latexmk -output-directory=${CMAKE_BINARY_DIR} -pdflatex='pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -shell-escape' -pdf ${file}.tex 
+
+set(BUILD_COMMAND latexmk)
+set(BUILD_ARGS -output-directory=${CMAKE_BINARY_DIR} -pdflatex='pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -shell-escape' -pdf )
+
 # set(BUILD_COMMAND xelatex)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=nonstopmode)
 # set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -shell-escape -synctex=1 -interaction=batchmode) -file-line-error
-set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -halt-on-error -interaction=nonstopmode -shell-escape -synctex=1)
+# set(BUILD_COMMAND pdflatex)
+# set(BUILD_ARGS -output-directory=${CMAKE_CURRENT_BINARY_DIR} -halt-on-error -interaction=nonstopmode -shell-escape -synctex=1)
 set(DRAFT_ARGS ${BUILD_ARGS} -draftmode)
 set(USE_GLOSSARY true)
 
@@ -117,6 +122,7 @@ add_custom_command(
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" &&
            cd ${CMAKE_SOURCE_DIR} &&
 #            xelatex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&xelatex\\" mylatexformat.ltx header.tex &&
+#            latexmk -output-directory=${CMAKE_BINARY_DIR} -pdflatex='pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -shell-escape' -pdf ${file}.tex 
            pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
            "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/header.fmt ${CMAKE_SOURCE_DIR}/header.fmt &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
@@ -307,5 +313,10 @@ compile(IIII_simulator IIII_simulator.tex 0_article_header.tex ../Simulator/docu
 # endforeach()
 # message("${SUBFILES_PDF}")
 
-compile(${TOP_FILE} ${TOP_FILE}.tex ${SUBFILES_TEX} ${BIBFILES} ${SUBFILE_DEPS})
+compile(${TOP_FILE} ${TOP_FILE}.tex ${SUBFILES_TEX} ${BIBFILES} ${SUBFILE_DEPS}
+        I_mvdr.tex 0_article_header.tex ../HowtoHowtoCapon/document.tex ../HowtoHowtoCapon/macros.tex ../HowtoHowtoCapon/library.bib
+        II_mvdr_ultrasound.tex 0_article_header.tex ../HRUIonGPU/document.tex ../HRUIonGPU/macros.tex ../ThesisJP/Paper2/cosbib.bib
+        III_lca.tex 0_article_header.tex ../LCAforActiveSonarImaging/document.tex ../LCAforActiveSonarImaging/macros.tex ../LCAforActiveSonarImaging/references.bib
+        IIII_simulator.tex 0_article_header.tex ../Simulator/document.tex ../Simulator/macros.tex ../Simulator/references.bib 
+        )
 

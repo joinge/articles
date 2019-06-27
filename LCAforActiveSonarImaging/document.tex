@@ -136,11 +136,9 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 \end{figure}
 
 
-
-
 \ifPhdDoc
-   \begin{figure*}[tbp]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig3_phd.pdf}%
+   \begin{figure*}[t]\centering%
+   \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig3_phd.pdf}}
    \caption{\emph{Determining LCA window type}: MVDR image with typical frequency responses for windows used in various pixel regions.\\[.5\baselineskip]
    \textbf{Left:} MVDR sectorscan image of the oiltanker Holmengraa, with 40x40 pixel groups for the shadow, highlight and speckle region of the image indicated with red boxes.\\[.5\baselineskip]
    \textbf{Right:} MVDR window amplitude and phase responses computed from the 40x40 pixel groups. The responses are overlayed each other and the amount of overlap is colored using a logarithmic scale. The size of the pixel groups were chosen ad-hoc for the histograms to be visually invariant to a shift in position within the same region. Since each pixel is pre-delayed into focus the unsteered responses all have their center at broadside. The dashed red lines at -13\,dB and -43\,dB marks the peak sidelobe levels of an unsteered rectangular and Hamming window, respectively. Note how the responses are more or less symmetric, with very little steering in the shadow, moderate steering in speckle and steering within roughly 3\,dB in highlight. The phase varies most in the highlight region where we see the highest contrast.}\label{III_mvdr_selected_windows}
@@ -161,7 +159,8 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure*}[tbp]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig4.pdf}%
+   \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig4.pdf}}
+%    \includegraphics[width=\linewidth]{gfx/fig4.pdf}%
    \caption{\emph{Determining Kaiser parameter boundaries}: LCA images of the resolution test cross and anchor created with a large window database, but where the upper bounds for $\beta$ and $\phi$ are varied. The upper left image is equal to DAS with a rectangular window. For all images we measure the lateral distance $\Delta x$ between the two \protect\minus{}3\,dB points of the anchor (red object). These are specified relatively to the reference distance  $\Delta x_\text{ref}$ from the upper left DAS image.
    \\[.5\baselineskip]
    \textbf{Upper bound $\beta$:} Observe that LCA gets better at suppressing sidelobes in the image as we increase the upper bounds for $\beta$. \Fig{III_mvdr_selected_windows} suggests that MVDR prefers windows with sidelobe levels lower than that of Kaiser with $\beta=2$, but here we observe further improvement going to $\beta=5$.
@@ -186,10 +185,10 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure*}[t]\centering
-   \subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a narrow response ($\beta=0$) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.]{\includegraphics[width=\textwidth]{gfx/fig5a.pdf}%%
+   \subfloat[$\beta$-values of the Kaiser window chosen for each image pixel. Note how LCA prefers a narrow response ($\beta=0$) on the anchor, and on other strong sources with little lateral interference. On the sources where lateral interference is present it chooses the widest response with the best sidelobe suppression.]{\makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig5a.pdf}}%%
    \label{III_oversampling_mosaic_bounds_beta}}
    \hfil
-   \subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{III_oversampling_mosaic_bounds}.]{\includegraphics[width=\textwidth]{gfx/fig5b_phd.pdf}%
+   \subfloat[$\phi$-values of the Kaiser window chosen for each image pixel. On strong sources LCA selects windows that are steered away from the source. This is what improves the FWHM measurement in \Fig{III_oversampling_mosaic_bounds}.]{\makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig5b_phd.pdf}}%
    \label{III_oversampling_mosaic_bounds_phi}}
    \caption{Kaiser windows chosen for each pixel in the image of the resolution test cross. The underlying image is the one shown in \Fig{III_oversampling_mosaic_bounds}, with the same parameters. The location of the anchor, cut line and main scatter locations of the cross is marked in red.}
    \label{III_fig_sim}
@@ -208,7 +207,7 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure*}[tb]\centering%
-   \includegraphics[width=\linewidth]{gfx/fig6.pdf}%
+   \makebox[\linewidth][c]{\includegraphics[width=1.25\linewidth]{gfx/fig6.pdf}}%
 \else
    \begin{figure*}[t]%\centering%
    \includegraphics[width=\textwidth]{gfx/buske6_online.pdf}%
@@ -218,10 +217,10 @@ The problem lies in estimating and inverting the spatial covariance matrix. We h
 
 \ifPhdDoc
    \begin{figure*}[t]\centering
-   \subfloat[\emph{Image quality of approximate point scatterers found in the resolution test cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\includegraphics[width=\textwidth]{gfx/fig7a.pdf}%
+   \subfloat[\emph{Image quality of approximate point scatterers found in the resolution test cross scene}. Two lateral image cuts are shown in the leftmost figures, along with the response of a rectangularly weighted DAS. Note how the FWHM of LCA sits in between that of DAS and MVDR. Also note how LCA is insensitive to the window type; its performance is near identical whether it uses Kasier or trigonometric windows.]{\makebox[\linewidth][c]{\includegraphics[width=1.25\textwidth]{gfx/fig7a.pdf}}%
    \label{III_beamformer_comparison_cross}}
    \hfil
-   \subfloat[\emph{Image quality of the full sector Holmengraa scene}. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.]{\includegraphics[width=\textwidth]{gfx/fig7b_phd.pdf}%%
+   \subfloat[\emph{Image quality of the full sector Holmengraa scene}. Compared to DAS the adaptive beamformers produce deeper shadows, sharper edges and a higher detail level. The adaptive methods produce nearly identical images.]{\makebox[\linewidth][c]{\includegraphics[width=1.25\textwidth]{gfx/fig7b_phd.pdf}}%%
    \label{III_beamformer_comparison_holmengraa}}
    \caption{Comparing image quality of DAS, MVDR and LCA with Kaiser or trigonometric windows.}\label{III_image_quality}
    \end{figure*}
@@ -420,7 +419,8 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 \ifPhdDoc
 \clearpage
 \appendix
-\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesection{\Alph{section}}
+\renewcommand\thesubsection{\Alph{section}.\arabic{subsection}}
 \else
 \appendices
 \fi
@@ -531,6 +531,7 @@ The authors would like to thank Kongsberg Maritime, the Norwegian Defence Resear
 \ifPhdDoc
 \typeout{heyheyhey}
    \printbibliography[title=References,heading=subbibliography]
+   \addcontentsline{toc}{section}{References}
 %    \bibliographysty
 %    \bibliography{library.bib}
 %    \print

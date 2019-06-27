@@ -1,3 +1,5 @@
+% !TeX root = thesis
+
 % Opening remarks:
 %
 % - This package is currently being maintained to be compatible with TexLive 2009.
@@ -207,6 +209,7 @@
 \fi
 
 \ifOPTuiophd
+   \DeclareOption{final}{\PassOptionsToClass{final}{\@bdoctype}}
    \DeclareOption{bibtex}{\OPTbibliographytrue}
    \DeclareOption{biblatex}{\OPTbibliographytrue}
    \DeclareOption{biber}{\OPTbibertrue}
@@ -221,7 +224,11 @@
    \DeclareOption{english}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{UKenglish}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
    \DeclareOption{altfont}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
-   \DeclareOption{draft}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+%    \DeclareOption{draft}{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
+   \PassOptionsToClass{a4paper}{\@bdoctype}
+   \PassOptionsToClass{twoside}{\@bdoctype}
+   \PassOptionsToClass{openright}{\@bdoctype}
+
    \DeclareOption{todos}{\OPTtodostrue}
    \DeclareOption*{\PassOptionsToClass{\CurrentOption}{\@bdoctype}}
 \fi
@@ -459,6 +466,9 @@
    \fi
    \typeout{++++xcolor+++}
    \RequirePackage[table,dvipsnames,svgnames]{xcolor}  % Adds colours in tabulars (will pull in colortbl)
+   \typeout{++++graphicx+++}
+   \RequirePackage[final]{graphicx}
+   
    \typeout{++++ccaption+++}
    \RequirePackage{ccaption}                       % For customised captions
    \typeout{++++fancyhdr++++}
@@ -471,8 +481,9 @@
       , doi=true
       , eprint=false
    %    , sortlocale=
-      , style=numeric-comp
-%       , style=ieee,
+%       , style=numeric-comp
+      , style=ieee
+%       , style=numeric
    %   , style=authoryear-icomp
       , url=false
       , sorting=none
@@ -486,7 +497,8 @@
 %       \RequirePackage{layout}
 %    \fi
    \usepackage{tikz}
-   \usetikzlibrary{calc,positioning,shapes,snakes}
+%    \usetikzlibrary{calc,positioning,shapes,snakes}
+   \usetikzlibrary{arrows.meta,calc,positioning,shadows,shadows.blur,shapes,snakes}
    %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
    \newcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
    \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
@@ -598,6 +610,9 @@
    % \usepackage{mylatexformat}
    \typeout{++++floatrow++++}
    \usepackage{floatrow}
+   
+   \typeout{++++placeins++++}
+   \usepackage{placeins}      % \FloatBarrier
    %\usepackage{bibtex}
    %\usepackage{comment}
    \typeout{++++environ++++}
@@ -608,6 +623,8 @@
    \typeout{++++afterpage++++}
    \usepackage{afterpage}
    % \typeout{++++placeins++++}
+   \typeout{++++flafter++++}
+   \usepackage{flafter}       % Floats after their reference
    % \usepackage{afterpage}
    \typeout{++++subfiles++++}
    \usepackage{subfiles}
@@ -619,12 +636,12 @@
 
    \usepackage[margin=0pt,font={it,small},labelfont={bf,it},labelsep=colon]{caption}
    
-
    \typeout{++++glossaries++++}
    \usepackage[nonumberlist,nogroupskip]{glossaries}
    \typeout{++++hyperref++++}
    \RequirePackage{hyperref}
    \RequirePackage{bookmark}
+   \setcounter{secnumdepth}{4}
    \typeout{--------------}
 \else
    \let\circledS\undefined 								% To avoid conflicts where this is previously defined
@@ -1009,9 +1026,10 @@
    , plainpages=false                             % Store roman/arabic numbering differently to avoid
                                                    % ``duplicate'' warning.
    , final
-   %  , bookmarksopen=true
-   %  , bookmarksopenlevel=3
-   %  , bookmarks=true
+     , bookmarksopen=true
+   , bookmarksdepth=5
+    , bookmarksopenlevel=2
+    , bookmarks=true
    , bookmarksnumbered }                          % Have the bookmarks numbered.
 
 \else
@@ -1145,7 +1163,7 @@
     \setcounter{totalnumber}{4}     % 2 may work better
     \setcounter{dbltopnumber}{2}    % for 2-column pages
     \renewcommand\dbltopfraction{0.9} % fit big float above 2-col. text
-    \renewcommand\textfraction{0.07}  % allow minimal text w. figs
+    \renewcommand\textfraction{0.02}  % allow minimal text w. figs
     %   Parameters for FLOAT pages (not text pages):
 %     \renewcommand\floatpagefraction{0.85}  % require fuller float pages
   % N.B.: floatpagefraction MUST be less than topfraction !!

@@ -11,8 +11,37 @@
 
 %\beforeepigraphskip
 
-\begin{document}
+\begin{document}{
 
+%\renewcommand{\@listI}{%
+%\leftmargin=25pt
+%\rightmargin=0pt
+%\labelsep=5pt
+%\labelwidth=20pt
+%\itemindent=0pt
+%\listparindent=0pt
+%\topsep=0pt plus 2pt minus 4pt
+%\partopsep=0pt plus 1pt minus 1pt
+%\parsep=0pt plus 1pt
+%\itemsep=0pt%\parsep
+%}
+
+%\renewenvironment{itemize}
+%{\begin{itemize}
+%% \setlength\abovedisplayskip{0pt}
+%% \setlength\belowdisplayskip{0pt}
+%% \setlength\abovedisplayshortskip{0pt}
+%% \setlength\belowdisplayshortskip{0pt}
+%\setlength{\parindent}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parskip}{5pt plus0.3pt minus0.3pt}
+%\setlength{\parsep}{0pt}
+%
+%%   \renewcommand\indent{}
+%%   \renewcommand\parindent{}
+%}
+%{\end{itemize}}
+   
 %\begin{savequote}[15pc] \slshape
 %% % "The best way to predict the future is to invent it."
 %% % \qauthor{Alan Kay}
@@ -77,25 +106,7 @@
 \IncludeWritingTipstrue
 \newcommand\tip[1]{\ifIncludeWritingTips{}#1\fi}
 
-\titleformat{\section}%command
-[block]%shape
-% {}%format
-{\Large\bfseries}%format
-{}%label
-{0pt}%sep
-{}%before
-[]%after
-\titlespacing*{\section}{0pt}{*0}{*0}
 
-\titleformat{\subsection}%command
-[block]%shape
-% {}%format
-{\bfseries}%format
-{}%label
-{0pt}%sep
-{}%before
-[]%after
-\titlespacing*{\subsection}{0pt}{*0}{*0}
 
 % \ifIncludeWritingTips
 % \begin{markdown}
@@ -115,21 +126,6 @@ Title: Sonar cognition with accelerated acustic image reconstruction and syntesi
 % Introduction - 1 paragraph: Attention grabbing, clarifies purpose, outlays roadmap
 
 
-% \end{markdown}
-% \fi
-
-% \section{Problem \& purpose statement, questions (PPS\&Q)}
-% \ifIncludeWritingTips
-% \begin{markdown}
-
-% \end{markdown}
-% \fi
-
-% PURPOSE:
-% \begin{itemize}
-% \item Attention: 
-% \end{itemize}
-
 % Adaptive methods for image reconstruction and synthesis often 
 % Research into HPC, big data and Value added to society when a method 
 
@@ -141,6 +137,27 @@ Title: Sonar cognition with accelerated acustic image reconstruction and syntesi
 
 \section{Motivation}
 
+Waves are made up of endless tiny energy transactions, a dance of tiny particles effecting each other in a search for equilibrium. They are caused by disturbances in the forces of nature. The drop of a rock into flat water or rapid displacement of still air cause mechanical waves, while synchronized oscillations of electric and magnetic fields cause electromagnetic waves. Regardless whether the waves are mechanical or electromagnetic, move perpendicular or parallel to the axis of propagation, what medium they propagate through or the means by which they do so, they are---perhaps surprisingly---governed by the same mathematical equations.
+
+This is a blessing. It allows similar techniques to be used to form images from waves in optics, medical applications, radars, sonars and seismics. To observe what our eyes and ears can not. To explore vast amounts of information with the sense that does it best: our vision.
+
+Although technology provides sensors that surpass our own, it handles information from them inefficiently. Biological creatures sense and react almost instantaneously, adapting their behavior on-the-fly to survive, fill in knowledge gaps, satisfy their curiosity, or hone a skill. These are traits that help them master the world. Traits that computers currently lack---perhaps unnecessarily.
+
+Computers never tire, hardly fail, chew information relentlessly at high bandwidth and low latency, can communicate with a mesh of devices. 
+
+
+
+
+
+ Concerned with acoustical. 
+
+Images great way to interpret lots of information
+Great computational complexity
+Want real-time performance
+Want adaptibility
+Want cognition
+
+% in their search for balance. an endless search for balance. through a mechanical or electromagnetic force. 
 
 Adaptive
   transmit
@@ -153,7 +170,7 @@ Adaptive
 \item Better research
 \end{itemize}
 
-\section{Scope (niche)}
+\section{Scope}
 % 1. Establish research territory
 % 2. Introduce / review items of previous research in the area (obligatory)
 %     Why important, central, interesting, problematic, etc. (optional)
@@ -168,15 +185,29 @@ Adaptive
 % * Discuss context and background to research problem
 % * Emphasize the need and relevance for the researc
 
+
+
 \subsection{Research territory}
+
+
+
+
+Every 
+
+
+
 Applications in sonar, ultrasound, radar, ...\\
 Dynamic / adaptive:
+
 \begin{itemize}
   \item Image reconstruction / beamforming
   \item Image synthesis / simulation
 \end{itemize}
 
 \subsection{Previous research}
+
+Most research on adaptive image reconstruction comes from passive systems. The minimum variance distortionless response
+
 \begin{itemize}
 \item Image reconstruction / beamforming
   \begin{itemize}
@@ -186,15 +217,15 @@ Dynamic / adaptive:
 \item ATR
 \end{itemize}
 
-d
 
-\subsection{Real-time adaptivity \tip{\hfill(niche)}}
+\subsection{Real-time adaptivity (niche)}
+
 \begin{itemize}
 \item High speed adaptive image reconstruction (beamforming) \& synthesis (simulation)
 \item Gap: When to use adaptive methods? What can they offer? Is GPU acceleration feasible?
 \end{itemize}
 
-\subsection{GPU acceleration \tip{(occupying niche)}}
+\subsection{GPU acceleration (occupying niche)}
 \begin{itemize}
 \item GPU accelerated image reconstruction (beamforming) \& synthesis (simulation)
 \end{itemize}
@@ -202,25 +233,21 @@ d
 \section{Relevance}
 % Argue scientific relevance.
 % Use citations (secondary evidence), focus on discussion chapters
+
 \subsection{Theoretical / scientific}
 \begin{itemize}
 \item Latency matters. Swift reaction key in autonomy, real-time acoustic imagery important in human-machine interactions. (vague)
-\item Quick iterations provide greater research momentum.
+\item Faster research progress. Quick iterations.
 \end{itemize}
 
 \subsection{Practical}
+
 \begin{itemize}
 \item AUVs: Cheaper / more effective missions. Higher quality data. 
-\item Real-time imaging sonars,
-\item Clinical ultrasound: Real-time user feedback,
+\item More data channels. more channels
+\item Real-time applications. Ultrasound. Responsive AUVs. 
+\item Software defined imaging devices. Radar/sonar/ultrasound. HW becoming cheaper, more compact.
 \end{itemize}
-
-% More processing power:
-%   More research per time unit
-%   Lower latency
-%   Handles more data channels
-
-% Accelerated hardware: Cheaper, more compact.
 
 
 \section{Current scientific situation / background}
@@ -682,4 +709,5 @@ Discussion and future work
 %- AUV revisit. Better image quality, lower data collection price.
 
 
+}
 \end{document}

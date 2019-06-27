@@ -5,6 +5,12 @@
 \DeclareOption{10pt}{\ClassWarningNoLine{uiophd}{Do not use type size '10pt'}}
 \DeclareOption{11pt}{\ClassWarningNoLine{uiophd}{Do not use type size '11pt'}}
 \DeclareOption{12pt}{}
+
+\DeclareOption{final}{\PassOptionsToClass{final}{report}}
+\DeclareOption{12pt}{\PassOptionsToClass{12pt}{report}}
+\DeclareOption{a4paper}{\PassOptionsToClass{a4paper}{report}}
+\DeclareOption{twoside}{\PassOptionsToClass{twoside}{report}}
+\DeclareOption{openright}{\PassOptionsToClass{openright}{report}}
 % \DeclareOption{american}{\renewcommand{\uiophd@lang}{USenglish}}
 % \DeclareOption{USenglish}{\renewcommand{\uiophd@lang}{USenglish}}
 % \DeclareOption{english}{\renewcommand{\uiophd@lang}{UKenglish}}
@@ -12,7 +18,7 @@
 % % % \DeclareOption{american}{\renewcommand{\uiophd@lang}{USenglish}}
 % \newcommand{\uiophd@lang}{USenglish}
 \DeclareOption{altfont}{}
-\DeclareOption{draft}{}
+% \DeclareOption{draft}{}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions \relax
 
@@ -26,11 +32,11 @@
 %    \RequirePackage{ebgaramond}
 \fi
 
-\ifxetex
-\RequirePackage[a4paper,twoside,margin=2.5cm,xetex]{geometry}       % [showframe] different margins on title pages
-\else
-\RequirePackage[a4paper,twoside,margin=2.5cm]{geometry}
-\fi
+% \ifxetex
+% \RequirePackage[a4paper,twoside,margin=2.5cm,xetex]{geometry}       % [showframe] different margins on title pages
+% \else
+% \RequirePackage[a4paper,twoside,margin=2.5cm]{geometry}
+% \fi
 % \RequirePackage{keyval}
 % \RequirePackage{pdfpages}
 \RequirePackage{setspace}
@@ -38,7 +44,7 @@
    \parskip=6pt plus 2.5pt\relax
 	\setstretch{1.1}
 	}
-\LoadClass[a4paper,twoside,openright,12pt]{report}
+\LoadClass{report}
 
 \ifxetex
 %   \RequirePackage{fontspec}

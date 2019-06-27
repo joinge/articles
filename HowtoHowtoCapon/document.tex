@@ -661,7 +661,8 @@ All in all, the MVDR maps well to the GPU since the computations involved are in
 \clearpage
 \appendix
 % \section*{Appendix}
-\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesection{\Alph{section}}
+\renewcommand\thesubsection{\Alph{section}.\arabic{subsection}}
 \else
 \appendices
 \fi
@@ -765,6 +766,7 @@ The authors would like to thank Kongsberg Maritime and the Norwegian Defence Res
 
 \ifPhdDoc
    \printbibliography[title=References,heading=subbibliography]
+   \addcontentsline{toc}{section}{References}
 %    \bibliographysty
 %    \bibliography{library.bib}
 %    \print
