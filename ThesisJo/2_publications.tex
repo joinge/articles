@@ -40,7 +40,7 @@
 % 
 
 
-We present four journal-papers concerned with the \emph{adaptive} and \emph{hardware accelerated} formation of acoustic images: the first three reconstructs them from acoustic echoes, and the last synthesizes them through acoustic simulation. 
+We present four journal published papers concerned with \emph{adaptive} and \emph{hardware accelerated} formation of acoustic images: the first three reconstruct them from acoustic echoes and the last synthesizes them through acoustic simulation. 
 
 %
 %Common:
@@ -72,9 +72,9 @@ Volume 40, Issue 2, April 2015
 
 This article evaluates time domain MVDR on GPUs for use in active sonar imaging. We refer to MVDR as fully adaptive, because it computes array weights analytically from spatial features of the data, yielding a continuous solution space. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
 
-We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but tighter bounded.
+We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but more tightly bound.
 
-We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage. The design is limited to 32 channels due data dependencies that are complicated and not inherently parallel, combined with the relatively limited bandwidth of this hardware architecture. 
+We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage. The design is limited to 32 channels due to data dependencies that are complicated and not inherently parallel, combined with the relatively limited bandwidth of this hardware architecture. 
 
 
 
@@ -146,11 +146,11 @@ J.I. Buskenes, H. Midelfart\\
 Submitted DD.MM.2019%\\\\
 %Volume 42, Issue 1, January 2017
 
-This article describes an acoustic simulator for SAS, implemented on GPUs using OpenGL and OpenCL. Its purpose is to enable AUVs to compare its images on-the-fly to simulations of various known objects, for more responsive, accurate and flexible automatic target recognition (ATR).
+This article describes an acoustic simulator for SAS, implemented on GPUs using OpenGL and OpenCL. It enables AUVs to compare its images on-the-fly to simulations of various known objects, for more responsive, accurate and flexible automatic target recognition (ATR).
 
 We find that simulating objects on-the-fly instead of pre-simulating them consistently improves classification accuracy at false positive rates (FPR) below 20\%, and ties above. 
 
-We discuss the design in-depth using a new navigational notation system, extended with topological concepts from robotics and homogeneous coordinates. We find it incredibly helpful for keeping track of complex geometries, numerical representations and higher level abstractions such as manipulating rigid objects. 
+The design is discussed in-depth using a new navigational notation system, extended with topological concepts from robotics and homogeneous coordinates. We find it incredibly helpful for keeping track of complex geometries, numerical representations and higher level abstractions such as manipulating rigid objects. 
 
 
 
