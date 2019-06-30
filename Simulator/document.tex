@@ -140,7 +140,7 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 
 
-\section{Introduction}
+\section{Introduction}\label{IV_sec_introduction}
 
 \setcounter{totalnumber}{1}
 \setcounter{topnumber}{1}
@@ -183,14 +183,14 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 %%\providecommand\r*{}\renewcommand*\c[2]{\scriptsize\color{red}\tikzmark{#1}{$#2$}}
 %\providecommand\b*{}\renewcommand*\v[2][]{{\color{cBasis}\ifthenelse{\equal{#1}{}}{#2}{\tikzmark{#1}{$\ubar{#2}$}}}}
 
-\providecommand\k*{}\renewcommand*\k[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
-\providecommand\n*{}\renewcommand*\n[2][]{{\ifx&#1&#2\else\scriptsize\tikzmark{#1}{$#2$}\fi}}
-\providecommand\d*{}\renewcommand*\d[2][]{{\color{cPoint}\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
-\providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cPoint}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{\scriptsize$\udot{#2}\udot{#3}$}\fi}}
-\providecommand\v*{}\renewcommand*\v[2][]{{\color{cBasis}\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
-\providecommand\vv*{}\renewcommand*\vv[3][]{{\color{cBasis}\ifx&#1&\uvec{#2}\uvec{#3}\else\scriptsize\tikzmark{#1}{$\uvec{#2}\uvec{#3}$}\fi}}
-\providecommand\b*{}\renewcommand*\b[2][]{{\color{cFrame}\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
-\providecommand\bb*{}\renewcommand*\bb[3][]{{\color{cFrame}\ifx&#1&\ubar{#2}\ubar{#3}\else\scriptsize\tikzmark{#1}{$\ubar{#2}\ubar{#3}$}\fi}}
+\providecommand\k*{}\renewcommand*\k[2][]{{\ifx&#1&#2\else\tikzmark{#1}{$#2$}\fi}}
+\providecommand\n*{}\renewcommand*\n[2][]{{\ifx&#1&#2\else\tikzmark{#1}{$#2$}\fi}}
+\providecommand\d*{}\renewcommand*\d[2][]{{\color{cPoint}\ifx&#1&\udot{#2}\else\tikzmark{#1}{$\scriptstyle\udot{#2}$}\fi}}
+\providecommand\dd*{}\renewcommand*\dd[3][]{{\color{cPoint}\ifx&#1&\udot{#2}\udot{#3}\else\tikzmark{#1}{$\scriptstyle\udot{#2}\udot{#3}$}\fi}}
+\providecommand\v*{}\renewcommand*\v[2][]{{\color{cBasis}\ifx&#1&\uvec{#2}\else\tikzmark{#1}{$\scriptstyle\uvec{#2}$}\fi}}
+\providecommand\vv*{}\renewcommand*\vv[3][]{{\color{cBasis}\ifx&#1&\uvec{#2}\uvec{#3}\else\tikzmark{#1}{$\scriptstyle\uvec{#2}\uvec{#3}$}\fi}}
+\providecommand\b*{}\renewcommand*\b[2][]{{\color{cFrame}\ifx&#1&\ubar{#2}\else\tikzmark{#1}{$\scriptstyle\ubar{#2}$}\fi}}
+\providecommand\bb*{}\renewcommand*\bb[3][]{{\color{cFrame}\ifx&#1&\ubar{#2}\ubar{#3}\else\tikzmark{#1}{$\scriptstyle\ubar{#2}\ubar{#3}$}\fi}}
 %\providecommand\td*{}\renewcommand*\td[2][]{{\ifx&#1&\udot{#2}\else\scriptsize\tikzmark{#1}{$\udot{#2}$}\fi}}
 %\providecommand\ta*{}\renewcommand*\ta[2][]{{\ifx&#1&\uvec{#2}\else\scriptsize\tikzmark{#1}{$\uvec{#2}$}\fi}}
 %\providecommand\tb*{}\renewcommand*\tb[2][]{{\ifx&#1&\ubar{#2}\else\scriptsize\tikzmark{#1}{$\ubar{#2}$}\fi}}
@@ -247,7 +247,9 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
       \includegraphics[width=\linewidth]{gfx/scene_coordinate_system_radial.svg}%
    \fi
 \fi
+\ifPhdDoc
 \FloatBarrier
+\fi
 
 \caption[caption]{\emph{Virtual scene geometry and processing steps.} As marked with encircled numbers in the figure, seven steps are needed to obtain the sonar template:\\[.5\baselineskip]
 %
