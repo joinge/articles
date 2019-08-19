@@ -148,6 +148,7 @@
     urlcolor=Blue,        %Colour of the links to external URLs
     colorlinks=true,      %??
     plainpages=false,     %Store roman/arabic numbering differently to avoid
+%     hypertexnames=false,
     bookmarksnumbered }%
 \fi
 % 
@@ -1857,6 +1858,19 @@
 %%%%%%%%                                        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 % SI++ % 
 %%%%%%%%                                        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+
+
+\providecommand\udot{}\renewcommand\udot[1]{\underaccent{\dot}{#1}}
+\providecommand\ubar{}\renewcommand\ubar[1]{\underaccent{\bar}{#1}}
+%\renewcommand\ubar[1]{\underaccent{\bar}{#1}}
+\providecommand\uvec{}\renewcommand\uvec[1]{\underaccent{\vec}{#1}}
+\providecommand\dvec{}\renewcommand\dvec[1]{\boldsymbol{#1}}       % Decomposed vector
+\providecommand\dhat{}\renewcommand\dhat[1]{\boldsymbol{\hat{#1}}} % Decomposed unit vector
+\providecommand\mat {}\renewcommand\mat [1]{\boldsymbol{#1}}
+\providecommand\dmat{}\renewcommand\dmat[3]{\boldsymbol{#1}_{#2}^{#3}}  % Decomposed matrix
+
+
+% \providecommand\dvec{}\renewcommand\dvec[1]{\boldsymbol{#1}}
 
 \newcommand\uns{$\,$} % uns = unit spacing :)
 %~~ SI System Base Units & Prefix ~~%

@@ -30,8 +30,9 @@ set(SUBFILES
 #    abstract
    frontmatter
    1_introduction
-   2_publications
-   3_discussion
+   2_background
+   3_publications
+   4_discussion
 #    literature_review
 #    background
 #    derivations

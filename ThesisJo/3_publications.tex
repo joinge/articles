@@ -70,7 +70,7 @@ J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 40, Issue 2, April 2015
 
-This article evaluates time domain MVDR on GPUs for use in active sonar imaging. We refer to MVDR as fully adaptive, because it computes array weights analytically from spatial features of the data, yielding a continuous solution space. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
+This article evaluates time domain MVDR on GPUs for use in active sonar imaging. We refer to MVDR as fully adaptive because it computes array weights analytically from spatial features of the data, yielding a continuous solution space. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
 
 We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but more tightly bound.
 
@@ -111,9 +111,9 @@ J.P. Åsen, J.I. Buskenes, C.-I.C. Nilsen, A. Austeng and S. Holm\\
 \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}\\
 Volume 61, Issue 1, January 2015
 
-This article evaluates frequency domain (or beamspace) MVDR on GPUs for use in cardiac ultrasound imaging. These systems typically have real-time requirements and more than 32 channels, so we apply a space reduction technique to reduce the computational effort. Since the transmitted beams are narrow, most acoustic energy falls within three to five center frequencies, and a good approximation follows from just computing those.
+This article evaluates frequency domain (or beamspace) MVDR on GPUs for use in cardiac ultrasound imaging. These systems typically have real-time requirements and exceed 32 channels, so we apply a space reduction technique to reduce computational effort. Since the transmitted beams are narrow, most acoustic energy falls within three to five center frequencies, and a good approximation follows from just computing those.
 
-We find that beamspace MVDR delivers real-time performance independent of channel-count and an image quality indistinguishable from time domain MVDR.
+We find that beamspace MVDR delivers real-time performance independent of channel-count and image quality indistinguishable from time domain MVDR.
 
 
 %The first article implements the fully adaptive MVDR beamformer on a GPU for use in active sonar imaging. Like any data-driven algorithm, it requires data with statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has weak temporal sample support. Therefore, MVDR in its unconstrained form overfits the data, yields high variance and fails.

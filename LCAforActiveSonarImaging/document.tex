@@ -418,7 +418,11 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 
 \ifPhdDoc
 \clearpage
+% \renewcommand{\theHchapter}{A\arabic{chapter}}
+\renewcommand{\theHsection}{LcaA\arabic{section}}
 \appendix
+\let\oldthesection\thesection
+\let\oldthesubsection\thesubsection
 \renewcommand\thesection{\Alph{section}}
 \renewcommand\thesubsection{\Alph{section}.\arabic{subsection}}
 \else
@@ -427,6 +431,8 @@ In summary, LCA is an attractive alternative to other adaptive beamformers due t
 
 
 \section{Steering angle}\label{III_appendix:steering_angles}
+% \addcontentsline{toc}{section}{Steering angle}
+% \stepcounter{section}
 
 \begin{figure}[t]
 \ifPhdDoc\centering
@@ -529,6 +535,8 @@ The authors would like to thank Kongsberg Maritime, the Norwegian Defence Resear
 \fi
 
 \ifPhdDoc
+\let\thesection\oldthesection
+\let\thesubsection\oldthesubsection
 \typeout{heyheyhey}
    \printbibliography[title=References,heading=subbibliography]
    \addcontentsline{toc}{section}{References}
