@@ -12,7 +12,37 @@
 
 \chapter{Discussion and Outlook}
 
-Constrain attention to beamformers and simulators (not ATR?).
+The contributions of this thesis are:
+
+Paper I - Time-domain MVDR beamforming on GPUs in active sonar imaging:
+\begin{enumerate}
+\item Accelerates the MVDR beamformer through algorithmic reductions and implementation on GPU.
+\item Demonstrates speeds exceeding 1\,Mpx/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
+\item Offers uncommon insights into hardware limitations, design implications and computation efficiency.
+\end{enumerate}
+
+Paper II - Frequency-domain MVDR beamforming on GPUs in clinical ultrasound imaging:
+\begin{enumerate}
+\item Alters the implementation in Paper I to operate in a frequency domain approximated by its three most significant components.
+\item Demonstrates speeds exceeding 1\,Mpx/s on systems with 64 and 96 channels.
+\item Yields similar image quality to time-domain MVDR.
+\end{enumerate}
+
+Paper III - LCA beamforming compared to MVDR in active sonar imaging:
+\begin{enumerate}
+\item Contrasts LCA, that selects the best performing weights from a predefined set, to MVDR, that computes the weights from an estimated covariance matrix formed from the input data.
+\item 
+\item Yields similar image quality to MVDR.
+\end{enumerate}
+
+Paper IV - Real-time sonar image synthesis:
+\begin{enumerate}
+\item Contrasts LCA, that selects the best performing weights from a predefined set, to MVDR, that computes the weights from an estimated covariance matrix formed from the input data.
+\item Extends a navigational notation system with topological ideas from robotics and homogeneous coordinates, promoting geometrical clarity and validity while aiding the designer in focusing on higher level concepts, such as manipulating rigid objects.
+\item Yields similar image quality to MVDR.
+\end{enumerate}
+
+
 
 \section{Trends}
 
