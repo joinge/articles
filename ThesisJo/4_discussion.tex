@@ -12,155 +12,236 @@
 
 \chapter{Discussion and Outlook}
 
-The contributions of this thesis are:
+The main contributions of this thesis can be summarized as follows:
 
-Paper I - Time-domain MVDR beamforming on GPUs in active sonar imaging:
+\textbf{Paper I} - \textit{Time-domain MVDR beamforming on GPUs in active sonar imaging}:
 \begin{enumerate}
-\item Accelerates the MVDR beamformer through algorithmic reductions and implementation on GPU.
-\item Demonstrates speeds exceeding 1\,Mpx/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
-\item Offers uncommon insights into hardware limitations, design implications and computation efficiency.
+\item Accelerates the MVDR beamformer through algorithmic reductions and fine-tuning to a GPU, yielding a real-time solution.
+\item Demonstrates speeds exceeding 1\,Mpixel/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
+\item Offers rarely documented insights into hardware limitations, design implications and computational efficiency.
 \end{enumerate}
 
-Paper II - Frequency-domain MVDR beamforming on GPUs in clinical ultrasound imaging:
+Time-domain MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. GPU acceleration mitigates the high computational complexity resulting from estimating and inverting a spatial covariance matrix, yielding real-time performance.
+
+
+\textbf{Paper II} - \textit{Frequency-domain MVDR beamforming on GPUs in clinical ultrasound imaging}:
 \begin{enumerate}
-\item Alters the implementation in Paper I to operate in a frequency domain approximated by its three most significant components.
-\item Demonstrates speeds exceeding 1\,Mpx/s on systems with 64 and 96 channels.
-\item Yields similar image quality to time-domain MVDR.
+\item Alters the implementation in Paper I to operate in beamspace (frequency domain), reduced to its three center beams (the most significant ones).
+\item Demonstrates speeds exceeding 1\,Mpixel/s on systems with 64 and 96 channels.
+\item Yields similar image quality to time-domain MVDR, in accordance with former studies in active sonar.
 \end{enumerate}
 
-Paper III - LCA beamforming compared to MVDR in active sonar imaging:
+\textbf{Paper III} - \textit{LCA beamforming versus MVDR in active sonar imaging}:
 \begin{enumerate}
-\item Contrasts LCA, that selects the best performing weights from a predefined set, to MVDR, that computes the weights from an estimated covariance matrix formed from the input data.
-\item 
-\item Yields similar image quality to MVDR.
+\item Shows that LCA beamformer performs similarly to MVDR with only 6 weight sets to choose from: The rectangular and Kaiser function with $\beta=6$, steered to $\phi\in[0,\pm\frac{1}{2}\delta{\phi_{-3dB}}]$, where $\delta{\phi_{-3dB}}$ is the $-3$\,dB bandwidth of the amplitude response to the weight set.
+%Contrasts the LCA and MVDR beamformer, two different ways to solve the minimum variance criterion. The former selects the best performing weights from a predefined set, the latter computes them from a sample covariance matrix estimated from the input data.
+\item Finds no further improvement above 15 suitable weight sets.
+\item Provides insights into typical amplitude responses of MVDR constrained for active sonar imaging and pinpoints their resemblance to the chosen LCA weight sets. 
+\item Suggests swapping the Kaiser function trigonometric one parametrized by $\alpha$, yielding similar image quality while allowing an analytic solution for $\alpha$ to be found. This reduces the algorithm to simply iterating through steering angles.
 \end{enumerate}
 
-Paper IV - Real-time sonar image synthesis:
+\textbf{Paper IV} - \textit{Real-time sonar image synthesis on GPUs for automatic target recognition}:
 \begin{enumerate}
-\item Contrasts LCA, that selects the best performing weights from a predefined set, to MVDR, that computes the weights from an estimated covariance matrix formed from the input data.
-\item Extends a navigational notation system with topological ideas from robotics and homogeneous coordinates, promoting geometrical clarity and validity while aiding the designer in focusing on higher level concepts, such as manipulating rigid objects.
-\item Yields similar image quality to MVDR.
+\item Implements a SAS simulator on GPU that allows AUVs to compare its images on-the-fly to vast numbers of objects and configurations, yielding superior classification results and real-time responses.
+\item Extends a navigational notation system with topological ideas from robotics and homogeneous coordinates, promoting geometrical clarity and validity while aiding the designer to focus on higher level concepts, such as manipulating rigid objects.
+\item Demonstrates superior classification accuracy on experimental data of a few thousand objects from Jesus Bay, Norway, at false positive rates (FRP) below 20, similar %, and tied with it above. 
 \end{enumerate}
 
-
-
-\section{Trends}
-
-The future is faster, smarter.
-
-\subsection{Hardware}
-
-\begin{itemize}
-\item Ever increasing processing speed.
-\begin{itemize}
-	\item Choose the best tool (algorithm) for the job
-	\item More complex not always better, but slower
-	\item Extracting the essential information is key 
-	\item Exploit hardware resources available
-   \item Intel entering the discrete graphics stage
-   \end{itemize}
-\item Software defined transceiver/receivers
-\begin{itemize}
-\item System on Chips with integrated ADCs/DACs. Big power in small package.
-\item Compact, flexible, direct conversion
-\item Software defined signal generation, filtering, synchronization, rate-conversion and mixing.
-\item Multipurpose, hardware reuse, easier implementation of advanced signal processing, faster development and lower price.
-\item 
-\item Compact multi-band Wifi
-\item MIMO (in new wifi). Breaks array SNR boost. Not viable for long range.
-\item Phones: Wifi 2.4-2.5G, 5G (massive MIMO, heavy SDR, 600M-6G), LTE (4G, Long Term Evolution 800M), GSM (2G, Global System for Mobile communications 900M,1.8-1.9M), UMTS (3G, Universal Mobile Telecommunications System 1.9-2.1M), GPS (Global Positioning System 1.5G), Bluetooth (2.4G), NFC (Near-Field Communications 13.56M), FM (100M). Multi-radio in a single SDR package!
-\end{itemize}
-\item Short feedback loops allow real-time adaptivity
-\end{itemize}
-
-
-\subsection{Algorithms}
-
-\begin{itemize}
-\item Intelligence - Ability to process data fast, and retain key information
-\item Adaptive methods ever more attractive.
-   \begin{itemize}
-   \item Processing more data to increase significance of extracted information
-   \item Reducing reaction time: Act when the data is fresh/valid.
-   \end{itemize}
-\item Better image quality
-\item Improved autonomy
-\end{itemize}
-
-
-\subsection{Connectivity}
-
-\begin{itemize}
-\item Internet of Things
-\item Big data
-\item Intelligent mesh of nodes
-\end{itemize}
-
-\section{Risks \& Challenges}
+% We grant them perception by performing automatic target recognition (ATR) with an
+% acoustic simulator for synthetic aperture sonar (SAS). With it, an AUV can compare
+% its images on-the-fly to vast numbers of objects and configurations, yielding superior
+% classification results and real-time responses. This is validated on experimental data of
+% a few thousand objects from Jesus Bay, Norway, recorded by the Kongsberg Maritime
+% HISAS1030 sonar. Our simulator consistently outperformed a conventional method using
+% predefined images at false positive rates (FRP) below 20 %, and tied with it above.
 
 
 
-\begin{itemize}
-\item Improving imaging systems by making them smarter.
-\item Big data - more processing power.
-\item Faster IS smarter
- \begin{itemize}
- 	\item Short feedback loops allow real-time adaptivity
- 	\item More data contains more information
- 	\item Faster learning
- \end{itemize}
-\end{itemize}
 
-
-
-%Discussion and future work
-%   Summary and discussion
-%      Simulator:
-%      - The way to train and constrain deep learning algorithms?
-%      MVDR:
-%      - Analytical optimization - full adaptivity.
-%      - Heavy on computations
-%      LCA:
-%      - Optimization by trial and error - discrete solution space.
-%      - Works almost as well as MVDR in most cases
-%      - Fast!
-%      - Well suited for hardware
-%      
-%      Lessions from deep learning:
-%      - 
-%      
-%   Future work
-
-
-\section{MVDR}
-
-Recent developments:
-- A low complexity minimum variance beamformer for ultrasound imaging using dominant mode rejection~\cite{Jiang2016}
-- Google deep beamforming
-
-\begin{itemize}
-\item SDR - Entirely software defined radio, radar and sonar, bigger potential for adaptive methods
-\item Cognitive radar/sonar. 1. Adaptive signal processing, learn from data. 2. Feedback from receiver to transmitter. 3. Preservation of the information in received data. All of this is present in bats.
-\end{itemize}
-
+In clinical ultrasound imaging 
 
 \section{Onlook}
 
-Machine cognition:
-\begin{itemize}
-\item Ethical dilemmas. Decision and actions have consequences. Who's legally responsible for a machine's doing? Itself?
-\item Safety. Machine flexibility allow more possible outcomes, and a wider range of security issues to consider.
-\end{itemize}
 
-R dim > 10000
-- Inverting such matrices better to do with gradient decent
+Machine intelligence requires high fidelity sensory data, sophisticated adaptive signal processing and massive computing power. If history is any indication, the future promises more of everything in these categories.
+
+The future holds a promise of more of everything: more sensors (data), more signal processing and more processing power.
+
+\emph{Big data} and \emph{Internet of things} (IoT) and \emph{big data} will continue to empower us with ever more information.  
 
 
-Deep learning. Simulator used to trained deep neural networks. Lots of data needed.
+\emph{Machine learning} has made leaps with the combination of deep neural networks and big data.  
+
+
+\subsection{Sensors}
+
+\emph{Phased arrays} 
+
+\section{Signal processing}
+
+\emph{Software defined sonar}
+
+
+\subsection{Hardware}
 
 
 
+\emph{System on Chips} (Soc) are becoming increasingly popular as a heterogeneous computing platform. One of these chips, the Ultrascale+ Radio Frequency SoC (RFSoC) from Xilinx, contains a quad-core CPU, a dual-core real-time processor, a GPU, Field Programmable Gate Array (FPGA) resources and up to 16 Analog-to-Digital and Digital-to-Analog Converters (ADCs and DACs)---all in one CMOS chip. It targets the need for multiple-input-multiple-output (MIMO) can easily replace most analog front-end electronics in a sonar or ultrasound system with a software-defined solution, yielding better flexibility, reduced design complexity, improved bandwidth and lowered latency, all in a tiny physical footprint. Although the GPU
 
-\section{}
+\emph{Phased arrays} samples and records wavefields for digital processing. It is a prerequisite for many of the image reconstruction algorithms
+
+
+
+\subsection{Software}
+
+
+% % 
+% % \item System on Chips with integrated ADCs/DACs. Big power in small package.
+% % \item Compact, flexible, direct conversion
+% % \item Software defined signal generation, filtering, synchronization, rate-conversion and mixing.
+% % \item Multipurpose, hardware reuse, easier implementation of advanced signal processing, faster development and lower price.
+% % \item 
+% % \item Compact multi-band Wifi
+% % \item MIMO (in new wifi). Breaks array SNR boost. Not viable for long range.
+% % \item Phones: Wifi 2.4-2.5G, 5G (massive MIMO, heavy SDR, 600M-6G), LTE (4G, Long Term Evolution 800M), GSM (2G, Global System for Mobile communications 900M,1.8-1.9M), UMTS (3G, Universal Mobile Telecommunications System 1.9-2.1M), GPS (Global Positioning System 1.5G), Bluetooth (2.4G), NFC (Near-Field Communications 13.56M), FM (100M). Multi-radio in a single SDR package!
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% The potential for intelligence improves with the amount of high quality data, the sophistication of the signal processing algorithms and the hardware processing that glues it all together. 
+% 
+% The acquisition of ever more data 
+% Instruments acquire ever 
+% 
+% The intelligence of autonomous instruments require boils down to a tight and fast integration of data collection, processing relies on high quality data, processing and to three key ingredients: high quality sensory data, fast data processing and adaptive signal processing. 
+% 
+% More high quality data
+% The processing power to digest it fast
+% Adaptive 
+% 
+% \section{Trends}
+% 
+% The future is faster, smarter.
+% 
+% \subsection{Hardware}
+% 
+% \begin{itemize}
+% \item Ever increasing processing speed.
+% \begin{itemize}
+% 	\item Choose the best tool (algorithm) for the job
+% 	\item More complex not always better, but slower
+% 	\item Extracting the essential information is key 
+% 	\item Exploit hardware resources available
+%    \item Intel entering the discrete graphics stage
+%    \end{itemize}
+% \item Software defined transceiver/receivers
+% \begin{itemize}
+% \item System on Chips with integrated ADCs/DACs. Big power in small package.
+% \item Compact, flexible, direct conversion
+% \item Software defined signal generation, filtering, synchronization, rate-conversion and mixing.
+% \item Multipurpose, hardware reuse, easier implementation of advanced signal processing, faster development and lower price.
+% \item 
+% \item Compact multi-band Wifi
+% \item MIMO (in new wifi). Breaks array SNR boost. Not viable for long range.
+% \item Phones: Wifi 2.4-2.5G, 5G (massive MIMO, heavy SDR, 600M-6G), LTE (4G, Long Term Evolution 800M), GSM (2G, Global System for Mobile communications 900M,1.8-1.9M), UMTS (3G, Universal Mobile Telecommunications System 1.9-2.1M), GPS (Global Positioning System 1.5G), Bluetooth (2.4G), NFC (Near-Field Communications 13.56M), FM (100M). Multi-radio in a single SDR package!
+% \end{itemize}
+% \item Short feedback loops allow real-time adaptivity
+% \end{itemize}
+% 
+% 
+% \subsection{Algorithms}
+% 
+% \begin{itemize}
+% \item Intelligence - Ability to process data fast, and retain key information
+% \item Adaptive methods ever more attractive.
+%    \begin{itemize}
+%    \item Processing more data to increase significance of extracted information
+%    \item Reducing reaction time: Act when the data is fresh/valid.
+%    \end{itemize}
+% \item Better image quality
+% \item Improved autonomy
+% \end{itemize}
+% 
+% 
+% \subsection{Connectivity}
+% 
+% \begin{itemize}
+% \item Internet of Things
+% \item Big data
+% \item Intelligent mesh of nodes
+% \end{itemize}
+% 
+% \section{Risks \& Challenges}
+% 
+% 
+% 
+% \begin{itemize}
+% \item Improving imaging systems by making them smarter.
+% \item Big data - more processing power.
+% \item Faster IS smarter
+%  \begin{itemize}
+%  	\item Short feedback loops allow real-time adaptivity
+%  	\item More data contains more information
+%  	\item Faster learning
+%  \end{itemize}
+% \end{itemize}
+% 
+% 
+% 
+% %Discussion and future work
+% %   Summary and discussion
+% %      Simulator:
+% %      - The way to train and constrain deep learning algorithms?
+% %      MVDR:
+% %      - Analytical optimization - full adaptivity.
+% %      - Heavy on computations
+% %      LCA:
+% %      - Optimization by trial and error - discrete solution space.
+% %      - Works almost as well as MVDR in most cases
+% %      - Fast!
+% %      - Well suited for hardware
+% %      
+% %      Lessions from deep learning:
+% %      - 
+% %      
+% %   Future work
+% 
+% 
+% \section{MVDR}
+% 
+% Recent developments:
+% - A low complexity minimum variance beamformer for ultrasound imaging using dominant mode rejection~\cite{Jiang2016}
+% - Google deep beamforming
+% 
+% \begin{itemize}
+% \item SDR - Entirely software defined radio, radar and sonar, bigger potential for adaptive methods
+% \item Cognitive radar/sonar. 1. Adaptive signal processing, learn from data. 2. Feedback from receiver to transmitter. 3. Preservation of the information in received data. All of this is present in bats.
+% \end{itemize}
+% 
+% 
+% \section{Onlook}
+% 
+% Machine cognition:
+% \begin{itemize}
+% \item Ethical dilemmas. Decision and actions have consequences. Who's legally responsible for a machine's doing? Itself?
+% \item Safety. Machine flexibility allow more possible outcomes, and a wider range of security issues to consider.
+% \end{itemize}
+% 
+% R dim > 10000
+% - Inverting such matrices better to do with gradient decent
+% 
+% 
+% Deep learning. Simulator used to trained deep neural networks. Lots of data needed.
+% 
+% 
+% 
+% 
+% \section{}
 
 \end{document}
