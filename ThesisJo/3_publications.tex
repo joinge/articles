@@ -40,7 +40,7 @@
 % 
 
 
-We present four journal published papers concerned with \emph{adaptive} and \emph{hardware accelerated} formation of acoustic images: the first three reconstruct from echoes and the last synthesizes through simulation. 
+We present four journal published papers concerned with \emph{adaptive} and \emph{hardware accelerated} formation of acoustic images: the first three through \emph{reconstruct} from echoes and the last \emph{synthesizes} through simulation. 
 
 %
 %Common:
@@ -65,18 +65,19 @@ We present four journal published papers concerned with \emph{adaptive} and \emp
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Paper I}\label{sec:paperI} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\textbf{An Optimized GPU implementation of the\\ MVDR Beamformer for Active Sonar Imaging}\\
+\textbf{An Optimized GPU implementation of the\\
+MVDR Beamformer for Active Sonar Imaging}\\
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 40, Issue 2, April 2015
 
-This article evaluates time domain MVDR on GPUs for use in active sonar imaging. We refer to MVDR as fully adaptive because it computes array weights analytically from spatial features of the data, yielding a continuous solution space. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
+This article accelerates time-domain MVDR with GPUs for use in active sonar imaging. Time-domain MVDR is the reference method for creating sonar images using the minimum variance optimization, aimed at reducing noise and interference while preserving signal integrity while. We refer to it as fully adaptive because it computes array weights analytically from spatial features of the data, yielding array weights from a continuous solution space that are optimal in the minimum variance sense. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
 
 We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but more tightly bound.
 
 We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage. The design is limited to 32 channels due to data dependencies that are complicated and not inherently parallel, combined with the relatively limited bandwidth of this hardware architecture. 
 
-
+%Time-domain MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. GPU acceleration mitigates the high computational complexity resulting from estimating and inverting a spatial covariance matrix, yielding real-time performance.
 
 %
 %%\begin{itemize}\setlength\baselineskip{0pt}
