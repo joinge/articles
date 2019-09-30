@@ -27,7 +27,7 @@ set(TOP_FILE thesis)
 
 set(SUBFILES
 #    preface
-#    abstract
+   abstract
    frontmatter
    1_introduction
    2_background

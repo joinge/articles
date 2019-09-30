@@ -143,7 +143,7 @@ Biological creatures sense and react almost instantaneously to waves, adapting t
 %\end{itemize}
 %
 %\subsection{Practical}
-%
+%x
 %\begin{itemize}
 %\item AUVs: Cheaper / more effective missions. Higher quality data. 
 %\item More data channels. more channels
@@ -151,43 +151,39 @@ Biological creatures sense and react almost instantaneously to waves, adapting t
 %\item Software defined imaging devices. Radar/sonar/ultrasound. HW becoming cheaper, more compact.
 %\end{itemize}
 
-\section{Motivation}
+\section{Motivation and scope}
 
 Technology tends to substitute biology's finesse with brute force: throwing superior sensors and massive computer power at the problem, but failing to replicate biology's intricate information processing. Computers never tire, hardly fail, handle information relentlessly at high bandwidth and low latency, and communicate extremely fast---but they lack the ability to truly adapt, learn, be curious and ask the question ``why?''
 
 %Technology provides better sensors than biology and processing power to deal with their data, but the algorithms lack finesse in doing so.
 
-We seek to improve sonar cognition, or intelligence, through accelerated adaptive image reconstruction and synthesis. Minimizing reaction time is important, so emphasis is put on computation complexity and hardware acceleration.
-
-Figure \ref{fig_outline_simple} for aid.
-
-mimicking biology.
-
-Our main inspiration is the human brain, which facilitates focused and diffused learning. Focused mode strengthens the connections between sets of neurons, while diffused mode forms new connections between neurons. 
-
-
-Sonar  is an interdisciplinary 
-Three different fields form the foundation for sonar sonar cognition:
-
-\emph{Acoustical imaging}, making images of mechanical waves like sound, vibration, ultrasound and infrasound in gases, liquids and solids.
-
-\emph{High performance computing}, making efficient use of hardware architectures.  such as CPUs, GPUs, FPGAs and ASICs. These are listed in descending order with respect to: flexibility, general purpose, ease of implementation  More or less fixed. Fast but not as flexible as the brain. More power hungry. 
-
-\emph{Machine learning}, making computers perform a task without explicit instructions, or learn by doing. and similar popular methods such as deep neural networks, Adaptivity. Architecture of the brain can change (plasticity) but that of machines can not. 
+We seek to improve sonar cognition, or intelligence, through accelerated adaptive image reconstruction and synthesis. This  interdisciplinary challenge delves deep into three fields:%acoustical imaging, high performance computing and machine learning.
+%Three different fields form the foundation for sonar sonar cognition:
+%
+\begin{itemize}
+%
+\item \emph{Acoustical imaging}: makes images of mechanical waves like sound, vibration, ultrasound and infrasound in gases, liquids and solids. We reconstruct images from 100\,kHz sonars and 3\,MHz clinical ultrasound devices. 
+%
+\item \emph{Machine learning}: makes computers perform a task without explicit instructions, or learn by doing. Analogous to human brains, mathematical models perform \emph{focused learning} by strengthening or weakening connections between information nodes, but struggle to perform \emph{diffused learning} by forming new connections. This feat of biology, called brain plasticity, is unrivaled. We focus on a niche focused learning problem by harnessing today's massive computer power and data.
+%
+\item \emph{High performance computing}: makes efficient use of hardware architectures such as central processing units (CPUs), graphics processing units (GPUs), field-programmable gate-arrays (FPGAs) and application-specific integrated circuits ASICs---listed in descending order with respect to flexibility, general purpose and ease of programming and in ascending order with respect to power efficiency and computing power. We accelerate our algorithms with GPUs.
+%Our main inspiration is the human brain, which facilitates focused and diffused learning. Focused mode strengthens the connections between sets of neurons, while diffused mode forms new connections between neurons.
+%The adaptive methods in this thesis offer learning with a weak resemblance to focused mode. Diffused mode is harder because hardware architectures are fixed. 
+\end{itemize}
 
 
-Accelerated 
+%Constrain attention to beamformers and simulators (not ATR?).
 
-This thesis explores ways to improve sonar intelligence 
+%Fast but not as flexible as the brain.
+%
+%Acceleration refers to speeding up algorithms through reduced computational complexity and implementation on high performance parallel hardware. 
+%
+%Figure \ref{fig_outline_simple} for aid.
+%
+%mimicking biology.
+%
+%Play on technology's strengths: processing speed and adaptive algorithms. Low latency. Massive data. 
 
-image synthesis.
-
-
-
-The adaptive methods in this thesis offer learning with a weak resemblance to focused mode. Diffused mode is harder because hardware architectures are fixed. 
-
-
-Play on technology's strengths: processing speed and adaptive algorithms. Low latency. Massive data. 
 
 % 
 % reasoning
@@ -225,7 +221,7 @@ Play on technology's strengths: processing speed and adaptive algorithms. Low la
 %\item Better research
 %\end{itemize}
 
-\section{Scope}
+%\section{Scope}
 % 1. Establish research territory
 % 2. Introduce / review items of previous research in the area (obligatory)
 %     Why important, central, interesting, problematic, etc. (optional)
@@ -246,19 +242,22 @@ Play on technology's strengths: processing speed and adaptive algorithms. Low la
 %- Acquire information
 %- Process it
 %- Use it
-
-Sonar intelligence is an interdisciplinary study that relies heavily on:
 %
 % Three different fields form the foundation for sonar sonar cognition:
 
-\emph{Acoustical imaging}, making images of mechanical waves like sound, vibration, ultrasound and infrasound in gases, liquids and solids.
-
-\emph{High performance computing}, making efficient use of hardware architectures.  such as CPUs, GPUs, FPGAs and ASICs. These are listed in descending order with respect to: flexibility, general purpose, ease of implementation  More or less fixed. Fast but not as flexible as the brain. More power hungry. 
-
-\emph{Machine learning}, making computers perform a task without explicit instructions, or learn by doing. and similar popular methods such as deep neural networks, Adaptivity. Architecture of the brain can change (plasticity) but that of machines can not. 
 
 
-Constrain attention to beamformers and simulators (not ATR?).
+
+
+%Improve sonar cognition
+%
+%Questions
+%\begin{itemize}
+%\item What are the advantages and disadvantages of adaptive methods?
+%\item When to use each method?
+%\item Are graphics processing units ideal for accelerating these adaptive methods?
+%\item Can accelerated adaptive image reconstruction and synthesis improve sonar cognition?
+%\end{itemize}
 
 
 % Evaluate MVDR and LCA 
@@ -381,17 +380,6 @@ Constrain attention to beamformers and simulators (not ATR?).
 % Why fix what isn't broken?
 % who, what, when, where, why, how
 
-Improve sonar cognition
-
-
-
-Questions
-\begin{itemize}
-\item What are the advantages and disadvantages of adaptive methods?
-\item When to use each method?
-\item Are graphics processing units ideal for accelerating these adaptive methods?
-\item Can accelerated adaptive image reconstruction and synthesis improve sonar cognition?
-\end{itemize}
 
 %- 
 %- Can adaptive image reconstruction 
@@ -416,31 +404,31 @@ Questions
 
 
 \section{Outline}
-\ifIncludeWritingTips
-\begin{markdown}
-    * Describe the context within which the research takes place
-    * Summarize methodology as well
-* Conceptual framework (optional)
-    * Specify the the thesis frame
-* Research significance (limitations, scope)
-    * Why is it important? Elaborate on assumptions, limitations, scope
-* Expected outcomes (?)
-* Overview of chapters
-    * Tell reader what to expect.
-    * Form the basis for establishing arguments and key points
-* Concluding paragraph
-    * Summarize key points
-    * Links to next chapter(?)
-\end{markdown}
-\fi
+%\ifIncludeWritingTips
+%\begin{markdown}
+%    * Describe the context within which the research takes place
+%    * Summarize methodology as well
+%* Conceptual framework (optional)
+%    * Specify the the thesis frame
+%* Research significance (limitations, scope)
+%    * Why is it important? Elaborate on assumptions, limitations, scope
+%* Expected outcomes (?)
+%* Overview of chapters
+%    * Tell reader what to expect.
+%    * Form the basis for establishing arguments and key points
+%* Concluding paragraph
+%    * Summarize key points
+%    * Links to next chapter(?)
+%\end{markdown}
+%\fi
 
-\begin{figure}[tp]\label{fig_outline_simple}
+\begin{figure}[tp]
 \makebox[\linewidth][c]{%
 \graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation_bigger_picture.svg}}
-\caption{Thesis outline. The first three papers are concerned with beamforming: the reconstruction of images from acoustic echoes. The last paper are concerned with simulation: the synthesis of image templates from 3D models and object parameters estimated from the reconstructed image. An object classifiers receives the sonar image and its simulated counterpart and  is fed to an object classifier}
+\caption{Thesis outline. The first three papers are concerned with beamforming: the reconstruction of images from acoustic echoes. The last paper are concerned with simulation: the synthesis of image templates from 3D models and object parameters estimated from the reconstructed image. An object classifiers receives the sonar image and its simulated counterpart and  is fed to an object classifier}\label{fig_outline_simple}
 \end{figure}
 
-Figure \ref{fig_outline_simple} offers a quick visual of how the papers relate. The three first papers are concerned with making images from acoustic echoes, and the last paper use parameters derived from such images to simulate image templates of common objects. Our  practical system---an autonomous underwater vehicle (AUV)---use the templates to classify objects in the scene and adapt accordingly. 
+This thesis presents four journal articles. Figure \ref{fig_outline_simple} offers a quick visual of how they relate. The three first papers are concerned with making images from acoustic echoes, and the last paper use parameters derived from such images to simulate image templates of common objects. Our practical system---an autonomous underwater vehicle (AUV)---use the templates to classify objects in the scene and adapt accordingly. 
 
 Chapter 2 provides some background material on beamforming and compares the . Chapter 3 summarizes the contributions of all four papers. Chapter 4 discusses the findings, proposes further work and entertains ideas of what the future might hold.
 
