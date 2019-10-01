@@ -1,15 +1,28 @@
 % \input{variables}\ifMonolithic\else\input{header}\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The world is highly dynamic, constantly changing from moment to moment. An autonomous device aspiring to navigate it must be situationally perceptive and reactive. This requires numerous sensors gathering high quality data at high throughput, adaptive signal processing algorithms and powerful parallel hardware capable of near-realtime responses.
+The world is highly dynamic, constantly changing from moment to moment. Any autonomous device aspiring to navigate it must be situationally perceptive and reactive. This requires numerous sensors gathering high quality data at high throughput, adaptive signal processing algorithms and powerful parallel hardware capable of near-realtime responses.
 
-This thesis explores ways to accelerate adaptive acoustic image reconstruction and synthesis. The reconstruction process relies heavily on beamforming: the art of delaying and weighting sensor arrays to achieve desired spatial responses. A beamformer can be viewed as a spatial filter or model, and works best---as any model---when it is neither too simple nor too complex. 
+
+
+This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated guessing). For all ultimate goal is to preserve suppress noise and interference 
+
+
+This thesis explores ways to accelerate adaptive acoustic image reconstruction and synthesis. The reconstruction process relies heavily on beamforming: the art of delaying and weighting sensor arrays to achieve desired spatial responses. 
+
+A beamformer can be viewed as a spatial filter or model, and works best---as any model---when it is neither too simple nor complex. 
 
 All models have a sweet spot in complexity, a balance point where its estimates offer an ideal compromise between bias and variance. 
 
 Such a spatial filter, or model, . model complexity should be just right. not too simple, not too complex. bias vs variance. 
 
+We begin by accelerating the minimum variance distortionless response (MVDR) beamformer in time-domain, then  in both time- and frequency-domain, frequency-domain MVDR and low-complexity adaptive (LCA). 
 
+We find that time-domain MVDR, frequency-domain MVDR and LCA all offer slight improvement in image quality over static methods. 
+
+All beamformers are fairly well suited for GPU acceleration because each pixel in the image can be processed independently.
+
+ offer is considered the reference among adaptive beamformers, it offers neglible benefits over 
 
 sensory faculty
 

@@ -42,7 +42,7 @@
 % Related work can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
 % \\
 
-Any wave, regardless of its nature, are governed by a partial differential equation known as the \emph{wave equation}:
+Any wave, regardless of its nature, is governed by a partial differential equation known as the \emph{wave equation}:
 %
 \begin{align}
 \nabla^2 f 
@@ -50,9 +50,9 @@ Any wave, regardless of its nature, are governed by a partial differential equat
 \end{align}
 %\frac{\delta^2 f}{\delta x^2} + \frac{\delta^2 f}{\delta y^2} + \frac{\delta^2 f}{\delta z^2}
 %
-where $\nabla^2$ is the Laplace operator, $f$ is field strength and $c$ is wave propagation speed. If $f$ represents the displacement of a vibrating string, the equation states that the force pulling the string towards equilibrium (right side) is proportional to the string's curvature (left side). In acoustics $f$ represents sound pressure, but since the mathematics are all the same we will simply think of $f$ as a signal: a unit-less scalar function with wave characteristics.
+where $\nabla^2$ is the Laplace operator, $f$ is field strength and $c$ is wave propagation speed. If $f$ represents the displacement of a vibrating string, the equation states that the force pulling the string towards equilibrium (right side) is proportional to the string's curvature (left side). In acoustics $f$ represents sound pressure, but since the mathematics are independent of the physics involved we will simply think of $f$ as a signal: a unit-less scalar function with wave characteristics.
 
-A few solutions to the wave equation are of interest, in particular that of a plane and spherical wave:
+The wave equation has a few solutions of interest, in particular that of a plane and spherical wave:
 %
 \begin{align}
 f_\textrm{plane}(\vec{p},t)  &= A e^{j(\omega t - \vec{k} \cdot \vec{p})} \\
@@ -85,6 +85,11 @@ Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert
 
 Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{I_beamforming}), an image is formed by coherently combining the receiver outputs to focus at one angle (or point) at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
+\begin{figure}[tp]\label{II_fig_article_relation}
+\makebox[\linewidth][c]{%
+\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
+\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated trial-and-error). Background on synthesis of image templates from the reconstructed images will be presented in article IV. }
+\end{figure}
 
 \subsection{Beamforming}
 % \ifPhdDoc
@@ -111,11 +116,7 @@ z[n] = \dvec{w}^H[n]\dvec{x}[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \b
 %
 where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. With static weights this is referred to as the conventional delay-and-sum (DAS) beamformer. A variety of weighting functions exist for trading lateral resolution for improved noise suppression (contrast), but a compromise between the two is unavoidable~\cite{Harris1978}. A class of adaptive beamformers target this limitation by adapting the weights to the impinging wavefield. One such technique is the minimum variace distortionless response (MVDR) method.
 
-\begin{figure}[tp]\label{II_fig_article_relation}
-\makebox[\linewidth][c]{%
-\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
-\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated trial-and-error). Background on synthesis of image templates from the reconstructed images will be presented in article IV. }
-\end{figure}
+
 
 % Accelerated adaptivity is key: it enables rapid dynamic responses to mission events. }
 
@@ -130,7 +131,7 @@ where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. With stat
 3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{2_eq_weights}). }\label{mvdr_beamforming}
 \end{figure}
 %
-The basic idea behind MVDR is to compute the set of weights that minimizes noise and signal power accumulated by the array, while seeking unit gain for signals from the pixel of interest. With pre-delayed data this can be formulated as follows:
+The basic idea behind MVDR is to compute the set of weights that minimizes noise and signal power accumulated by the array, while ensuring unit gain for signals from the pixel of interest. With pre-delayed data this can be formulated as follows:
 %
 \begin{gather}
 \argmin{\dvec{w}}\ E\Big\{\big|\dvec{w}^H[n]\dvec{x}[n]\big|^2\Big\} \qquad\text{subject to}\qquad \dvec{w}^H[n]\dvec{1} = 1. \label{2_eq_mvdr_def}
@@ -165,31 +166,33 @@ To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image w
 
 \subsection{Frequency-domain MVDR}
 
-As we increase system size the inversion step will take over as the main bottleneck. We can, however, reduce the dimensionality further than subarray averaging already has by performing MVDR beamforming in the frequency domain. The underlying concept here that for narrowband data there will be a direct relation between the Fourier transform across the array and angles of arrival in the spatial domain; the zero-frequency will correspond to broadside, and increasing frequencies will map to monotonously increasing opening angles. Since the combined transmit and receive response is highly directive, this method allows us to only process the angles where our signals are coming from~\cite{Nilsen2009a,VanTrees2002}. The method is called beamspace MVDR.
+Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimatation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. If the data is narrow band, narrow beam, or both, the backscatter energy resides primarily in the center frequencies. The zero-frequency correspond to broadside, higher frequencies to larger opening angles. Since the combined transmit and receive response is highly directive, it is sufficient to process only three or five center angles and ignore the rest~\cite{Nilsen2009a,VanTrees2002}. The method is called beamspace MVDR.
 
-The beamspace MVDR formulation very closely resembles that of the time domain MVDR. The main difference is the initial need to Fourier transform the data:
+Beamspace MVDR formulation closely resembles that of time domain MVDR, the main difference being an initial need to Fourier transform the data:
 %
 \begin{gather}
 \x_{\text{BS},l}[n] = \mat{B}\x_l[n], \qquad \mat{B}\in \mathbb{C}^{N_b,L}, \qquad \text{where} \qquad [\mat{B}]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}.\label{2_eq_beamspace}
 \end{gather}
 %
-Here $\mat{B}$ is referred to as the Butler matrix, $l$ is the subarray index, and $N_b$ is the number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\w_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
+Here $\mat{B}$ refers to the Butler matrix, $l$ is subarray index, and $N_b$ is number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\w_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
 
-When we reduce the covariance size from $L$ to $N_b$ we also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
+Reducing the covariance size from $L$ to $N_b$ also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
 
 
 
 \subsection{LCA beamformer}
 
-The Low Complexity Adaptive (LCA) beamformer is another take on the optimization problem in (\ref{2_eq_mvdr_def}). Instead of calculating the weights like in (\ref{2_eq_weights}), it simply computes the beamformer output for each window in a larger set of windows, and finally applies the one that best fulfils the given optimization criterion. If we let $\w_p$ be the $p$'th of a total of $P$ windows, then this can be formulated as~\cite{Synnevag2008}:
+The Low Complexity Adaptive (LCA) beamformer offers a different approach to the optimization problem in (\ref{2_eq_mvdr_def}). Instead of calculating weights like MVDR in (\ref{2_eq_weights}), it iterates through a set of precomputed weights and applies the one that best fulfils the optimization criterion. If $\w_p$ denotes the $p$'th out of $P$ weight sets, then LCA can be formulated as~\cite{Synnevag2008}:
+%
 \begin{gather}
 \argmin{p}\ E\Big\{\big|\w_p^H\x[n]\big|^2\Big\} \qquad\text{subject to}\qquad \w_p^H\1 = 1. \label{2_eq_lca_def}
 \end{gather}
-Note the similarity between (\ref{2_eq_mvdr_def}) and (\ref{2_eq_lca_def}). The LCA and MVDR uses essentially the same optimization criterion, but whereas MVDR searches a continuous solution space for the best set of weights to apply, the LCA beamformer only have $P$ solutions to select from. However, we have found that once the LCA has 10-20 well designed windows available the quality of the images it produces quickly approaches that of the MVDR beamformer.
+%
+Note the similarity between (\ref{2_eq_mvdr_def}) and (\ref{2_eq_lca_def}). Both LCA and MVDR rely on the same optimization criterion, but whereas MVDR searches a continuous solution space for the optimal weights, LCA only have $P$ solutions to select from.
 
-Although LCA promotes good image quality, its two most attractive traits is perhaps its simplicity and low computational complexity. The LCA is essentially a delay-and-sum (DAS) beamformer where the delay step is carried out as usual, but where the weighting and summing is repeated for each of the $P$ windows. In its basic form its computational complexity only of O($M\,P$).
 
 
+% \subsection{Image quality}
 
 
 % These challenges are very closely linked. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB of shared memory (L1 cache) and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This will expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (Little's law). By dividing the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
@@ -200,18 +203,28 @@ Although LCA promotes good image quality, its two most attractive traits is perh
 
 % The solution is make sure that each thread primarily access the shared memory (L1 cache) and registers. Unfortunately, these are scarce resources and 
 
+% \begin{figure}[!t]\centering\label{2_fig_holmengraa}%
+% \graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
+% \caption{The 68$\times$9\,m oil tanker Holmengraa lying at a depth of 77\,m. The MVDR images were processed with L=16, K=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was set up with a window database consisting of 5 Kaiser windows with the window-parameter set in the range $\beta\in[0,10]$, and then each of these were steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from..}
+% \end{figure}
+% 
+% \begin{figure}[!h]\centering%
+% \graphicsAI[drawing,width=.8\linewidth]{gfx/benchmark1_tagged.pdf}%
+% \caption{Benchmarks for the our time-domain and frequency-domain MVDR method running on a GPU. The grey line marks the realtime requirement for the HUGIN AUV to perform full-coverage sectorscan images with a ping rate of 3 pings/s.}\label{2_fig_benchmark}
+% \end{figure}
+% 
+% \section{Comparison}
+% 
+% Figure \ref{2_fig_holmengraa} contrasts image quality of the mentioned beamformers. The experimental data comes from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. 
+% 
+% To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar mounted on the HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\,m and operating frequency of 100\,kHz, and it was operated in sidescan mode here. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\,m long and 9\,m wide, and lies at a slanted seabed at 77\,m depth outside of Horten, Norway. The results are shown in Figure \ref{2_fig_holmengraa}. The MVDR images were processed with parameters $L$=16, $K$=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was designed with a window database consisting of 5 Kaiser windows, each with different window-parameters from the range $\beta\in[0,10]$, and each steered in 5 distinct directions leaving a total of 25 windows for the LCA to select from.
+% 
+% A few benchmarks of these methods are presented in Figure \ref{2_fig_benchmark}. On our test system with a quad-core Intel Xeon E5620, 64Gb of RAM and an nVidia Quadro 6000 card, the MVDR methods managed to create images at rates just over 1\,Mpx/s. A single-thread C implementation that was added as reference was outperformed by around 2 orders of magnitude. However, do not consider this comparison fair because while the GPU design is make efficient use of the L1 cache, similar optimisation work was not carried out on the CPU design.
 
-\section{Results}
 
 
-To display the imaging capabilities of the mentioned beamformers, we have processed experimental datasets from the 32 element Kongsberg Maritime HISAS1030 sonar mounted on the HUGIN AUV~\cite{Hansen2009}. HISAS1030 is a high resolution synthetic aperture sonar with an array length of 1.2\,m and operating frequency of 100\,kHz, and it was operated in sidescan mode here. The studied object is the 1500 dwt oil tanker wreck Holmengraa. It is 68\,m long and 9\,m wide, and lies at a slanted seabed at 77\,m depth outside of Horten, Norway. The results are shown in Figure \ref{2_fig_holmengraa}. The MVDR images were processed with parameters $L$=16, $K$=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was designed with a window database consisting of 5 Kaiser windows, each with different window-parameters from the range $\beta\in[0,10]$, and each steered in 5 distinct directions leaving a total of 25 windows for the LCA to select from.
 
-A few benchmarks of these methods are presented in Figure \ref{2_fig_benchmark}. On our test system with a quad-core Intel Xeon E5620, 64Gb of RAM and an nVidia Quadro 6000 card, the MVDR methods managed to create images at rates just over 1\,Mpx/s. A single-thread C implementation that was added as reference was outperformed by around 2 orders of magnitude. However, do not consider this comparison fair because while the GPU design is make efficient use of the L1 cache, similar optimisation work was not carried out on the CPU design.
 
-\begin{figure}[!t]\centering%
-\graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
-\caption{The 68$\times$9\,m oil tanker Holmengraa lying at a depth of 77\,m. The MVDR images were processed with L=16, K=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was set up with a window database consisting of 5 Kaiser windows with the window-parameter set in the range $\beta\in[0,10]$, and then each of these were steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from..}\label{2_fig_holmengraa}
-\end{figure}
 
 % \begin{table}[h]\centering%\normalsize
 % \begin{tabular}[c]{l r r r@{:}  l}\hline
@@ -221,14 +234,7 @@ A few benchmarks of these methods are presented in Figure \ref{2_fig_benchmark}.
 % \caption{Nvidia Quadro 6000; Memory bandwidths (BW) compared to the peak arithmetic bandwidth of 1.03 Tflop/s.}\label{tabbandwidth}
 % \end{table}
 
-\begin{figure}[!h]\centering%
-\graphicsAI[drawing,width=.8\linewidth]{gfx/benchmark1_tagged.pdf}%
-\caption{Benchmarks for the our time-domain and frequency-domain MVDR method running on a GPU. The grey line marks the realtime requirement for the HUGIN AUV to perform full-coverage sectorscan images with a ping rate of 3 pings/s.}\label{2_fig_benchmark}
-\end{figure}
 
-
-\newpage
-\section{Discussion}
 
 % \begin{table}[b]\centering%\normalsize
 % \begin{tabular}[c]{l r r r@{:}  l}\hline
@@ -242,9 +248,7 @@ A few benchmarks of these methods are presented in Figure \ref{2_fig_benchmark}.
 % \end{table}
 
 
-The MVDR beamformer is a technique that is capable of improving image quality over conventional methods. This can be seen in Figure \ref{2_fig_holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge definitions. Contrary to common belief, it is also possible to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
 
-If this performance is insufficient, we suggest looking at the LCA method. It is based on the same optimisation criterion as the MVDR method, but avoids the estimation and inversion step altogether by limiting the weight's solution space to only a few predefined windows. As seen the Figure \ref{2_fig_holmengraa}, it produces images with a quality comparable to the MVDR method, but computing the images takes only a fraction of the time.
 
 }
 

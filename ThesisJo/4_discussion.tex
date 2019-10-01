@@ -57,8 +57,28 @@ Time-domain MVDR is the reference method for creating sonar images using the min
 % HISAS1030 sonar. Our simulator consistently outperformed a conventional method using
 % predefined images at false positive rates (FRP) below 20 %, and tied with it above.
 
+The MVDR beamformer is a technique that is capable of improving image quality over conventional methods. This can be seen in Figure \ref{2_fig_holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge definitions. Contrary to common belief, it is also possible to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
+
+If this performance is insufficient, we suggest looking at the LCA method. It is based on the same optimisation criterion as the MVDR method, but avoids the estimation and inversion step altogether by limiting the weight's solution space to only a few predefined windows. As seen the Figure \ref{2_fig_holmengraa}, it produces images with a quality comparable to the MVDR method, but computing the images takes only a fraction of the time.
+
+However, in practice we find that once the LCA has 10-20 well designed windows available the quality of the images it produces quickly approaches that of the MVDR beamformer.
+
+Although LCA promotes good image quality, its two most attractive traits is perhaps its simplicity and low computational complexity. The LCA is essentially a delay-and-sum (DAS) beamformer where the delay step is carried out as usual, but where the weighting and summing is repeated for each of the $P$ windows. In its basic form its computational complexity only of O($M\,P$).
 
 
+\begin{figure}[!t]\centering\label{2_fig_holmengraa}%
+\graphicsAI[drawing,width=\linewidth]{gfx/plot_holmengraa_L16_Navg1.pdf}%
+\caption{The 68$\times$9\,m oil tanker Holmengraa lying at a depth of 77\,m. The MVDR images were processed with L=16, K=3, and 1\% diagonal loading. For beamspace MVDR we set $N_b=L/2$. LCA was set up with a window database consisting of 5 Kaiser windows with the window-parameter set in the range $\beta\in[0,10]$, and then each of these were steed in 5 distinct directions leaving a total of 25 windows for the LCA to select from..}
+\end{figure}
+
+\begin{figure}[!h]\centering%
+\graphicsAI[drawing,width=.8\linewidth]{gfx/benchmark1_tagged.pdf}%
+\caption{Benchmarks for the our time-domain and frequency-domain MVDR method running on a GPU. The grey line marks the realtime requirement for the HUGIN AUV to perform full-coverage sectorscan images with a ping rate of 3 pings/s.}\label{2_fig_benchmark}
+\end{figure}
+
+\section{Comparison}
+
+Figure \ref{2_fig_holmengraa} contrasts image quality of the mentioned beamformers. The experimental data comes from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. 
 
 In clinical ultrasound imaging 
 
