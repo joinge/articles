@@ -1,94 +1,94 @@
 % \input{variables}\ifMonolithic\else\input{header}\input{subheader}\fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The world is highly dynamic, constantly changing from moment to moment. Any autonomous device aspiring to navigate it must be situationally perceptive and reactive. This requires numerous sensors gathering high quality data at high throughput, adaptive signal processing algorithms and powerful parallel hardware capable of near-realtime responses.
+The world is highly dynamic. Any device aspiring to master it must be situationally perceptive and reactive. This requires numerous sensors gathering high quality data at high throughput, adaptive signal processing algorithms and powerful parallel hardware capable of delivering swift responses. In our case of sonar-equipped autonomous underwater vehicles and clinical ultrasound devices, this process revolves around acoustic images.
+
+This thesis explores methods to accelerate adaptive acoustic image reconstruction and synthesis, through beamforming and simulation, respectively. Beamforming is the main attraction: the art of delaying and weighting sensor arrays to craft desired spatial responses. When aiming to minimize image noise and interference, two good candidates are the minimum variance distortionless response (MVDR) and low complexity adaptive (LCA) beamformer. We study time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated guessing), and conclude that:
+%
+\begin{itemize}
+\item \emph{Image quality} is similar for our adaptive beamformers, but improved upon compared to static methods.
+%
+\item \emph{Solution space} is continuous for MVDR and discrete for LCA, but similarly shaped. 
+%
+\item \emph{Model complexity} has a sweet spot, a balance point where its estimates offer an ideal compromise between bias and variance. MVDR depend on 
+%
+\item \emph{Acceleration} of MVDR through algorithmic reductions and implementation on graphics processing units (GPUs) yields real-time responses in time-domain up to 32 channels and in frequency-domain for any system size with narrow-band, narrow-beam, or both. LCA is inherently fast and extremely well suited for acceleration, 
+\end{itemize}
+%
+Finally, we perform image synthesis of common objects in the seabed with a GPU accelerated simulator. These are in turn used to perform adaptive automatic target recognition (ATR). The result is a more dynamic and flexible system yielding improved image quality, image quality and classification performance. Finally, we describe this system with a new navigational notation system, extended with topological concepts from robotics and homogeneous coordinates. It helps keeping track of complex geometries, numerical representations and higher level abstractions such as manipulating rigid objects.
 
 
 
-This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated guessing). For all ultimate goal is to preserve suppress noise and interference 
-
-
-This thesis explores ways to accelerate adaptive acoustic image reconstruction and synthesis. The reconstruction process relies heavily on beamforming: the art of delaying and weighting sensor arrays to achieve desired spatial responses. 
-
-A beamformer can be viewed as a spatial filter or model, and works best---as any model---when it is neither too simple nor complex. 
-
-All models have a sweet spot in complexity, a balance point where its estimates offer an ideal compromise between bias and variance. 
-
-Such a spatial filter, or model, . model complexity should be just right. not too simple, not too complex. bias vs variance. 
-
-We begin by accelerating the minimum variance distortionless response (MVDR) beamformer in time-domain, then  in both time- and frequency-domain, frequency-domain MVDR and low-complexity adaptive (LCA). 
-
-We find that time-domain MVDR, frequency-domain MVDR and LCA all offer slight improvement in image quality over static methods. 
-
-All beamformers are fairly well suited for GPU acceleration because each pixel in the image can be processed independently.
-
- offer is considered the reference among adaptive beamformers, it offers neglible benefits over 
-
-sensory faculty
-
-as adaptive as possible with the least possible computational load.
-
-
-
-
-gather information
-dynamically analyze it
-and react to it
-Får 
-
-adapt
-persist
-prevail
-
-Adaptive algorithm and the computation power to drive it.
-
-
-Necessitates an algorithm that adapts to changing data. 
-
-
-
-Cognition is the mental action or process of acquiring knowledge and understanding through thought, experience and the senses. 
-
-The intelligence and autonomy of acoustical imaging devices require more sensory data, algorithmic adaptivity and processing power. All are vital and equally important. 
-
-
-
-improves with more high quality sensory data, sophisticated adaptive signal processing and the hardware resources to deal with it all. 
-
-more sensory data, algorithmic adaptivity and processing power.
-
-adaptive processing and processing power. 
-
-benefits from more sensors, sensory data,   detectors rely on 
-
-autonomy improves with data amount, adaptive processing, processing power.
-
-fast dynamic information gathering and processing. 
-
-
-sensory input, sophisticated information and the processing power to drive it all. 
-
-rely on fast adaptive data processing. have an intrinsic need for adaptive data processing and hardware acceleration. 
-
-Accelerated adaptive image reconstruction and synthesis. 
-
-information gathering and processing. 
-
-One use case autonomy
-
-Key challenges that are addressed include active sonar and
-
-- Active sonar and clinical ultrasound
-- Different ways to achieve adaptivity. Analytical assessment of the data, computing weights. Approximating it. Trial-and-error. Different means to the same adaptivity
-- Computational complexity
-- Hardware acceleration
-- 
-
-Spatial sensitivity is like a balloon; squeezing it on one side inflates it on the other. 
-
-World is highly dynamic, constantly changing from moment to moment. Necessitates an algorithm that adapts to changing data. 
-
-
+%
+%
+%
+%brings most adaptivity to the table, but also greatest computational load and model complexity.
+%
+%
+%
+%
+%computational complexity increases but can be handled through algorithmic reduction and hardware acceleration, , for the adaptive beamformers are better than static methods, but ; \emph{user friendliness} is better for LCA than MVDR; 
+%
+%
+%MVDR yields weights from a continuous solution space, but requires ad-hoc tuning of robustification parameters, is harder to understand and has high computational complexity. 
+%
+%The reconstruction process relies heavily on beamforming: the art of delaying and weighting sensor arrays to achieve desired spatial responses. Our adaptive beamformer reference, minimum variance distortionless response (MVDR), computes the weights analytically from an estimate of the full-array covariance matrix. 
+%
+%
+%
+%, both in time- and frequency domain. Then we ,  begin our study of a reference method  MVDR, frequency-domain MVDR and LCA all offer slight improvement in image quality over static methods. 
+%
+%All methods implemented on the GPU except LCA.
+%
+%A beamformer can be viewed as a spatial filter or model, and works best---as any model---when it is neither too simple nor complex. 
+%
+%
+%
+%We begin by accelerating the minimum variance distortionless response (MVDR) beamformer in time-domain, then  in both time- and frequency-domain, frequency-domain MVDR and low-complexity adaptive (LCA). 
+% 
+%
+%All beamformers are fairly well suited for GPU acceleration because each pixel in the image can be processed independently.
+%
+% offer is considered the reference among adaptive beamformers, it offers neglible benefits over 
+%
+%sensory faculty
+%
+%as adaptive as possible with the least possible computational load.
+%
+%
+%gather information
+%dynamically analyze it
+%and react to it
+%
+%adapt
+%persist
+%prevail
+%
+%Adaptive algorithm and the computation power to drive it.
+%
+%Cognition is the mental action or process of acquiring knowledge and understanding through thought, experience and the senses. 
+%
+%The intelligence and autonomy of acoustical imaging devices require more sensory data, algorithmic adaptivity and processing power. All are vital and equally important. 
+%
+%improves with more high quality sensory data, sophisticated adaptive signal processing and the hardware resources to deal with it all. 
+%
+%more sensory data, algorithmic adaptivity and processing power.
+%
+%autonomy improves with data amount, adaptive processing, processing power.
+%
+%information gathering and processing. 
+%
+%Key challenges that are addressed include active sonar and
+%
+%- Active sonar and clinical ultrasound
+%- Different ways to achieve adaptivity. Analytical assessment of the data, computing weights. Approximating it. Trial-and-error. Different means to the same adaptivity
+%- Computational complexity
+%- Hardware acceleration
+%- 
+%
+%Spatial sensitivity is like a balloon; squeezing it on one side inflates it on the other. 
+%
+%
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % \ifMonolithic\else\input{subfooter}\fi

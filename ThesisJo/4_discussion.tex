@@ -20,10 +20,9 @@ The main contributions of this thesis can be summarized as follows:
 \item Demonstrates speeds exceeding 1\,Mpixel/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
 \item Offers rarely documented insights into hardware limitations, design implications and computational efficiency.
 \end{enumerate}
-
-Time-domain MVDR is---in theory---the optimal way of computing weights that minimize variance (noise) in the image. 
-
-Time-domain MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. GPU acceleration mitigates the high computational complexity resulting from estimating and inverting a spatial covariance matrix, yielding real-time performance.
+% 
+% Time-domain MVDR is---in theory---the optimal way of computing weights that minimize variance (noise) in the image. 
+% 
 
 
 \textbf{Paper II} - \textit{Frequency-domain MVDR beamforming on GPUs in clinical ultrasound imaging}:
@@ -57,6 +56,32 @@ Time-domain MVDR is the reference method for creating sonar images using the min
 % HISAS1030 sonar. Our simulator consistently outperformed a conventional method using
 % predefined images at false positive rates (FRP) below 20 %, and tied with it above.
 
+MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. When using time-domain MVDR in systems with less than 32 channels, GPU acceleration mitigates the high computational complexity in estimating and inverting a spatial covariance matrix. For systems with narrow-band, narrow-beam, or both, the fre , yielding real-time performance.
+
+
+\section{Comparison}
+
+reconstruction/Beamforming:
+%
+\begin{itemize}
+\item \emph{Image quality} is similar for our adaptive beamformers, but improved upon compared to static methods.
+%
+\item \emph{Solution space} is continuous for MVDR and discrete for LCA, but similarly shaped. 
+%
+\item \emph{Model complexity} has a sweet spot, a balance point where its estimates offer an ideal compromise between bias and variance. MVDR depend on 
+%
+\item \emph{Acceleration} of MVDR through algorithmic reductions and implementation on graphics processing units (GPUs) yields real-time responses in time-domain up to 32 channels and in frequency-domain for any system size with narrow-band, narrow-beam, or both.
+\end{itemize}
+
+synthesis/simulation:
+
+
+%A classification model should be neither too simple (high bias or underfitted)
+%nor complex (high variance or underfit), but strike a balance between the
+%two that captures statistically significant details of the object but not the
+%noise. Higher detail-to-noise ratios favor more complex models and occur at
+
+
 The MVDR beamformer is a technique that is capable of improving image quality over conventional methods. This can be seen in Figure \ref{2_fig_holmengraa}, where the MVDR produces images with cleaner shadows and slightly improved edge definitions. Contrary to common belief, it is also possible to create these images relatively fast. Through careful optimization work and by running the MVDR on a GPU we have achieved image creation rates of more than 1\,Mpx/s. This is an improvement of 2 orders of magnitude over our reference implementation in C. To obtain these rates we run MVDR in the time-domain for smaller systems, and in the frequency domain for larger systems.
 
 If this performance is insufficient, we suggest looking at the LCA method. It is based on the same optimisation criterion as the MVDR method, but avoids the estimation and inversion step altogether by limiting the weight's solution space to only a few predefined windows. As seen the Figure \ref{2_fig_holmengraa}, it produces images with a quality comparable to the MVDR method, but computing the images takes only a fraction of the time.
@@ -76,7 +101,7 @@ Although LCA promotes good image quality, its two most attractive traits is perh
 \caption{Benchmarks for the our time-domain and frequency-domain MVDR method running on a GPU. The grey line marks the realtime requirement for the HUGIN AUV to perform full-coverage sectorscan images with a ping rate of 3 pings/s.}\label{2_fig_benchmark}
 \end{figure}
 
-\section{Comparison}
+
 
 Figure \ref{2_fig_holmengraa} contrasts image quality of the mentioned beamformers. The experimental data comes from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. 
 
