@@ -41,6 +41,22 @@
 
 % Related work can be found e.g. in ultrasound imaging, where Chen et. al have investigated porting a time domain MVDR method to a GPU \cite{Chen2009,Chen2011,Chen2011a}. Unlike their work, however, we do not impose the restriction of the input data to be real, nor do we approach larger systems by enforcing Toeplitz structure of the covariance matrix. 
 % \\
+\begin{figure}[tp]\label{2_fig_article_relation}
+\makebox[\linewidth][c]{%
+\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
+\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated trial-and-error). Background on synthesis of image templates from the reconstructed images is presented in article IV. }
+\end{figure}
+
+\begin{figure}[!t]\label{2_fig_geometry}\centering
+\makebox[\linewidth][c]{%
+\graphicsAI[width=.7\linewidth]{gfx/geometry.svg}}
+\caption{
+An array with $M$ sensors has reference frame $\udot{A} \triangleq (\udot{A},\uvec{A})$ attached to it, where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation (\,$\hat{\cdot}$ denoting unit length). Impinging on the array at angle $\theta$ is a monochromatic plane wave: a single frequency wave from a source ${S}$ far away relative to the wavelength and array length (far field). Notation details are presented in Paper IV.
+}
+\end{figure}
+
+
+
 
 Any wave, regardless of its nature, is governed by a partial differential equation known as the \emph{wave equation}:
 %
@@ -55,11 +71,11 @@ where $\nabla^2$ is the Laplace operator, $f$ is field strength and $c$ is wave 
 The wave equation has a few solutions of interest, in particular that of a plane and spherical wave:
 %
 \begin{align}
-f_\textrm{plane}(\vec{p},t)  &= A e^{j(\omega t - \vec{k} \cdot \vec{p})} \\
-f_\textrm{spheric}(\vec{p},t) &= \frac{A}{\lVert \vec{p} \rVert} e^{j(\omega t - \lVert\vec{k}\rVert \lVert \vec{p} \rVert)},
+f_\textrm{plane}(\vec{p},t)  &= A e^{j(\omega t - \vec{k} \cdot \vec{p}_{OS})} \\
+f_\textrm{spheric}(\vec{p},t) &= \frac{A}{\lVert \vec{p}_{OS} \rVert} e^{j(\omega t - \lVert\vec{k}\rVert \lVert \vec{p}_{OS} \rVert)},
 \end{align}
 % 
-Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert\vec{k}\rVert=\frac{\omega}{c}=\frac{2\pi}{\lambda}$ is spatial wave frequency (wavenumber) and $\vec{p}$ is position of the source relative to the observer. 
+Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert\vec{k}\rVert=\frac{\omega}{c}=\frac{2\pi}{\lambda}$ is spatial wave frequency (wavenumber) and $\vec{p}_{OS}$ is position of the source $\mathcal{S}$ relative to the observer $\mathcal{O}$. We model the wavefield as superimposed plane waves under far-field conditions (when distance to the source is large relative to the wavelength and array length) and as superimposed spherical waves under near-field conditions. 
 
 % One is that of plane wave and the other a  A signal source with the position $\udot{S}$ . We can represent the field observed at $\udot{A}$ as $f(\dvec{p}^A,t)$, where position is represented by $\dvec{p}^A=[x_A,y_A,z_A]^T\in\mathbb{R}^3$ and time by $t\in\mathbb{R}$,
 % 
@@ -83,13 +99,9 @@ Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert
 
 \section{Image reconstruction}\label{methods}
 
-Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{I_beamforming}), an image is formed by coherently combining the receiver outputs to focus at one angle (or point) at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{2_fig_article_relation}), an image is formed by coherently combining the receiver outputs to focus at one angle (or point) at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
-\begin{figure}[tp]\label{II_fig_article_relation}
-\makebox[\linewidth][c]{%
-\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
-\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated trial-and-error). Background on synthesis of image templates from the reconstructed images will be presented in article IV. }
-\end{figure}
+
 
 \subsection{Beamforming}
 % \ifPhdDoc
@@ -106,30 +118,61 @@ Consider an acoustic signal transmitted to highlight a surface of interest. Assu
 % \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then, before summation, a suitable set of delays $\Delta$ and weights $w$ are applied to focus on a pixel of interest at angle and range ($\theta,n$).}\label{I_beamforming}
 % \end{figure}
 
-Imagine an array with $M$ sensors with a reference frame $\ubar{A} \triangleq (\udot{A},\uvec{A})$ attached to it, where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation (where $\hat{\cdot}$ denotes unit length). Assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n-\Delta_m]\in\mathbb{C}$. By making the dependence on $\theta$ implicit and assuming the data to be pre-delayed to the pixel of interest, we can simplify the notation to $x_m[\theta,n-\Delta_m] = x_m[n]$. 
+\begin{figure}[tp]\label{2_fig_scenario_das}
+\makebox[\linewidth][c]{%
+\graphicsAI[width=1\linewidth]{gfx/scenario_interference_das.svg}}
+\caption{DAS beampattern is static (conventional beamforming). Interference suppression at the first mainlobe is -13\,dBr.}
+\end{figure}
 
-The beamformer output $z[n]\in\mathbb{C}$ is by definition the weighted sum of all the delayed data samples:
+\begin{figure}[tp]\label{2_fig_scenario_mvdr}
+\makebox[\linewidth][c]{%
+\graphicsAI[width=1\linewidth]{gfx/scenario_interference_mvdr.svg}}
+\caption{MVDR beampattern is dynamic and continuous (adaptive beamforming). Interference suppression is good for prevalent noise sources if a good estimate of the spatial statistics can be obtained.}
+\end{figure}
+
+\begin{figure}[tp]\label{2_fig_scenario_lca}
+\makebox[\linewidth][c]{%
+\graphicsAI[width=1\linewidth]{gfx/scenario_interference_lca.svg}}
+\caption{LCA beampattern is dynamic and discrete (adaptive beamforming). Interference suppression is on-par with MVDR with 15 weight sets to choose from, nearly as good even with 6 weight sets.}
+\end{figure}
+
+Imagine an array with $M$ sensors at positions $\udot{0},\udot{1},\dots, \udot{m}, \dots, \udot{M{\!-\!1}}$ with reference frame $\ubar{A} \triangleq (\udot{A},\uvec{A})$ attached to its phase center (Figure \ref{2_fig_geometry}), where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation ( $\hat{\cdot}$ denoting unit length). Assume that the array channels are 
+digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n-\Delta_m]\in\mathbb{C}$. Focus at source $\udot{S}$ requires delays akin to
+%
+\begin{align}
+\Delta_m[n] = \frac{\lVert \vec{p}_{m}\rVert - \lVert \vec{p}_{0S}\rVert}{c}.\label{2_eq_delta}
+\end{align}
+%
+where $\vec{p}_{m}$ denotes position vector $\udot{A}$ to $\udot{m}$ and $\vec{p}_{0S}$ denotes position vector $\udot{0}$ to $\udot{S}$, respectively. By making the dependence on $\theta$ implicit and assuming the data to be pre-delayed to the pixel of interest, we simplify the notation to $x_m[n]$. By definition, the beamformer output $z[n]\in\mathbb{C}$ is the weighted sum of delayed data samples:
 %
 \begin{align}
 z[n] = \dvec{w}^H[n]\dvec{x}[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]} \in\mathbb{C},\label{2_eq_z}
 \end{align}
 %
-where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. With static weights this is referred to as the conventional delay-and-sum (DAS) beamformer. A variety of weighting functions exist for trading lateral resolution for improved noise suppression (contrast), but a compromise between the two is unavoidable~\cite{Harris1978}. A class of adaptive beamformers target this limitation by adapting the weights to the impinging wavefield. One such technique is the minimum variace distortionless response (MVDR) method.
-
-
-
-% Accelerated adaptivity is key: it enables rapid dynamic responses to mission events. }
+where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. Spatial response of the weights when the array is steered to broadside can be characterized by the beampattern,
+%
+\begin{align}
+W(\vec{k}) = \sum_m^{M-1} w_m^* e^{j\vec k \cdot \vec{p}_m}.\label{2_eq_beampattern}
+\end{align}
+%
+%
+%
+%
+%. Beampattern is broadside-steered beamformer output in the presence of a single plane wave, as a function of the wave's angle.
+%%Steered response is beamformer's output in the presence of some wave field, as a function of steering angle. 
+%
+The beamformer is called delay-and-sum (DAS) or conventional if the weights are static. A variety of weighting functions exist for trading lateral resolution for improved noise suppression (contrast), but a compromise between the two is unavoidable~\cite{Harris1978}. A class of adaptive beamformers target this limitation by adapting the weights to the impinging wavefield. One such technique is the minimum variace distortionless response (MVDR) method.
 
 
 \subsection{Time-domain MVDR}
 
-\begin{figure}[t]\centering%
-\graphicsAI[drawing,width=1\linewidth]{gfx/implementation.svg}%
-\caption{MVDR beamforming. For one of the total number of pixels in range and azimuth, $N_y$ and $N_x$,\newline
-1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
-2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
-3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{2_eq_weights}). }\label{mvdr_beamforming}
-\end{figure}
+%\begin{figure}[t]\centering%
+%\graphicsAI[drawing,width=1\linewidth]{gfx/implementation.svg}%
+%\caption{MVDR beamforming. For one of the total number of pixels in range and azimuth, $N_y$ and $N_x$,\newline
+%1. an $L\times{}L$ sample covariance matrix $\eR$ is computed, \newline
+%2. the term $\eR^{-1}\1$ is found using a linear equation solver,\newline
+%3. and the beamformer output is computed from $z$ from (\ref{finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{2_eq_weights}). }\label{mvdr_beamforming}
+%\end{figure}
 %
 The basic idea behind MVDR is to compute the set of weights that minimizes noise and interference accumulated by the array, while ensuring unit gain for signals coming from the pixel of interest. With pre-delayed data this can be formulated as follows:
 %

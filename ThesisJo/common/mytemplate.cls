@@ -506,7 +506,14 @@
                \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
                
                
-   \usepackage{accents} % For underaccent
+%   \usepackage{accents} % For underaccent
+%   \DeclareRobustCommand\underaccent[2]{%
+%     \begingroup
+%       \def\cc@a{#2}% Stores the nucleous...
+%       \cc@palette\cc@underaccent{#1}% ...and the accent is passed
+%       #2%
+%     \endgroup}
+     
 %   \usepackage{multirow}
    \usepackage{tabularx}
    
@@ -1159,6 +1166,7 @@
     \renewcommand\topfraction{0.9}  % max fraction of floats at top
     \renewcommand\bottomfraction{0.8} % max fraction of floats at bottom
     %   Parameters for TEXT pages (not float pages):
+    \renewcommand{\floatpagefraction}{.8}%
     \setcounter{topnumber}{2}
     \setcounter{bottomnumber}{2}
     \setcounter{totalnumber}{4}     % 2 may work better
@@ -1860,10 +1868,10 @@
 %%%%%%%%                                        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 
-\providecommand\udot{}\renewcommand\udot[1]{\underaccent{\dot}{#1}}
-\providecommand\ubar{}\renewcommand\ubar[1]{\underaccent{\bar}{#1}}
+\DeclareRobustCommand\udot[1]{\underaccent{\dot}{#1}}
+\DeclareRobustCommand\ubar[1]{\underaccent{\bar}{#1}}
 %\renewcommand\ubar[1]{\underaccent{\bar}{#1}}
-\providecommand\uvec{}\renewcommand\uvec[1]{\underaccent{\vec}{#1}}
+\DeclareRobustCommand\uvec[1]{\underaccent{\vec}{#1}}
 \providecommand\dvec{}\renewcommand\dvec[1]{\boldsymbol{#1}}       % Decomposed vector
 \providecommand\dhat{}\renewcommand\dhat[1]{\boldsymbol{\hat{#1}}} % Decomposed unit vector
 \providecommand\mat {}\renewcommand\mat [1]{\boldsymbol{#1}}
