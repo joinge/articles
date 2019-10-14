@@ -3,15 +3,17 @@
 
 The world is highly dynamic. Any device aspiring to master it must be situationally perceptive and reactive. This requires numerous sensors gathering high quality data at high throughput, adaptive signal processing algorithms and powerful parallel hardware capable of delivering swift responses. In our case of sonar-equipped autonomous underwater vehicles and clinical ultrasound devices, this process revolves around acoustic images.
 
-This thesis explores methods to accelerate adaptive acoustic image reconstruction and synthesis, through beamforming and simulation, respectively. Beamforming is the main attraction: the art of delaying and weighting sensor arrays to craft desired spatial responses. When aiming to minimize image noise and interference, two good candidates are the minimum variance distortionless response (MVDR) and low complexity adaptive (LCA) beamformer. We study time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated guessing), and conclude that:
+This thesis explores methods to accelerate adaptive acoustic image reconstruction and synthesis through beamforming and simulation, respectively. Beamforming is the main attraction: the art of delaying and weighting sensor arrays to craft desired spatial responses. When aiming to minimize image noise and interference, two good candidates are the minimum variance distortionless response (MVDR) and low complexity adaptive (LCA) beamformer. We study time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated guessing), and conclude that:
 %
 \begin{itemize}
 \item \emph{Image quality} is similar for our adaptive beamformers, but improved upon compared to static methods.
 %
+% \item \emph{Adaptivity} is best for time-domain MVDR,
+%
 \item \emph{Acceleration} of MVDR through algorithmic reductions and implementation on graphics processing units (GPUs) yields real-time responses in time-domain up to 32 channels and in frequency-domain for any system size with narrow-band, narrow-beam, or both. LCA is inherently fast and extremely well suited for acceleration, 
 \end{itemize}
 %
-Finally, we perform image synthesis of common objects in the seabed with a GPU accelerated simulator. These are in turn used to perform adaptive automatic target recognition (ATR). The result is a more dynamic and flexible system yielding improved image quality, image quality and classification performance. Finally, we describe this system with a new navigational notation system, extended with topological concepts from robotics and homogeneous coordinates. It helps keeping track of complex geometries, numerical representations and higher level abstractions such as manipulating rigid objects.
+Finally, we perform image synthesis of common objects on the seafloor with a GPU accelerated simulator. These are in turn used to perform adaptive automatic target recognition (ATR). The result is a more dynamic and flexible system yielding improved classification performance. Finally, we describe this system with a new navigational notation system, extended with topological concepts from robotics and homogeneous coordinates. It helps keep track of complex geometries, numerical representations and higher level abstractions such as manipulating rigid objects.
 
 
 
