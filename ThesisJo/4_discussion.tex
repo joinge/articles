@@ -16,18 +16,18 @@ The main contributions of this thesis, along with brief discussion and onlook fo
 
 \section{Summary}
 
-\textbf{Paper I} - \textit{Time-domain MVDR beamforming on GPUs in active sonar imaging}:
+\textbf{Paper I} - \textit{Element-space MVDR beamforming on GPUs in active sonar imaging}:
 \begin{enumerate}
 \item Accelerates the MVDR beamformer through algorithmic reductions and fine-tuning to a GPU, yielding a real-time solution.
 \item Demonstrates speeds exceeding 1\,Mpixel/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
 \item Offers rarely documented insights into hardware limitations, design implications and computational efficiency.
 \end{enumerate}
 
-\textbf{Paper II} - \textit{Frequency-domain MVDR beamforming on GPUs in clinical ultrasound imaging}:
+\textbf{Paper II} - \textit{Beam-space MVDR beamforming on GPUs in clinical ultrasound imaging}:
 \begin{enumerate}
-\item Alters the implementation in Paper I to operate in beamspace (frequency domain), reduced to its three center beams (the most significant ones).
+\item Alters the implementation in Paper I to operate in beam-space (frequency domain), reduced to its three center beams (the most significant ones).
 \item Demonstrates speeds exceeding 1\,Mpixel/s on systems with 64 and 96 channels.
-\item Yields similar image quality to time-domain MVDR, in accordance with former studies in active sonar.
+\item Yields similar image quality to element-space MVDR, in accordance with former studies in active sonar.
 \end{enumerate}
 
 \textbf{Paper III} - \textit{LCA beamforming versus MVDR in active sonar imaging}:
@@ -63,7 +63,7 @@ Any adaptive model---be it a spatial filter or classifier---should neither be to
 %%two that captures statistically significant details of the object but not the
 %%noise. Higher detail-to-noise ratios favor more complex models and occur at
 
-GPU acceleration and algorithmic reductions largely mitigates the computational argument against MVDR in time-domain up to 32 channels and in time-domain for larger systems granted it is narrow-beam, narrow-band, or both. LCA is entirely data-parallel thus ideal for GPUs, but runs faster unoptimized on CPUs than accelerated MVDR.%  Real-time performance is likely possible. 
+GPU acceleration and algorithmic reductions largely solves the issue with MVDR's computational complexity in element-space up to 32 channels, and in beam-space for larger systems that are narrow-beam, narrow-band, or both. LCA is entirely data-parallel thus ideal for GPUs, but runs faster unoptimized on CPUs than accelerated MVDR.%  Real-time performance is likely possible. 
 
 %
 

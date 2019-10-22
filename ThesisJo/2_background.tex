@@ -45,7 +45,7 @@
 \begin{figure}[tp]
 \makebox[\linewidth][c]{%
 \graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
-\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: time-domain MVDR (reference), frequency-domain MVDR (close approximation) and time-domain LCA (educated trial-and-error). Article IV presents background on synthesis of image templates from reconstructed images. }%
+\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: element-space MVDR (reference), beam-space MVDR (close approximation) and element-space LCA (educated trial-and-error). Article IV presents background on synthesis of image templates from reconstructed images. }%
 \label{2_fig_article_relation}
 \end{figure}
 
@@ -59,7 +59,7 @@ An array with $M$ sensors has reference frame $\udot{A} \triangleq (\udot{A},\uv
 \end{figure}
 
 
-Any wave, regardless of its nature, is governed by a partial differential equation known as the \emph{wave equation}. For a linear, homogeneous (translation-invariant) and isotropic (rotation-invariant) medium its form is
+Any wave, regardless of its nature, is governed by a partial differential equation known as the \emph{wave equation}. Its form for a linear, homogeneous (translation-invariant) and isotropic (rotation-invariant) medium is
 %
 \begin{align}\label{eq_wave_equation}
 \nabla^2 f 
@@ -102,7 +102,7 @@ Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert
 
 \section{Image reconstruction}\label{methods}
 
-Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{2_fig_article_relation}), an image is formed by coherently combining the receiver outputs to focus at one angle (or point) at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{2_fig_article_relation}), an image is formed by coherently combining the receiver outputs to focus at an angle or point at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
 
 
@@ -148,13 +148,13 @@ Imagine an array $\mathcal{A}$ with $M$ sensors at positions $\udot{0},\udot{1},
 \Delta_m[n] = \frac{\lVert \vec{p}_{mS}\rVert - \underset{m'}{\mathrm{min}}\ \lVert \vec{p}_{m'S}\rVert}{c},\label{2_eq_delta}
 \end{align}
 %
-where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$ and subtracting the minimum distance is optional. By making the dependence on $\vec{p}$ implicit and assuming the data to be pre-delayed to the pixel of interest, we simplify the notation to $x_m[n]$. By definition, the beamformer output $z[n]\in\mathbb{C}$ is the weighted sum of delayed data samples:
+where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$. Subtracting the minimum distance reduces latency and is optional. By making the dependence on $\vec{p}$ implicit and assuming the data to be pre-delayed to the pixel of interest, we simplify the notation to $x_m[n]$. By definition, the beamformer output $z[n]\in\mathbb{C}$ is a weighted sum of delayed data samples:
 %
 \begin{align}
 z[n] = \dvec{w}^H[n]\dvec{x}[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]} \in\mathbb{C},\label{2_eq_z}
 \end{align}
 %
-where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. Spatial responses of the weights when the array is steered to broadside can be characterized by the beampattern,
+where $w_m\in\mathbb{C}$ is the weight factor assigned to channel $m$. Spatial responses of the weights for an array steered to broadside are characterized by the beampattern,
 %
 \begin{align}
 W(\vec{k}) = \sum_m^{M-1} w_m^* e^{j\vec k \cdot \vec{p}_m}.\label{2_eq_beampattern}
@@ -175,7 +175,7 @@ The beamformer is called delay-and-sum (DAS) or conventional if the weights are 
 % Known direction of arrival
 
 
-\subsection{Time-domain MVDR}
+\subsection{Element-space MVDR}
 
 %\begin{figure}[t]\centering%
 %\graphicsAI[drawing,width=1\linewidth]{gfx/implementation.svg}%
@@ -186,7 +186,7 @@ The beamformer is called delay-and-sum (DAS) or conventional if the weights are 
 %\end{figure}
 %
 
-Time-domain MVDR often improves image contrast and resolution compared to conventional beamformers, as demonstrated in e.g. radar~\cite{Benitz1997}, ultrasound~\cite{Synnevag2007} and active sonar~\cite{Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}. It achieves this by computing the weight set that minimizes noise and interference accumulated by the array, under the constraint of unit gain for signals from the pixel of interest. Assuming pre-delayed data, we can formulate this as
+Element-space MVDR often improves image contrast and resolution compared to conventional beamformers~\cite{Benitz1997,Synnevag2007,Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}, but is computationally complex and statistically fragile. It seeks the weight set that minimizes noise and interference accumulated by the array, while enforcing unit gain for signals from the pixel of interest,
 %
 \begin{gather}
 \argmin{\dvec{w}}\ E\Big\{\big|\dvec{w}^H[n]\dvec{x}[n]\big|^2\Big\} \qquad\text{subject to}\qquad \dvec{w}^H[n]\dvec{a} = 1, \label{2_eq_mvdr_def}
@@ -202,7 +202,7 @@ where $\dvec{a}$ is steering vector. Applying Lagrange multipliers to this conve
 where $\dvec{1}$ is a row-vector of ones representing broadside phase-steering and $\R=E\{\dvec{x}[n]\dvec{x}^H[n]\}$ is the spatial covariance matrix for the full array. (\ref{2_eq_weights}) is the maximum likelihood estimate of the signal in the presence of zero-mean random Gaussian noise. We estimate $\R$ with a sample covariance matrix $\eR$, requiring some degree of
 %
 \begin{itemize}
-\item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985};
+\item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Widrow1982,Kailath1985};
 \item \emph{temporal averaging} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009a};
 \item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979,VanTrees2002}.
 \end{itemize}%
@@ -235,7 +235,7 @@ To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image w
 
 
 
-\subsection{Frequency-domain MVDR}
+\subsection{Beam-space MVDR}
 
 Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimatation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. If the data is narrow band, narrow beam, or both, the backscatter energy resides primarily in the center frequencies. The zero-frequency correspond to broadside, higher frequencies to larger opening angles. Since the combined transmit and receive response is highly directive, it is sufficient to process only three or five center angles and ignore the rest~\cite{Nilsen2009a,VanTrees2002}. The method is called beamspace MVDR.
 
