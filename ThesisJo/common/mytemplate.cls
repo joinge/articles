@@ -1035,8 +1035,8 @@
                                                    % ``duplicate'' warning.
    , final
      , bookmarksopen=true
-   , bookmarksdepth=5
-    , bookmarksopenlevel=2
+   , bookmarksdepth=2
+    , bookmarksopenlevel=1
     , bookmarks=true
    , bookmarksnumbered }                          % Have the bookmarks numbered.
 
