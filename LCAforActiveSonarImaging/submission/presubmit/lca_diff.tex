@@ -582,7 +582,7 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi}\DIFdelbegin \DIFdel{,}\DIFdelend \DIFaddbegin \DIFadd{.}\DIFaddend \label{eq:mvdr_weights}
 \end{gather}
-\DIFdelbegin \DIFdel{where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. }\DIFdelend The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add \DIFdelbegin \DIFdel{$d$ }\DIFdelend \DIFaddbegin {\large\DIFadd{$\epsilon$}} \DIFaddend percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+\DIFdelbegin \DIFdel{where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. }\DIFdelend The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009}, and to improve robustness to parameter errors we add \DIFdelbegin \DIFdel{$d$ }\DIFdelend \DIFaddbegin {\large\DIFadd{$\epsilon$}} \DIFaddend percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%
@@ -856,7 +856,7 @@ In the image reconstruction we have run MVDR with subarray length $L=16$ and \DI
 \DIFdelend \DIFaddbegin \DIFadd{$\text{\large$\epsilon$}=1\%$ diagonal loading}\DIFaddend . Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters\DIFdelbegin \DIFdel{.}%DIFDELCMD < \todo{suitable ref?}
 %DIFDELCMD < %%%
 \DIFdelend \DIFaddbegin \DIFadd{~\mbox{%DIFAUXCMD
-\cite{Synnevag2009a}
+\cite{Synnevag2009}
 }%DIFAUXCMD
 .
 }\DIFaddend 

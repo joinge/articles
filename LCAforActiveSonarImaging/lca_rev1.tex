@@ -517,7 +517,7 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi},\label{eq:mvdr_weights}
 \end{gather}
-where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009}, and to improve robustness to parameter errors we add $d$ percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]%
 \includegraphics[width=\linewidth]{gfx/calc_kaiser_3dB.eps}%

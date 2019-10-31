@@ -264,7 +264,7 @@ This is a convex optimization problem with the solution:
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these techniques will also ensure a numerically well conditioned $\eR$. 
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by by computing a sample covariance matrix $\eR$. In this computation we perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009}. Combined, these techniques will also ensure a numerically well conditioned $\eR$. 
 
 To arrive at a formulation of how $\eR$ can be estimated, we first split the array into subarrays of length $L$ that overlap on all but one sensor. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}

@@ -76,11 +76,17 @@ We present four journal published papers concerned with \emph{adaptive} and \emp
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Paper I}\label{sec:paperI} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\textbf{An Optimized GPU implementation of the\\
-MVDR Beamformer for Active Sonar Imaging}\\
+\textbf{An Optimized GPU implementation of the\\MVDR Beamformer for Active Sonar Imaging}~\cite{Buskenes2014}\\
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 40, Issue 2, April 2015
+
+\textit{In short}:
+\begin{enumerate}
+\item Accelerates the MVDR beamformer through algorithmic reductions and fine-tuning to a GPU, yielding a real-time solution.
+\item Demonstrates speeds exceeding 1\,Mpixel/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
+\item Offers rarely documented insights into hardware limitations, design implications and computational efficiency.
+\end{enumerate}
 
 This article accelerates element-space MVDR with GPUs for use in active sonar imaging. Element-space MVDR is the reference method for creating sonar images using minimum variance optimization, aimed at reducing noise and interference while preserving signal integrity. We refer to it as fully adaptive because it computes array weights analytically from spatial features in the data, yielding array weights from a continuous solution space that are optimal in the minimum variance sense. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
 
@@ -118,10 +124,17 @@ We find that implementing MVDR on GPUs instead of CPUs accelerates it by two ord
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Paper II}\label{sec:paperII} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\textbf{Implementing Capon Beamformer on a GPU for\\ Real-Time Cardiac Ultrasound Imaging}\\
+\textbf{Implementing Capon Beamformer on a GPU for\\ Real-Time Cardiac Ultrasound Imaging}~\cite{Asen2013}\\
 J.P. Åsen, J.I. Buskenes, C.-I.C. Nilsen, A. Austeng and S. Holm\\
 \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}\\
 Volume 61, Issue 1, January 2015
+
+\textit{In short}:
+\begin{enumerate}
+\item Alters the implementation in Paper I to operate in beam-space (frequency domain), reduced to its three center beams (the most significant ones).
+\item Demonstrates speeds exceeding 1\,Mpixel/s on systems with 64 and 96 channels.
+\item Yields similar image quality to element-space MVDR, in accordance with former studies in active sonar.
+\end{enumerate}
 
 This article evaluates frequency domain (or beamspace) MVDR on GPUs for use in cardiac ultrasound imaging. These systems typically have real-time requirements and exceed 32 channels, so we apply a space reduction technique to reduce computational effort. Since the transmitted beams are narrow, most acoustic energy falls within three to five center frequencies, and a good approximation follows from just computing those.
 
@@ -138,15 +151,23 @@ We find that beamspace MVDR delivers real-time performance independent of channe
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Paper III}\label{sec:paperIII} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\textbf{Low Complexity Adaptive Beamforming}~\cite{Buskenes2014}\\
+\textbf{Low Complexity Adaptive Beamforming}~\cite{Buskenes2016}\\
 J.I. Buskenes, R.E. Hansen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 42, Issue 1, January 2017
 
+\textit{In short}:
+\begin{enumerate}
+\item Shows that LCA beamformer performs similarly to MVDR with only 6 weight sets to choose from: The rectangular and Kaiser function with $\beta=6$, steered to $\phi\in[0,\pm\frac{1}{2}\delta{\phi_{-3dB}}]$, where $\delta{\phi_{-3dB}}$ is the $-3$\,dB bandwidth of the amplitude response to the weight set.
+%Contrasts the LCA and MVDR beamformer, two different ways to solve the minimum variance criterion. The former selects the best performing weights from a predefined set, the latter computes them from a sample covariance matrix estimated from the input data.
+\item Finds no further improvement above 15 suitable weight sets.
+\item Provides insights into typical amplitude responses of MVDR constrained for active sonar imaging and pinpoints their resemblance to the chosen LCA weight sets. 
+\item Suggests swapping the Kaiser function trigonometric one parametrized by $\alpha$, yielding similar image quality while allowing an analytic solution for $\alpha$ to be found. This reduces the algorithm to simply iterating through steering angles.
+\end{enumerate}
+
 This article describes LCA, an alternative to MVDR that iterates through precomputed sets of array weights and picks the one that best fulfills the minimum variance criterion. It can be viewed as either a simplification of MVDR or as an adaptive extension to DAS.
 
 We find that constrained MVDR typically generates spatial responses between that of uniform weights and Hamming weights. When LCA is configured with six weight sets covering this range, it matches MVDR in image quality. As a bonus, it is inherently robust and easy to work with, understand and accelerate with GPUs.
-
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,6 +178,13 @@ J.I. Buskenes, H. Midelfart\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Submitted DD.MM.2019%\\\\
 %Volume 42, Issue 1, January 2017
+
+\textit{In short}:
+\begin{enumerate}
+\item Implements a SAS simulator on GPU that allows AUVs to compare its images on-the-fly to vast numbers of objects and configurations, yielding superior classification results and real-time responses.
+\item Extends a navigational notation system with topological ideas from robotics and homogeneous coordinates, promoting geometrical clarity and validity while aiding the designer to focus on higher level concepts, such as manipulating rigid objects.
+\item Demonstrates superior classification accuracy on experimental data of a few thousand objects from Jesus Bay, Norway, at false positive rates (FPR) below 20, similar %, and tied with it above. 
+\end{enumerate}
 
 This article describes an acoustic simulator for SAS, implemented on GPUs using OpenGL and OpenCL. It enables AUVs to compare its images on-the-fly to simulations of various known objects, for more responsive, accurate and flexible automatic target recognition (ATR).
 

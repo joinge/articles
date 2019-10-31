@@ -640,7 +640,7 @@ Here $\a_\phi$ is a steering vector, $E\{\cdot\}$ is the expectation operator, a
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi}\DIFdelbegin \DIFdel{.}\DIFdelend \DIFaddbegin \DIFadd{,}\DIFaddend \label{eq:mvdr_weights}
 \end{gather}
-\DIFaddbegin \DIFadd{where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. }\DIFaddend The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add \DIFdelbegin %DIFDELCMD < {\large%%%
+\DIFaddbegin \DIFadd{where $\R=E\{\x[n]\x\H[n]\}\in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. }\DIFaddend The problem lies in estimating and inverting this spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009}, and to improve robustness to parameter errors we add \DIFdelbegin %DIFDELCMD < {\large%%%
 \DIFdel{$\epsilon$}%DIFDELCMD < } %%%
 \DIFdelend \DIFaddbegin \DIFadd{$d$ }\DIFaddend percent diagonal loading~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
@@ -948,7 +948,7 @@ To test the performance of the MVDR and LCA beamformers, we have processed data 
 Two different scenes will be studied. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an 1\,m by 1\,m iron \DIFdelbegin \DIFdel{resolution test }\DIFdelend cross, connected to a an anchor with 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71). Both scenes are imaged in sectorscan mode.
 
 In the image reconstruction we have run MVDR with subarray length $L=16$ and \DIFdelbegin \DIFdel{$\text{\large$\epsilon$}=1\%$ diagonal loading}\DIFdelend \DIFaddbegin \DIFadd{$d=1\%$ diagonal loading}\todo{also used for element distance}\DIFaddend . Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters\DIFdelbegin \DIFdel{~\mbox{%DIFAUXCMD
-\cite{Synnevag2009a}
+\cite{Synnevag2009}
 }%DIFAUXCMD
 .}\DIFdelend \DIFaddbegin \DIFadd{.}\todo{suitable ref?}
 \DIFaddend 
@@ -1359,7 +1359,7 @@ T.~Kailath and T.-J. Shan, ``{Adaptive beamforming for coherent signals and
   interference},'' \emph{IEEE Transactions on Acoustics, Speech, and Signal
   Processing}, vol.~33, no.~3, pp. 527--536, Jun. 1985.
 
-\bibitem{Synnevag2009a}
+\bibitem{Synnevag2009}
 J.-F. Synnev\aa{}g, A.~Austeng, and S.~Holm, ``{Benefits of minimum-variance
   beamforming in medical ultrasound imaging},'' \emph{IEEE Transactions on
   Ultrasonics, Ferroelectrics and Frequency Control}, vol.~56, no.~9, pp.

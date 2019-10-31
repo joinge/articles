@@ -102,7 +102,7 @@ Here $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert
 
 \section{Image reconstruction}\label{methods}
 
-Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{2_fig_article_relation}), an image is formed by coherently combining the receiver outputs to focus at one position (or angle) at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers. After stripping the carrier frequency by heterodyning and the signal signature by matched filtering (Fig. \ref{2_fig_article_relation}), an image is formed by coherently combining the receiver outputs to focus at an angle or point at a time. The principle of adjusting the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
 
 
@@ -131,7 +131,7 @@ Consider an acoustic signal transmitted to highlight a surface of interest. Assu
 \begin{figure}[tp]
 \makebox[\linewidth][c]{%
 \graphicsAI[width=1\linewidth]{gfx/scenario_interference_mvdr.svg}}
-\caption{MVDR (minimum variance distortionless response) beampattern is dynamic and continuous (adaptive beamforming). Interference suppression is good for prevalent noise sources, assuming sufficient spatial statistics.}%
+\caption{MVDR (minimum variance distortionless response) beampattern is dynamic and continuous (adaptive beamforming). Interference suppression is good for prevalent noise sources assuming sufficient spatial statistics.}%
 \label{2_fig_scenario_mvdr}
 \end{figure}
 
@@ -175,6 +175,16 @@ The beamformer is called delay-and-sum (DAS) or conventional if the weights are 
 % Known direction of arrival
 
 
+% MVDR
+
+% MPDR 
+
+% Applications: Radar, radar astronomy, sonar, commnications, direction finding, seismology, tomography, 
+
+% Performance measures
+% Array: Directivity, array gain vs spatially white noise, sensitivity or tolerance factor, 
+
+
 \subsection{Element-space MVDR}
 
 %\begin{figure}[t]\centering%
@@ -186,32 +196,33 @@ The beamformer is called delay-and-sum (DAS) or conventional if the weights are 
 %\end{figure}
 %
 
-
-
-Element-space MVDR often improves image contrast and resolution compared to conventional beamformers~\cite{Benitz1997,Synnevag2007,Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}, but is computationally complex and statistically fragile. It seeks the weight set that minimizes noise and interference accumulated by the array, while enforcing unit gain for signals from the pixel of interest,
+Element-space (time-domain) MVDR often improves image contrast and resolution compared to conventional beamformers~\cite{Benitz1997,Synnevag2007,Blomberg2013,Blomberg2012a,Dursun2009,Lo2004}, but is computationally complex and statistically fragile (more on this later). It seeks the weight set that minimizes noise and interference accumulated by the array, while enforcing unit gain for signals from the pixel of interest,
 %
 \begin{gather}
 \argmin{\dvec{w}}\ E\Big\{\big|\dvec{w}^H[n]\dvec{x}[n]\big|^2\Big\} \qquad\text{subject to}\qquad \dvec{w}^H[n]\dvec{a} = 1, \label{2_eq_mvdr_def}
 % \vec w[n] = \frac{\Ri[n]\1}{\1^T\Ri[n]\1},\label{2_eq_weights}
 \end{gather}
 %
-where $\dvec{a}$ is steering vector. Applying Lagrange multipliers to this convex optimization problem yields the solution
+where $\dvec{a}$ is steering vector. Solving this convex optimization problem with Lagrange multipliers yields
 %
 \begin{gather}
 \dvec w[n] = \frac{\Ri[n]\dvec{a}}{\dvec{a}^T\Ri[n]\dvec{a}}, \label{2_eq_weights}
 \end{gather}
 %
-where $\dvec{a}=\dvec{1}$ is a row-vector of ones representing broadside phase-steering and $\R=E\{\dvec{x}[n]\dvec{x}^H[n]\}$ is the spatial covariance matrix for the full array. These weights yield the maximum likelihood estimate of the signal in the presence of zero-mean random Gaussian noise---but not in active systems typically characterized by highly correlated noise, interference and signal~\cite{Widrow1982}. For regular array geometries such as ours, this can be handled with spatial smoothing. 
+where $\dvec{a}=\dvec{1}$ is a row-vector of ones representing broadside phase-steering and $\R=E\{\dvec{x}[n]\dvec{x}^H[n]\}$ is the spatial covariance matrix for the full array. In the presence of zero-mean random Gaussian noise, these weights yield the maximum likelihood estimate of the signal and the maximum signal-to-interference-and-noise ratio (SINR). However, active systems or passive ones subjected to multipath or jamming, experience highly correlated noise, interference and signal~\cite{Widrow1982}. Limited amount of data, array miscalibration and model inaccuracies makes matters worse, sometimes resulting in performance inferior to DAS~\cite{Li2006robust}. 
 
-We estimate $\R$ with a sample covariance matrix $\eR$, requiring some degree of
+To make MVDR robust, it must handle avoid signal cancellation, preserve speckle statistics and ensure numerical and statistical robustness. The literature suggests estimating $\R$ with a sample covariance matrix $\eR$ using some degree of
 %
 \begin{itemize}
-\item \emph{spatial smoothing} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985};
-\item \emph{temporal smoothing} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009a};
-\item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979,VanTrees2002}.
+\item \emph{Spatial smoothing}: Decorrelates coherent echoes to avoid signal cancellation, assuming regular arrays. We perform subarray averaging~\cite{Kailath1985}, which trades off spatial resolution and makes the covariance matrix exhibit Toeplitz-like structure. Some studies construct such matrices directly since are simpler to invert [TK87]. $\eR$ is guaranteed non-singular in cases with twice as many subarrays as signals [WPMS88,PK89]. 
+\item \emph{Temporal smoothing} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009};
+\item \emph{Diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979,VanTrees2002}.
 \end{itemize}%
 %
-These techniques ensure a numerically well conditioned $\eR$~\cite{VanTrees2002,Kailath1985}, allow reducing the computational complexity and expose sufficient data parallelism for GPU-acceleration. 
+These techniques ensure a numerically well conditioned $\eR$, allow reducing the computational complexity and expose enough data parallelism to facilitate GPU-acceleration. 
+
+
+Topeplitz [TK87] - choose wm to make the smoothed matrix close to Toeplitz. Topelitz weighting, adaptive spatial averaging in literature. [TK87]
 
 Formulation of the sample covariance matrix $\eR$ begins by splitting the array into subarrays of length $L$ that overlap on all but one sensor. If we let $x_l[n]$ represent the datavector from subarray $l$,
 %
@@ -225,35 +236,37 @@ then $\eR$ formed with temporal and spatial averaging (smoothing) is given as
 \eR[n] =  \frac{1}{N_K N_L} \sumb{l=0}{N_L-1}\sumb{n'=n-K}{n+K} \x_l[n]\x_l^H[n] \in\mathbb{C}^{L,L},\label{2_eq_spatialR}
 \end{gather}
 %
-where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. Finally, a fraction of the total power of $\eR[n]$ is added to its diagonal~\cite{Synnevag2007}.
+where $N_K = 2K+1$ is the number of temporal samples to perform averaging over, and $N_L = M-L+1$ is the number of subarrays. A fraction of the total power of $\eR[n]$ is finally added to its diagonal~\cite{Synnevag2007}.
 
-To summarize: For every pixel in the image we estimate $\eR$ (\ref{2_eq_spatialR}), solve the linear equation $\eRi\1$ (\ref{2_eq_weights}), the finally substitute some to get the beamformer output (\ref{2_eq_mvdr_def}-\ref{2_eq_weights}). Complexity is cubic with the number of sensors, $O(M^3)$, as opposed to linear for conventional beamformers, $O(M)$.
+To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image we estimate $\eR$ (\ref{2_eq_spatialR}), solve the linear equation $\eRi\1$ (\ref{2_eq_weights}), the finally substitute some to get the beamformer output (\ref{2_eq_mvdr_def}-\ref{2_eq_weights}).
 
-
-sample spatial spectral matrices
-asymptotic behaviour
-Forward-backward averaging
-Toeplitz-structured covariance - assuming stationarity
-Structured spectral matrix estimation
-parametric spectral matrix estimation
-singular value decomposition
-fixed diagonal loading
 
 
 
 \subsection{Beam-space MVDR}
 
-Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimatation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. If the data is narrow band, narrow beam, or both, the backscatter energy resides primarily in the center frequencies. The zero-frequency correspond to broadside, higher frequencies to larger opening angles. Since the combined transmit and receive response is highly directive, it is sufficient to process only three or five center angles and ignore the rest~\cite{Nilsen2009a,VanTrees2002}. The method is called beamspace MVDR.
+Systems with narrow beams, narrow bands, or both, have most backscattered energy residing in center spatial frequencies. Zero-frequency maps to broadside, higher frequencies map to larger opening angles. Computing weighted combinations of such frequencies, similarly to doing so with elements, is referred to as beamspace or discrete Fourier-transform (DFT) beamforming. 
 
-Beamspace MVDR formulation closely resembles that of time domain MVDR, the main difference being an initial need to Fourier transform the data:
+%,  Similarly to performing weighted sums of elements, we perform weighted sums of frequencies  Weighted sums of Performing weighted sum 
+
+In imaging sonar and ultrasound systems, the combined transmit and receive response is usually narrow enough to contain most energy in three or five center beams~\cite{Nilsen2009a,VanTrees2002}. This allows  Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. 
+
+Beam-space MVDR resembles element-space MVDR, but demands an initial Fourier transformation of the data:
 %
 \begin{gather}
-\x_{\text{BS},l}[n] = \mat{B}\x_l[n], \qquad \mat{B}\in \mathbb{C}^{N_b,L}, \qquad \text{where} \qquad [\mat{B}]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}.\label{2_eq_beamspace}
+\x_{\text{BS},l}[n] = \mat{B}\x_l[n], \qquad \mat{B}\in \mathbb{C}^{N_b,L},\label{2_eq_beamspace}
 \end{gather}
 %
-Here $\mat{B}$ refers to the Butler matrix, $l$ is subarray index, and $N_b$ is number of beams that should be computed. Note has once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\w_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
+where $l$ is subarray index, $N_b$ is number of beams that should be computed and
+%
+\begin{gather}
+[\mat{B}]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}.\label{2_eq_butler}
+\end{gather}
+%
+is the Butler (or DFT) matrix~\cite{Butler1961}. Once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\w_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
 
-Reducing the covariance size from $L$ to $N_b$ also reduce the estimation step to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
+Reducing $\eR_\text{BS}$ size from $L$ to $N_b$ reduce estimation to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
+
 
 
 \subsection{LCA beamformer}

@@ -1035,7 +1035,7 @@
                                                    % ``duplicate'' warning.
    , final
      , bookmarksopen=true
-   , bookmarksdepth=2
+   , bookmarksdepth=3
     , bookmarksopenlevel=1
     , bookmarks=true
    , bookmarksnumbered }                          % Have the bookmarks numbered.
@@ -1674,6 +1674,24 @@
 %   \newcommand\bibgroup[1]{\vspace{10pt}\hspace{-8pt}\color{Brown}\textbf{\textsl{#1}}\baseColour\vspace{-10pt}}
 \fi
 
+%\DeclareSourcemap{
+%  \maps[datatype=bibtex]{
+%    \map[overwrite]{
+%      \step[fieldsource=month, match=\regexp{\A(j|J)an(uary)?\Z}, replace=1]
+%      \step[fieldsource=month, match=\regexp{\A(f|F)eb(ruary)?\Z}, replace=2]
+%      \step[fieldsource=month, match=\regexp{\A(m|M)ar(ch)?\Z}, replace=3]
+%      \step[fieldsource=month, match=\regexp{\A(a|A)pr(il)?\Z}, replace=4]
+%      \step[fieldsource=month, match=\regexp{\A(m|M)ay\Z}, replace=5]
+%      \step[fieldsource=month, match=\regexp{\A(j|J)un(e)?\Z}, replace=6]
+%      \step[fieldsource=month, match=\regexp{\A(j|J)ul(y)?\Z}, replace=7]
+%      \step[fieldsource=month, match=\regexp{\A(a|A)ug(ust)?\Z}, replace=8]
+%      \step[fieldsource=month, match=\regexp{\A(s|S)ep(tember)?\Z}, replace=9]
+%      \step[fieldsource=month, match=\regexp{\A(o|O)ct(ober)?\Z}, replace=10]
+%      \step[fieldsource=month, match=\regexp{\A(n|N)ov(ember)?\Z}, replace=11]
+%      \step[fieldsource=month, match=\regexp{\A(d|D)ec(ember)?\Z}, replace=12]
+%    }
+%  }
+%}
 
 
 % % 'thebiblipgraphy' is just a list. Redefine to gain some control...

@@ -303,7 +303,7 @@ If the weights in (\ref{z}) were static, this would be referred to as the \gls{D
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to ensure a numerically well conditioned $\eR$~\cite{Synnevag2009a}.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x[n]\H\}$ is the spatial covariance matrix. Since $\R$ is unknown, it must be estimated. We will do this by computing the sample covariance matrix, $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to achieve \gls{DAS}-like speckle statistics, and \emph{diagonal loading} to ensure a numerically well conditioned $\eR$~\cite{Synnevag2009}.
 
 \emph{Spatial averaging} is achieved by grouping the array channels into $M-L+1$ subarrays of length $L$, where all but one element overlap. If we let $x_l[n]$ represent the datavector from subarray $l$,
 \begin{gather}

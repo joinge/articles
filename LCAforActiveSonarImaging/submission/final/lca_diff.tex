@@ -587,7 +587,7 @@ Here $\a_\phi$ is a steering vector \DIFaddbegin \DIFadd{for an azimuthal steeri
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\a_\phi}{\a_\phi\T\Ri[n]\a_\phi}.\label{eq:mvdr_weights}
 \end{gather}
-The problem lies in estimating and inverting \DIFdelbegin \DIFdel{this }\DIFdelend \DIFaddbegin \DIFadd{the }\DIFaddend spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009a}, and to improve robustness to parameter errors we add {\large$\epsilon$} percent \DIFdelbegin \DIFdel{diagonal loading}\DIFdelend \DIFaddbegin \DIFadd{of the total output power to the matrix's diagonal}\DIFaddend ~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
+The problem lies in estimating and inverting \DIFdelbegin \DIFdel{this }\DIFdelend \DIFaddbegin \DIFadd{the }\DIFaddend spatial covariance matrix. We have described the exact steps in~\cite{Buskenes2014}: To avoid signal cancellation we apply spatial averaging by computing a mean covariance matrix from a set of subarrays with length $L$~\cite{Kailath1985}, for true speckle statistics we perform temporal averaging over $N_k = 2K+1$ temporal samples~\cite{Synnevag2009}, and to improve robustness to parameter errors we add {\large$\epsilon$} percent \DIFdelbegin \DIFdel{diagonal loading}\DIFdelend \DIFaddbegin \DIFadd{of the total output power to the matrix's diagonal}\DIFaddend ~\cite{Cox1987,Maksym1979}. These steps are also needed to ensure that the covariance matrix is numerically well conditioned and hence invertible.
 
 \begin{figure}[tbp]\centering%
 \ifPeerReview%
@@ -855,7 +855,7 @@ To test the performance of the MVDR and LCA beamformers, we have processed data 
 
 Two different scenes will be studied. One of the 1500 DWT oil tanker wreck Holmengraa lying at a slanted seabed at 77\;m depth outside of Horten, Norway~\cite{holmengraa}. It measures 68\;m by 9\;m and fills most of the highlighted sector. This data was collected by the Norwegian Defense Research Establishment and Kongsberg Maritime. The other scene is of an 1\,m by 1\,m iron resolution test cross, connected to a an anchor with 13\,cm diameter (\Fig{cross}). This data was collected by the Bundeswehr Technical Center for Ships and Naval Weapons, Maritime Technology and Research (WTD 71).
 
-In the image reconstruction we have run MVDR with subarray length $L=16$ and $\text{\large$\epsilon$}=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters~\cite{Synnevag2009a}.
+In the image reconstruction we have run MVDR with subarray length $L=16$ and $\text{\large$\epsilon$}=1\%$ diagonal loading. Both MVDR and LCA was run with $K=1$ temporal averaging. This is a fairly aggressive yet stable set of parameters~\cite{Synnevag2009}.
 
 The results will be presented in the following order: In \DIFdelbegin \DIFdel{section }\DIFdelend \DIFaddbegin \DIFadd{Section }\DIFaddend \ref{sec:results_lca_window_function} we discuss typical window responses computed by MVDR, and hypothesize that these can be mimicked by Kaiser windows. In \DIFdelbegin \DIFdel{section }\DIFdelend \DIFaddbegin \DIFadd{Section }\DIFaddend \ref{sec:results_window_parameters} we determine sensible boundaries for the Kaiser parameter $\beta$ and window steering $\phi$. In \DIFdelbegin \DIFdel{section }\DIFdelend \DIFaddbegin \DIFadd{Section }\DIFaddend \ref{sec:results_database_size} we discuss how many window variations are needed for LCA to perform well. 
 
@@ -1239,7 +1239,7 @@ T.~Kailath and T.-J. Shan, ``{Adaptive beamforming for coherent signals and
   interference},'' \emph{IEEE Transactions on Acoustics, Speech, and Signal
   Processing}, vol.~33, no.~3, pp. 527--536, Jun. 1985.
 
-\bibitem{Synnevag2009a}
+\bibitem{Synnevag2009}
 J.-F. Synnev\aa{}g, A.~Austeng, and S.~Holm, ``{Benefits of minimum-variance
   beamforming in medical ultrasound imaging},'' \emph{IEEE Transactions on
   Ultrasonics, Ferroelectrics and Frequency Control}, vol.~56, no.~9, pp.

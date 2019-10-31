@@ -117,8 +117,8 @@ Implementing Capon Beamformer on a GPU for Real-Time Cardiac Ultrasound Imaging}
 
 
 %\newpage
-\chapter*{Excluded Publications}
-\addcontentsline{toc}{chapter}{Excluded publications}
+\chapter*{Related Publications}
+\addcontentsline{toc}{chapter}{Related publications}
 
 \begin{enumerate}
 \pubEntry{%
@@ -152,6 +152,100 @@ Adapting the minimum variance beamformer to a graphics processing unit for activ
 {2011}
 \end{enumerate}
 }
+
+
+%\newpage
+\chapter*{Symbol reference}
+\addcontentsline{toc}{chapter}{Symbol reference}
+
+%\begin{table}[H]\noindent%
+%\begin{tabular}{>{$}l<{$} >{}l<{} l >{$}l<{$}}
+\newcommand\pb[1]{\parbox[c]{9mm}{\textbf{\centering#1}}}
+\newcommand\bb[1]{\mathbb{#1}}
+%@{\hspace*{0\tabcolsep}}
+\begin{longtable}{@{\hspace*{-\tabcolsep}}>{$}l<{$}   >{$\mathbb}l<{$}   >{}l<{} l >{$}l<{$}}
+	\pb{Sym-bol}         & \textbf{Space} & \textbf{Unit} & \textbf{Description}                                                    & \textbf{Equal to}                     \\
+	\mathcal{A}          &                &               & Name of geometrical object (e.g. an \textbf{A}rray)                     &                                       \\
+	\ubar{A}             & \bb V^3\bb A   &               & Frame (configuration) of $\mathcal{A}$                                  & (\uvec{A},\udot{A})                   \\
+	\uvec{A}             & \bb V^3        &               & Orientation of $\mathcal{A}$ (absolute, coordinate free)                &                                       \\
+	\udot{A}             & \bb A          &               & Position of $\mathcal{A}$ (absolute, coordinate free)                   &                                       \\
+	\hat{a}              & \bb V^3        &               & Steering vector (unit-length, coordinate-free)                          &                                       \\
+	c                    & \bb R^+        & m/s           & Wave propagation speed                                                  &                                       \\
+	\Delta_m             & \bb R          & s             & Delay applied to $m$th sensor                                           &                                       \\
+	\dvec{\Delta}        & \bb R^M        & s             & Delay vector, all sensors                                               &                                       \\
+	f                    & \bb R          &               & Field strength in (\ref{eq_wave_equation})                              &                                       \\
+	                     & \bb R^+        & s$^{-1}$      & Frequency (everywhere else)                                             &                                       \\
+	F_s                  & \bb R^+        & s$^{-1}$      & Temporal sampling frequency                                             & T_s^{-1}                              \\
+	\vec{k}              & \bb V^3        &               & Wave vector, wavenumber with direction                                  &                                       \\
+	\lVert\vec{k}\rVert  & \bb R^+        & m$^{-1}$      & Spatial angular frequency (wavenumber)                                  & \frac{2\pi}{\lambda}=\frac{\omega}{c} \\
+	K                    & \bb Z          &               & Number of temporal samples to average (one-sided)                       &  \\
+	\lambda              & \bb R^+        & m             & Wavelength                                                              &                                       \\
+	L                    & \bb N          &               & Subarray length                                                         &                                       \\
+	M                    & \bb N          &               & Number of sensors (hydrophones/microphones)                             &                                       \\
+	n                    & \bb Z          &               & Temporal sample index                                                   &                                       \\
+	N                    & \bb N          &               & Number of temporal samples                                              &                                       \\
+	N_K                  & \bb N          &               & Number of temporal samples to average                                   &                                       \\
+	N_L                  & \bb N          &               & Number of subarrays                                                     &                                       \\
+	\vec{p}_{AB}         & \bb V^3        &               & Position vector (coordinate-free) from $\udot{A}$ to $\dot{B}$          & \udot{B}-\dot{A}                      \\
+	\dvec{p}_{AB}^C      & \bb R^3        &               & Position vector from $\udot{A}$ to $\dot{B}$, represented in $\uvec{C}$ &                                       \\
+	t                    & \bb R          & s             & Time                                                                    & T_s n                                 \\
+	T_s                  & \bb R          & s             & Temporal sampling period                                                & F_s^{-1}                              \\
+	\omega               & \bb R^+        & s$^{-1}$      & Temporal angular frequency                                              & 2\pi f                                \\
+	w_m[n]               & \bb C          &               & Weight on $m$th sensor                                                  &                                       \\
+	\dvec{w}[n]          & \bb C^M        &               & Weight set, all sensors                                                 &                                       \\
+	x_m                  & \bb C^N        &               & Data (delayed, element-space) from $m$th sensor                         &                                       \\
+	x_{\textrm{BS},m}    & \bb C^{N_b}    &               & Data (delayed, beam-space) from $m$th sensor                            &                                       \\
+	\dvec{x}             & \bb C^{M,N}    &               & Data (delayed, element-space) from all sensors                          &                                       \\
+	\dvec{x}_\mathrm{BS} & \bb C^{M,N_b}  &               & Data (delayed, beam-space) from all sensors                             &                                       \\
+	z                    & \bb C^N        &               & Beamformer output                                                       &
+\end{longtable}
+%	y_m                  & \bb C^N        &               & Data (no delay, element-space) from $m$th sensor                        &                                       \\
+%\end{tabular}
+%\end{table}
+
+%\newpage
+\chapter*{Acronym reference}
+\addcontentsline{toc}{chapter}{Acronym reference}
+
+\begin{longtable}{l l}
+	\textbf{Acronym} & \textbf{Description}                                                      \\
+	ADC              & Analog-to-digital converter                                               \\
+	ATR              & Automatic target recognition                                              \\
+	AUV              & Autonomous underwater vehicle                                             \\
+	BS-Capon         & Beam-space Capon (or MVDR, beamformer)                                    \\
+	CPU              & Central processing unit                                                   \\
+	CUDA             & Compute unified device architecture (from Nvidia)                         \\
+	DAC              & Digital-to-analog converter                                               \\
+	DAS              & Delay-and-sum (beamformer)                                                \\
+	DFT              & Discrete Fourier transform                                                \\
+	DMA              & Direct memory access                                                      \\
+	ES-Capon         & Element-space Capon (or MVDR, beamformer)                                 \\
+	FFT              & Fast Fourier transform                                                    \\
+	FPGA             & Field-programmable gate array                                             \\
+	FPR              & False positive rate                                                       \\
+	FWHM             & Full width at half maximum                                                \\
+	GPU              & Graphics processing unit                                                  \\
+	HISAS1030        & High resolution synthetic aperture sonar, Kongsberg Maritime (model 1030) \\
+	HPC              & High performance computing                                                \\
+	HUGIN            & An autonomous underwater vehicle developed by Kongsberg Maritime          \\
+	LCA              & Low complexity adaptive (beamformer)                                      \\
+   MCM & Mine counter measures \\
+	MKL              & Math kernel library (from Intel)                                          \\
+	MVDR             & Minimum variance distortionless response (or Capon, beamformer)           \\
+	NDC              & Normalized device coordinates                                             \\
+	PCI (Express)    & Peripheral component interconnect (data bus)                              \\
+	RAM              & Random access memory                                                      \\
+	ROC              & Receiver operating curve                                                  \\
+	SAS              & Synthetic aperture sonar                                                  \\
+	SDFT             & Sliding discrete Fourier transform                                        \\
+	SIGMAS+          & Name of an acoustic GPU-based simulator                                   \\
+	SSS              & Sidescan sonar                                                            \\
+	SM               & Streaming multi-processor \\
+   TPR & True positive rate 
+\end{longtable}
+
+
+
 
 
 \end{document}

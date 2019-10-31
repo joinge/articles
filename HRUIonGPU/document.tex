@@ -108,7 +108,6 @@ Adaptive beamforming, Capon beamforming, Covariance matrix, GPGPU, Graphics proc
 \IEEEpeerreviewmaketitle
 
 
-
 \section{Introduction}
 % The very first letter is a 2 line initial drop letter followed
 % by the rest of the first word in caps.
@@ -134,7 +133,7 @@ Previous work on parallel implementations of the Capon beamformer have been focu
 %Using real data will results in symmetric windows, and even if the number of samples they managed to process per second was high, both the number of floating point operations per sample and the imaging region is reduced using real data compared with use of complex data. It is crucial to use complex data within the Capon beamformer framework, both for reducing the amount of data per image, and to allow for asymmetric windows. All results in this paper is reported with use of critically sampled complex data, both laterally and in range.  (ikke helt kritisk samplet, ikke si det, bare at det er i baseband).
 
 % denne må utelates i IUS-artikkelen
-In recent work we have applied a GPU-based Capon beamformer for both active sonar imaging \cite{Buskenes, Buskenes2013} and cardiac ultrasound imaging \cite{Asen2012}. Sonar has a less strict real-time requirement than medical ultrasound imaging, which means that most array configurations can be handled in real time using the GPU. In \cite{Asen2012} and in this paper we show that Capon beamforming applied in medical ultrasound imaging, and in particular cardiac ultrasound imaging, demands frame rates that not even a cluster of high-end GPUs can provide. Since the execution time of Capon beamforming is cubic with respect to the number of array elements, we need methods that reduce the computational complexity for large arrays. Various approaches to low-complexity Capon beamforming for medical ultrasound imaging have been proposed in the literature \cite{Synnevag2011, Asl2012, Jensen2012, Kim}. In this paper we extend the work done in \cite{Asen2012} and \cite{Buskenes2013} by utilizing a beamspace transformation. The beamspace transform has been proposed used in ultrasound imaging by Nilsen and Hafizovic \cite{Nilsen2009} in order to maintain high frame rates as the number of elements increases while maintaining almost the same lateral resolution and sidelobe reduction capabilities of element-space Capon when applied in narrow-beam systems.
+In recent work we have applied a GPU-based Capon beamformer for both active sonar imaging \cite{Buskenes2015, Buskenes2013} and cardiac ultrasound imaging \cite{Asen2012}. Sonar has a less strict real-time requirement than medical ultrasound imaging, which means that most array configurations can be handled in real time using the GPU. In \cite{Asen2012} and in this paper we show that Capon beamforming applied in medical ultrasound imaging, and in particular cardiac ultrasound imaging, demands frame rates that not even a cluster of high-end GPUs can provide. Since the execution time of Capon beamforming is cubic with respect to the number of array elements, we need methods that reduce the computational complexity for large arrays. Various approaches to low-complexity Capon beamforming for medical ultrasound imaging have been proposed in the literature \cite{Synnevag2011, Asl2012, Jensen2012, Kim}. In this paper we extend the work done in \cite{Asen2012} and \cite{Buskenes2013} by utilizing a beamspace transformation. The beamspace transform has been proposed used in ultrasound imaging by Nilsen and Hafizovic \cite{Nilsen2009} in order to maintain high frame rates as the number of elements increases while maintaining almost the same lateral resolution and sidelobe reduction capabilities of element-space Capon when applied in narrow-beam systems.
 %The beamspace transformation matches well with the focused transmit beams used in cardiac ultrasound imaging. 
 %(Referer til JOE-artikkelen, få med beskrivelse av hva som blir anerledes for ultralyd.)
 
@@ -196,7 +195,7 @@ A factor proportional to the output power is often used to reduce the need for p
 \epsilon[n] &= d \times \frac{\text{trace}\{\mat{\breve{R}}[n]\}}{L},
 \end{align}
 %
-has been applied in much of the recent literature on Capon beamforming for medical ultrasound imaging \cite{Synnevag2007, Nilsen2009, Wang2009, Mehdizadeh2012}. It has also been applied to HF and VHF antenna processing \cite{Featherstone1997b}.
+has been applied in much of the recent literature on Capon beamforming for medical ultrasound imaging \cite{Synnevag2007, Nilsen2009, Wang2009, Mehdizadeh2012}. It has also been applied to HF and VHF antenna processing \cite{Featherstone1997}.
 
 Next, a linear system of equations has to be solved,
 %
@@ -230,7 +229,7 @@ z[n] &= \frac{1}{N_L}\vec{w}[n]^H \sum_{l=0}^{N_L-1} \vec{x}_l[n] \label{II_eq:z
 where $*$ is a non-truncated convolution across elements.
 Note how we can either choose to sum all subarrays (\ref{II_eq:z_mv}), or accumulate a weighting per element (\ref{II_eq:z_mv2}).
 
-In passive systems, assuming stationary statistics, the sample covariance matrix in (\ref{II_eq:R}) is typically averaged over a long sequence of samples\cite{Krima}. Since medical ultrasound imaging is an active, short-pulsed system, there is a limited amount of data from which $\mat{\hat{R}}$ can be estimated. The estimated matrix is therefore often found to be both inaccurate and poorly conditioned. Another challenge with active systems is the high correlation between signal and interference, resulting in signal cancellation \cite{Reddy1987}. Thus, the beamformer output can be lower than expected, even when there is signal present and the distortionless-response criterion is applied. 
+In passive systems, assuming stationary statistics, the sample covariance matrix in (\ref{II_eq:R}) is typically averaged over a long sequence of samples\cite{Krim1996}. Since medical ultrasound imaging is an active, short-pulsed system, there is a limited amount of data from which $\mat{\hat{R}}$ can be estimated. The estimated matrix is therefore often found to be both inaccurate and poorly conditioned. Another challenge with active systems is the high correlation between signal and interference, resulting in signal cancellation \cite{Reddy1987}. Thus, the beamformer output can be lower than expected, even when there is signal present and the distortionless-response criterion is applied. 
 
 In order to get a well-conditioned $\mat{\hat{R}}$, avoid signal cancellation, and to get DAS-like speckle, $\mat{\hat{R}}$ has to be averaged over $L\le M/2$ long subarrays and $N_K \sim T_p/T_s$ time samples \cite{Synnevag2007a}, where, $T_p$ is the pulse length in seconds and $T_s$ is the sampling period. For our baseband data, one pulse length ($1.5\lambda$) is around 3 samples ($K=1$). Typical values for $d$ is between $1/10$ and $1/100$.
 
@@ -297,7 +296,7 @@ An SM has a limited amount of shared memory (or near-core cache) and registers. 
 
 \section{Parallel ES-Capon}\label{II_sec:meth}
 
-In this section we will give a brief summary of our parallel implementation of the ES-Capon beamformer as presented in \cite{Asen2012} and \cite{Buskenes}. This implementation was our starting point when the BS-Capon beamformer was implemented.   
+In this section we will give a brief summary of our parallel implementation of the ES-Capon beamformer as presented in \cite{Asen2012} and \cite{Buskenes2015}. This implementation was our starting point when the BS-Capon beamformer was implemented.   
 
 If the beamformer in (\ref{II_eq:z_mv}) is analyzed in combination with the matrix equation in (\ref{II_eq:b}) and the covariance estimation process in (\ref{II_eq:diag}), we see that the calculation of a set of Capon weights is independent across the outputs $z[n]$. As shown in Fig.\ \ref{II_fig:gpulayout}, a first level of granularity is therefore to divide the image into a grid, where the output in each cell can be calculated independently. Further, based on memory dependencies and to hold memory consumption per thread at a minimum, a group of threads should process one output in the final image. Continuing with the calculation of one weight vector, the algorithm can be broken down into three main steps that, to some extent, can be divided further into a set of parallel processes. That is, for each data vector $\vec{x}$ in the image:
 \begin{align*}
@@ -320,6 +319,7 @@ The computational complexities of these three steps are $O(N_KN_LL^2)$, $O(L^3)$
 
 %(The three steps have, for modularity, been implemented using three different kernels. Joining all kernels into one could possible lead to an increase in speed.)
 
+
 %\begin{figure}
 %\includegraphics[width=3in]{gfx/gpu_layout_lowres.png}%
 %\caption{}
@@ -332,7 +332,7 @@ The computational complexities of these three steps are $O(N_KN_LL^2)$, $O(L^3)$
 
 Calculation of one element of \R is from (\ref{II_eq:R}) found to be independent of calculation of the other elements. A natural level of granularity would then be to assign one thread to each element of $\mat{\hat{R}}$ \cite{Chen2011}. This will minimize global reads and writes needed per thread, but since we want to avoid block-to-block synchronization, the maximum supported subarray length is limited to 32 by this approach. Since most medical ultrasound arrays have 64 elements or more, an implementation not limited by $L_{max}=M/2=32$ is preferable.
 
-In \cite{Asen2012, Buskenes} we demonstrated how the cubic complexity with $L$ %and linear complexity with $N_K$ 
+In \cite{Asen2012, Buskenes2015} we demonstrated how the cubic complexity with $L$ %and linear complexity with $N_K$ 
 can be reduced by realizing that calculations in (\ref{II_eq:R}) overlap across subarrays. %Element $(i,j)$ of $\mat{\breve{R}}[n]$ can be calculated from element $(i-1, j-1), \text{for } i,j \in [1, L-1]$ in a sliding window maner as
 %\begin{align}
 %\mat{\breve{R}}_{i,j}[n] &=  \mat{\breve{R}}_{i-1,j-1}[n]  \nonumber \\
@@ -571,7 +571,7 @@ In Fig.\ \ref{II_fig:benchBS} we present similar benchmarks for the BS-Capon bea
 %\label{II_fig:slices}
 %\end{figure*}
 
-%To investigate the image quality of both the ES and BS-Capon beamformer, a phantom was simulated using Field II \cite{Jensen1992, Jensen1996a} (Fig. \ref{II_fig:phantom}). The simulation was performed using a 64-element, $p=\lambda/2$ pitch, 10 $\mu$m kerf, 80\% bandwidth, and 10 mm high phased array. The transducer was excited with a 3.4 MHz and $1.5\lambda$ long pulse with transmit focus at 90 mm. The phantom contains two circular areas, one bright at 20 dB and one dark at -20 dB, and two point targets at 30 dB, located at 90 mm depth. Speckle level is at 0 dB, covering an area from $\pm90\degree$ in azimuth. The resulting image has been processed both using DAS with uniform weights, ES- and BS-Capon. The presented image is frame $15$ in a series of images where motion is imposed on both circles, point targets and the probe. The entire simulation is presented in two attached videos \multimedia{Media-Movie 1 and 2}.
+%To investigate the image quality of both the ES and BS-Capon beamformer, a phantom was simulated using Field II \cite{Jensen1992, Jensen1996} (Fig. \ref{II_fig:phantom}). The simulation was performed using a 64-element, $p=\lambda/2$ pitch, 10 $\mu$m kerf, 80\% bandwidth, and 10 mm high phased array. The transducer was excited with a 3.4 MHz and $1.5\lambda$ long pulse with transmit focus at 90 mm. The phantom contains two circular areas, one bright at 20 dB and one dark at -20 dB, and two point targets at 30 dB, located at 90 mm depth. Speckle level is at 0 dB, covering an area from $\pm90\degree$ in azimuth. The resulting image has been processed both using DAS with uniform weights, ES- and BS-Capon. The presented image is frame $15$ in a series of images where motion is imposed on both circles, point targets and the probe. The entire simulation is presented in two attached videos \multimedia{Media-Movie 1 and 2}.
 
 Fig.\ \ref{II_fig:invivo} presents results of applying ES- and BS-Capon on an \textit{in-vivo} image of the left ventricle. The image was acquired using a 64-element and $p=0.65\lambda$ pitched phased array in harmonic mode (1.7 MHz at transmit and 3.4 MHz at receive). The image frame is extracted from a cardiac cycle, that can be viewed in its full length in the attached videos \multimedia{Media-Movie 1, 2 and 3}.
 The region of interest is 70\degree{} with a minimal lateral sampling of 98 receive beams given by (\ref{II_eq:rayleigh}).
@@ -593,7 +593,7 @@ In Fig.\ \ref{II_fig:speed_res_trade}, the minimum distance between two point ta
 In Fig.\ \ref{II_fig:invivo}, the diagonal loading factor for BS-Capon was adjusted to make the two results equal for $L=32$ and $N_b=3$. %The resolution for ES-Capon is therefore better here than what is presented in Fig. \ref{II_fig:phantom}. 
 %We considered this to be a small value for ES-Capon and a normal value for BS-Capon (cf. Section \ref{II_sec:bs}), hence the resolution for ES-Capon is here better than what is presented in Fig. \ref{II_fig:phantom}.
 
-The phantom used contained two point targets with 30 dB amplitude located at 90 mm depth. The two point targets were placed inside speckle, with 0 dB in amplitude, covering an area from $\pm90\degree$ in azimuth. The phantom was simulated using Field II \cite{Jensen1992, Jensen1996a}. The simulation was performed using a 64-element, $p=\lambda/2$ pitch, 10 $\mu$m kerf, 80\% bandwidth, and 10 mm high phased array. The transducer was excited with a 3.4 MHz and $1.5\lambda$ long pulse with transmit focus at 90 mm. The precision of the presented measurements is 0.12 mm, dictated by the simulated frame rate of 25 FPS, and the relative speed of the two point scatterers, 3 mm/s. To avoid having to deal with signal cancellation and errors caused by not hitting each point with a receive beam, 16x oversampling has been used on transmit. 
+The phantom used contained two point targets with 30 dB amplitude located at 90 mm depth. The two point targets were placed inside speckle, with 0 dB in amplitude, covering an area from $\pm90\degree$ in azimuth. The phantom was simulated using Field II \cite{Jensen1992, Jensen1996}. The simulation was performed using a 64-element, $p=\lambda/2$ pitch, 10 $\mu$m kerf, 80\% bandwidth, and 10 mm high phased array. The transducer was excited with a 3.4 MHz and $1.5\lambda$ long pulse with transmit focus at 90 mm. The precision of the presented measurements is 0.12 mm, dictated by the simulated frame rate of 25 FPS, and the relative speed of the two point scatterers, 3 mm/s. To avoid having to deal with signal cancellation and errors caused by not hitting each point with a receive beam, 16x oversampling has been used on transmit. 
 
 For high values of $L$ and $N_b$ the two methods are equal, but for lower values, BS-Capon provides improved resolution compared to using small subarrays. We see that the resolution for BS-Capon gradually decreases due to an automatic increase in diagonal loading (cf. end of Section \ref{II_sec:bs}). If we compensate by reducing $d$, BS-Capon will provide resolution equal to ES-Capon (with $L=M/2$) for all values of $N_b$ except one \cite{Nilsen2009}. For $N_b=1$ the resolution is worse than for DAS because of a triangular apodization caused by subarray averaging. 
 

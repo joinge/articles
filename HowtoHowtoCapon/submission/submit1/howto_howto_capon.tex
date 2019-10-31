@@ -549,7 +549,7 @@ Various adaptive beamformers target this limitation by allowing the weights to c
 \begin{gather}
 \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 \end{gather}
-where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. Combined, these steps will also ensure a numerically well conditioned $\eR$.
+where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. Combined, these steps will also ensure a numerically well conditioned $\eR$.
 
 To form $\eR$ we will first compute an intermediate sample covariance matrix $\breve{\R}$, which we form using temporal and spatial averaging. To do this we need to segment our array into subarrays. If we let $x_l[n]$ represent the data vector from subarray $l$,
 \begin{gather}
@@ -1480,7 +1480,7 @@ The bandwidths are compared in Tab. \ref{throughputs}. Note that even when using
 % \begin{gather}
 % \vec w[n] = \frac{\Ri[n]\1}{\1\T\Ri[n]\1},\label{weights}
 % \end{gather}
-% where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009a}. Combined, these steps will also ensure a numberically well conditioned $\eR$\todo{should we mention variance reduction?}.
+% where $\1$ is a row vector of ones that represents broadside steering, and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since $\R$ is unknown, we will estimate it by computing a sample covariance matrix $\eR$. In this computation we will perform some degree of \emph{spatial averaging} to avoid signal cancellation, \emph{temporal averaging} to maintain true speckle statistics, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Synnevag2009}. Combined, these steps will also ensure a numberically well conditioned $\eR$\todo{should we mention variance reduction?}.
 % 
 % If we let $x_l[n]$ represent the datavector from subarray $l$,
 % \begin{gather}

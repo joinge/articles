@@ -620,11 +620,11 @@ Various adaptive beamformers target this limitation by allowing the weights to c
 where \DIFdelbegin \DIFdel{$\1$ is a row vector of ones that represents broadside steering , }\DIFdelend \DIFaddbegin \DIFadd{$\a$ is a steering vector }\DIFaddend and $\R=E\{\x[n]\x\H[n]\} \in\mathbb{C}^{M,M}$ is the spatial covariance matrix for the full array. Since we pre-steer our data to every pixel in the image we \DIFdelbegin \DIFdel{will always look to broadside, but }\DIFdelend \DIFaddbegin \DIFadd{simplify }\DIFaddend (\ref{weights}) \DIFdelbegin \DIFdel{can be easily generalized by substituting $\1$ with a suitable steering vector . Since }\DIFdelend \DIFaddbegin \DIFadd{by substituting $\a$ with a row vector $\1$ that represents broadside phase-steering. To estimate }\DIFaddend $\R$ \DIFdelbegin \DIFdel{is unknown, we estimate it by computing }\DIFdelend \DIFaddbegin \DIFadd{we compute }\DIFaddend a sample covariance matrix $\eR$. In this computation we perform some degree of:
 \begin{itemize}
 \item \emph{spatial averaging} to avoid signal cancellation by decorrelating coherent echoes~\cite{Kailath1985},
-\item \emph{temporal averaging} over an interval comparable to the pulse length (1-5 samples) to maintain true speckle statistics~\cite{Synnevag2009a}, and
+\item \emph{temporal averaging} over an interval comparable to the pulse length (1-5 samples) to maintain true speckle statistics~\cite{Synnevag2009}, and
 \item \emph{diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979}.
 \end{itemize}%
 %
-% will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009a}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
+% will perform some degree of \emph{spatial averaging} to avoid signal cancellation caused by coherent echoes~\cite{Kailath1985}, \emph{temporal averaging} to maintain true speckle statistics~\cite{Synnevag2009}, and \emph{diagonal loading} to improve robustness to parameter errors ~\cite{Cox1987,Maksym1979}. 
 %
 Combined, these steps will also ensure a numerically well conditioned $\eR$.
 
