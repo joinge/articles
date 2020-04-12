@@ -92,7 +92,13 @@ This article accelerates element-space MVDR with GPUs for use in active sonar im
 
 We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but more tightly bound.
 
-We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage. The design is limited to 32 channels due to data dependencies that are complicated and not inherently parallel, combined with the relatively limited bandwidth of this hardware architecture. 
+We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage.
+
+Processing of pixels are independent of one another, but processing
+At the pixel level Data-parallelism Pixels are processed independently, 
+
+
+The design is limited to 32 channels, due to data dependencies that are complicated and not inherently parallel at the sub-pixel level, combined with the relatively limited bandwidth of this hardware architecture. 
 
 %Time-domain MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. GPU acceleration mitigates the high computational complexity resulting from estimating and inverting a spatial covariance matrix, yielding real-time performance.
 
