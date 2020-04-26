@@ -124,7 +124,7 @@ add_custom_command(
            cd ${CMAKE_SOURCE_DIR} &&
 #            xelatex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&xelatex\\" mylatexformat.ltx header.tex &&
 #            latexmk -output-directory=${CMAKE_BINARY_DIR} -pdflatex='pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error -shell-escape' -pdf ${file}.tex 
-           pdftex --output-directory=${CMAKE_BINARY_DIR} -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
+           pdftex --output-directory=${CMAKE_BINARY_DIR} -interaction=nonstopmode -halt-on-error  -ini -jobname=\\"header\\" \\"\\&pdflatex\\" mylatexformat.ltx header.tex &&
            "${CMAKE_COMMAND}" -E copy ${CMAKE_BINARY_DIR}/header.fmt ${CMAKE_SOURCE_DIR}/header.fmt &&
            "${CMAKE_COMMAND}" -E echo "~~~~~~~~~~~~~~~~~~~~~~~"
    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

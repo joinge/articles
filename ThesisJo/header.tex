@@ -1,3 +1,4 @@
+% !TeX root = thesis
 \input{variables}
 
 \documentclass[
@@ -100,6 +101,166 @@ uiophd
 % Increase header a bit to allow two lines in it
 \addtolength\headheight{\topmargin}
 \setlength\topmargin{0pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Fancy text quotes %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{libertine} % or use \setmainfont to choose any font on your system
+%%\newfontfamily\quotefont[Ligatures=TeX]{Linux Libertine O} % selects Libertine as the quote font
+%
+%
+%\newcommand*\quotesize{60} % if quote size changes, need a way to make shifts relative
+%% Make commands for the quotes
+%\newcommand*{\openquote}
+%   {\tikz[remember picture,overlay,xshift=-4ex,yshift=-2.5ex]
+%   \node (OQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}
+%
+%\newcommand*{\closequote}[1]
+%  {\tikz[remember picture,overlay,xshift=4ex,yshift={#1}]
+%   \node (CQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont''};}
+%
+%% select a colour for the shading
+%\colorlet{shadecolor}{Azure}
+%
+%\newcommand*\shadedauthorformat{\emph} % define format for the author argument
+
+% wrap everything in its own environment which takes one argument (author) and one optional argument
+% specifying the alignment [l, r or c]
+%
+%\newenvironment{quoteload}[2]%
+%{\newcommand{#1}
+%\ifblank{#2}
+%   {\def\shadequoteauthor{}\def\yshift{-2ex}\def\quotefill{\hfill}}
+%   {\def\shadequoteauthor{\par\authorfill\shadedauthorformat{#2}}\def\yshift{2ex}}
+%\begin{snugshade}\begin{quote}\openquote}
+%{\shadequoteauthor\quotefill\closequote{\yshift}\end{quote}\end{snugshade}}
+
+%\newenvironment{quoteload}[2]%
+%{%\newcommand{#1}
+%%\ifblank{#2}
+%%   {\def\shadequoteauthor{}\def\yshift{-2ex}\def\quotefill{\hfill}}
+%%   {\def\shadequoteauthor{\par\authorfill\shadedauthorformat{#2}}\def\yshift{2ex}}
+% \begin{snugshade}\begin{quote}\openquote}
+%{\shadequoteauthor\quotefill\closequote{\yshift}\end{quote}\end{snugshade}
+%
+%}
+
+\usepackage{framed}
+%\usepackage{mdframed}
+
+
+\newcommand*\quotefont{\fontfamily{LinuxLibertineT-LF}}
+\newcommand*\quotesize{60}
+
+\newcommand*{\openquote}{%
+\ifoddpage
+   \typeout{=====Odd start}
+   \setlength\hoff{-\evensidemargin}
+\else
+   \typeout{=====Even start}
+   \setlength\hoff{-\oddsidemargin}
+\fi
+\tikz[remember picture,overlay,inner sep=0pt,outer sep=0pt,text depth=0pt,color=Grey]%
+{\node(OQ)[inner sep=0pt] at (-22pt,-2ex){\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}}
+
+%\coordinate (p) at ([yshift=-.5ex]current bounding box.center);
+%  % Set up some general bounding box markers
+%  \coordinate(R) at ($ (I2) + (0em,1\baselineskip) $);
+%  % Compute arrow via points
+%  \path let \p1 = ($ (I1) + (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I1)  at (\x1,\y2);
+%  \path let \p1 = ($ (I2) - (1.0\baselineskip,0em) $),  \p2 = (R) in coordinate (_I2)  at (\x1,\y2);
+
+\newlength\hoff
+\usepackage{ifoddpage}
+\newcommand*{\closequote}%
+{
+\checkoddpage
+\ifoddpage
+   \typeout{=====Oddside}
+   \setlength\hoff{-3.59cm}
+\else
+   \typeout{=====Evenside}
+   \setlength\hoff{-2.13cm}
+\fi
+\tikz[remember picture,overlay,inner sep=0pt,outer sep=0pt,text depth=0pt,color=Grey]{%
+%current page.south west
+   \path let \p1=($ (current page.east) + (\hoff,0ex) $), \p2=(0em,+1ex) in coordinate (_OQ)  at (\x1,\y2);
+%current page.south west
+%   \path let \p1=($ (OQ) + (1.0\linewidth+40pt+\hoff,0ex) $), \p2=(0em,-2ex) in coordinate (_OQ)  at (\x1,\y2);
+   \node(CQ) at (_OQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont''};}}
+
+%\newcommand*{\openquote}{%
+%\tikz[remember picture,overlay,inner sep=0pt,outer sep=0pt,text depth=0pt,color=Grey]%
+%\coordinate (start) at (0em,0em);}
+%%{\node(OQ)[inner sep=0pt] at (-22pt,-2ex){\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}}
+%
+%\newcommand*{\closequote}{%
+%\tikz[remember picture,overlay,inner sep=0pt,outer sep=0pt,text depth=0pt,color=Grey]{%
+%\path let \p1=(start), \p2=(0em,-2ex) in coordinate (_start)  at (\x1,\y2);
+%\node(I)  at ($ ( start) + (             -22pt, -2ex) $) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt
+%\node(CQ) at ($ (_start) + (1.0\linewidth+40pt, -2ex) $) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont''};}}
+%
+
+\definecolor{shadecolor}{rgb}{0.98,0.98,0.98}
+%\colorlet{shadecolor}{lightgray}
+
+\newcommand\quoteload[1]{%
+\begin{shaded}%
+\openquote\hspace{-4.8pt}%
+\csname #1\endcsname%
+\closequote%
+\end{shaded}%
+}
+
+%\newenvironment{quotesave}[2]{
+%\expandafter\newcommand\csname#1\endcsname{#2}
+%}
+
+%\makeatletter
+\newcommand\quotesave[2]{%
+\expandafter\providecommand\csname #1\endcsname{}
+\expandafter\renewcommand\csname #1\endcsname{#2}%
+\protected@write\@auxout{}{
+\string\expandafter\string\gdef
+\string\csname\string\detokenize{#1}\string\endcsname{#2}%
+%\gdef\string\csname #1\endcsname{#2}
+}%
+\csname #1\endcsname}%
+%\makeatother
+
+
+%\ifPhdDoc
+%\let\oldcite\cite
+%\renewcommand\cite[1]{%
+%(\oldcite{#1})%
+%}%
+%\fi
+
+
+%\newcommand{\laterdef}[2]{%
+%  \protected@write\@auxout{}{\gdef\string#1{#2}}}
+
+
+
+%\newcommand\quotesave}[2]{\newcommand{#1}{#2}}
+
+%\newcommand{quoteload}[1]{
+%\#1
+%}
+
+
+
+%% Usage %%
+%\begin{shadequote}[l]{Douglas Adams}
+% Some text.
+%\end{shadequote}
+% 
+%
+%
+
+
+
 
 % \titleformat{\chapter}%command
 % [display]%shape

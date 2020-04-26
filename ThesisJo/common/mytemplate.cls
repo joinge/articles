@@ -483,6 +483,7 @@
       , eprint=false
    %    , sortlocale=
 %       , style=numeric-comp
+%      , style=apa
       , style=ieee
 %       , style=numeric
    %   , style=authoryear-icomp

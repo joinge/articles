@@ -286,20 +286,28 @@ Sonar, SAS, simulator, template matching, OpenGL, OpenCL.
 
 % - Adapt simulation to its behaviour, see if they still match.
 
-\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are vital in the exploration of underwater frontiers. When equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with unforeseen events, such as poor imaging conditions, blocked paths, corrupted data or rare objects. One reason is their lack of a reliable and adaptive system for automatic target recognition (ATR).\todo{Struggle with the phrasing you suggested here?}
+\quotesave{IV_text_introduction}{
+\IEEEPARstart{A}{utonomous} underwater vehicles (AUVs) are vital in the exploration of underwater frontiers. When equipped with a modern synthetic aperture sonar (SAS), they map seafloors, survey underwater biology, help localize wrecks, inspect oil pipes, fields and electricity lines, or help remove mines, biohazard waste or plastic. However, they struggle to deal with unforeseen events, such as poor imaging conditions, blocked paths, corrupted data or rare objects. In other words, their automatic target recognition (ATR) are insufficiently reliable and adaptive.
 
 %However, Such independent systems have much to gain from being able to adapt to the scenario at hand. For instance, with a well designed automatic target recognition (ATR) system on board they can adapt their mission plan to collect more information on particularly interesting objects, or fine-tune the sonar and navigation system to create better images.
  
 % Automatic target recognition (ATR) is an important component in autonomous underwater vehicles (AUVs), as it allows the vehicle to adapt its mission plan to e.g. revisit detected objects for closer examination. One way to classify these objects is by using template matching. The principle involved  is to isolate an image segment containing the object of interest, compare it with a set of template images of the relevant object classes, and assign it to the class of the template with the the best fit.
+%objects isolated, features extracted and class estimated 
+%
+%estimates object class from features extracted from 
+%and estimates their classes
 
-Typical conventional ATR isolates an object of interest, extracts its key features, and uses these to estimate the object's class~\cite{Duda2012}. The challenge is finding features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle and range. Inferring three-dimensional features from a two-dimensional projection is ambiguous, particularly from SAS images---despite their best-in-class resolution and dynamic range---due acoustical distortions such as layover, multiple scattering, refraction, diffraction and penetration.
+Typical conventional ATR isolates objects of interest, extracts their key features and classifies them accordingly~\cite{Duda2012}. The challenge is finding features that are unique and intrinsic, such as type, shape and size, independent of extrinsic ones such as alignment, burial depth, degeneration level or view angle and range. Inferring three-dimensional features from a two-dimensional projection is ambiguous, particularly from SAS images---despite their best-in-class resolution and dynamic range~\cite{Hayes2009}---due acoustical distortions such as layover, multiple scattering, refraction, diffraction and penetration~\cite{Jensen2011}.
 
 
-Template matching offers a model based alternative to feature extraction: to compare the object with image templates of relevant classes and orientations, and assign it the best fitting class. Such templates are typically simulated to allow specifying input parameters in world space. The problem is finding a set of templates that properly represent the objects. Too many templates are needed to densely sample each degree of freedom. Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
+Template matching---a model-based alternative to feature extraction---compares isolated objects with image templates of relevant classes and orientations, and assigns them the best fitting class. The difficulty is representing the objects properly, considering only a few degrees of freedom can be properly sampled with a manageable number of templates (curse of dimensionality). Therefore, practical implementations resort to a few sparsely sampled features, ultimately yielding inaccurate results~\cite{Midelfart2010}.
 
+%The templates are typically simulated.
+%Too many templates are needed to densely sample each degree of freedom.
 
-Adaptive template matching is a hybrid solution: to extract the most reliable statistics from the image, such as shadow and highlight characteristics, then use these to limit the template solution space~\cite{Midelfart2010,Myers2010}. This enables a fine-grained search through more features, at a reduced computational load and improved accuracy. However, we can remove the template library completely by simulating templates on-the-fly.
+Adaptive template matching---a combination of the two aforementioned solutions---extracts the most reliable statistics from the image, such as highlight, shadow and background characteristics\cite{Reed2004,Quidu2000,Fawcett2005,Fei2015}, then uses these to limit relevant template configurations~\cite{Midelfart2009,Midelfart2010,Myers2010}. This enables fine-grained search through more features, at reduced computational load and improved accuracy. We seek to improve this further, by simulating templates on-the-fly to eliminate the template library altogether.
 
+% normalized shadow-echo matching (NSEM)
 %, to adapt to much broader scenarios.
 
 % Supervised learning
@@ -321,7 +329,13 @@ Adaptive template matching is a hybrid solution: to extract the most reliable st
 %\todo{However, only a few simulators for high frequency, side-looking sonar imagery have been published. ***}
 %On-the-fly template simulators capable of high frequency, side-looking sonar imaging tend to 
 
-A few simulators for high frequency, side-looking sonar imagery are published~\cite{Hunter2006,Bell1997,Sammelm2003}, but these prioritize accurate acoustic modeling at the expense of execution speed. One exception is the SIGMAS+ simulator~\cite{Coiras2009a, Coiras2009b}, which is accelerated by the parallel computing power of graphics processing units (GPUs). Aligning with our goals, it assumes Lambertian scattering and renders sonar images from 3D models with the OpenGL computer graphics library. However, it includes stochastic effects such as ambient noise, which we deem irrelevant for templates, and lacks general programmability, which limits adaptivity.
+
+%frequency domain, finite difference, finite element / boundary element, ray tracing, rasterization
+
+
+Most simulators for high frequency sonar imagery prioritize modeling accuracy over execution speed~\cite{Bell1995,Hunter2006}, either by solving wave equations~\cite{Elston2004} or performing ray-tracing (e.g. Heriot-Watt~\cite{Bell1997}, Limerick~\cite{Riordan2005}, SIGMAS~\cite{Coiras2009}, SWAT~\cite{Sammelm2003}). Faster sonar simulators typically adapt rasterization techniques for full acceleration by graphics processing units (GPUs)~\cite{Cerqueira2017}, such as the SIGMAS+ simulator~\cite{Coiras2009a} from NATO Centre for Maritime Research and Experimentation (CMRE). Aligning with our goals, it assumes Lambertian scattering and renders sonar images from 3D models with the OpenGL computer graphics library. However, it includes stochastic effects such as ambient noise, which we deem irrelevant for templates, and lacks general programmability, which limits adaptivity.}
+
+
 
 %while we consider templates deterministic. Neither is
 
@@ -339,11 +353,11 @@ A few simulators for high frequency, side-looking sonar imagery are published~\c
 % This allows tailoring the sonar image with greater flexibility and allows tighter integration with the classifier.\todo{Too vague} 
 % on a new full geometrical implementation of the simulator.
 
-Our simulator was designed from the ground up as an integrated part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. We describe it using a new notation system for homogeneous coordinates that allows expressing complicated geometries in a rigorous, unified and simple way. Its function is verified using data from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS mounted on a HUGIN AUV from Kongsberg Maritime.
+This study describes and demonstrates a simulator designed from the ground up as part of a GPU-accelerated adaptive template matcher. It uses both OpenGL and the general-purpose programming framework OpenCL; two libraries that can inter-operate on the GPU. To describe the simulator, we extend a new navigational notation system with homogeneous coordinates and some ideas from modern robotics, to express complicated geometries in a rigorous, unified and simple way.
 
+Section \ref{IV_sec_methods} describes the simulator concept, underlying geometry and notation system. Section \ref{IV_sec_general_notation} and \ref{IV_sec_decomposed_notation} details the notation without and with coordinates, respectively. Section \ref{IV_sec_results} presents classification results on experimental data of a few thousand objects from Jesus Bay, Norway, recorded by the HISAS1030 100\,kHz SAS mounted on a HUGIN AUV from Kongsberg Maritime in 2009 and 2012. Section~\ref{IV_sec_results_selected_objects} verifies the design through qualitative analysis of SAS, simulation and segmentation images of selected objects, and Section~\ref{IV_sec_results_all_objects} validates the design through quantitative analysis of receiver operating characteristic (ROC) curves. Section~\ref{IV_sec_conclusion} concludes with a list of key merits for the design and notation. 
 
-
-\section{Methods}\label{IV_methods}
+\section{Methods}\label{IV_sec_methods}
 
 
 %
@@ -421,7 +435,7 @@ Our simulator was designed from the ground up as an integrated part of a GPU-acc
    \end{tabular}}} & \mc{1}{l}{\emph{$\mat{T}$}}                 & \mc{9}{O}{\hspace*{0\tabcolsep}\Emph{$\colon$ Mapping}} &  \\\arrayrulecolor{cBaseMark}\hline\arrayrulecolor{black}%cline{10-20}
 	                                               &                    \\[0\baselineskip]
 	                                Radial camera & \t{R}             &\figstep{4}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} $T_{RC}$ & $(x,y,z)   \in\mathbb{R}^3$          & $(x,\varphi,r)$ &  $\mathbb{R}S\mathbb{R}$ \end{tabular}} \\
-	                                      Normalized coordinates & \t{N}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{NR}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[0,1]^3$ \end{tabular}} \\ \bottomrule
+	                                      Normalized coordinates & \t{N}             &\figstep{5}{}&                                             &                             & & &                 &  &                &           &                &   & \mc{11}{L}{\hspace*{-\tabcolsep}\begin{tabular}[c]{p{2.2em} @{ $\colon$} p{7em} @{ $\to$ } p{3.45em} @{ $\in$ } l} \Tr{NR}           & $(x,\phi,r)\in\mathbb{R}S\mathbb{R}$ & NDC$^{(3)}$  &  $[-1,1]^3$ \end{tabular}} \\ \bottomrule
                                          %\end{tabular}\parbox[L]{8em}{} $\to$ \parbox[L]{3.8em}{NDC$^{(3)}$} \parbox[L]{1em}{$\in$} $[0,1]^3$}   \\ \bottomrule
 \mc{10}{l}{$^{(1)}$Degrees of Freedom} \\
 \mc{10}{l}{$^{(2)}$Subject to $\hat{x}_C = \hat{x}_S$ and $\hat{z}_C \parallel \vec{p}_{SI}$} \\
@@ -508,7 +522,7 @@ Our simulator was designed from the ground up as an integrated part of a GPU-acc
 }}
 \fi
 }
-\caption{Reference frames and their transformations. The upper half is an affine domain (physical) where frames relate through poses, each defined by a specific configuration and coordinate representation. The lower half is a domain where frames represent intermediary states between coordinate manipulations. All set-multiplications are cartesian.}\label{IV_tab_frames_transitions}
+\caption{Reference frames and their transformations. The upper half is an affine domain (metric) where frames relate through poses, each defined by a specific configuration and coordinate representation. The lower half contains non-linear and non-metric domains, their coordinate transformations described with the same uniform notation. All set-multiplications are Cartesian.}\label{IV_tab_frames_transitions}
 \end{table*}
 
 \Fig{IV_buildup} illustrates the basic idea behind the simulator: First OpenGL renders an intensity and depth image of an object and seafloor model, then OpenCL converts these into a sonar-line image template. We call the method conventional when its input parameters are predefined, and adaptive when they are estimated from the SAS image.
@@ -519,11 +533,13 @@ Our simulator was designed from the ground up as an integrated part of a GPU-acc
 \Fig{IV_simulator_coordinate_system} and \Tab{IV_tab_frames_transitions} detail the geometry and processing steps associated with the upcoming implementation details. The first steps detail the transformations a vertex $\udot{V}$ undergoes---from being represented in the reference frame of a model, $\ubar{M}$, to that of an OpenGL camera, $\ubar{C}$---then discuss rendering and post-processing details. The mathematical syntax comes from a rigorous navigational notation system and rule set developed by K.~Gade~\cite{Gade2018}.
 %be rthat of the image region  $\ubar{I}$ , a sonar $\ubar{S}$, an orthogonal and cylindric viewing plane, $\ubar{O}$ and $\ubar{C}$ respectively, and a clipping space $\ubar{N}$ (not shown in \Fig{IV_simulator_coordinate_system}).\todo{Not sure if about this sentence.}
 
-Gade's notation has a coordinate-free form that promotes geometrical reasoning, conceptual clarity and physical understanding~\cite{Derose1992}, and a decomposed form that facilitates geometrical clarity and validity when implementing coordinates numerically. Combined they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing coordinates from different frames.%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
+Gade's notation has a coordinate-free form that promotes geometrical reasoning, conceptual clarity and physical understanding~\cite{Derose1992}, and a decomposed form that facilitates geometrical clarity and validity when implementing coordinates numerically. Combined they help the designer focus on higher level concepts rather than getting lost in implementation details, such as mixing coordinates from different frames. 
+
+%, such as ensuring that a vectors rather than ensuring that the points are decomposed in the same frame).
 %
 % and ing,  coordinates; manipulating them can be tricky and tedious, their interpretation ambiguous, and their construction error prone. Strict discipline is needed to avoid constructing invalid geometrical operations, such as mixing coordinates from two different frames. The notation aids system unambiguously expresses geometrical meaning and validity, thus allowing the designer to focus on higher level concepts rather than getting lost in implementation details. 
 
-We adhere to Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and suggest a slight tweak for arbitrary functions. This facilitates transitioning between reference frames in a unified and geometrically valid way. Inspired by modern robotics, we also touch on topology and Lie group theory of rigid objects~\cite{Lynch2017}.
+We adhere to Gade's notation for affine geometry, extend it to handle homogeneous coordinates and projective geometry, and suggest a slight tweak for arbitrary functions. This allows representing  transitions between reference frames in a unified and geometrically valid way. Inspired by modern robotics, we also touch on topology and Lie group theory of rigid objects~\cite{Lynch2017,Murray1994}.
 
 
 
@@ -549,9 +565,9 @@ We adhere to Gade's notation for affine geometry, extend it to handle homogeneou
 
 
 
-\subsection{Free notation}\label{IV_sec:general_notation}
+\subsection{Free notation}\label{IV_sec_general_notation}
 
-The upcoming notation may at first seem strange, but we believe some long-term insights and benefits await those that persevere to understand. Its core idea is to mark symbols of positions, orientations and reference frames with dots, vectors and bars, respectively. 
+The upcoming notation may at first seem strange, but we believe some long-term insights and benefits await those that persevere to understand. We begin with the core idea of marking symbols of positions, orientations and reference frames with dots, vectors and bars, respectively. 
 %
 %A vertex (or point) in the object is written $\udot{V}$. 
 %
@@ -572,23 +588,22 @@ The upcoming notation may at first seem strange, but we believe some long-term i
 %
 % \triangleq\big(\vec{x}_{M},\vec{y}_{M},\vec{z}_M\big)
 
-For the rigid model in \Fig{IV_simulator_coordinate_system}, we denote its position as $\udot{M}\in\mathbb{A}$, orientation as 
-The reference frame of the rigid model in \Fig{IV_simulator_coordinate_system} gets written as $\ubar{M} \triangleq (\udot{M},\uvec{M})$, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\in\mathbb{V}^N$ is its absolute orientation.
-%
+%The rigid object in \Fig{IV_simulator_coordinate_system}, we denote its position as $\udot{M}\in\mathbb{A}$, orientation as 
+The model in \Fig{IV_simulator_coordinate_system} is a rigid object with reference frame $\ubar{M} \triangleq (\udot{M},\uvec{M})$, where $\udot{M}\in\mathbb{A}$ is its absolute position and $\uvec{M}\in\mathbb{V}^N$ is its absolute orientation.
 %
 %
 %The set of all possible configurations for the model is called its C-space, its dimension matching the number of degrees of freedom and its shape matching the topology. Rigid bodies have $N(N+1)/2$ degrees of freedom, $N$ Euclidean ones for position (topology $\mathbb{E}^N$), and $N(N-1)/2$ angular ones for orientation (topology $S^2S^1$ or $S^1$ for $N=\{3,2\}$, respectively).
 %
 %
-We relate any two positions by a position vector, such as $\vec{p}_{\td{M}\td{V}}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
+We relate positions with position vectors, such as $\vec{p}_{\td{M}\td{V}}\in\mathbb{V}$ going from $\udot{M}$ to $\udot{V}$,
 %
 \begin{align}\label{eq_p_MV_free}
-\vec{p}_{\d{M}\d{V}} &\triangleq \udot{V} - \udot{M},
+\vec{p}_{\udot{M}\udot{V}} &\triangleq \udot{V} - \udot{M},
 \end{align}
 %
-where $\vec{p}_{\udot{M}\udot{V}} = -\vec{p}_{\udot{V}\udot{M}}$. 
+where $\vec{p}_{\udot{M}\udot{V}} = -\vec{p}_{\udot{V}\udot{M}}$. The subscript dots explicitly state the position vector's sole dependence on positions.  %, for geometric clarity. We can also say things like $   %Dropping the annotations leads to implicit notation, but comes at no cost of generality. %To demonstrate both forms we will use implicit notation in the text and explicit notation in the standalone equations, color coded for added clarity.
 
-An image frame $\ubar{I}$ specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{pose} (or displacement) $\vec{T}_{\ubar{I}\ubar{M}}$ of {\color{cFrame}frame} $\ubar{M}$ relative to frame $\ubar{I}$,
+The image frame $\ubar{I}$ in \Fig{IV_simulator_coordinate_system} specifies the location and orientation of the seafloor area where we want to place the model. We express the \emph{pose} (or displacement) $\vec{T}_{\ubar{I}\ubar{M}}$ of {\color{cFrame}frame} $\ubar{M}$ relative to {\color{cFrame}frame} $\ubar{I}$,
 %
 \begin{align}
 \vec{T}_{\bb{I}{M}} \colon \ubar{M} &\to \ubar{I},\label{eq_T_IM_free}
@@ -608,12 +623,12 @@ We can write the configuration of $\vec{T}_{\tb{I}\tb{M}}$ as $\mathcal{C}_{\tb{
 %%It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, and the rest for orientation. 
 %The translation has $N$ degrees of freedom and topology $\mathbb{R}^N$. The rotation has $N(N-1)/2$ degrees of freedom with topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$.
 %
-It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. We also drop the sub- and superscript accents and colors from symbols in the text, but keep it for comparison in the standalone equations. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
+It has $N(N+1)/2$ degrees of freedom: $N$ for the translation, with Euclidean topology $\mathbb{R}^N$; and $N(N-1)/2$ for rotation, with angular topology $\{S^2\times{}S^1, S^1\}$ for $N=\{3,2\}$. The symbol $\times$, which denotes the Cartesian product of sets, will be dropped and assumed implicit in upcoming set-multiplications. We also drop the sub- and superscript accents and colors from symbols in the text, but keep it for comparison in the standalone equations. All frames and their configurations are listed in \Tab{IV_tab_frames_transitions}, along with an associated numeric representation. We describe this next.
 
 % \dvec{p} vector subscripts define {\color{cPoint}direction} and {\color{cPoint}magnitude} in terms of two points, and superscripts define {\color{cBasis}representation} in terms of a . Stated differently, subscripts define geometric features while superscripts define numerical features.
 
 
-\subsection{Decomposed notation}\label{IV_decomposed_notation}
+\subsection{Decomposed notation}\label{IV_sec_decomposed_notation}
 
 Suppose we reference the model's vertices from the image frame $\ubar{I}$ using the head-to-tail vector rule,
 %
@@ -670,9 +685,9 @@ This vector addition (and any other vector-vector operation) is numerically poss
 % Associative but not commutative
 % <<
 % 
-where bold symbols without accents denote decomposed elements such as vectors and matrices. 
+where bold symbols without arrows denote multi-number elements such as vectors and matrices. 
 
-To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{R}\dvec{R}^T = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, a suitable representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
+To obtain $\dvec{p}_{MV}^I$ we must rotate $\dvec{p}_{MV}^M$ by $\vec{R}_{IM}$. Since rotations have angular topology, we represent them in a space with more dimensions than degrees of freedom, which avoids issues with rapidly changing values and singularities (e.g. Gimbal lock). A common choice is a rotation matrix $\dvec{R}\in\mathrm{SO}(N)$, i.e. a special (right handed) orthogonal $\mathbb{R}^{N\times{}N}$ matrix, with the properties $|\dvec{R}|=1$ (left-handed would be $-1$) and $\dvec{R}^T\dvec{R} = \dvec{R}\dvec{R}^T = \dvec{I}$. The latter property constrains the column vectors of $\dvec{R}$ to be independent (orthogonal) and of unit length. This leaves $\dvec{R}$ with $N(N-1)/2$ degrees of freedom, as desired. Thus, a suitable representation of $\vec{R}_{IM}$ in $\uvec{I}$ is $\dvec{R}_{IM}^I = \dvec{R}_{IM}^M = \dvec{R}_{IM}\in \mathrm{SO}(N)$, subject to $\uvec{M} \mapsto \uvec{I}$,
 %
 \begin{align}\nonumber\\
 \m{CL}
@@ -708,7 +723,7 @@ The rotation in \eq{eq_passive_rotation} is called passive because its geometric
 
 \subsection{Homogeneous transformations}
 
-Any transformation in $\mathbb{R}^N$-space can be represented by a transformation matrix $\dvec{T} \in \mathbb{R}^{N+1,N+1}$. In the affine case, it has the form of a Special Euclidean matrix $\dvec{T}\in\mathrm{SE}(N)$,
+Any affine transformation in $\mathbb{R}^N$-space can be represented by a transformation matrix $\dvec{T} \in \mathbb{R}^{N+1,N+1}$~\cite{Klein2004}. In the affine case, it has the form of a Special Euclidean matrix $\dvec{T}\in\mathrm{SE}(N)$,
 %
 \begin{align}
 \dvec{T} &= 
@@ -780,7 +795,7 @@ $\vec{p}_{IM}$ in $\ubar{I}$ by user-defined Cartesian coordinates,
 \dvec{p}_{\dd[IM]{I}{M}}^{\,\v[I1]{I}} &= [x,y,z]\T \in \mathbb{R}^3
 \end{align}
 %
-$\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi) \in [0,\pi]^3$,
+$\vec{R}_{IM}$ in $\ubar{I}$ by user-defined Euler angles $(\psi,\theta,\phi)\in[0,2\pi][0,\pi][0,2\pi]$,
 %
 \begin{align}
 \mat{R}_{\vv{I}{M}}    &= \mat{R}_{\mathrm{eu}}(\psi,\theta,\phi) \in SO(3),
@@ -1004,7 +1019,7 @@ To prepare for this computation and ease specification of spatial system boundar
     }
 \end{align}
 %
-We drop the superscript of $T_{RC}$ since this is a pure change of reference.
+$T_{RC}$ needs no superscript since this is a pure change of reference.
 
 
 \subsubsection{Normalization of coordinates \texorpdfstring{$\vec{T}_{NR}$}{T\_NR}}
@@ -1118,7 +1133,7 @@ where $\oslash$ denotes Hadamard (element-wise) division.
 We control the rendering process through two code-snippets called a vertex and fragment shader. In the former we apply our transformation matrices to the vertices in our defined volume,
 %
 \begin{align}\nonumber\\
-\dvec{\rho}_{\tikzmark{NV}{$\scriptstyle{}N\color{cPoint}\udot{V}$}}^{\,\n[N1]{N}} &= \mat{T}_{\n[N2]{N}\b{R}}^{\,\n[N3]{N}} \;T_{\vv{R}{C}}(\mat{T}_{\bb{C}{S}}^{\v{C}}\;\mat{T}_{\bb{S}{I}}^{\v{S}}\;\mat{T}_{\bb{I}{M}}^{\v{I}} \dvec{\rho}_{\d{M}\d[V1]{V}}^{\v{M}} ),
+\dvec{\rho}_{\tikzmark{NV}{$\scriptstyle{}N\color{cPoint}\udot{V}$}}^{\,\n[N1]{\scriptstyle{}N}} &= \mat{T}_{\n[N2]{\scriptstyle{}N}\b{R}}^{\,\n[N3]{\scriptstyle{}N}} \;T_{\vv{R}{C}}(\mat{T}_{\bb{C}{S}}^{\v{C}}\;\mat{T}_{\bb{S}{I}}^{\v{S}}\;\mat{T}_{\bb{I}{M}}^{\v{I}} \dvec{\rho}_{\d{M}\d[V1]{V}}^{\v{M}} ),
 %\left[\begin{array}{c}
 %\dvec{p}_{\cd[M2]{M}\d[V1]{V}}^{\cv[M3]{M}} \\ \tikzmark{One}{1}
 %\end{array}\right].
@@ -1169,7 +1184,7 @@ where $\dvec\Delta^{\!R}$ is the size of a resolution cell,
 \dvec\Delta^{\!\v{R}} = \dvec{p}_{IE}^{\v{R}} \oslash \bmat{N_x/2\\ N_\varphi/2\\ N_r/2},
 \end{align}
 %
-$\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that shares a resolution cell in along-track and range. Pseudo-code for this can be written as
+$\odot$ denotes Hadamard (elementwise) product and $\{N_x, N_\varphi, N_r\}$ are the user-defined number of samples for along-track, elevation and range, respectively. To form the sonar image $\dvec\gamma_n^R$, we accumulate all intensities in elevation that share a resolution cell in along-track and range. Pseudo-code for this can be written as
 %
 % \begin{minipage}{\linewidth}
 \ifPhdDoc
@@ -1307,7 +1322,39 @@ We perform this computation in OpenCL which provides general purpose programming
 
 \subsection{Template matching}
 
-Templates are finally matched to the SAS image by isolating the highlight and shadow regions in each, correlating them with each other, and assigning the mean correlation coefficient to the match score~\cite{Midelfart2010}.
+Templates are finally matched to the SAS image by isolating the highlight and shadow regions in each, cross-correlating them, and assigning the mean correlation coefficient to the match score~\cite{Midelfart2011}. 
+
+Improved feature filters~\cite{Fei2015} and object models~\cite{Pailhas2010} would likely improve performance here.
+
+%
+%\cite{Fawcett2005}. Computer-aided classification for a database of images of minelike objects. Sidescan. Image library. Kernel-based nearest-neighbour. TPR+TNR 90\% at 20\% FPR.
+%
+%\cite{Cetin2003}. Nonquadratic optimization. Improved performance (low data quality and quantity) of three classifiers: templates, likelihood based on Gaussian reflectivity models, locations of dominant scatterers. 
+%
+%%   Speckle and noise etc. makes optical similarity metrics such as sum of absolute difference and normalized cross-correlation fail.
+%\cite{Myers2010} (+Fawcett). A Template Matching Procedure for Automatic Target Recognition in Synthetic Aperture Sonar Imagery
+%   
+%   Approaches that segment pixels into highlight, shadow and background to reduce the effect of noise:
+%
+%   - \cite{Reed2004}. Detection with Markov random field model (good in noise) using prior knowledge. Segmentation with statistical snake (assumes statistical separability). Classification with Dampster-Shafer, comparing features with synthesized ones from sidescan model. Hausdorff distance.
+%   
+%   - \cite{Quidu2000}. Mine classification from raw sonar data. Fourier descriptors, statistical models, genetic algorithms. Skips segmentation.
+%   
+%   - \cite{Fawcett2005}.
+%
+%Similarity metrics:
+%3-4: cross-correlation
+%1: likelihood
+%4: probabilistic models
+%
+%When separated into shadow/highlight:
+%Reed: Maximum distance between shadow regions
+%Fawcett: Fraction of pixels in highlight and shadow regions matching corresponding pixels in the image
+%
+%Groen
+
+
+
 
 %       ROC curves from last run. Computing the mean correlation score of the shadow and highlight/echo.
 %       Early results. Can only check vs. cylinder-like objects.
@@ -1391,7 +1438,7 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 \setcounter{topnumber}{1}
 \setcounter{totalnumber}{1}
 
-\section{Results \& Discussion}
+\section{Results \& Discussion}\label{IV_sec_results}
 
 \ifPhdDoc
 \begin{figure*}[!h]\centering%
@@ -1442,7 +1489,7 @@ Once the simulator runs it generates thousands of sonar templates per second. Ho
 \caption{\emph{Receiver operating characteristics (ROC) curves.} The adaptive methods outperform the conventional one below 20\% FPR, with additional adaption to burial depth increasing the advantage. Above 20\% FPR the methods tie. This suggests significant potential for improving performance in this scenario by increasing adaptivity.}\label{IV_fig_roc_curves}%
 \end{figure*}
 
-Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS) attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
+Our results are based on experimental data from a HISAS1030 interferometric synthetic aperture sonar (SAS)~\cite{Hagen2008} attached to a HUGIN autonomous underwater vehicle (AUV), both developed by Kongsberg Maritime, Norway. The HISAS1030 is a fully digital phased array with 32 hydrophones, 100\,kHz center frequency, 30\,kHz bandwidth, 1.2\,m length, 23$^\circ$ half-power beamwidth (HPBW) and 3-4\,cm theoretical resolution both cross- and along-track. Our version of HUGIN also carries a camera that is used for optical inspection of interesting objects.
 
 %To test performance of our simulator and template matching techniques where measured using experimental data from 
 
@@ -1468,29 +1515,29 @@ Our simulator computes thousands of one-megapixel templates per second on a comp
 
 
 
-\subsection{Classification - selected objects}
+\subsection{Classification - selected objects}\label{IV_sec_results_selected_objects}
 
-We contrast simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depths and aspect angles. SAS image segments and templates for these objects are shown in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to reference the objects' contours. Observe the following:
+We contrast simulation and classification performance on three typical objects from the 2012 data: two roughly 3\,m long mines and a 5\,m long torpedo, each with unique immersion depths and aspect angles. SAS image segments and templates for these objects are shown in \Fig{IV_fig_images_sonar_simulation}, with hand-drawn red lines superimposed to reference the objects' contours. Segmentation performance and correlation scores are illustrated in \Fig{IV_fig_image_simulation}. Observe the following:
 %
 \begin{itemize}
 \item \emph{Template image quality} is similar for both SIGMAS+ and FFISim. With accurate input parameters, both simulators generate highlight and shadow regions with correct size and shape. Intensity values are nearly identical (ignoring background level), as expected since both rely on a Lambertian scattering model.
-\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the poorer its representation by the static database, the greater the advantage of the adaptive method.
+\item \emph{Template accuracy} improves when using the adaptive technique; it excels at generating accurate highlight regions, but is less convincing in shadow regions. The less common the object, the less accurate its representation by the static database, the greater the advantage of the adaptive method.
 \end{itemize}
 
 \ifPhdDoc
 \FloatBarrier
 \fi
 
-\subsection{Classification - all objects}
+\subsection{Classification - all objects}\label{IV_sec_results_all_objects}
 
 Classification performance on all objects is demonstrated with receiver operating characteristic (ROC) curves in \Fig{IV_fig_roc_curves}. They illustrate the classification trade off between true positive rate (TPR) and false positive rate (FPR)---also called sensitivity and (inverse) specificity, or hit rate and alarm rate---as a function of different threshold values. A skillful model assigns higher probability to a positive occurrence than a negative one. Perfect skill is represented at the point $(0,1)$ and no skill at $(0.5,0.5)$. Observe the following:
 %
 \begin{itemize}
-\item \emph{Below 20\% FPR} the adaptive techniques outperformed the static method in every run. This benefits e.g. mine counter measures (MCM) operations where only a few detections out of 3000 will be visually inspected up close.
+\item \emph{Below 20\% FPR} the adaptive techniques outperformed the static method in every run. This benefits typical mine counter measures (MCM) operations with thousands of detections, as only some of these can be visually inspected up close, transmitted via underwater modem, or both.
 \item \emph{Above 20\% FPR} the results are less clear: the adaptive techniques performed similarly to the static method in 2012, worse 6 January 2009 and better 8 January 2009---with 5 and 3 false detections at 20\% FPR, respectively. Visual inspection revealed fish trawler tracks and poor highlight and shadow quality as likely culprits.
 \end{itemize}
 %
-A classification model should be neither too simple (high bias or underfitted) nor complex (high variance or overfitted), but strike a balance between the two that captures statistically significant details of the object but not the noise. Higher detail-to-noise ratios favor more complex models and occur at lower FPR, where poor quality objects are discarded. The added complexity of the adaptive techniques seems beneficial here, yielding greater advantage at higher detail levels without suffering at lower ones. The greatest edge is held by the adaptive technique that also adjusts burial depth. The results suggest significant potential for improving performance by raising adaptivity in this scenario.
+A classification model should be neither too simple (high bias or underfitted) nor complex (high variance or overfitted), but strike a balance between the two that captures statistically significant details of the object but not the noise. Higher detail-to-noise ratios favor more complex models and occur at lower FPR, where poor quality objects are discarded. The added complexity of the adaptive techniques seems beneficial here, yielding greater advantage at higher detail levels without suffering at lower ones. The greatest edge is held by the adaptive technique that also adjusts burial depth. The results suggest significant potential to improve performance by raising adaptivity in this scenario.
 
 
 %
@@ -1513,7 +1560,7 @@ A classification model should be neither too simple (high bias or underfitted) n
 % Best performance at the ideal compromize between the two.
 
 
-\section{Conclusion}\label{IV_conclusion}
+\section{Conclusion}\label{IV_sec_conclusion}
 
 Classification accuracy of adaptive template matching improves relative to conventional static methods with:
 %
@@ -1531,6 +1578,10 @@ The simulator was described with a rigorous and unified navigational notation sy
 \item \emph{Free form}---that promotes geometrical reasoning, conceptual insight and physical understanding---with \emph{topological ideas} from robotics and an abstraction level raised to that of \emph{affine transformations}, and 
 \item \emph{Decomposed form}---that ensures geometrical validity and clarity when handling coordinates---with \emph{homogeneous coordinates} for affine transformations and usage ideas for arbitrary functions.
 \end{itemize}
+
+Improved classification accuracy and speed pave the way for 
+
+heterogeneous clusters of AUVs ~\cite{Midtgaard2019}
 
 %We abide by a notation system with a:
 %%
@@ -1656,7 +1707,7 @@ where $\theta\in[0,\pi]$ and $\mat{S}(\dhat{r})$ denotes the skew-symmetric matr
 } \in\mathfrak{so}(3).
 \end{align}
 %
-The equality between the matrix trigonometric\todo{Correct?} in \eq{IV_eq_euler_rodrigues_decomposed} and the matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} may be verified by Taylor expansion about $\theta=0$. Note how axis-angle parameters are related to rotation matrices by the exponential function. Stated in group theory terms: possible rotations make up the Lie group $\mathrm{SO}(3)$, possible axis-angle pair make up the Lie algebra $\mathfrak{so}(3)$, and an exponential map relates them.
+The equality between the matrix trigonometric in \eq{IV_eq_euler_rodrigues_decomposed} and the matrix exponential in \eq{IV_eq_euler_rodrigues_exponential} may be verified by Taylor expansion about $\theta=0$~\cite{Murray1994}. Note how axis-angle parameters are related to rotation matrices by the exponential function. Stated in group theory terms: possible rotations make up the Lie group $\mathrm{SO}(3)$, possible axis-angle pair make up the Lie algebra $\mathfrak{so}(3)$, and an exponential map relates them.
 
 % The action of rotation can be represented by the Lie group SO3 under multiplication, or by the Lie algebra so3 under addition, 
 
@@ -1811,7 +1862,7 @@ where
 }.
 \end{align}
 %
-At $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem. Axis-angle representations such as Euler-Rodrigues formula or quaternions avoids this issue by adding a fourth parameter and one constraint: one angle and three parameters for the rotation axis subject to unit length. 
+At $\theta=\frac{\pi}{2}$ we have $\phi=-\psi$, and at $\theta=-\frac{\pi}{2}$ we have $\phi=\psi$. This effect, in which one degree of freedom is lost, is known as Gimbal lock. Any three-parameter specification of an orientation in three-dimensional space has this problem~\cite{Stuelpnagel1964}. Axis-angle representations such as Euler-Rodrigues formula or quaternions avoids this issue by adding a fourth parameter and one constraint: one angle and three parameters for the rotation axis subject to unit length. 
 
 
 
@@ -1854,7 +1905,7 @@ The geometrical intent of an active rotation is to move a point, by contrast the
 %
 %
 % Implicit representation: (x,y,z) subject to x²+y²+z²=c -> no 
-depending on whether the free or decomposed form is wanted, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Beware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, for example, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; either the point changes, or the representation does, but never both.
+depending on whether the free or decomposed form is wanted, and where $\vec{R}\colon \mathbb{V}^N \to \mathbb{V}^N$ and $\dvec{R}^M\colon \mathbb{R}^N \to \mathbb{R}^N$. Be aware that the rotation matrix can be identical---both notationally and numerically---in the active and passive case, for example, if $\dvec{R}^M$ was replaced by $\dvec{R}_{IM}$ in \eq{IV_eq_active_rotation}. Thus, the geometrical intent must be inferred from the position vector notation; either the point changes, or the representation does, but never both.
 
 
 

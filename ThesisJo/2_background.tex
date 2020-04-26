@@ -147,7 +147,7 @@ Let the array have $M$ sensors equally spaced at positions $\udot{0},\udot{1},\d
 \Delta_m[n] = \frac{\lVert \vec{p}_{mS}\rVert - \underset{m'}{\mathrm{min}}\ \lVert \vec{p}_{m'S}\rVert}{c\,f_s},\label{2_eq_delta}
 \end{align}
 %
-where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$. Subtracting the minimum distance is mathematically optional, but facilitates physical realization and low latency. By assuming implicit dependence on $\vec{p}$ and data pre-delayed to the pixel of interest, we simplify notation to $x_m[n]\in\mathbb{C}$. Beamformer output $z[n]\in\mathbb{C}$ is, by definition, the weighted sum of delayed data samples,
+where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$. Subtracting the minimum distance is mathematically optional, but facilitates physical realization and low latency. Approximating delays with phase shifts is common in applications that are narrow band, narrow beam, or both~\cite{Johnson1993}. By assuming implicit dependence on $\vec{p}$ and data pre-delayed to the pixel of interest, we simplify notation to $x_m[n]\in\mathbb{C}$. Beamformer output $z[n]\in\mathbb{C}$ is, by definition, the weighted sum of delayed data samples,
 %
 \begin{align}
 z[n] = \dvec{w}^H[n]\dvec{x}[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]} \in\mathbb{C},\label{2_eq_z}
@@ -265,7 +265,6 @@ is the Butler (or DFT) matrix~\cite{Butler1961}. Once $\x_{\text{BS},l}[n]$ is c
 Reducing $\eR_\text{BS}$ size from $L$ to $N_b$ reduce estimation to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
 
 
-
 \subsection{LCA beamformer}
 
 The Low Complexity Adaptive (LCA) beamformer offers a different approach to the optimization problem in (\ref{2_eq_mvdr_def}). Instead of calculating weights like MVDR in (\ref{2_eq_weights}), it iterates through a set of precomputed weights and applies the one that best fulfils the optimization criterion. If $\w_p$ denotes the $p$'th out of $P$ weight sets, then LCA can be formulated as~\cite{Synnevag2008}:
@@ -286,6 +285,9 @@ Template matching classifies objects by comparing them to idealized image templa
 
 
 To improve noise- In sonar imaging Several adaptiations to sonar imaging approaches 
+
+\quoteload{IV_text_introduction}
+
 
 
 % These challenges are very closely linked. The Quadro 6000 architecture is of compute capability 2.0, which means there are 48\,kB of shared memory (L1 cache) and 128\,kB of registers per SM~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This will expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (Little's law). By dividing the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory\todo{introduce memory structure -shared for data shared between threads}, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
