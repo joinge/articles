@@ -192,7 +192,7 @@ Consider a sonar imaging scenario where an encoded signal is transmitted to high
 \fi\fi%
 \caption{Beamforming principle. Signal signature is first removed by matched filtering. Then, before summation, a suitable set of delays $\Delta$ and weights $w$ are applied to focus on a pixel of interest at angle and range ($\theta,n$).}\label{I_beamforming}
 \end{figure}
-Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter (Fig. \ref{I_beamforming}). Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
+Let the receiver be an $M$ element uniform linear array, and assume that the signature of the transmitted signal has been removed by a matched filter (\Fig{I_beamforming}). Further assume that the array channels are digitally delayed to focus at a pixel with azimuth angle $\theta$ and range sample $n$, such that the delayed data from the $m$th channel can be expressed as $x_m[\theta,n]$. To simplify notation, we make the dependence on $\theta$ implicit from now on. 
 
 By definition, the beamformer output $z[n]$ can now be expressed as the weighted sum of all the delayed data samples:
 \begin{align}
@@ -253,7 +253,7 @@ z[n] = \w\H[n] \sumb{l=0}{M-L} \x_l[n].\label{I_finalZ}
 2. the term $\eR^{-1}\1$ is found using a linear equation solver;\newline
 3. and the beamformer output $z$ is computed from (\ref{I_finalZ}), where $\w$ is found by substituting $\eR^{-1}\1$ into (\ref{I_weights}). } \label{I_mvdr_beamforming}
 \end{figure}
-As summarized in Fig. \ref{I_mvdr_beamforming}, the MVDR method is applied to each pixel independently, by:
+As summarized in \Fig{I_mvdr_beamforming}, the MVDR method is applied to each pixel independently, by:
 \begin{enumerate}
 \item computing the sample covariance matrix $\eR$ in (\ref{I_finalR});
 \item computing $\eRi\1$ in (\ref{I_weights});
@@ -339,13 +339,13 @@ To use Nvidia's own terminology, the Quadro 6000 comprises 14 streaming multipro
 
 \subsection[Computing the Spatial Covariance Matrix]{Computing the Spatial Covariance Matrix, $\hat{\boldsymbol{R}}$}\label{I_computing_eR}
 
-% As Fig. \ref{I_mvdr_complexity} illustrates the computation of $\eR$ 
+% As \Fig{I_mvdr_complexity} illustrates the computation of $\eR$ 
 
-As observed in Fig. \ref{I_mvdr_complexity}, a direct computation of $\eR$ by implementing (\ref{I_spatialR}) and (\ref{I_finalR}) is the greatest computational burden. We target this issue by first minimizing arithmetic operations, then aim to get as close to the peak arithmetic throughput on the GPU as possible.
+As observed in \Fig{I_mvdr_complexity}, a direct computation of $\eR$ by implementing (\ref{I_spatialR}) and (\ref{I_finalR}) is the greatest computational burden. We target this issue by first minimizing arithmetic operations, then aim to get as close to the peak arithmetic throughput on the GPU as possible.
 
 \subsubsection{Minimizing Arithmetic Operations}
 
-In Fig. \ref{I_mvdr_build_R}, we illustrate how to reduce the arithmetic complexity of building $\eR$ in a system with $M=5$ sensors, a subarray size of $L=3$, and temporal averaging is set to $K=1$. Here the spatial sum is carried out before the temporal sum. To reduce arithmetic operations we may:
+In \Fig{I_mvdr_build_R}, we illustrate how to reduce the arithmetic complexity of building $\eR$ in a system with $M=5$ sensors, a subarray size of $L=3$, and temporal averaging is set to $K=1$. Here the spatial sum is carried out before the temporal sum. To reduce arithmetic operations we may:
 %
 \begin{enumerate}
 \item exploit the fact that $\eR$ is Hermitian positive semidefinite to compute only one half of it;
@@ -364,10 +364,10 @@ In Fig. \ref{I_mvdr_build_R}, we illustrate how to reduce the arithmetic complex
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/buildR-breakdown.eps}
 \fi\fi%
-\caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in Fig. \ref{I_mvdr_complexity} (higher is better) . Note how the arithmetic count is reduced by a factor 4-10 in the memory-optimized case, and by a factor 6-22 in the instruction-optimized case.}\label{I_mvdr_complexity_optimized}
+\caption{Arithmetic optimization of computing $\eR$: Relative reduction in arithmetic complexity compared to the initial implementation shown in \Fig{I_mvdr_complexity} (higher is better). Note how the arithmetic count is reduced by a factor 4-10 in the memory-optimized case, and by a factor 6-22 in the instruction-optimized case.}\label{I_mvdr_complexity_optimized}
 \end{figure}
 
-To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied, we call it a "minimum instructions" solution, and when step 2 is left out, we call it a "minimum memory" solution. Fig. \ref{I_mvdr_complexity_optimized} compares the two solutions, and formulas may be found in Appendix \ref{I_mvdr_formulas}. Here the complexity curves are relative to the reference implementation in Fig. \ref{I_mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
+To study the effect of these optimizations we altered the complexity formulas to take them into account. Exploiting symmetry and performing iterative summing (step 1 and 3) is always desirable, but avoiding redundant multiplications (step 2) comes at the cost of increased memory consumption. When all optimizations are applied, we call it a "minimum instructions" solution, and when step 2 is left out, we call it a "minimum memory" solution. \Fig{I_mvdr_complexity_optimized} compares the two solutions, and formulas may be found in Appendix \ref{I_mvdr_formulas}. Here the complexity curves are relative to the reference implementation in \Fig{I_mvdr_complexity}. Both solutions reduce the complexity considerably, and recomputing the multiplications does not make that much of a difference. We selected the memory minimized version since our algorithm is severely memory bound, as we will see next.
 
 \ifPhdDoc
 \begin{figure}[p]\centering
@@ -413,7 +413,7 @@ where the peak bandwidth of the three types of GPU memory are compared to the pe
 
 These challenges are very closely linked. Since the Quadro 6000 architecture is of compute capability 2.0, it has 48\;kB shared memory (L1 cache) and 128\;kB of register memory per streaming multiprocessor (SM)~\cite{Nvidia2012}. This memory is shared by all active threads on that SM, a number that should be no less than 768~\cite{Nvidia2012a}. This is to expose a sufficient level of data parallelism to ensure that memory latency is completely hidden (in accordance with Little's law). If we divide the shared memory evenly on all 768 threads we find that each thread should store no more than 8 single precision complex numbers in shared memory, and 24 stored in registers. This should make it apparent why computing a single pixel per thread is a bad idea, and why we need to keep each thread as light on memory consumption as possible.
 
-In Fig. \ref{I_mvdr_implementation}, we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
+In \Fig{I_mvdr_implementation}, we illustrate how we get around these challenges. First we make each SM compute entire range lines of pixels, then load the subset of $\x$ that all these pixels depend upon into shared memory. This lets us perform temporal averaging without having to read additional channel data.
 
 Second, we assign $L$ threads per pixel to traverse the diagonals of $\eR$. On the top row, a full computation is carried out, then that row is saved back to global memory following a coalesced access pattern that maximizes global memory bandwidth. For subsequent rows, the threads move along the diagonals while performing iterative summations; the result from the previous element on the diagonal is updated by adding and subtracting the correlation coefficients that enter and exit the sum, respectively. To minimize memory consumption, we compute the coefficients again every time we need them. When a thread has finished up a diagonal, we have them wrap around to compute one of the diagonals in the lower triangular of $\eR$. Since $\eR$ is conjugate symmetric, the values in the leftmost column are obtained by a complex conjugate copy of the relevant value in the first row. This is slightly nonoptimal as it causes divergent branching, but it is needed because the solver is Gauss Jordan based and thus require a full $\eR$. Combined these steps balance the load evenly on all threads, is almost completely free of arithmetic redundancy, and cause minimal memory consumption.
  
@@ -505,7 +505,7 @@ The computational performance of our implementation was first assessed on a test
 \includegraphics[width=\linewidth]{gfx/buske8\figPostfix.eps}
 % Same caption but slightly different formatting since it is now on its own page
 \caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.
-\\[.5\baselineskip]\textbf{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in Fig. \ref{I_mvdr_complexity}.
+\\[.5\baselineskip]\textbf{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in \Fig{I_mvdr_complexity}.
 \\[.5\baselineskip]\textbf{Bottom:} Compared to a reference MATLAB and single thread C implementation running on a CPU the GPU offered a speedup of 2-3 orders of magnitude, but these numbers are somewhat misleading. If the C implementation was properly optimized we expect the GPU to be no more than a factor 5-10 faster, even if its theoretical peak performance is ~20 times higher than that of the CPU.}\label{I_benchmarks}
 \else
 \ifPeerReview
@@ -514,7 +514,7 @@ The computational performance of our implementation was first assessed on a test
 \else
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark.eps}
-\fi\caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.\newline \emph{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in Fig. \ref{I_mvdr_complexity}.\newline
+\fi\caption{\protect MVDR benchmarks. A 1\;MP image from a $M=32$ channel array was processed for all $L$, and for $K\in\{0,1,2\}$.\newline \emph{Top:} The time the GPU spent on building $\eR$, solving $\eRi\1$, and computing $z$. Note the major speedup of building $\eR$ when compared to the complexity plot in \Fig{I_mvdr_complexity}.\newline
 \emph{Bottom:} Compared to a reference MATLAB and single thread C implementation running on a CPU the GPU offered a speedup of 2-3 orders of magnitude, but these numbers are somewhat misleading. If the C implementation was properly optimized we expect the GPU to be no more than a factor 5-10 faster, even if its theoretical peak performance is ~20 times higher than that of the CPU.}\label{I_benchmarks}
 \fi%
 \end{figure}
@@ -558,7 +558,7 @@ The computational performance of our implementation was first assessed on a test
 \begin{figure}[!t]\centering
 \includegraphics[width=\linewidth]{gfx/benchmark_boston.eps}
 \fi\fi
-\caption{\protect MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20 Kepler GPU. The exact same scenario and code as in Fig. \ref{I_benchmarks} was used here. With no code alterations the performance was only improved marginally compared to running on the Quadro 6000.}\label{I_benchmarks_boston}
+\caption{\protect MVDR benchmarks from Boston HPC centre with the new high-end Nvidia K20 Kepler GPU. The exact same scenario and code as in \Fig{I_benchmarks} was used here. With no code alterations the performance was only improved marginally compared to running on the Quadro 6000.}\label{I_benchmarks_boston}
 \end{figure}
 
 As seen in the runtime comparisons presented in \Fig{I_benchmarks}, the GPU method became two to three orders of magnitude faster than the C implementation we started out with. The remaining bottleneck in the final design is the inversion step, which is typically five times slower than the build step. In most cases the processing speed of the Quadro 6000 is above 1\;MP/s, and this was only improved by a factor 1.5-2 when run on the new K20 GPU. The benchmarks of our memory-only and arithmetic-only kernels show that the kernels spend roughly the same time on both these tasks, so optimising only one of these further will have marginal impact. All GPU kernels were compiled with \texttt{nvcc} at optimization level \texttt{O2}. Excluded from these benchmarks is the data transfer time from CPU to GPU, which account for 2-20\% of the total processing time. We believe it makes little sense to include them since it keeps getting easier to perform these data transfers in parallel by offloading the task to the direct memory access (DMA) controllers present on modern GPUs. Furthermore, the data rates in an active sonar are relatively low compared to the bandwidth available for these transfers.

@@ -619,6 +619,7 @@
    % \usepackage{mylatexformat}
    \typeout{++++floatrow++++}
    \usepackage{floatrow}
+   \usepackage{float}
    
    \typeout{++++placeins++++}
    \usepackage{placeins}      % \FloatBarrier

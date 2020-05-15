@@ -1,4 +1,5 @@
 %&header
+% !TeX root = thesis
 % !TeX root = 1_introduction
 
 \input{subheader}
@@ -74,9 +75,16 @@
 
 Waves are made of endless tiny energy transactions, a dance of particles effecting each other in search of equilibrium. They are caused by disturbances in the forces of nature. The drop of a rock into calm water or rapid displacement of still air cause mechanical waves, while synchronized oscillations of electric and magnetic fields cause electromagnetic waves. Regardless of whether the waves are mechanical or electromagnetic, move perpendicular or parallel to the axis of propagation, what medium they propagate through or the means by which they do so, they are---perhaps surprisingly---all governed by the same mathematical equations.
 
-This shared mathematical foundation for waves allows the use of similar techniques to form images from waves in optics, medical applications, radars, sonars and seismics. To observe what our eyes and ears can not. To explore vast amounts of information with the sense that does it best: our vision.
+This shared mathematical foundation allows similar techniques to form images from waves in optics, medical applications, radars, sonars and seismics. To let us observe what our eyes and ears can not. To make our machines do what we can not.
 
-Biological creatures sense and react to waves almost instantaneously, adapting their behavior on-the-fly to survive, filling in knowledge gaps, satisfying their curiosity, or honing a skill. Such traits help them master the world, but seem notoriously hard to grant machines.
+% To explore vast amounts of information with the sense that does it best: our vision.
+
+Our mind process waves instantly to adapt our behavior on-the-fly, fill knowledge gaps, satisfy our curiosity or hone skills. It performs \emph{focused learning} through repetition to strengthen existing connections between neurons and \emph{diffused learning} through rest to form new connections. The latter feat of biology, called brain plasticity, is currently unrivaled. Such traits help us master the world, but are notoriously hard to grant machines.
+%
+%Such traits help us master the world, but are notoriously hard to grant machines.
+%
+%
+%Analogous to human brains, mathematical models perform 
 
 
 %Raw data -> preprocessing -> beamforming -> image
@@ -153,23 +161,83 @@ Biological creatures sense and react to waves almost instantaneously, adapting t
 
 \section{Motivation and scope}
 
-Technology substitutes biology's finesse with brute force: throwing superior sensors and massive computing power at the problem, but failing to replicate biology's intricate information processing. Computers never tire, hardly fail, handle information relentlessly at high bandwidth and low latency, and communicate extremely fast---but they lack the ability to truly adapt, learn, be curious and ask the question ``Why?''
+Technology substitutes biology's finesse with brute force, by throwing superior sensors and massive computing power at the problem, but failing to replicate biology's intricate information processing. Computers never tire, hardly fail, handle information relentlessly at high bandwidth and low latency, and communicate extremely fast---but lack the ability to truly adapt, learn, be curious and ask the question ``Why?''. 
 
-%Technology provides better sensors than biology and processing power to deal with their data, but the algorithms lack finesse in doing so.
+We dive into the interdisciplinary 
 
-We seek to improve sonar cognition, or intelligence, through accelerated adaptive image reconstruction and synthesis. This interdisciplinary challenge delves deeply into three fields:%acoustical imaging, high performance computing and machine learning.
-%Three different fields form the foundation for sonar sonar cognition:
-%
+\emph{We aim} to improve sonar cognition, or intelligence,
+We seek to 
+Imaging systems generally delve into
+
 \begin{itemize}
 %
 \item \emph{Acoustical imaging}: makes images of mechanical waves like sound, vibration, ultrasound and infrasound in gases, liquids and solids. We reconstruct images from 100\,kHz sonars and 3\,MHz clinical ultrasound devices. 
 %
-\item \emph{Machine learning}: makes computers perform a task without explicit instructions, or learn by doing. Analogous to human brains, mathematical models perform \emph{focused learning} by strengthening or weakening connections between information nodes, but struggle to perform \emph{diffused learning} by forming new connections. This feat of biology, called brain plasticity, is unrivaled. We focus on a niche focused learning problem by harnessing today's massive computer power and data.
+\item \emph{Machine learning}: makes computers perform a task without explicit instructions, or learn by doing.  We focus on a niche focused learning problem by harnessing today's massive computer power and data.
 %
 \item \emph{High performance computing}: makes efficient use of hardware architectures such as central processing units (CPUs), graphics processing units (GPUs), field-programmable gate-arrays (FPGAs) and application-specific integrated circuits ASICs---listed in descending order with respect to flexibility, general purpose and ease of programming and in ascending order with respect to power efficiency and computing power. We accelerate our algorithms with GPUs.
 %Our main inspiration is the human brain, which facilitates focused and diffused learning. Focused mode strengthens the connections between sets of neurons, while diffused mode forms new connections between neurons.
 %The adaptive methods in this thesis offer learning with a weak resemblance to focused mode. Diffused mode is harder because hardware architectures are fixed. 
 \end{itemize}
+
+\emph{We limit} our study to 100\,kHz sonar imaging systems and 3\,MHz clinical ultrasound devices, machine learning 
+
+%Technology provides better sensors than biology and processing power to deal with their data, but the algorithms lack finesse in doing so.
+
+\section{Aims and claims}
+
+\emph{We aim} to improve sonar cognition, or intelligence, through accelerated adaptive image reconstruction and synthesis.
+
+\emph{We claim} that faster processing opens 
+Faster processing, lower latency, real time, opens new possibilities.
+
+* Explore fast adaptive beamformers
+* 
+* Hardware acceleration with GPUs
+
+Reconstruction, beamforming, software defined manipulation of waves.
+- MVDR for sonar
+- MVDR for ultrasound
+- LCA for sonar
+- Simulation for real-time object classification
+
+Synthesis, 
+
+Autonomy
+- Fast feedback from sensors.
+- Present data more relevant than past data
+- 
+
+\section{Research questions}
+
+\begin{itemize}
+\item Are minimum variance distortionless response (MVDR) beamformers---when optimized and accelerated with graphics processing units (GPUs)---real-time capable in typical sonar clinical ultrasound applications? 
+\item 
+\item How does the low complexity adaptive (LCA) minimum variance beamformer---with its discrete solution space---fare against the analytically computed, full solution space of MVDR?
+\item 
+\end{itemize}
+- How fast can MVDR become if hardware accelerated?
+- How well does beamformers with finite set of solutions fare?
+- What possibilities does low latency, high throughput image reconstruction and sythesis open up?
+
+
+\section{Outline}
+
+\begin{figure}[!thb]
+\makebox[\linewidth][c]{%
+\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation_bigger_picture.svg}}
+\caption{Thesis outline. The first three papers focus on beamforming: the reconstruction of images from acoustic echoes. The last paper focuses on simulation: the synthesis of image templates from 3D models and object parameters estimated from the reconstructed image. %An object classifiers receives the sonar image and its simulated counterpart and  is fed to an object classifier
+}\label{fig_outline_simple}
+\end{figure}
+
+This thesis presents four journal articles, related visually in Figure \ref{fig_outline_simple}. The first three papers focus on constructing images from acoustic echoes, and the last paper uses parameters derived from such images to simulate image templates of common objects. Our practical system---an autonomous underwater vehicle (AUV)---uses the templates to classify objects in the scene and adapt accordingly. 
+
+Chapter 2 accounts for theories and studies provides some background material and accounts for research our on beamforming. Chapter 3 summarizes the contributions of all four papers. Chapter 4 discusses findings, proposes further work and entertains ideas of what the future holds.
+
+%acoustical imaging, high performance computing and machine learning.
+%Three different fields form the foundation for sonar sonar cognition:
+%
+
 
 
 %Constrain attention to beamformers and simulators (not ATR?).
@@ -403,7 +471,7 @@ We seek to improve sonar cognition, or intelligence, through accelerated adaptiv
 %\end{itemize}
 
 
-\section{Outline}
+%\section{Outline}
 %\ifIncludeWritingTips
 %\begin{markdown}
 %    * Describe the context within which the research takes place
@@ -422,16 +490,7 @@ We seek to improve sonar cognition, or intelligence, through accelerated adaptiv
 %\end{markdown}
 %\fi
 
-\begin{figure}[!thb]
-\makebox[\linewidth][c]{%
-\graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation_bigger_picture.svg}}
-\caption{Thesis outline. The first three papers focus on beamforming: the reconstruction of images from acoustic echoes. The last paper focuses on simulation: the synthesis of image templates from 3D models and object parameters estimated from the reconstructed image. %An object classifiers receives the sonar image and its simulated counterpart and  is fed to an object classifier
-}\label{fig_outline_simple}
-\end{figure}
 
-This thesis presents four journal articles, related visually in Figure \ref{fig_outline_simple}. The first three papers focus on constructing images from acoustic echoes, and the last paper uses parameters derived from such images to simulate image templates of common objects. Our practical system---an autonomous underwater vehicle (AUV)---uses the templates to classify objects in the scene and adapt accordingly. 
-
-Chapter 2 provides some background material on beamforming. Chapter 3 summarizes the contributions of all four papers. Chapter 4 discusses findings, proposes further work and entertains ideas of what the future holds.
 
 %\begin{lstlisting}
 %Title: Sonar cognition with accelerated acustic image reconstruction and syntesis

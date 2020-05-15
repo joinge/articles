@@ -87,16 +87,22 @@ uiophd
 \providecommand\sumb{}
 \renewcommand\sumb[2]{\sum\limits_{#1}^{#2}\;}
 
+%Make section number before figure number.
+%\renewcommand{\thefigure}{\thechapter-\arabic{figure}}
+%\renewcommand{\thetable}{\thechapter-\arabic{table}}
+%\renewcommand{\thelstlisting}{\thechapter-\arabic{lstlisting}}
 
 
 % \newcommand\gls[1]{#1}
 
-\renewcommand\figurename{Fig.}
-\renewcommand\thefigure{\arabic{figure}}
+\newcommand\Fig[1]{Figure \ref{#1}}
+
+\renewcommand\figurename{Figure}
+%\renewcommand\thefigure{\arabic{figure}}
 % \addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
 
-\renewcommand\thetable{\arabic{table}} 
-\renewcommand\theequation{\arabic{equation}} 
+%\renewcommand\thetable{\arabic{table}} 
+%\renewcommand\theequation{\arabic{equation}} 
 
 % Increase header a bit to allow two lines in it
 \addtolength\headheight{\topmargin}

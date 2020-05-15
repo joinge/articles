@@ -19,6 +19,8 @@
 
 \chapter{Background}
 
+This chapter 
+
 {
 
 % \newcommand\mat[1]{\boldsymbol{#1}}
@@ -45,17 +47,7 @@
 \begin{figure}[tp]
 \makebox[\linewidth][c]{%
 \graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
-\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: element-space MVDR (reference), beam-space MVDR (close approximation) and element-space LCA (educated trial-and-error). Article IV presents background on synthesis of image templates from reconstructed images. }%
-\label{2_fig_article_relation}
-\end{figure}
-
-\begin{figure}[!t]\centering
-\makebox[\linewidth][c]{%
-\graphicsAI[width=.7\linewidth]{gfx/geometry.svg}}
-\caption{
-An array with $M$ sensors has reference frame $\udot{A} \triangleq (\udot{A},\uvec{A})$ attached to it, where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation (\,$\hat{\cdot}$ denoting unit length). Impinging on the array at angle $\theta$ is a monochromatic plane wave: a single frequency wave from a source $\mathcal{S}$ far away relative to the wavelength and array length (far field). Notation details are presented in 
-}%
-\label{2_fig_geometry}
+\caption{Method relations. This thesis explores three beamformers reconstructing images from acoustic echoes: element-space MVDR (reference), beam-space MVDR (close approximation) and element-space LCA (educated trial-and-error). Article IV presents background on synthesis of image templates from reconstructed images. }\label{2_fig_article_relation}
 \end{figure}
 
 
@@ -69,9 +61,9 @@ Any wave, regardless of its nature, is governed by a partial differential equati
 %
 where $\nabla^2$ is the Laplace operator, $f$ is field strength and $c$ is wave propagation speed. In complex mediums $c$ may depend on signal strength (non-linear), position (non-homogeneous/refractive), angle (anisotropic), frequency (dispersive) or be non-real (lossy). Deep sea is acoustically non-homogeneous due to varying pressure, temperature and salinity, but has negligible dispersion and attenuation. Biological tissue are non-homogeneous, non-linear and lossy. We approximate both cases with (\ref{eq_wave_equation}), because data inaccuracies are inevitable and good for testing algorithmic robustness.
 
-If $f$ represents displacement of a vibrating string, (\ref{eq_wave_equation}) states that the force pulling the string towards equilibrium (right side) is proportional to the string's curvature (left side). In acoustics $f$ represents sound pressure, with SI unit Pascal [Pa = N/m$^2$] or logarithmic unit sound-pressure-level (SPL) [1\,Pa = 94\,$\mathrm{dB}_{\textrm{SPL}}$]. To generalize and simplify, we keep our equations free of physical units and simply think of $f$ as a signal: a unit-less scalar function with wave characteristics.
+If $f$ represents displacement of a vibrating string, (\ref{eq_wave_equation}) states that the force pulling the string towards equilibrium (right side) is proportional to the string's curvature (left side). In acoustics $f$ represents sound pressure, with SI unit Pascal [Pa = N/m$^2$] or logarithmic unit sound-pressure-level (SPL) [1\,Pa = 94\,$\mathrm{dB}_{\textrm{SPL}}$]. To generalize and simplify, we free our equations of physical units and simply think of $f$ as a signal: a unit-less scalar function with wave characteristics. Consequently, every presented image will be unit-less as well.
 
-The linear homogeneous wave equation has a few solutions of interest, in particular that of a plane and spherical wave. For a field emitted from source position $\udot{S}$ and observed from $m$th sensor position $\udot{m}$, the solutions are
+The linear homogeneous wave equation has a few solutions of interest, in particular that of a plane and spherical wave. For a field emitted from source position $\udot{S}$, observed from the $m$th sensor at position $\udot{m}$, the solutions are
 %
 \begin{align}
 f_\textrm{plane}(t,\vec{p}_{mS})  &= A e^{j(\omega t - \vec{k} \cdot \vec{p}_{mS})} \\
@@ -80,7 +72,7 @@ f_\textrm{spheric}(t,\vec{p}_{mS}) &= \frac{A}{\lVert \vec{p}_{mS} \rVert} e^{j(
 % 
 where $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVert\vec{k}\rVert=\frac{\omega}{c}=\frac{2\pi}{\lambda}$ is spatial wave frequency (wavenumber) and $\vec{p}_{mS}$ is position vector $\udot{m}$ to $\udot{S}$. We model the wavefield as superimposed plane waves under far-field conditions (when distance to the source is large relative to wavelength and array length) and as superimposed spherical waves under near-field conditions. 
 
-% One is that of plane wave and the other a  A signal source with the position $\udot{S}$ . We can represent the field observed at $\udot{A}$ as $f(\dvec{p}^A,t)$, where position is represented by $\dvec{p}^A=[x_A,y_A,z_A]^T\in\mathbb{R}^3$ and time by $t\in\mathbb{R}$,
+% One is that of plane wave and the other a  A signal source with the position $\udot{S}$ . We can represent the field observessd at $\udot{A}$ as $f(\dvec{p}^A,t)$, where position is represented by $\dvec{p}^A=[x_A,y_A,z_A]^T\in\mathbb{R}^3$ and time by $t\in\mathbb{R}$,
 % 
 % An introduction to such notation can be found in \chapref{IV_methods}{IV}.
 % 
@@ -102,8 +94,16 @@ where $A$ is amplitude, $\omega$ is temporal wave frequency, $t$ is time, $\lVer
 
 \section{Image reconstruction}\label{methods}
 
-Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers, stripped of its carrier frequency by heterodyning and its signal signature by matched filtering (Fig. \ref{2_fig_article_relation}). Further assume the sensors are linear, infinite bandwidth and invarant to shifts in position (homogeneous, inter-independent), direction (isotropic) and time. Image reconstruction coherently combines these receiver outputs to focus at an angle or point at a time. Configuring the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
+Consider an acoustic signal transmitted to highlight a surface of interest. Assume the backscattered wavefield is properly sampled using a uniform linear array (ULA) of receivers, stripped of its carrier frequency by heterodyning and its signal signature by matched filtering (\Fig{2_fig_article_relation}). Further assume the sensors are linear, infinite bandwidth and invarant to shifts in position (homogeneous, inter-independent), direction (isotropic) and time. Image reconstruction coherently combines these receiver outputs to focus at an angle or point at a time. Configuring the array's focus in range and direction is commonly referred to as beamforming, and involves assigning suitable delays and weights to the array's channels.
 
+\begin{figure}[!t]\centering
+\makebox[\linewidth][c]{%
+\graphicsAI[width=.7\linewidth]{gfx/geometry.svg}}
+\caption{
+An array with $M$ sensors has reference frame $\udot{A} \triangleq (\udot{A},\uvec{A})$ attached to it, where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation (\,$\hat{\cdot}$ denoting unit length). Impinging on the array at angle $\theta$ is a monochromatic plane wave: a single frequency wave from a source $\mathcal{S}$ far away relative to the wavelength and array length (far field). Notation details are presented in 
+}%
+\label{2_fig_geometry}
+\end{figure}
 
 \subsection{Beamforming}
 % \ifPhdDoc
@@ -141,19 +141,21 @@ Consider an acoustic signal transmitted to highlight a surface of interest. Assu
 \label{2_fig_scenario_lca}
 \end{figure}
 
-Let the array have $M$ sensors equally spaced at positions $\udot{0},\udot{1},\dots, \udot{m}, \dots, \udot{M{\!-\!1}}$ with reference frame $\ubar{A} \triangleq (\udot{A},\uvec{A})$ attached to its phase center (Figure \ref{2_fig_geometry}), where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\triangleq\big(\hat{x}_{A},\hat{y}_{A},\hat{z}_{A}\big)\in\mathbb{V}^3$ its absolute orientation ( $\hat{\cdot}$ denoting unit length). Data sample $n$ from channel $m$ delayed by $\Delta_m$ is written $x_m[n-\Delta_{m}, \vec{p}_{Am}]\in\mathbb{C}$. The delays (normalized by sampling frequency $f_s$) coarsely aligns signals from source $\udot{S}$,
+
+Let the array have $M$ sensors equally spaced at positions $\udot{0},\udot{1},\dots, \udot{m}, \dots, \udot{M{\!-\!1}}$ with reference frame $\ubar{A} \triangleq (\udot{A},\uvec{A})$ attached to its phase center (\Fig{2_fig_geometry}), where $\udot{A}\in\mathbb{A}$ is its absolute position and $\uvec{A}\in\mathbb{V}^3$ its absolute orientation. Data sample $n$ from channel $m$ delayed by $\Delta_m$ is written $x_m[n-\Delta_{m}, \vec{p}_{Am}]\in\mathbb{C}$. The delays (normalized by sampling frequency $f_s$) coarsely aligns signals from source $\udot{S}$,
 %
 \begin{align}
 \Delta_m[n] = \frac{\lVert \vec{p}_{mS}\rVert - \underset{m'}{\mathrm{min}}\ \lVert \vec{p}_{m'S}\rVert}{c\,f_s},\label{2_eq_delta}
 \end{align}
 %
-where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$. Subtracting the minimum distance is mathematically optional, but facilitates physical realization and low latency. Approximating delays with phase shifts is common in applications that are narrow band, narrow beam, or both~\cite{Johnson1993}. By assuming implicit dependence on $\vec{p}$ and data pre-delayed to the pixel of interest, we simplify notation to $x_m[n]\in\mathbb{C}$. Beamformer output $z[n]\in\mathbb{C}$ is, by definition, the weighted sum of delayed data samples,
+where both $\vec{p}_{mS}$ and $\vec{p}_{m'S}$ denote position vector $\udot{m}$ to $\udot{S}$. Subtracting the minimum distance is mathematically optional, but facilitates physical realization and low latency. Phase shifts can substitute delays in applications that are narrow band, narrow beam, or both~\cite{Johnson1993}. By assuming implicit dependence on $\vec{p}$ and data pre-delayed to the pixel of interest, we simplify notation to $x_m[n]\in\mathbb{C}$. Beamformer output $z[n]\in\mathbb{C}$ is, by definition, the weighted sum of delayed data samples,
 %
 \begin{align}
 z[n] = \dvec{w}^H[n]\dvec{x}[n] = \bmat{w_0[n]\\w_1[n]\\\vdots\\w_{M-1}[n]}^H \bmat{x_0[n]\\x_1[n]\\\vdots\\x_{M-1}[n]} \in\mathbb{C},\label{2_eq_z}
 \end{align}
 %
-where the weights are normalized and $w_m=\in\mathbb{C}$ is the weight factor assigned to channel $m$. The weights are normalized, $\dvec{w}^H\dvec{1}=1$, Spatial responses of the weights for an array steered to broadside are characterized by the beam pattern,
+where the weights are normalized and $w_m=\in\mathbb{C}$ is the weight factor assigned to channel $m$. %The weights are normalized, $\dvec{w}^H\dvec{1}=1$, \todo{???} 
+Spatial responses of the weights for an array steered to broadside are characterized by the beam pattern,
 %
 \begin{align}
 W(\vec{k}) = \sum_m^{M-1} w_m^* e^{j\vec k \cdot \vec{p}_{Am}},\label{2_eq_beam pattern}
@@ -163,7 +165,11 @@ W(\vec{k}) = \sum_m^{M-1} w_m^* e^{j\vec k \cdot \vec{p}_{Am}},\label{2_eq_beam 
 %
 where the start position $\udot{A}$ is arbitrary. Note how the beam pattern depends on both angle and frequency of the incoming wave. 
 
-The beamformer is called delay-and-sum (DAS) or conventional if the weights are static (temporally non-varying). Various weighting functions exist for trading lateral resolution for improved noise suppression (contrast), but a compromise between the two is unavoidable~\cite{Harris1978}. A class of adaptive beamformers target this limitation by adapting the weights to the dynamic impinging wavefield. One such technique is the minimum variance distortionless response (MVDR) or Capon beamformer, named after its maker for use in spectral estimation~\cite{Capon1969}. We discuss two versions of it termed by 
+The beamformer is called delay-and-sum (DAS) or conventional if the weights are static (temporally non-varying). Various weighting functions exist for trading lateral resolution for improved noise suppression (contrast), but a compromise between the two is unavoidable~\cite{Harris1978}. Adaptive beamformers target this limitation by adapting the weights, to spatial and temporal features of the dynamically impinging wavefield.
+
+The minimum variance distortionless response (MVDR) or Capon beamformer (named after its inventor for use in spectral estimation~\cite{Capon1969}), analytically yields array weights from a continuous solution space that are optimal in the minimum variance sense. Section \ref{sec_es_mvdr} describes its formulation in the temporal domain, used in 
+
+ %We discuss two versions of it termed by \todo{???}
 
 % Assume:
 % Known array characteristics (sensor locations, element patterns, ...
@@ -182,7 +188,7 @@ The beamformer is called delay-and-sum (DAS) or conventional if the weights are 
 % Array: Directivity, array gain vs spatially white noise, sensitivity or tolerance factor, 
 
 
-\subsection{Element-space MVDR}
+\subsection{Element-space MVDR}\label{sec_es_mvdr}
 
 %\begin{figure}[t]\centering%
 %\graphicsAI[drawing,width=1\linewidth]{gfx/implementation.svg}%
@@ -200,7 +206,7 @@ Element-space (time-domain) MVDR often improves image contrast and resolution co
 % \vec w[n] = \frac{\Ri[n]\1}{\1^T\Ri[n]\1},\label{2_eq_weights}
 \end{gather}
 %
-where $\dvec{a}$ is steering vector. Solving this convex optimization problem with Lagrange multipliers yields
+where $\dvec{a}$ is steering vector. We refer to it as fully adaptive because it  Solving this convex optimization problem with Lagrange multipliers yields
 %
 \begin{gather}
 \dvec w[n] = \frac{\Ri[n]\dvec{a}}{\dvec{a}^T\Ri[n]\dvec{a}}, \label{2_eq_weights}
@@ -208,17 +214,17 @@ where $\dvec{a}$ is steering vector. Solving this convex optimization problem wi
 %
 where $\dvec{a}=\dvec{1}$ is a row-vector of ones representing broadside phase-steering and $\R=E\{\dvec{x}[n]\dvec{x}^H[n]\}$ is the spatial covariance matrix for the full array. In the presence of zero-mean random Gaussian noise, these weights yield the maximum likelihood estimate of the signal and the maximum signal-to-interference-and-noise ratio (SINR). However, active systems or passive ones subjected to multipath or jamming, experience highly correlated noise, interference and signal~\cite{Widrow1982}. Limited amount of data, array miscalibration and model inaccuracies makes matters worse, sometimes resulting in performance inferior to DAS~\cite{Li2006robust}. 
 
-To make MVDR robust, it must avoid signal cancellation, preserve speckle statistics and ensure numerical and statistical robustness. Literature suggests estimating $\R$ with a sample covariance matrix $\eR$ using some degree of
+To make MVDR robust, it must avoid signal cancellation, preserve speckle statistics and ensure numerical and statistical robustness. The literature suggests estimating $\R$ with a sample covariance matrix $\eR$ using some degree of
 %
 \begin{itemize}
-\item \emph{Spatial smoothing}: Decorrelates coherent echoes to avoid signal cancellation, assuming regular arrays. We achieve this through subarray averaging~\cite{Kailath1985}, which trades off spatial resolution and makes the covariance matrix exhibit Toeplitz-like structure. Some studies construct inversion-friendly Toeplitz-matrices directly [TK87]. $\eR$ is guaranteed non-singular in cases with twice as many subarrays as signals [WPMS88,PK89]. 
+\item \emph{Spatial smoothing}: Decorrelates coherent echoes to avoid signal cancellation, assuming regular arrays. We achieve this through subarray averaging~\cite{Kailath1985,Johnson1993}, which trades off spatial resolution and makes the covariance matrix exhibit Toeplitz-like structure. Some studies construct inversion-friendly Toeplitz-matrices directly [TK87]. $\eR$ is guaranteed non-singular in cases with twice as many subarrays as signals [WPMS88,PK89]. 
 \item \emph{Temporal smoothing} over an interval comparable to the pulse length (one to five samples) to maintain true speckle statistics~\cite{Synnevag2009};
 \item \emph{Diagonal loading} to improve robustness to parameter errors~\cite{Cox1987,Maksym1979,VanTrees2002}.
 \end{itemize}%
 %
 These techniques ensure a numerically well conditioned $\eR$, allow reducing the computational complexity and expose enough data parallelism to facilitate GPU-acceleration. 
 
-
+\todo{???}
 Topeplitz [TK87] - choose wm to make the smoothed matrix close to Toeplitz. Topelitz weighting, adaptive spatial averaging in literature. [TK87]
 
 Formulation of the sample covariance matrix $\eR$ begins by splitting the array into subarrays of length $L$ that overlap on all but one sensor. If we let $x_l[n]$ represent the datavector from subarray $l$,
@@ -240,32 +246,32 @@ To summarize as in Figure \ref{mvdr_beamforming}: For every pixel in the image w
 
 
 
-\subsection{Beam-space MVDR}
+\subsection{Beam-space MVDR}\label{sec_bs_mvdr}
 
-Systems with narrow beams, narrow bands, or both, have most backscattered energy residing in center spatial frequencies. Zero-frequency maps to broadside, higher frequencies map to larger opening angles. Computing weighted combinations of such frequencies, similarly to doing so with elements, is referred to as beamspace or discrete Fourier-transform (DFT) beamforming. 
+Systems with narrow beams, narrow bands, or both, have most backscattered energy residing in center spatial frequencies. Zero-frequency maps to broadside, higher frequencies map to larger opening angles. Beamspace (discrete Fourier-transform, DFT) beamforming coherently combines such frequencies in a weighted manner, similarly to doing so with elements. 
 
 %,  Similarly to performing weighted sums of elements, we perform weighted sums of frequencies  Weighted sums of Performing weighted sum 
 
-In imaging sonar and ultrasound systems, the combined transmit and receive response is usually narrow enough to contain most energy in three or five center beams~\cite{Nilsen2009a,VanTrees2002}. Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. 
+In sonar and ultrasound imaging systems, the combined transmit and receive response is usually narrow enough to contain most energy in three or five center beams~\cite{Nilsen2009a,VanTrees2002}. Above 32 channels the inversion step becomes a greater computational bottleneck than covariance estimation. We mitigate this by applying space reduction in the spatial frequency-domain, or beamspace. 
 
 Beam-space MVDR resembles element-space MVDR, but demands an initial Fourier transformation of the data:
 %
 \begin{gather}
-\x_{\text{BS},l}[n] = \mat{B}\x_l[n], \qquad \mat{B}\in \mathbb{C}^{N_b,L},\label{2_eq_beamspace}
+\dvec{x}_{\text{BS},l}[n] = \mat{B}\dvec{x}_l[n], \qquad \mat{B}\in \mathbb{C}^{N_b,L},\label{2_eq_beamspace}
 \end{gather}
 %
 where $l$ is subarray index, $N_b$ is number of beams that should be computed and
 %
 \begin{gather}
-[\mat{B}]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}.\label{2_eq_butler}
+[\mat{B}]_{p,q} = \frac{1}{\sqrt{L}} e^{-j2\pi\,p\,q/L}\label{2_eq_butler}
 \end{gather}
 %
-is the Butler (or DFT) matrix~\cite{Butler1961}. Once $\x_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\w_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
+is the Butler (or DFT) matrix~\cite{Butler1961}. Once $\dvec{x}_{\text{BS},l}[n]$ is computed, $\eR_\text{BS}$ can be found as in (\ref{2_eq_spatialR}), $\dvec{w}_\text{BS}$ as in (\ref{2_eq_weights}), and $z$ as in (\ref{z}).
 
 Reducing $\eR_\text{BS}$ size from $L$ to $N_b$ reduce estimation to O($N_K N_L N_b^2$), and the inversion step to O($N_b^3$). The downside is the additional computations required by the frequency transform, which must be weighted up against the gain of reducing $N_b$.
 
 
-\subsection{LCA beamformer}
+\subsection{LCA beamformer}\label{sec_lca}
 
 The Low Complexity Adaptive (LCA) beamformer offers a different approach to the optimization problem in (\ref{2_eq_mvdr_def}). Instead of calculating weights like MVDR in (\ref{2_eq_weights}), it iterates through a set of precomputed weights and applies the one that best fulfils the optimization criterion. If $\w_p$ denotes the $p$'th out of $P$ weight sets, then LCA can be formulated as~\cite{Synnevag2008}:
 %
@@ -276,8 +282,7 @@ The Low Complexity Adaptive (LCA) beamformer offers a different approach to the 
 Note the similarity between (\ref{2_eq_mvdr_def}) and (\ref{2_eq_lca_def}). Both LCA and MVDR rely on the same optimization criterion, but whereas MVDR searches a continuous solution space for the optimal weights, LCA only have $P$ solutions to select from.
 
 
-
-\section{Image synthesis}
+\section{Image synthesis}\label{sec_image_synthesis}
 
 \subsection{Template matching}
  

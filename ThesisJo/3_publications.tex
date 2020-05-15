@@ -44,14 +44,16 @@
 %\quotesave{somequote}{
 %Some text Some other text Some other text Some other text Some other}
 
-We present four journal published papers concerned with \emph{adaptive} and \emph{hardware accelerated} formation of acoustic images: the first three \emph{reconstruct} images from echoes and the last \emph{synthesizes} through simulation.
+We present four journal published papers concerned with \emph{adaptive} and \emph{hardware accelerated} formation of acoustic imagery: the first three \emph{reconstruct} images from echoes and the last \emph{synthesizes} images through simulation.
 
+This chapter briefly describes the motivation, methods and results of each article. \Fig{3_fig_article_relation} (same as \Fig{2_fig_article_relation}) offers visual context.
 
-\begin{figure}[tp]\label{III_fig_article_relation}
+\begin{figure}[tp]
 \makebox[\linewidth][c]{%
 \graphicsAI[drawing,width=1.3\linewidth]{gfx/article_relation.svg}}
-\caption{Article relations (repost of Figure \ref{I_fig_article_relation} in chapter 1). The first three articles reconstructs images from acoustic echoes. The last article synthesizes image templates from 3D models and object parameters estimated from the reconstructed image. Accelerated adaptivity is key: it enables rapid dynamic responses to mission events. }
+\caption{Article relations (repost of Figure \ref{2_fig_article_relation}). The first three articles reconstructs images from acoustic echoes. The last article synthesizes image templates from 3D models and object parameters estimated from the reconstructed image. Accelerated adaptivity enables rapid dynamic responses to mission events. }\label{3_fig_article_relation}
 \end{figure}
+
 
 %
 %Common:
@@ -76,32 +78,53 @@ We present four journal published papers concerned with \emph{adaptive} and \emp
 % LCA: No particular need of acceleration
 % Sim: Needs acceleration
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\newpage
 \section{Paper I}\label{sec:paperI} %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Motivation
+% Methods
+% Results
+
 \textbf{An Optimized GPU implementation of the\\MVDR Beamformer for Active Sonar Imaging}~\cite{Buskenes2014}\\
 J.I. Buskenes, J.P. Åsen, C.-I.C. Nilsen and A. Austeng\\
 \textit{IEEE Jou\textbf{}rnal of Oceanic Engineering}\\
 Volume 40, Issue 2, April 2015
 
-\textit{In short}:
+\textit{Key results}
 \begin{enumerate}
 \item Accelerates the MVDR beamformer through algorithmic reductions and fine-tuning to a GPU, yielding a real-time solution.
 \item Demonstrates speeds exceeding 1\,Mpixel/s on systems with no more than 32 channels, two orders of magnitude faster than a semi-optimized C-implementation on a CPU.
-\item Offers rarely documented insights into hardware limitations, design implications and computational efficiency.
+\item Offers rarely documented insights into GPU hardware limitations, design implications and computational efficiency.
 \end{enumerate}
 
-This article accelerates element-space MVDR with GPUs for use in active sonar imaging. Element-space MVDR is the reference method for creating sonar images using minimum variance optimization, aimed at reducing noise and interference while preserving signal integrity. We refer to it as fully adaptive because it computes array weights analytically from spatial features in the data, yielding array weights from a continuous solution space that are optimal in the minimum variance sense. Like any data-driven algorithm, it requires statistically distinguishable signal and noise. However, in typical active systems, the signal is highly correlated with the noise and has poor temporal sample support. Therefore, in its unconstrained form, MVDR overfits the data, yields high variance and fails to generate representative images.
+%Element-space MVDR beamforming on GPUs in active sonar imaging
+
+Element-space MVDR is often considered a reference method for creating sonar images using minimum variance optimization, aimed at reducing noise and interference while preserving signal integrity. Unfortunately, its computational complexity is high because a spatial covariance matrix must be estimated and inverted for each image pixel. This discourages its use in sonar systems aiming at longer ranges, higher resolutions and real-time performance---all competing for the same computational resources. 
 
 We relax MVDR through a combination of temporal and spatial averaging, and regularization. This makes it robust and produces images with slightly more details and less noise than delay-and-sum. The resulting solution space is still continuous, but more tightly bound.
 
-We find that implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage.
+Implementing MVDR on GPUs instead of CPUs accelerates it by two orders of magnitude, but requires considerable and delicate efforts to reduce arithmetic operations and fine-tune cache usage.
+
+The design is limited to 32 channels, due to data dependencies that are complicated and not inherently parallel at the sub-pixel level, combined with the relatively limited bandwidth of this hardware architecture. 
 
 Processing of pixels are independent of one another, but processing
 At the pixel level Data-parallelism Pixels are processed independently, 
 
 
-The design is limited to 32 channels, due to data dependencies that are complicated and not inherently parallel at the sub-pixel level, combined with the relatively limited bandwidth of this hardware architecture. 
+In this study we show that for active sonar systems up to 32 channels, the computation time
+can be significantly reduced by performing arithmetic optimizations, and by implementing
+the MVDR beamformer on a graphics processing unit (GPU). We point out important
+hardware limitations for these devices, and assess the design in terms of how efficiently it is
+able to use the GPU’s resources. On a quad-core Intel Xeon system with a high-end Nvidia
+GPU, our GPU implementation renders more than a million pixels per second (1 MP/s).
+Compared to our initial central processing unit (CPU) implementation the optimizations
+described herein led to a speedup of more than two orders of magnitude, or an expected
+five to ten times improvement had the CPU received similar optimization effort. This
+throughput enables real-time processing of sonar data, and makes the MVDR a viable
+alternative to conventional methods in practical systems.
+
 
 %Time-domain MVDR is the reference method for creating sonar images using the minimum variance criterion. It computes array weights analytically, yielding optimal weights in the minimum variance sense. Initially, this may seem ideal, but its use is cumbersome: parameters for temporal averaging, spatial averaging and regularization must often be fine-tuned ad-hoc to obtain improved image quality. GPU acceleration mitigates the high computational complexity resulting from estimating and inverting a spatial covariance matrix, yielding real-time performance.
 
@@ -138,6 +161,8 @@ J.P. Åsen, J.I. Buskenes, C.-I.C. Nilsen, A. Austeng and S. Holm\\
 \textit{IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control}\\
 Volume 61, Issue 1, January 2015
 
+Beam-space MVDR beamforming on GPUs in clinical ultrasound imaging
+
 \textit{In short}:
 \begin{enumerate}
 \item Alters the implementation in Paper I to operate in beam-space (frequency domain), reduced to its three center beams (the most significant ones).
@@ -165,6 +190,8 @@ J.I. Buskenes, R.E. Hansen and A. Austeng\\
 \textit{IEEE Journal of Oceanic Engineering}\\
 Volume 42, Issue 1, January 2017
 
+LCA beamforming versus MVDR in active sonar imaging
+
 \textit{In short}:
 \begin{enumerate}
 \item Shows that LCA beamformer performs similarly to MVDR with only 6 weight sets to choose from: The rectangular and Kaiser function with $\beta=6$, steered to $\phi\in[0,\pm\frac{1}{2}\delta{\phi_{-3dB}}]$, where $\delta{\phi_{-3dB}}$ is the $-3$\,dB bandwidth of the amplitude response to the weight set.
@@ -188,11 +215,13 @@ J.I. Buskenes, H. Midelfart\\
 Submitted DD.MM.2019%\\\\
 %Volume 42, Issue 1, January 2017
 
+Real-time sonar image synthesis on GPUs for automatic target recognition
+
 \textit{In short}:
 \begin{enumerate}
 \item Implements a SAS simulator on GPU that allows AUVs to compare its images on-the-fly to vast numbers of objects and configurations, yielding superior classification results and real-time responses.
 \item Extends a navigational notation system with topological ideas from robotics and homogeneous coordinates, promoting geometrical clarity and validity while aiding the designer to focus on higher level concepts, such as manipulating rigid objects.
-\item Demonstrates superior classification accuracy on experimental data of a few thousand objects from Jesus Bay, Norway, at false positive rates (FPR) below 20, similar %, and tied with it above. 
+\item Demonstrates superior classification accuracy on experimental data of a few thousand objects from Jesus Bay, Norway, at false positive rates (FPR) below 20, similar\todo{???} %, and tied with it above. 
 \end{enumerate}
 
 This article describes an acoustic simulator for SAS, implemented on GPUs using OpenGL and OpenCL. It enables AUVs to compare its images on-the-fly to simulations of various known objects, for more responsive, accurate and flexible automatic target recognition (ATR).

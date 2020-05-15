@@ -16,9 +16,6 @@
 \newcommand\supcarry[1]{{\color{cPoint}#1}}
 \newcommand\subcarry[1]{{\color{cBasis}#1}}
 
-
-
-
 %\newcommand{\tikzmark}[1]{\tikz[remember picture]\coordinate(#1){(-.35em,-.545ex)};}
 \providecommand\tikzmark{}\renewcommand{\tikzmark}[2]{\tikz[remember picture,baseline=(#1.base)]\node[shape=rectangle,inner sep=0pt](#1){#2};}
 %\newcommand{\tikzmark}[2][]{\tikz[remember picture,overlay]\coordinate[#1](#2);}
@@ -376,8 +373,10 @@
 %\newcommand*\h{^H}
 \typeout{====Start of macro file====}
 
+\ifPhdDoc\else
 \providecommand\Fig{}
 \renewcommand\Fig[1]{Fig.~\ref{#1}}
+\fi
 \providecommand\Tab{}
 \renewcommand\Tab[1]{Table~\ref{#1}}
 \providecommand\eq{}
